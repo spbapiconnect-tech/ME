@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Layers3, LayoutDashboard, PanelTopClose, Sparkles } from "lucide-react";
+import { Layers3, LayoutDashboard, LayoutTemplate, PanelTopClose, Sparkles } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -158,10 +158,16 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
                   <h2 className="shell-title">{messages.common.moduleCenter}</h2>
                   <p className="shell-copy">{messages.common.enabledCoreModules}</p>
                 </div>
-                <Link className="shell-link-button" href="/modules">
-                  <Layers3 size={16} />
-                  <span>{messages.common.openModuleCenter}</span>
-                </Link>
+                <div className="template-link-row">
+                  <Link className="shell-link-button" href="/modules">
+                    <Layers3 size={16} />
+                    <span>{messages.common.openModuleCenter}</span>
+                  </Link>
+                  <Link className="shell-link-button" href="/templates">
+                    <LayoutTemplate size={16} />
+                    <span>{messages.common.openTemplates}</span>
+                  </Link>
+                </div>
               </div>
 
               <ModuleGrid

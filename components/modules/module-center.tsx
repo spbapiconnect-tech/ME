@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Layers3, LayoutDashboard, Workflow } from "lucide-react";
+import { Layers3, LayoutDashboard, LayoutTemplate, Workflow } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { ModuleGrid } from "@/components/modules/module-grid";
@@ -112,10 +112,16 @@ export function ModuleCenter({ modules }: ModuleCenterProps) {
                 <p className="hero-subtitle">{messages.common.moduleCenterSummary}</p>
                 <p className="hero-subtitle-zh">{messages.common.enabledCoreModules}</p>
               </div>
-              <Link className="shell-link-button" href="/">
-                <LayoutDashboard size={16} />
-                <span>{messages.common.backToDashboard}</span>
-              </Link>
+              <div className="template-link-row">
+                <Link className="shell-link-button" href="/">
+                  <LayoutDashboard size={16} />
+                  <span>{messages.common.backToDashboard}</span>
+                </Link>
+                <Link className="shell-link-button" href="/templates">
+                  <LayoutTemplate size={16} />
+                  <span>{messages.common.openTemplates}</span>
+                </Link>
+              </div>
             </div>
           </section>
 

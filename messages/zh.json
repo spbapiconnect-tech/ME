@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME 当前将模块注册基础升级为结构化 Module Center，让模块元数据、上线计划与分类分组都统一由配置驱动。",
-    "milestone": "v0.2.1 Module Registry"
+    "description": "ME 当前新增 schema-driven 页面模板系统，让未来模块页面可以复用统一的 Dashboard、Listing、Detail、Issue、Form、Report 与 Settings 结构。",
+    "milestone": "v0.3.0 Page Templates"
   },
   "common": {
     "theme": "主题",
@@ -43,7 +43,8 @@
     "permissionCount": "权限数量",
     "apiScopeCount": "API 范围数量",
     "ownerRole": "负责角色",
-    "sourceMapping": "来源映射"
+    "sourceMapping": "来源映射",
+    "openTemplates": "打开页面模板"
   },
   "themes": {
     "bright": "Bright",
