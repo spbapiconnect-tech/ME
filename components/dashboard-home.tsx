@@ -183,6 +183,10 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
                     <Blocks size={16} />
                     <span>{messages.common.openComponents}</span>
                   </Link>
+                  <Link className="shell-link-button" href="/action-contracts">
+                    <Sparkles size={16} />
+                    <span>{messages.common.openActionContracts}</span>
+                  </Link>
                 </div>
               </div>
 

@@ -67,3 +67,13 @@
 - Demo routes should use the service layer as the single data entry point.
 - Mock repositories remain the only data source; no real API/database exists.
 - Demo UI should keep mock-data notices visible and avoid direct `data/demo` imports in page/components.
+
+## Action Source Mapping / Button Contract Foundation (v0.6.2)
+
+- Route: `/action-contracts` (metadata-only contract and registry explorer).
+- Registry: `config/actions/`.
+- Contract types: `types/action-contract.ts`.
+- Helpers: `lib/actions.ts`.
+- Reusable UI: `components/actions/` (ActionButton + debug cards).
+- No real permission enforcement, audit logging, workflow execution, task creation, API/database integration, or persistence.
+- Source mapping keys should remain stable even when layout/skin foundations change.

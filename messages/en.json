@@ -46,6 +46,7 @@
     "sourceMapping": "Source Mapping",
     "openTemplates": "Open Page Templates",
     "openComponents": "Open Core Components",
+    "openActionContracts": "Open Action Contracts",
     "openDemo": "Open Demo Workspace",
     "prototypeDemo": "Prototype Demo",
     "mockDataOnly": "Mock Data Only",

@@ -147,3 +147,13 @@ Use Conventional Commits.
 - When updating UI pages, route-level components should read data via `lib/services/*` (or `lib/page-data/*`) instead of importing `data/*`.
 - Keep repository provider in mock mode until an API-backed repository is ready.
 - Do not add Next.js API routes, fetch/axios, or database code during this milestone.
+
+## Action Source Mapping / Button Contract Foundation (v0.6.2)
+
+- Route: `/action-contracts` (metadata-only contract and registry explorer).
+- Registry: `config/actions/`.
+- Contract types: `types/action-contract.ts`.
+- Helpers: `lib/actions.ts`.
+- Reusable UI: `components/actions/` (ActionButton + debug cards).
+- No real permission enforcement, audit logging, workflow execution, task creation, API/database integration, or persistence.
+- Source mapping keys should remain stable even when layout/skin foundations change.

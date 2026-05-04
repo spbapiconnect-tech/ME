@@ -46,6 +46,7 @@
     "sourceMapping": "来源映射",
     "openTemplates": "打开页面模板",
     "openComponents": "打开核心组件",
+    "openActionContracts": "打开 Action Contracts",
     "openDemo": "打开 Demo Workspace",
     "prototypeDemo": "Prototype Demo",
     "mockDataOnly": "仅使用 Mock Data",

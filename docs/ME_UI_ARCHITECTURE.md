@@ -121,3 +121,13 @@
 - Pages can resolve `DataResult` on the server and pass plain data into client components.
 - UI components should not import raw mock data modules (`data/demo`, `data/tasks`) for new work.
 - Repository provider stays mock for now; no real API/database/persistence is implemented yet.
+
+## Action Source Mapping / Button Contract Foundation (v0.6.2)
+
+- Route: `/action-contracts` (metadata-only contract and registry explorer).
+- Registry: `config/actions/`.
+- Contract types: `types/action-contract.ts`.
+- Helpers: `lib/actions.ts`.
+- Reusable UI: `components/actions/` (ActionButton + debug cards).
+- No real permission enforcement, audit logging, workflow execution, task creation, API/database integration, or persistence.
+- Source mapping keys should remain stable even when layout/skin foundations change.

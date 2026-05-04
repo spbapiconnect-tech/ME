@@ -162,3 +162,13 @@ This section defines future intelligence directions for ME only.
 - Repository provider defaults to mock mode.
 - This is a foundation-only boundary; no real procurement/supplier/inventory runtime implementation is included.
 - Layout Engine remains data-source agnostic.
+
+## Action Source Mapping / Button Contract Foundation (v0.6.2)
+
+- Route: `/action-contracts` (metadata-only contract and registry explorer).
+- Registry: `config/actions/`.
+- Contract types: `types/action-contract.ts`.
+- Helpers: `lib/actions.ts`.
+- Reusable UI: `components/actions/` (ActionButton + debug cards).
+- No real permission enforcement, audit logging, workflow execution, task creation, API/database integration, or persistence.
+- Source mapping keys should remain stable even when layout/skin foundations change.

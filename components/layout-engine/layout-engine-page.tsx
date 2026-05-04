@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, LayoutTemplate, ListTodo, Workflow } from "lucide-react";
+import { Blocks, LayoutTemplate, ListTodo, Sparkles, Workflow } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { MockDataNotice } from "@/components/demo/mock-data-notice";
@@ -29,6 +29,7 @@ const copy = {
     components: "Open Core Components",
     demo: "Open Demo Workspace",
     tasks: "Open Task Engine",
+    actionContracts: "Open Action Contracts",
     controls: "Foundation Controls",
     registry: "Layout And Skin Registries",
     display: "Display Model Preview",
@@ -41,6 +42,7 @@ const copy = {
     components: "打开核心组件",
     demo: "打开 Demo Workspace",
     tasks: "打开 Task Engine",
+    actionContracts: "打开 Action Contracts",
     controls: "基础控制台",
     registry: "布局与皮肤注册表",
     display: "显示模型预览",
@@ -124,6 +126,10 @@ export function LayoutEnginePage() {
                 <Link className="shell-link-button" href="/tasks">
                   <ListTodo size={16} />
                   <span>{currentCopy.tasks}</span>
+                </Link>
+                <Link className="shell-link-button" href="/action-contracts">
+                  <Sparkles size={16} />
+                  <span>{currentCopy.actionContracts}</span>
                 </Link>
               </div>
             </div>
