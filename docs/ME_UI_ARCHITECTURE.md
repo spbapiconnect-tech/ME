@@ -8,6 +8,7 @@
 4. `messages/`: English and Chinese message catalogs
 5. `types/`: platform contracts for modules, page schema, permissions, and source mapping
 6. `stores/`: lightweight client preferences for theme and language
+7. `lib/`: registry helper utilities for filtering, grouping, and stats
 
 ## Key Principles
 
@@ -34,3 +35,13 @@
 - Rule: module list must come from `config/modules.ts`
 - Rule: theme colors must come from CSS variables
 - Rule: bilingual layout must avoid English overflow
+
+## Module Registry Milestone
+
+- The module registry is the single source of truth for module metadata
+- Module Center reads from `config/modules.ts`
+- Future modules are registered but not implemented
+- No real module business logic is included yet
+- Dashboard shows enabled/core modules only
+- Module Center can display all modules by category and status
+- Future module additions should happen by config first, not by hardcoding pages

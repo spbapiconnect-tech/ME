@@ -3,19 +3,23 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "The first Core Shell foundation for ME focuses on themes, bilingual UX, responsive shells, and a typed module registry without any real business logic.",
-    "milestone": "v0.0.1 Project Setup -> v0.1.0 Theme System"
+    "description": "ME now upgrades the registry foundation into a structured Module Center that keeps metadata, rollout planning, and module grouping in one configurable source of truth.",
+    "milestone": "v0.2.1 Module Registry"
   },
   "common": {
     "theme": "Theme",
     "language": "Language",
     "currentTheme": "Current Theme",
     "moduleCenter": "Module Center",
+    "moduleRegistry": "Module Registry",
+    "moduleCenterSummary": "A structured registry foundation for ME modules, grouped by category, plan, and rollout status.",
+    "moduleCenterDescription": "Module Center reads directly from config/modules.ts and exposes both current and future registry entries.",
     "supportedThemes": "Supported Themes",
     "placeholderRoutes": "Placeholder Routes",
     "permissions": "Permissions",
     "category": "Category",
     "status": "Status",
+    "plan": "Plan",
     "foundationStatus": "Foundation Status",
     "currentViewport": "Current Viewport",
     "activeLanguage": "Active Language",
@@ -23,7 +27,23 @@
     "noBusinessLogic": "No real business logic, database, or external connectors are implemented in this milestone.",
     "dashboardReady": "Dashboard shell is ready for future modules.",
     "responsiveReady": "Responsive shell patterns are in place.",
-    "bilingualReady": "English and Chinese labels share the same layout system."
+    "bilingualReady": "English and Chinese labels share the same layout system.",
+    "totalModules": "Total Modules",
+    "enabledModules": "Enabled Modules",
+    "comingSoonModules": "Coming Soon",
+    "betaModules": "Beta Modules",
+    "disabledModules": "Disabled Modules",
+    "openModuleCenter": "Open Module Center",
+    "backToDashboard": "Back To Dashboard",
+    "allModules": "All Modules",
+    "allRegisteredModules": "All modules are registered from config.",
+    "enabledCoreModules": "Dashboard shows enabled core and control modules only, while Module Center shows the full registry.",
+    "moduleCategoryGroups": "Module Category Groups",
+    "routeCount": "Route Count",
+    "permissionCount": "Permission Count",
+    "apiScopeCount": "API Scope Count",
+    "ownerRole": "Owner Role",
+    "sourceMapping": "Source Mapping"
   },
   "themes": {
     "bright": "Bright",
@@ -37,7 +57,14 @@
   "status": {
     "enabled": "Enabled",
     "disabled": "Disabled",
-    "coming-soon": "Coming Soon"
+    "coming-soon": "Coming Soon",
+    "beta": "Beta"
+  },
+  "plan": {
+    "starter": "Starter",
+    "ops": "Ops",
+    "pro": "Pro",
+    "enterprise": "Enterprise"
   },
   "category": {
     "core": "Core",
@@ -77,6 +104,66 @@
     "task": {
       "name": "Task",
       "shortName": "Task"
+    },
+    "approval": {
+      "name": "Approval Center",
+      "shortName": "Approval"
+    },
+    "message": {
+      "name": "Message Center",
+      "shortName": "Messages"
+    },
+    "api-center": {
+      "name": "API Center",
+      "shortName": "API"
+    },
+    "automation-center": {
+      "name": "Automation Center",
+      "shortName": "Automation"
+    },
+    "rule-center": {
+      "name": "Rule Center",
+      "shortName": "Rules"
+    },
+    "formula-center": {
+      "name": "Formula Center",
+      "shortName": "Formula"
+    },
+    "report-builder": {
+      "name": "Report Builder",
+      "shortName": "Builder"
+    },
+    "ai-assistant": {
+      "name": "AI Assistant",
+      "shortName": "Assistant"
+    },
+    "branch-overview": {
+      "name": "Branch Overview",
+      "shortName": "Branch"
+    },
+    "inspection": {
+      "name": "Inspection",
+      "shortName": "Inspect"
+    },
+    "scheduling": {
+      "name": "Scheduling",
+      "shortName": "Schedule"
+    },
+    "staff": {
+      "name": "Staff",
+      "shortName": "Staff"
+    },
+    "crm": {
+      "name": "CRM",
+      "shortName": "CRM"
+    },
+    "erp-integration": {
+      "name": "ERP Integration",
+      "shortName": "ERP"
+    },
+    "advanced-wms": {
+      "name": "Advanced WMS",
+      "shortName": "WMS"
     }
   }
 }

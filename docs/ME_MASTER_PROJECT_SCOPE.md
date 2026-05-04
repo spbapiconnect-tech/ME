@@ -29,6 +29,16 @@ The current milestone does not include real business logic or production integra
 - No workflow, automation, rules, or formula engine
 - No real external API connectors
 
+## Module Registry Milestone
+
+- The module registry is the single source of truth for module metadata
+- Module Center reads directly from `config/modules.ts`
+- Future modules are registered but not implemented
+- No real module business logic is included yet
+- Dashboard shows enabled/core modules only
+- Module Center can display all modules by category and status
+- Future module additions should happen by config first, not by hardcoding pages
+
 ## ME Brain Layer / AI Intelligence Roadmap
 
 This section defines future intelligence directions for ME only.
@@ -62,5 +72,5 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.0.1 Project Setup -> v0.1.0 Theme System`
+- Current milestone: `v0.2.1 Module Registry`
 - Delivery goal: establish a scalable shell for future ME modules without rework-heavy hardcoding

@@ -1,12 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { Layers3, LayoutDashboard, PanelTopClose, Sparkles } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { ModuleCard } from "@/components/module-card";
+import { ModuleGrid } from "@/components/modules/module-grid";
 import { ResponsiveShell } from "@/components/shell/responsive-shell";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { getEnabledModules, getModuleStats } from "@/lib/modules";
 import enMessages from "@/messages/en.json";
 import zhMessages from "@/messages/zh.json";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
@@ -69,6 +71,14 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
   const currentTheme: ThemeMode = hydrated ? theme : "bright";
   const messages = catalogs[currentLocale];
 
+  const dashboardModules = useMemo(
+    () => getEnabledModules(modules)
+      .filter((module) => module.category === "core" || module.category === "control")
+      .slice(0, 6),
+    [modules],
+  );
+  const registryStats = useMemo(() => getModuleStats(modules), [modules]);
+
   return (
     <main className="main-frame">
       <div className="dashboard-shell">
@@ -100,16 +110,16 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
 
               <div className="hero-stats">
                 <div className="hero-stat">
-                  <strong>{modules.length}</strong>
-                  <span>{messages.common.moduleCenter}</span>
+                  <strong>{registryStats.total}</strong>
+                  <span>{messages.common.totalModules}</span>
                 </div>
                 <div className="hero-stat">
-                  <strong>3</strong>
-                  <span>{messages.common.supportedThemes}</span>
+                  <strong>{registryStats.enabled}</strong>
+                  <span>{messages.common.enabledModules}</span>
                 </div>
                 <div className="hero-stat">
-                  <strong>2</strong>
-                  <span>{messages.common.activeLanguage}</span>
+                  <strong>{registryStats.comingSoon}</strong>
+                  <span>{messages.common.comingSoonModules}</span>
                 </div>
               </div>
             </section>
@@ -146,33 +156,32 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
               <div className="panel-header">
                 <div>
                   <h2 className="shell-title">{messages.common.moduleCenter}</h2>
-                  <p className="shell-copy">{messages.common.bilingualReady}</p>
+                  <p className="shell-copy">{messages.common.enabledCoreModules}</p>
                 </div>
-                <span className="locale-chip">
+                <Link className="shell-link-button" href="/modules">
                   <Layers3 size={16} />
-                  {messages.common.dashboardReady}
-                </span>
+                  <span>{messages.common.openModuleCenter}</span>
+                </Link>
               </div>
 
-              <div className="modules-grid">
-                {modules.map((module) => (
-                  <ModuleCard
-                    key={module.code}
-                    locale={currentLocale}
-                    module={module}
-                    labels={{
-                      category: messages.common.category,
-                      status: messages.common.status,
-                      placeholderRoutes: messages.common.placeholderRoutes,
-                      permissions: messages.common.permissions,
-                      supportedThemes: messages.common.supportedThemes,
-                      statusMap: messages.status,
-                      categoryMap: messages.category,
-                      themeMap: messages.themes,
-                    }}
-                  />
-                ))}
-              </div>
+              <ModuleGrid
+                modules={dashboardModules}
+                locale={currentLocale}
+                variant="compact"
+                labels={{
+                  category: messages.common.category,
+                  status: messages.common.status,
+                  plan: messages.common.plan,
+                  routeCount: messages.common.routeCount,
+                  permissionCount: messages.common.permissionCount,
+                  apiScopeCount: messages.common.apiScopeCount,
+                  ownerRole: messages.common.ownerRole,
+                  sourceMapping: messages.common.sourceMapping,
+                  statusMap: messages.status,
+                  categoryMap: messages.category,
+                  planMap: messages.plan,
+                }}
+              />
             </section>
 
             <section className="info-grid">

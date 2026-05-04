@@ -3,19 +3,23 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME 的第一阶段只交付 Core Shell 基础层，聚焦主题系统、双语体验、响应式骨架与类型化模块注册，不接入任何真实业务逻辑。",
-    "milestone": "v0.0.1 Project Setup -> v0.1.0 Theme System"
+    "description": "ME 当前将模块注册基础升级为结构化 Module Center，让模块元数据、上线计划与分类分组都统一由配置驱动。",
+    "milestone": "v0.2.1 Module Registry"
   },
   "common": {
     "theme": "主题",
     "language": "语言",
     "currentTheme": "当前主题",
     "moduleCenter": "模块中心",
+    "moduleRegistry": "模块注册中心",
+    "moduleCenterSummary": "按分类、计划与上线状态组织的 ME 模块注册基础层。",
+    "moduleCenterDescription": "模块中心直接读取 config/modules.ts，展示当前与未来的注册模块。",
     "supportedThemes": "支持主题",
     "placeholderRoutes": "占位路由",
     "permissions": "权限",
     "category": "分类",
     "status": "状态",
+    "plan": "计划",
     "foundationStatus": "基础状态",
     "currentViewport": "当前视图",
     "activeLanguage": "当前语言",
@@ -23,7 +27,23 @@
     "noBusinessLogic": "当前里程碑不包含真实业务逻辑、数据库或外部连接器。",
     "dashboardReady": "Dashboard 骨架已为后续模块扩展做好准备。",
     "responsiveReady": "三端响应式 Shell 模式已准备完成。",
-    "bilingualReady": "中文与 English 共用同一套稳定布局。"
+    "bilingualReady": "中文与 English 共用同一套稳定布局。",
+    "totalModules": "模块总数",
+    "enabledModules": "已启用模块",
+    "comingSoonModules": "即将上线",
+    "betaModules": "Beta 模块",
+    "disabledModules": "停用模块",
+    "openModuleCenter": "打开模块中心",
+    "backToDashboard": "返回 Dashboard",
+    "allModules": "全部模块",
+    "allRegisteredModules": "所有模块都从配置注册并展示。",
+    "enabledCoreModules": "Dashboard 仅展示已启用的核心与控制模块，模块中心展示完整注册表。",
+    "moduleCategoryGroups": "模块分类分组",
+    "routeCount": "路由数量",
+    "permissionCount": "权限数量",
+    "apiScopeCount": "API 范围数量",
+    "ownerRole": "负责角色",
+    "sourceMapping": "来源映射"
   },
   "themes": {
     "bright": "Bright",
@@ -37,7 +57,14 @@
   "status": {
     "enabled": "启用",
     "disabled": "停用",
-    "coming-soon": "即将上线"
+    "coming-soon": "即将上线",
+    "beta": "Beta"
+  },
+  "plan": {
+    "starter": "Starter",
+    "ops": "Ops",
+    "pro": "Pro",
+    "enterprise": "Enterprise"
   },
   "category": {
     "core": "核心",
@@ -77,6 +104,66 @@
     "task": {
       "name": "任务",
       "shortName": "任务"
+    },
+    "approval": {
+      "name": "审批中心",
+      "shortName": "审批"
+    },
+    "message": {
+      "name": "消息中心",
+      "shortName": "消息"
+    },
+    "api-center": {
+      "name": "API 中心",
+      "shortName": "API"
+    },
+    "automation-center": {
+      "name": "自动化中心",
+      "shortName": "自动化"
+    },
+    "rule-center": {
+      "name": "规则中心",
+      "shortName": "规则"
+    },
+    "formula-center": {
+      "name": "公式中心",
+      "shortName": "公式"
+    },
+    "report-builder": {
+      "name": "报表构建器",
+      "shortName": "构建器"
+    },
+    "ai-assistant": {
+      "name": "AI 助手",
+      "shortName": "助手"
+    },
+    "branch-overview": {
+      "name": "门店总览",
+      "shortName": "总览"
+    },
+    "inspection": {
+      "name": "巡检",
+      "shortName": "巡检"
+    },
+    "scheduling": {
+      "name": "排班",
+      "shortName": "排班"
+    },
+    "staff": {
+      "name": "员工",
+      "shortName": "员工"
+    },
+    "crm": {
+      "name": "客户关系",
+      "shortName": "客户"
+    },
+    "erp-integration": {
+      "name": "ERP 集成",
+      "shortName": "ERP"
+    },
+    "advanced-wms": {
+      "name": "高级仓储",
+      "shortName": "WMS"
     }
   }
 }

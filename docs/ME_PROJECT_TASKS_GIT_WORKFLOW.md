@@ -36,3 +36,13 @@ Use Conventional Commits.
 - Module cards still read from `config/modules.ts`
 - No hardcoded component colors bypass CSS variables
 - No real business logic or connectors were introduced
+
+## Module Registry Milestone
+
+- The module registry is the single source of truth for module metadata
+- Module Center reads from `config/modules.ts`
+- Future modules are registered but not implemented
+- No real module business logic is included yet
+- Dashboard shows enabled/core modules only
+- Module Center can display all modules by category and status
+- Future module additions should happen by config first, not by hardcoding pages

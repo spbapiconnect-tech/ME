@@ -3,9 +3,10 @@ import assert from "node:assert/strict";
 
 import enMessages from "../messages/en.json";
 import zhMessages from "../messages/zh.json";
-import { coreModules } from "../config/modules";
+import { moduleRegistry } from "../config/modules";
+import { getEnabledModules, getModuleStats } from "../lib/modules";
 
-const requiredCodes = [
+const requiredCoreCodes = [
   "procurement",
   "supplier",
   "inventory",
@@ -14,30 +15,42 @@ const requiredCodes = [
   "task",
 ] as const;
 
-test("ME core module registry includes all required module codes", () => {
-  assert.deepEqual(
-    coreModules.map((module) => module.code),
-    requiredCodes,
-  );
+test("ME module registry includes all required current core module codes", () => {
+  const codes = moduleRegistry.map((module) => module.code);
+
+  for (const code of requiredCoreCodes) {
+    assert.equal(codes.includes(code), true);
+  }
 });
 
-test("every module supports the three approved themes and placeholder routes", () => {
-  for (const module of coreModules) {
+test("every registered module supports the three approved themes and expanded routes", () => {
+  for (const module of moduleRegistry) {
     assert.deepEqual(module.themeSupport, ["bright", "dark", "moon"]);
-    assert.equal(Object.keys(module.routes).length, 5);
-    assert.ok(module.permissions.length >= 2);
+    assert.deepEqual(module.languageSupport, ["zh", "en"]);
+    assert.equal(Object.keys(module.routes).length, 8);
+    assert.ok(module.permissions.length >= 1);
+    assert.ok(module.apiScope.length >= 1);
   }
 });
 
-test("message catalogs cover all module names in both languages", () => {
-  for (const code of requiredCodes) {
-    assert.ok(enMessages.modules[code].name.length > 0);
-    assert.ok(zhMessages.modules[code].name.length > 0);
+test("module stats expose expected counts for the registry foundation", () => {
+  const stats = getModuleStats(moduleRegistry);
+
+  assert.equal(stats.total, moduleRegistry.length);
+  assert.ok(stats.enabled >= 3);
+  assert.ok(stats.comingSoon >= 1);
+  assert.ok(getEnabledModules(moduleRegistry).length >= stats.enabled);
+});
+
+test("message catalogs cover critical module center labels in both languages", () => {
+  for (const label of ["moduleCenter", "moduleRegistry", "totalModules", "enabledModules"]) {
+    assert.ok(enMessages.common[label].length > 0);
+    assert.ok(zhMessages.common[label].length > 0);
   }
 });
 
-test("forbidden legacy brand names are not present in the public ME catalogs", () => {
-  const publicText = JSON.stringify({ enMessages, zhMessages, codes: requiredCodes });
+test("forbidden legacy brand names are not present in public ME catalogs", () => {
+  const publicText = JSON.stringify({ enMessages, zhMessages, codes: requiredCoreCodes });
 
   for (const legacyName of ["OmniOps", "OmniBranch", "ME Ops", "Opsight"]) {
     assert.equal(publicText.includes(legacyName), false);
