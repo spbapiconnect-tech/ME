@@ -131,3 +131,14 @@
 - Reusable UI: `components/actions/` (ActionButton + debug cards).
 - No real permission enforcement, audit logging, workflow execution, task creation, API/database integration, or persistence.
 - Source mapping keys should remain stable even when layout/skin foundations change.
+
+## Access Control Metadata Foundation (v0.6.3)
+
+- Route: `/access-control`.
+- Access metadata registries are defined under `config/access/`.
+- Access contract types are defined under `types/access-control.ts`.
+- Access helper functions are implemented in `lib/access.ts`.
+- Access preview components live under `components/access/`.
+- This milestone is metadata-only and preview-only.
+- No real authentication, authorization enforcement, middleware, API, or database integration is connected.
+- Action source mapping can connect to access preview metadata without changing runtime behavior.

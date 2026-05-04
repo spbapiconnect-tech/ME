@@ -3,6 +3,7 @@ import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getActionExecutionPreview, resolveActionDescription, resolveActionLabel } from "@/lib/actions"
+import { getActionAccessPreview } from "@/lib/access"
 import type { ActionContract } from "@/types/action-contract"
 import type { SupportedLocale } from "@/types/module"
 
@@ -17,6 +18,7 @@ function flagLabel(locale: SupportedLocale, zh: string, en: string) {
 
 export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
   const preview = getActionExecutionPreview(action)
+  const accessPreview = getActionAccessPreview(action)
   const label = resolveActionLabel(action, locale)
   const description = resolveActionDescription(action, locale)
 
@@ -71,6 +73,14 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
           {preview.canExecute
             ? flagLabel(locale, "当前可执行（不做真实权限检查）", "Executable now (no real permission enforcement)")
             : flagLabel(locale, "当前不可执行（占位/禁用/即将上线）", "Not executable now (placeholder/disabled/coming soon)")}
+        </div>
+        <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+          <div className="font-medium text-foreground/80">{flagLabel(locale, "访问合同预览", "Access Contract Preview")}</div>
+          <div>{accessPreview.canAccess ? flagLabel(locale, "访问预览为可访问", "Access preview is allowed") : flagLabel(locale, "访问预览为不可访问", "Access preview is not allowed")}</div>
+          {accessPreview.requiredPermission ? <div>{flagLabel(locale, "权限", "Permission")}: {accessPreview.requiredPermission}</div> : null}
+          {accessPreview.requiredRole ? <div>{flagLabel(locale, "角色", "Role")}: {accessPreview.requiredRole}</div> : null}
+          {accessPreview.requiredPlan ? <div>{flagLabel(locale, "方案", "Plan")}: {accessPreview.requiredPlan}</div> : null}
+          <div>{flagLabel(locale, "仅元数据展示，不做真实鉴权。", "Metadata display only; no real authorization enforcement.")}</div>
         </div>
       </CardContent>
     </Card>

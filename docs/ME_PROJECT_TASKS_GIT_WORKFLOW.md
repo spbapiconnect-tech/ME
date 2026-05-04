@@ -157,3 +157,13 @@ Use Conventional Commits.
 - Reusable UI: `components/actions/` (ActionButton + debug cards).
 - No real permission enforcement, audit logging, workflow execution, task creation, API/database integration, or persistence.
 - Source mapping keys should remain stable even when layout/skin foundations change.
+
+## Permission Placeholder / Role Access Contract Foundation (v0.6.3)
+
+- Route: `/access-control` is added for metadata preview.
+- Access config is centralized in `config/access/`.
+- Access UI cards are under `components/access/`.
+- Access helper utilities are in `lib/access.ts`.
+- No real authentication/authorization middleware is added.
+- No real API/database integration is added.
+- Action contracts can map to access previews without changing execution behavior.

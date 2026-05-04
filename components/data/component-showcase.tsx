@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, Layers3, LayoutTemplate, ListTodo, PanelTopClose, Sparkles, Workflow } from "lucide-react";
+import { Blocks, Layers3, LayoutTemplate, ListTodo, PanelTopClose, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import { useEffect } from "react";
 
 import { ActionBar } from "@/components/data/action-bar";
@@ -35,6 +35,7 @@ const componentCopy = {
     tasks: "Open Task Engine",
     layoutEngine: "Layout Engine",
     actionContracts: "Open Action Contracts",
+    accessControl: "ME Access Control",
   },
   zh: {
     title: "ME Core Components",
@@ -47,6 +48,7 @@ const componentCopy = {
     tasks: "打开任务引擎",
     layoutEngine: "布局引擎",
     actionContracts: "打开 Action Contracts",
+    accessControl: "ME Access Control",
   },
 } as const;
 
@@ -119,6 +121,10 @@ export function ComponentShowcase() {
                 <Link className="shell-link-button" href="/action-contracts">
                   <Sparkles size={16} />
                   <span>{copy.actionContracts}</span>
+                </Link>
+                <Link className="shell-link-button" href="/access-control">
+                  <ShieldCheck size={16} />
+                  <span>{copy.accessControl}</span>
                 </Link>
                 <Link className="shell-link-button" href="/templates">
                   <LayoutTemplate size={16} />

@@ -57,3 +57,12 @@ UI Button / CTA
 - Automation trigger mapping
 - Role-based action display policies
 - Plan-based feature gating
+
+## Access Control Contract Foundation (v0.6.3)
+
+- Route: `/access-control`.
+- Access config registry: `config/access/`.
+- Access helper utilities: `lib/access.ts`.
+- Access UI contract cards: `components/access/`.
+- ActionContract metadata can be interpreted into AccessPreview metadata via `getActionAccessPreview`.
+- No real auth/session/middleware/database/API or production access enforcement is added in this milestone.

@@ -172,3 +172,14 @@ This section defines future intelligence directions for ME only.
 - Reusable UI: `components/actions/` (ActionButton + debug cards).
 - No real permission enforcement, audit logging, workflow execution, task creation, API/database integration, or persistence.
 - Source mapping keys should remain stable even when layout/skin foundations change.
+
+## Access Control Metadata Foundation (v0.6.3)
+
+- Adds an access-control metadata layer without runtime auth enforcement.
+- Route: `/access-control`.
+- Access registries: `config/access/`.
+- Access components: `components/access/`.
+- Access helper utilities: `lib/access.ts`.
+- Action contract metadata can map into access previews.
+- No login/session/auth middleware/database/API is included.
+- No production route/action hiding is enabled in this milestone.

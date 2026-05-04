@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, ListTodo, PanelTopClose, Sparkles, Workflow } from "lucide-react";
+import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, ListTodo, PanelTopClose, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -186,6 +186,10 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
                   <Link className="shell-link-button" href="/action-contracts">
                     <Sparkles size={16} />
                     <span>{messages.common.openActionContracts}</span>
+                  </Link>
+                  <Link className="shell-link-button" href="/access-control">
+                    <ShieldCheck size={16} />
+                    <span>ME Access Control</span>
                   </Link>
                 </div>
               </div>

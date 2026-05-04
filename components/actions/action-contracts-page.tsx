@@ -24,6 +24,7 @@ const copy = {
     back: "Back To Dashboard",
     openLayoutEngine: "Open Layout Engine",
     openComponents: "Open Components",
+    openAccessControl: "ME Access Control",
     filters: "Filters",
     intent: "Intent",
     sourceModule: "Source Module",
@@ -50,6 +51,7 @@ const copy = {
     back: "返回 Dashboard",
     openLayoutEngine: "打开布局引擎",
     openComponents: "打开组件页",
+    openAccessControl: "ME Access Control",
     filters: "筛选",
     intent: "意图",
     sourceModule: "来源模块",
@@ -188,6 +190,9 @@ export function ActionContractsPage() {
             </Button>
             <Button asChild variant="outline" size="sm">
               <Link href="/components">{t.openComponents}</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/access-control">{t.openAccessControl}</Link>
             </Button>
           </div>
         </CardHeader>
