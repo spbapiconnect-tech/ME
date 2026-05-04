@@ -55,3 +55,9 @@
 ## Recommended Next Stage
 
 - `v0.5.4 Procurement + Supplier + Inventory implementation foundation`
+
+## Service Layer Foundation Status
+
+- A mock-first service layer foundation exists under `lib/services/`.
+- Repository contracts and a default mock repository provider exist under `lib/repositories/`.
+- Demo routes remain local mock-data only until migration is explicitly started.

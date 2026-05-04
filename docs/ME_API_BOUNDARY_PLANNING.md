@@ -55,3 +55,10 @@ This document defines the future API boundary for ME without implementing API. I
 - No permission middleware.
 - No database schema migration.
 - No external supplier or POS integration.
+
+## Service Layer Foundation Status
+
+- A mock-first service layer foundation exists.
+- Repository contracts live under `lib/repositories/contracts.ts`.
+- Repository provider defaults to mock mode under `lib/repositories/provider.ts`.
+- No API routes or backend implementation exist yet.

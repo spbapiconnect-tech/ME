@@ -135,3 +135,9 @@ Use Conventional Commits.
 - No real procurement, inventory, or POS execution logic is included.
 - Demo flow is for presentation and validation only.
 
+
+## Service Layer Foundation (v0.6.0)
+
+- A mock-first service layer and repository contract foundation exists.
+- Repository provider defaults to mock mode.
+- No real API/database/business implementation is included yet.

@@ -61,3 +61,9 @@ This plan explains how ME will move from mock data to real data without rebuildi
 - All actions have source mapping.
 - All module pages can read from an abstract data provider.
 - No component imports mock data directly except demo routes.
+
+## Service Layer Foundation Status
+
+- A thin service layer and repository contract foundation exists under `lib/services/` and `lib/repositories/`.
+- Repository provider defaults to mock mode.
+- No real API or database is implemented yet.

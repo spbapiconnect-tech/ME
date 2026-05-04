@@ -155,3 +155,10 @@ This section defines future intelligence directions for ME only.
 - No real procurement, inventory, or POS execution logic is included.
 - Demo flow is for presentation and validation only.
 
+
+## Service Layer Foundation (v0.6.0)
+
+- A service layer and mock repository foundation exists under `lib/services/` and `lib/repositories/`.
+- Repository provider defaults to mock mode.
+- This is a foundation-only boundary; no real procurement/supplier/inventory runtime implementation is included.
+- Layout Engine remains data-source agnostic.
