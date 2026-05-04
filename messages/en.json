@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME now stabilizes a reusable core component library so future module pages can compose KPI cards, status chips, filters, data displays, drawers, timelines, and form sections from shared building blocks.",
-    "milestone": "v0.3.1 Core Components"
+    "description": "ME now presents polished demo pages and a reusable mock data flow so the six core modules can be demonstrated as a believable modular SaaS workspace without any real API, database, or execution logic.",
+    "milestone": "v0.4.0 Demo Pages / Demo Data Flow"
   },
   "common": {
     "theme": "Theme",
@@ -45,7 +45,8 @@
     "ownerRole": "Owner Role",
     "sourceMapping": "Source Mapping",
     "openTemplates": "Open Page Templates",
-    "openComponents": "Open Core Components"
+    "openComponents": "Open Core Components",
+    "openDemo": "Open Demo Workspace"
   },
   "themes": {
     "bright": "Bright",

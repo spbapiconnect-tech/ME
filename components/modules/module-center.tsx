@@ -121,6 +121,10 @@ export function ModuleCenter({ modules }: ModuleCenterProps) {
                   <LayoutTemplate size={16} />
                   <span>{messages.common.openTemplates}</span>
                 </Link>
+                <Link className="shell-link-button" href="/demo">
+                  <Workflow size={16} />
+                  <span>{messages.common.openDemo}</span>
+                </Link>
                 <Link className="shell-link-button" href="/components">
                   <Blocks size={16} />
                   <span>{messages.common.openComponents}</span>

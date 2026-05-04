@@ -79,3 +79,16 @@ Use Conventional Commits.
 - No real business logic is included yet
 - No real API is connected
 - Future module pages should compose from these components first
+
+## Demo Pages Milestone
+
+- Demo pages are local mock-data only.
+- Demo data lives under `data/demo/`.
+- `/demo` shows a cross-module demo workspace.
+- `/demo/[module]` shows a module-specific demo workspace.
+- Demo pages use existing module registry, page templates, and core components.
+- No real API is connected.
+- No real database is connected.
+- No real procurement, inventory, or POS execution logic is included.
+- Demo flow is for presentation and validation only.
+

@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME 当前进一步稳定可复用核心组件库，让未来模块页面可以用统一的 KPI 卡片、状态标签、筛选栏、数据展示、抽屉、时间线与表单区块进行组合。",
-    "milestone": "v0.3.1 Core Components"
+    "description": "ME 当前提供打磨后的 Demo 页面与可复用 mock data flow，让六个核心模块可以在不接入真实 API、数据库或执行逻辑的前提下，以可信的模块化 SaaS 方式进行展示。",
+    "milestone": "v0.4.0 Demo Pages / Demo Data Flow"
   },
   "common": {
     "theme": "主题",
@@ -45,7 +45,8 @@
     "ownerRole": "负责角色",
     "sourceMapping": "来源映射",
     "openTemplates": "打开页面模板",
-    "openComponents": "打开核心组件"
+    "openComponents": "打开核心组件",
+    "openDemo": "打开 Demo Workspace"
   },
   "themes": {
     "bright": "Bright",

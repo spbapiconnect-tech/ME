@@ -103,3 +103,16 @@ This section defines future intelligence directions for ME only.
 - Current branch: `develop`
 - Current milestone: `v0.3.1 Core Components`
 - Delivery goal: provide a stable reusable component library so future ME module pages can compose from shared UI instead of redesigning each page
+
+## Demo Pages Milestone
+
+- Demo pages are local mock-data only.
+- Demo data lives under `data/demo/`.
+- `/demo` shows a cross-module demo workspace.
+- `/demo/[module]` shows a module-specific demo workspace.
+- Demo pages use existing module registry, page templates, and core components.
+- No real API is connected.
+- No real database is connected.
+- No real procurement, inventory, or POS execution logic is included.
+- Demo flow is for presentation and validation only.
+
