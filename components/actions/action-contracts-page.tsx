@@ -194,6 +194,9 @@ export function ActionContractsPage() {
             <Button asChild variant="outline" size="sm">
               <Link href="/access-control">{t.openAccessControl}</Link>
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/audit-trail">ME Audit Trail</Link>
+            </Button>
           </div>
         </CardHeader>
       </Card>

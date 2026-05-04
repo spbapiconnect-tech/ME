@@ -191,6 +191,10 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
                     <ShieldCheck size={16} />
                     <span>ME Access Control</span>
                   </Link>
+                  <Link className="shell-link-button" href="/audit-trail">
+                    <ShieldCheck size={16} />
+                    <span>ME Audit Trail</span>
+                  </Link>
                 </div>
               </div>
 

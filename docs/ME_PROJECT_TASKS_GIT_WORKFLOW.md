@@ -167,3 +167,15 @@ Use Conventional Commits.
 - No real authentication/authorization middleware is added.
 - No real API/database integration is added.
 - Action contracts can map to access previews without changing execution behavior.
+
+## Audit Trail Contract Foundation (v0.6.4)
+
+- Route: `/audit-trail`.
+- Audit contract types: `types/audit.ts`.
+- Audit registries: `config/audit/`.
+- Audit helper utilities: `lib/audit.ts`.
+- Audit UI components: `components/audit/`.
+- Action and access previews can now resolve audit metadata previews without runtime enforcement.
+- This milestone is metadata-only and preview-only.
+- No real persistence, database, API/backend, session lookup, or middleware is added.
+- Audit source mapping keys must remain stable across layout/skin/shell redesigns.

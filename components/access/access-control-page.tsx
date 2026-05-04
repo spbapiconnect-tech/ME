@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { actionRegistry } from "@/config/actions"
 import { accessRules, planRegistry, roleRegistry } from "@/config/access"
 import { getAccessPreview, getActionAccessPreview } from "@/lib/access"
+import { getAccessAuditPreview, getActionAuditPreview } from "@/lib/audit"
 import { useUiPreferencesStore } from "@/stores/ui-preferences"
 import type { AccessScope, AccessStatus } from "@/types/access-control"
 import type { SupportedLocale } from "@/types/module"
@@ -123,6 +124,8 @@ export function AccessControlPage() {
 
   const rulePreview = React.useMemo(() => (effectiveRule ? getAccessPreview(effectiveRule) : undefined), [effectiveRule])
   const actionPreview = React.useMemo(() => (selectedActionKey ? getActionAccessPreview(selectedActionKey) : undefined), [selectedActionKey])
+  const ruleAuditPreview = React.useMemo(() => (effectiveRule ? getAccessAuditPreview(effectiveRule.key) : undefined), [effectiveRule])
+  const actionAuditPreview = React.useMemo(() => (selectedActionKey ? getActionAuditPreview(selectedActionKey) : undefined), [selectedActionKey])
 
   const stats = React.useMemo(() => {
     const placeholder = accessRules.filter((rule) => rule.status === "placeholder" || rule.status === "coming-soon" || rule.condition.isPlaceholder).length
@@ -157,6 +160,7 @@ export function AccessControlPage() {
             <Button asChild variant="outline" size="sm"><Link href="/">{t.back}</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/action-contracts">{t.openActionContracts}</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/layout-engine">{t.openLayoutEngine}</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
           </div>
         </CardHeader>
       </Card>
@@ -257,8 +261,8 @@ export function AccessControlPage() {
           </CardContent>
         </Card>
         <div className="grid gap-4">
-          {rulePreview ? <AccessPreviewCard preview={rulePreview} locale={currentLocale} /> : null}
-          {actionPreview ? <AccessPreviewCard preview={actionPreview} locale={currentLocale} /> : null}
+          {rulePreview ? <AccessPreviewCard preview={rulePreview} locale={currentLocale} auditPreview={ruleAuditPreview} /> : null}
+          {actionPreview ? <AccessPreviewCard preview={actionPreview} locale={currentLocale} auditPreview={actionAuditPreview} /> : null}
         </div>
       </section>
     </main>

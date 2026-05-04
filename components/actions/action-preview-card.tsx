@@ -2,6 +2,7 @@ import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { getActionAuditPreview } from "@/lib/audit"
 import { getActionExecutionPreview, resolveActionDescription, resolveActionLabel } from "@/lib/actions"
 import { getActionAccessPreview } from "@/lib/access"
 import type { ActionContract } from "@/types/action-contract"
@@ -19,6 +20,7 @@ function flagLabel(locale: SupportedLocale, zh: string, en: string) {
 export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
   const preview = getActionExecutionPreview(action)
   const accessPreview = getActionAccessPreview(action)
+  const auditPreview = getActionAuditPreview(action)
   const label = resolveActionLabel(action, locale)
   const description = resolveActionDescription(action, locale)
 
@@ -81,6 +83,18 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
           {accessPreview.requiredRole ? <div>{flagLabel(locale, "角色", "Role")}: {accessPreview.requiredRole}</div> : null}
           {accessPreview.requiredPlan ? <div>{flagLabel(locale, "方案", "Plan")}: {accessPreview.requiredPlan}</div> : null}
           <div>{flagLabel(locale, "仅元数据展示，不做真实鉴权。", "Metadata display only; no real authorization enforcement.")}</div>
+        </div>
+        <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+          <div className="font-medium text-foreground/80">{flagLabel(locale, "审计预览", "Audit Preview")}</div>
+          <div>
+            {auditPreview.shouldCapture
+              ? flagLabel(locale, "该动作在预览层可标记为应捕获审计事件。", "This action is marked as should-capture in audit preview metadata.")
+              : flagLabel(locale, "该动作当前不触发真实审计捕获。", "This action currently does not trigger real audit capture.")}
+          </div>
+          <div>{flagLabel(locale, "状态", "Status")}: {auditPreview.status}</div>
+          <div>{flagLabel(locale, "严重级别", "Severity")}: {auditPreview.severity}</div>
+          {auditPreview.accessRuleKey ? <div>{flagLabel(locale, "访问规则", "Access Rule")}: {auditPreview.accessRuleKey}</div> : null}
+          <div>{flagLabel(locale, "仅审计元数据预览，不写日志、不落库。", "Audit metadata preview only; no log writes or persistence.")}</div>
         </div>
       </CardContent>
     </Card>

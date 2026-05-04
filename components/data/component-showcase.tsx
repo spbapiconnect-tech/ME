@@ -36,6 +36,7 @@ const componentCopy = {
     layoutEngine: "Layout Engine",
     actionContracts: "Open Action Contracts",
     accessControl: "ME Access Control",
+    auditTrail: "ME Audit Trail",
   },
   zh: {
     title: "ME Core Components",
@@ -49,6 +50,7 @@ const componentCopy = {
     layoutEngine: "布局引擎",
     actionContracts: "打开 Action Contracts",
     accessControl: "ME Access Control",
+    auditTrail: "ME Audit Trail",
   },
 } as const;
 
@@ -125,6 +127,10 @@ export function ComponentShowcase() {
                 <Link className="shell-link-button" href="/access-control">
                   <ShieldCheck size={16} />
                   <span>{copy.accessControl}</span>
+                </Link>
+                <Link className="shell-link-button" href="/audit-trail">
+                  <ShieldCheck size={16} />
+                  <span>{copy.auditTrail}</span>
                 </Link>
                 <Link className="shell-link-button" href="/templates">
                   <LayoutTemplate size={16} />

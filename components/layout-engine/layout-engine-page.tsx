@@ -31,6 +31,7 @@ const copy = {
     tasks: "Open Task Engine",
     actionContracts: "Open Action Contracts",
     accessControl: "ME Access Control",
+    auditTrail: "ME Audit Trail",
     controls: "Foundation Controls",
     registry: "Layout And Skin Registries",
     display: "Display Model Preview",
@@ -45,6 +46,7 @@ const copy = {
     tasks: "打开 Task Engine",
     actionContracts: "打开 Action Contracts",
     accessControl: "ME Access Control",
+    auditTrail: "ME Audit Trail",
     controls: "基础控制台",
     registry: "布局与皮肤注册表",
     display: "显示模型预览",
@@ -136,6 +138,10 @@ export function LayoutEnginePage() {
                 <Link className="shell-link-button" href="/access-control">
                   <ShieldCheck size={16} />
                   <span>{currentCopy.accessControl}</span>
+                </Link>
+                <Link className="shell-link-button" href="/audit-trail">
+                  <ShieldCheck size={16} />
+                  <span>{currentCopy.auditTrail}</span>
                 </Link>
               </div>
             </div>
