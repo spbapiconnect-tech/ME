@@ -98,7 +98,7 @@ export function ComponentShowcase() {
                   <Layers3 size={16} />
                   <span>{copy.moduleCenter}</span>
                 </Link>
-                <Link className="shell-link-button" href="/demo">
+                <Link className="shell-link-button shell-link-button--primary" href="/demo">
                   <Workflow size={16} />
                   <span>{copy.demo}</span>
                 </Link>

@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME now presents polished demo pages and a reusable mock data flow so the six core modules can be demonstrated as a believable modular SaaS workspace without any real API, database, or execution logic.",
-    "milestone": "v0.4.0 Demo Pages / Demo Data Flow"
+    "description": "ME now presents a sales-demo-ready modular SaaS prototype with polished demo pages, reusable mock data flow, and clear boundaries between current prototype value and future product delivery.",
+    "milestone": "v0.4.1 Demo QA / Visual Polish / Sales Demo Readiness"
   },
   "common": {
     "theme": "Theme",
@@ -46,7 +46,9 @@
     "sourceMapping": "Source Mapping",
     "openTemplates": "Open Page Templates",
     "openComponents": "Open Core Components",
-    "openDemo": "Open Demo Workspace"
+    "openDemo": "Open Demo Workspace",
+    "prototypeDemo": "Prototype Demo",
+    "mockDataOnly": "Mock Data Only"
   },
   "themes": {
     "bright": "Bright",

@@ -8,6 +8,7 @@ import { KpiCard } from "@/components/data/kpi-card";
 import { DemoFlow } from "@/components/demo/demo-flow";
 import { DemoOverview } from "@/components/demo/demo-overview";
 import { DemoModuleSwitcher } from "@/components/demo/demo-module-switcher";
+import { MockDataNotice } from "@/components/demo/mock-data-notice";
 import { demoDashboardData } from "@/data/demo";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { SupportedLocale, ThemeMode } from "@/types/module";
@@ -18,12 +19,14 @@ const copy = {
     modules: "Open Module Center",
     templates: "Open Page Templates",
     components: "Open Core Components",
+    summary: "Sales Demo Ready Prototype",
   },
   zh: {
     back: "返回 Dashboard",
     modules: "打开模块中心",
     templates: "打开页面模板",
     components: "打开核心组件",
+    summary: "适合销售演示的原型",
   },
 } as const;
 
@@ -71,6 +74,10 @@ export function DemoWorkspace() {
                 <h1 className="hero-title">{demoDashboardData.title[currentLocale]}</h1>
                 <p className="hero-subtitle">{demoDashboardData.subtitle[currentLocale]}</p>
                 <p className="hero-subtitle-zh">{demoDashboardData.description[currentLocale]}</p>
+                <div className="template-chip-row">
+                  <span className="template-chip template-chip--type">{currentCopy.summary}</span>
+                  <span className="template-chip">v0.4.1</span>
+                </div>
               </div>
               <div className="template-link-row">
                 <Link className="shell-link-button" href="/">
@@ -92,6 +99,8 @@ export function DemoWorkspace() {
               </div>
             </div>
           </section>
+
+          <MockDataNotice locale={currentLocale} />
 
           <section className="modules-panel">
             <div className="panel-header">

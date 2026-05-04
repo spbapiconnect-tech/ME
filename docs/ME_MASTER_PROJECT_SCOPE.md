@@ -101,8 +101,8 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.3.1 Core Components`
-- Delivery goal: provide a stable reusable component library so future ME module pages can compose from shared UI instead of redesigning each page
+- Current milestone: `v0.4.1 Demo QA / Visual Polish / Sales Demo Readiness`
+- Delivery goal: provide a presentation-ready ME prototype with polished demo pages, local mock data flows, and clear sales-demo positioning.
 
 ## Demo Pages Milestone
 

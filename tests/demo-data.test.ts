@@ -38,3 +38,24 @@ test("demo data contains no forbidden legacy brand names", () => {
     assert.equal(serialized.includes(legacyName), false);
   }
 });
+
+
+test("demo readiness docs exist", async () => {
+  const { access } = await import("node:fs/promises");
+
+  for (const path of [
+    "docs/ME_DEMO_QA_CHECKLIST.md",
+    "docs/ME_SALES_DEMO_SCRIPT.md",
+    "docs/ME_DEMO_READINESS.md",
+  ]) {
+    await access(path);
+  }
+});
+
+test("demo data remains local-only text and does not imply live APIs", () => {
+  const serialized = JSON.stringify(demoModuleDataMap);
+
+  for (const forbiddenText of ["fetch(", "axios", "https://", "http://", "database", "postgres"]) {
+    assert.equal(serialized.includes(forbiddenText), false);
+  }
+});

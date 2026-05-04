@@ -15,6 +15,7 @@ import { RightDrawer } from "@/components/data/right-drawer";
 import { StatusChip } from "@/components/data/status-chip";
 import { Timeline } from "@/components/data/timeline";
 import { DemoModuleSwitcher } from "@/components/demo/demo-module-switcher";
+import { MockDataNotice } from "@/components/demo/mock-data-notice";
 import { demoModuleCodes, getDemoModuleData } from "@/data/demo";
 import { getPageSchema } from "@/config/page-schemas";
 import { getLocalizedText } from "@/lib/localized";
@@ -46,6 +47,8 @@ const copy = {
     openAction: "Open Demo Workspace",
     view: "View",
     handle: "Handle",
+    summary: "Presentation-Ready Module Demo",
+    prototypeStatus: "Mock Data Only",
   },
   zh: {
     back: "返回 Demo Workspace",
@@ -64,6 +67,8 @@ const copy = {
     openAction: "打开 Demo Workspace",
     view: "查看",
     handle: "处理",
+    summary: "适合演示的模块页面",
+    prototypeStatus: "仅使用 Mock Data",
   },
 } as const;
 
@@ -211,7 +216,9 @@ export function DemoModulePage({ moduleCode }: DemoModulePageProps) {
                 actionLabel={{ zh: currentCopy.openAction, en: currentCopy.openAction }}
               />
             </section>
-            <section className="control-panel">
+            <MockDataNotice locale={currentLocale} compact />
+
+          <section className="control-panel">
               <DemoModuleSwitcher locale={currentLocale} />
             </section>
           </div>
@@ -243,6 +250,10 @@ export function DemoModulePage({ moduleCode }: DemoModulePageProps) {
                 <h1 className="hero-title">{getLocalizedText(moduleItem.name, currentLocale)}</h1>
                 <p className="hero-subtitle">{getLocalizedText(demoData.scenario, currentLocale)}</p>
                 <p className="hero-subtitle-zh">{getLocalizedText(demoData.summary, currentLocale)}</p>
+                <div className="template-chip-row">
+                  <span className="template-chip template-chip--type">{currentCopy.summary}</span>
+                  <span className="template-chip">{currentCopy.prototypeStatus}</span>
+                </div>
               </div>
               <div className="template-link-row">
                 <Link className="shell-link-button" href="/demo">
@@ -273,6 +284,8 @@ export function DemoModulePage({ moduleCode }: DemoModulePageProps) {
               <StatusChip label={demoData.detailRecord.status ?? "demo"} locale={currentLocale} tone="success" size="sm" />
             </div>
           </section>
+
+          <MockDataNotice locale={currentLocale} compact />
 
           <section className="control-panel">
             <div className="panel-header">
@@ -342,7 +355,7 @@ export function DemoModulePage({ moduleCode }: DemoModulePageProps) {
                       title: row[listingSchema.columns[0]?.key] ?? `Row ${index + 1}`,
                       subtitle: row[listingSchema.columns[1]?.key] ?? "--",
                       meta: row[listingSchema.columns[2]?.key] ?? "--",
-                      status: row.status ?? row.stockStatus,
+                      status: row.status ?? row.stockStatus ?? row.priority,
                       actionLabel: currentCopy.view,
                     }))}
                   />
