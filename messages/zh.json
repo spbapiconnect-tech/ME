@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME 当前提供适合销售演示的模块化 SaaS 原型，具备打磨后的 Demo 页面、可复用 mock data flow，以及清晰的原型边界说明。",
-    "milestone": "v0.4.1 Demo QA / Visual Polish / Sales Demo Readiness"
+    "description": "ME 当前已包含 Task Engine MVP 基础，支持本地 mock task lifecycle、source mapping，以及跨核心模块的闭环任务关系。",
+    "milestone": "v0.5.0 Task Engine MVP"
   },
   "common": {
     "theme": "主题",
@@ -48,7 +48,8 @@
     "openComponents": "打开核心组件",
     "openDemo": "打开 Demo Workspace",
     "prototypeDemo": "Prototype Demo",
-    "mockDataOnly": "仅使用 Mock Data"
+    "mockDataOnly": "仅使用 Mock Data",
+    "openTaskEngine": "打开 Task Engine"
   },
   "themes": {
     "bright": "Bright",

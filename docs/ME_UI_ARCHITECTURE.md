@@ -8,7 +8,7 @@
 4. `messages/`: English and Chinese message catalogs
 5. `types/`: platform contracts for modules, page schema, permissions, and source mapping
 6. `stores/`: lightweight client preferences for theme and language
-7. `lib/`: registry helper utilities, localized helpers, and shared UI support logic
+7. `lib/`: registry helper utilities, localized helpers, shared UI support logic, and local task helpers
 
 ## Key Principles
 
@@ -16,6 +16,7 @@
 - Read labels from message catalogs, never from scattered inline strings
 - Read theme colors from CSS variables, never from component-level hardcoded colors
 - Keep shell components responsive and placeholder-only in this milestone
+- Keep Task Engine surfaces local-data only until workflow services exist
 
 ## Responsive Strategy
 
@@ -74,6 +75,16 @@
 - No real business logic is included yet
 - No real API is connected
 - Future module pages should compose from these components first
+
+## Task Engine Milestone
+
+- `/tasks` is the task inbox and board entry for the current prototype
+- `/tasks/[taskId]` provides local-only task detail drill-down
+- Task mock records live under `data/tasks/`
+- `lib/tasks.ts` builds summary, stats, and lookup helpers for the UI
+- Task pages reuse `ActionBar`, `DetailPanel`, `Timeline`, and shared chips
+- Task pages link back to module demo pages through source mapping metadata
+- No real workflow engine, notification service, database, or API is connected
 
 ## Demo Pages Milestone
 

@@ -12,7 +12,8 @@
 - [ ] `/demo/inventory`
 - [ ] `/demo/pos-report`
 - [ ] `/demo/education`
-- [ ] `/demo/task`
+- [ ] `/tasks`
+- [ ] `/tasks/TASK-1001`
 
 ## B. Theme QA
 
@@ -56,5 +57,6 @@
 - [ ] Dashboard entry clear
 - [ ] Module Center entry clear
 - [ ] Demo workspace entry clear
+- [ ] Task Engine entry clear
 - [ ] Component and template demos explain platform structure
 - [ ] Buyer can understand the value in 3 minutes

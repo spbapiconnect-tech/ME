@@ -43,7 +43,9 @@ test("module stats expose expected counts for the registry foundation", () => {
 });
 
 test("message catalogs cover critical module center labels in both languages", () => {
-  for (const label of ["moduleCenter", "moduleRegistry", "totalModules", "enabledModules"]) {
+  const requiredLabels = ["moduleCenter", "moduleRegistry", "totalModules", "enabledModules"] as const;
+
+  for (const label of requiredLabels) {
     assert.ok(enMessages.common[label].length > 0);
     assert.ok(zhMessages.common[label].length > 0);
   }

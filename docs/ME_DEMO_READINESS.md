@@ -14,6 +14,7 @@
 - Page templates
 - Core components
 - Demo pages
+- Task Engine pages
 - Mock data flow
 
 ## What Is Not Ready
@@ -27,5 +28,5 @@
 
 ## Recommended Next Stage
 
-- `v0.5.0 Task Engine MVP`, or
+- `v0.5.0 Task Engine workflow + notification integration`, or
 - `v0.5.0 Procurement + Supplier + Inventory MVP planning`

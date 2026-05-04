@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, Workflow } from "lucide-react";
+import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, ListTodo, Workflow } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { ModuleGrid } from "@/components/modules/module-grid";
@@ -124,6 +124,10 @@ export function ModuleCenter({ modules }: ModuleCenterProps) {
                 <Link className="shell-link-button shell-link-button--primary" href="/demo">
                   <Workflow size={16} />
                   <span>{messages.common.openDemo}</span>
+                </Link>
+                <Link className="shell-link-button" href="/tasks">
+                  <ListTodo size={16} />
+                  <span>{messages.common.openTaskEngine}</span>
                 </Link>
                 <Link className="shell-link-button" href="/components">
                   <Blocks size={16} />

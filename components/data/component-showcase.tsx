@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, Layers3, LayoutTemplate, Workflow } from "lucide-react";
+import { Blocks, Layers3, LayoutTemplate, ListTodo, Workflow } from "lucide-react";
 import { useEffect } from "react";
 
 import { ActionBar } from "@/components/data/action-bar";
@@ -32,6 +32,7 @@ const componentCopy = {
     moduleCenter: "Open Module Center",
     templates: "Open Page Templates",
     demo: "Open Demo Workspace",
+    tasks: "Open Task Engine",
   },
   zh: {
     title: "ME Core Components",
@@ -41,6 +42,7 @@ const componentCopy = {
     moduleCenter: "打开模块中心",
     templates: "打开页面模板",
     demo: "打开 Demo Workspace",
+    tasks: "打开任务引擎",
   },
 } as const;
 
@@ -101,6 +103,10 @@ export function ComponentShowcase() {
                 <Link className="shell-link-button shell-link-button--primary" href="/demo">
                   <Workflow size={16} />
                   <span>{copy.demo}</span>
+                </Link>
+                <Link className="shell-link-button" href="/tasks">
+                  <ListTodo size={16} />
+                  <span>{copy.tasks}</span>
                 </Link>
                 <Link className="shell-link-button" href="/templates">
                   <LayoutTemplate size={16} />

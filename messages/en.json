@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME now presents a sales-demo-ready modular SaaS prototype with polished demo pages, reusable mock data flow, and clear boundaries between current prototype value and future product delivery.",
-    "milestone": "v0.4.1 Demo QA / Visual Polish / Sales Demo Readiness"
+    "description": "ME now includes a Task Engine MVP foundation with local mock task lifecycle data, source mapping, and close-loop task relationships across core modules.",
+    "milestone": "v0.5.0 Task Engine MVP"
   },
   "common": {
     "theme": "Theme",
@@ -48,7 +48,8 @@
     "openComponents": "Open Core Components",
     "openDemo": "Open Demo Workspace",
     "prototypeDemo": "Prototype Demo",
-    "mockDataOnly": "Mock Data Only"
+    "mockDataOnly": "Mock Data Only",
+    "openTaskEngine": "Open Task Engine"
   },
   "themes": {
     "bright": "Bright",

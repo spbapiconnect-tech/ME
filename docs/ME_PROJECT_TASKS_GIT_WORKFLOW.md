@@ -10,6 +10,7 @@
 6. Dashboard polish and verification
 7. Schema-driven page templates
 8. Reusable core component library
+9. Task Engine demo surfaces and navigation
 
 ## Branch Model
 
@@ -30,6 +31,7 @@ Use Conventional Commits.
 - `feat: add ME module registry`
 - `feat: add ME page templates`
 - `feat: add ME core component library`
+- `feat: add ME task engine navigation`
 - `fix: prevent ME module card overflow`
 - `docs: update ME project scope`
 
@@ -40,6 +42,7 @@ Use Conventional Commits.
 - Module cards still read from `config/modules.ts`
 - No hardcoded component colors bypass CSS variables
 - No real business logic or connectors were introduced
+- `/tasks` navigation remains reachable from the main demo surfaces
 
 ## Module Registry Milestone
 
@@ -79,6 +82,15 @@ Use Conventional Commits.
 - No real business logic is included yet
 - No real API is connected
 - Future module pages should compose from these components first
+
+## Task Engine Milestone
+
+- Task Engine route lives at `/tasks`
+- Task detail route lives at `/tasks/[taskId]`
+- Task mock data lives under `data/tasks/`
+- Task pages reuse shared data and form-adjacent UI primitives
+- Source-mapping links connect demo module records to Task Engine views
+- No real workflow engine, notification service, database, or API is connected
 
 ## Demo Pages Milestone
 

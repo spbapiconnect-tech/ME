@@ -16,6 +16,7 @@ This repository currently delivers only the first Core Shell foundation.
 - Chinese and English message catalogs
 - Typed module registry and source mapping contracts
 - Premium landing dashboard for the initial ME experience
+- Task Engine UI routes backed by local task mock data
 
 ## Explicit Exclusions
 
@@ -28,6 +29,7 @@ The current milestone does not include real business logic or production integra
 - No AI features
 - No workflow, automation, rules, or formula engine
 - No real external API connectors
+- No workflow engine or notification backend
 
 ## Module Registry Milestone
 
@@ -68,6 +70,16 @@ The current milestone does not include real business logic or production integra
 - No real API is connected
 - Future module pages should compose from these components first
 
+## Task Engine Milestone
+
+- Task Engine route lives at `/tasks`
+- Task detail route lives at `/tasks/[taskId]`
+- Task mock data lives under `data/tasks/`
+- Task summary and lookup helpers live under `lib/tasks.ts`
+- Task UI reuses existing action bar, detail panel, timeline, and status chip components
+- Cross-module links connect demo source pages to Task Engine records
+- No real workflow engine, notification service, database, or API is connected
+
 ## ME Brain Layer / AI Intelligence Roadmap
 
 This section defines future intelligence directions for ME only.
@@ -102,7 +114,7 @@ This section defines future intelligence directions for ME only.
 
 - Current branch: `develop`
 - Current milestone: `v0.4.1 Demo QA / Visual Polish / Sales Demo Readiness`
-- Delivery goal: provide a presentation-ready ME prototype with polished demo pages, local mock data flows, and clear sales-demo positioning.
+- Delivery goal: provide a presentation-ready ME prototype with polished demo pages, Task Engine surfaces, local mock data flows, and clear sales-demo positioning.
 
 ## Demo Pages Milestone
 

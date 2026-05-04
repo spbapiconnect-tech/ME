@@ -10,3 +10,17 @@ export interface SourceMappingDefinition {
   notes?: string;
   status: SourceMappingStatus;
 }
+
+export interface TaskSourceMapping {
+  source_module: string;
+  source_record_id: string;
+  source_page: string;
+  source_component: string;
+  source_event: string;
+  target_module: string;
+  target_route: string;
+  target_action: string;
+  api_action: string;
+  audit_required: boolean;
+  permission_required: string;
+}
