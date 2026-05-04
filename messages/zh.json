@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME 当前已包含 Task Engine MVP 基础，支持本地 mock task lifecycle、source mapping，以及跨核心模块的闭环任务关系。",
-    "milestone": "v0.5.0 Task Engine MVP"
+    "description": "ME 当前已包含首个 Layout Engine 与 Skin System 基础，让未来 UI 重设计可以在不重写模块逻辑的前提下切换布局与皮肤。",
+    "milestone": "v0.5.2 Layout Engine / Skin System Foundation"
   },
   "common": {
     "theme": "主题",
@@ -49,7 +49,8 @@
     "openDemo": "打开 Demo Workspace",
     "prototypeDemo": "Prototype Demo",
     "mockDataOnly": "仅使用 Mock Data",
-    "openTaskEngine": "打开 Task Engine"
+    "openTaskEngine": "打开 Task Engine",
+    "openLayoutEngine": "打开 Layout Engine"
   },
   "themes": {
     "bright": "Bright",
