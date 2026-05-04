@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, LayoutTemplate, Layers3, ListTodo, Workflow } from "lucide-react";
+import { Blocks, LayoutTemplate, Layers3, ListTodo, PanelTopClose, Workflow } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
@@ -29,6 +29,7 @@ const textCatalog = {
     components: "Open Core Components",
     demo: "Open Demo Workspace",
     tasks: "Open Task Engine",
+    layoutEngine: "Layout Engine",
   },
   zh: {
     title: "ME Page Templates",
@@ -41,6 +42,7 @@ const textCatalog = {
     components: "打开核心组件",
     demo: "打开 Demo Workspace",
     tasks: "打开任务引擎",
+    layoutEngine: "布局引擎",
   },
 } as const;
 
@@ -143,6 +145,10 @@ export function TemplateDemo() {
                 <Link className="shell-link-button" href="/tasks">
                   <ListTodo size={16} />
                   <span>{copy.tasks}</span>
+                </Link>
+                <Link className="shell-link-button" href="/layout-engine">
+                  <PanelTopClose size={16} />
+                  <span>{copy.layoutEngine}</span>
                 </Link>
                 <Link className="shell-link-button" href="/components">
                   <Blocks size={16} />

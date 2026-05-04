@@ -49,6 +49,7 @@
     "openDemo": "Open Demo Workspace",
     "prototypeDemo": "Prototype Demo",
     "mockDataOnly": "Mock Data Only",
+    "layoutEngine": "Layout Engine",
     "openTaskEngine": "Open Task Engine",
     "openLayoutEngine": "Open Layout Engine"
   },

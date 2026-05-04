@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Layers3, LayoutDashboard, Workflow } from "lucide-react";
+import { Layers3, LayoutDashboard, PanelTopClose, Workflow } from "lucide-react";
 import { useEffect } from "react";
 
 import { MockDataNotice } from "@/components/demo/mock-data-notice";
@@ -106,6 +106,10 @@ export function TaskDetailPage({ taskId }: TaskDetailPageProps) {
                 <Link className="shell-link-button" href="/modules">
                   <Layers3 size={16} />
                   <span>{currentLocale === "zh" ? "打开模块中心" : "Open Module Center"}</span>
+                </Link>
+                <Link className="shell-link-button" href="/layout-engine">
+                  <PanelTopClose size={16} />
+                  <span>{currentLocale === "zh" ? "布局引擎" : "Layout Engine"}</span>
                 </Link>
               </div>
             </div>

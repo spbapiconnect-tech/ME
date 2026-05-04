@@ -34,6 +34,15 @@
 - Do not claim ERP sync is live.
 - Do not claim production readiness.
 
+## Layout Engine / Skin System Foundation
+
+- If time allows, open `/layout-engine` after Templates or Components.
+- Explain that `LayoutRegistry`, `SkinRegistry`, DisplayModel adapters, and `ModulePageRenderer` are foundation layers only.
+- Say that the current route is metadata-first and preview-only.
+- Say that existing module pages are not fully migrated yet.
+- Do not claim persisted skin preferences, customer-specific live skin switching, real API connections, or production readiness.
+- Position this route as the safer way to refresh ME UI shells before rewriting module pages.
+
 ## Part 5: Suggested demo order
 
 1. Dashboard
@@ -43,4 +52,5 @@
 5. Procurement Demo
 6. Templates
 7. Components
-8. Close with roadmap
+8. Layout Engine
+9. Close with roadmap

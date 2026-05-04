@@ -175,6 +175,10 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
                     <ListTodo size={16} />
                     <span>{messages.common.openTaskEngine}</span>
                   </Link>
+                  <Link className="shell-link-button" href="/layout-engine">
+                    <PanelTopClose size={16} />
+                    <span>{messages.common.openLayoutEngine}</span>
+                  </Link>
                   <Link className="shell-link-button" href="/components">
                     <Blocks size={16} />
                     <span>{messages.common.openComponents}</span>

@@ -17,6 +17,7 @@ This repository currently delivers only the first Core Shell foundation.
 - Typed module registry and source mapping contracts
 - Premium landing dashboard for the initial ME experience
 - Task Engine UI routes backed by local task mock data
+- Layout Engine foundation route and preview registry surfaces
 
 ## Explicit Exclusions
 
@@ -80,6 +81,22 @@ The current milestone does not include real business logic or production integra
 - Cross-module links connect demo source pages to Task Engine records
 - No real workflow engine, notification service, database, or API is connected
 
+## Layout Engine / Skin System Foundation
+
+- `/layout-engine` route now exists
+- `LayoutRegistry` exists under `config/layout-engine/`
+- `SkinRegistry` exists under `config/layout-engine/`
+- DisplayModel adapters exist under `config/layout-engine/`
+- `ModulePageRenderer` foundation exists under `components/layout-engine/`
+- This is metadata-first and preview-only for now
+- Existing module pages are not fully migrated yet
+- No real business logic is included
+- No real API/database is connected
+- No persisted skin preference is implemented yet
+- Future UI redesigns should prefer layout/skin changes before rewriting module pages
+- Current foundation status: completed as `v0.5.2-layout-engine-foundation`
+- Next recommended milestone: `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
+
 ## ME Brain Layer / AI Intelligence Roadmap
 
 This section defines future intelligence directions for ME only.
@@ -113,8 +130,8 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.4.1 Demo QA / Visual Polish / Sales Demo Readiness`
-- Delivery goal: provide a presentation-ready ME prototype with polished demo pages, Task Engine surfaces, local mock data flows, and clear sales-demo positioning.
+- Current milestone: `v0.5.2 Layout Engine / Skin System Foundation`
+- Delivery goal: provide a presentation-ready ME prototype with polished demo pages, Task Engine surfaces, and a metadata-first Layout Engine foundation for future UI shell swaps.
 
 ## Demo Pages Milestone
 

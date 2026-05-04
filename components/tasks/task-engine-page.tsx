@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Layers3, LayoutDashboard, Workflow } from "lucide-react";
+import { Layers3, LayoutDashboard, PanelTopClose, Workflow } from "lucide-react";
 import { useEffect } from "react";
 
 import { MockDataNotice } from "@/components/demo/mock-data-notice";
@@ -22,12 +22,14 @@ const copy = {
     modules: "Open Module Center",
     dashboard: "Back To Dashboard",
     demo: "Open Demo Workspace",
+    layoutEngine: "Layout Engine",
     summary: "Close-loop layer between data and action",
   },
   zh: {
     modules: "打开模块中心",
     dashboard: "返回 Dashboard",
     demo: "打开 Demo Workspace",
+    layoutEngine: "布局引擎",
     summary: "连接数据与动作的闭环层",
   },
 } as const;
@@ -92,6 +94,10 @@ export function TaskEnginePage() {
                 <Link className="shell-link-button shell-link-button--primary" href="/demo">
                   <Workflow size={16} />
                   <span>{currentCopy.demo}</span>
+                </Link>
+                <Link className="shell-link-button" href="/layout-engine">
+                  <PanelTopClose size={16} />
+                  <span>{currentCopy.layoutEngine}</span>
                 </Link>
               </div>
             </div>

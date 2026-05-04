@@ -49,6 +49,7 @@
     "openDemo": "打开 Demo Workspace",
     "prototypeDemo": "Prototype Demo",
     "mockDataOnly": "仅使用 Mock Data",
+    "layoutEngine": "布局引擎",
     "openTaskEngine": "打开 Task Engine",
     "openLayoutEngine": "打开 Layout Engine"
   },

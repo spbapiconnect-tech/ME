@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, ListTodo, Workflow } from "lucide-react";
+import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, ListTodo, PanelTopClose, Workflow } from "lucide-react";
 import { useEffect } from "react";
 
 import { KpiCard } from "@/components/data/kpi-card";
@@ -20,6 +20,7 @@ const copy = {
     templates: "Open Page Templates",
     components: "Open Core Components",
     tasks: "Open Task Engine",
+    layoutEngine: "Layout Engine",
     summary: "Sales Demo Ready Prototype",
   },
   zh: {
@@ -28,6 +29,7 @@ const copy = {
     templates: "打开页面模板",
     components: "打开核心组件",
     tasks: "打开任务引擎",
+    layoutEngine: "布局引擎",
     summary: "适合销售演示的原型",
   },
 } as const;
@@ -97,6 +99,10 @@ export function DemoWorkspace() {
                 <Link className="shell-link-button" href="/tasks">
                   <ListTodo size={16} />
                   <span>{currentCopy.tasks}</span>
+                </Link>
+                <Link className="shell-link-button" href="/layout-engine">
+                  <PanelTopClose size={16} />
+                  <span>{currentCopy.layoutEngine}</span>
                 </Link>
                 <Link className="shell-link-button" href="/components">
                   <Blocks size={16} />
