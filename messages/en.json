@@ -1,0 +1,82 @@
+{
+  "app": {
+    "name": "ME",
+    "subtitle": "Modular Store Operations Platform",
+    "subtitleZh": "模块化门店运营平台",
+    "description": "The first Core Shell foundation for ME focuses on themes, bilingual UX, responsive shells, and a typed module registry without any real business logic.",
+    "milestone": "v0.0.1 Project Setup -> v0.1.0 Theme System"
+  },
+  "common": {
+    "theme": "Theme",
+    "language": "Language",
+    "currentTheme": "Current Theme",
+    "moduleCenter": "Module Center",
+    "supportedThemes": "Supported Themes",
+    "placeholderRoutes": "Placeholder Routes",
+    "permissions": "Permissions",
+    "category": "Category",
+    "status": "Status",
+    "foundationStatus": "Foundation Status",
+    "currentViewport": "Current Viewport",
+    "activeLanguage": "Active Language",
+    "shellPlaceholder": "Shell Placeholder",
+    "noBusinessLogic": "No real business logic, database, or external connectors are implemented in this milestone.",
+    "dashboardReady": "Dashboard shell is ready for future modules.",
+    "responsiveReady": "Responsive shell patterns are in place.",
+    "bilingualReady": "English and Chinese labels share the same layout system."
+  },
+  "themes": {
+    "bright": "Bright",
+    "dark": "Dark",
+    "moon": "Moon"
+  },
+  "languages": {
+    "en": "English",
+    "zh": "中文"
+  },
+  "status": {
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "coming-soon": "Coming Soon"
+  },
+  "category": {
+    "core": "Core",
+    "control": "Control",
+    "admin": "Admin",
+    "future": "Future"
+  },
+  "shells": {
+    "mobile": "Mobile Shell",
+    "tablet": "Tablet Shell",
+    "desktop": "Desktop Shell",
+    "mobileCopy": "Top bar, compact KPI lane, module stream, and bottom navigation placeholder.",
+    "tabletCopy": "Sidebar, workspace split, utility toolbar, and adaptive content region placeholder.",
+    "desktopCopy": "Global sidebar, workspace canvas, analytics rail, and operations panel placeholder."
+  },
+  "modules": {
+    "procurement": {
+      "name": "Procurement",
+      "shortName": "Procure"
+    },
+    "supplier": {
+      "name": "Supplier",
+      "shortName": "Supplier"
+    },
+    "inventory": {
+      "name": "Inventory",
+      "shortName": "Stock"
+    },
+    "pos-report": {
+      "name": "POS Report",
+      "shortName": "POS"
+    },
+    "education": {
+      "name": "Education",
+      "shortName": "Learning"
+    },
+    "task": {
+      "name": "Task",
+      "shortName": "Task"
+    }
+  }
+}

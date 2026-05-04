@@ -1,0 +1,82 @@
+{
+  "app": {
+    "name": "ME",
+    "subtitle": "Modular Store Operations Platform",
+    "subtitleZh": "模块化门店运营平台",
+    "description": "ME 的第一阶段只交付 Core Shell 基础层，聚焦主题系统、双语体验、响应式骨架与类型化模块注册，不接入任何真实业务逻辑。",
+    "milestone": "v0.0.1 Project Setup -> v0.1.0 Theme System"
+  },
+  "common": {
+    "theme": "主题",
+    "language": "语言",
+    "currentTheme": "当前主题",
+    "moduleCenter": "模块中心",
+    "supportedThemes": "支持主题",
+    "placeholderRoutes": "占位路由",
+    "permissions": "权限",
+    "category": "分类",
+    "status": "状态",
+    "foundationStatus": "基础状态",
+    "currentViewport": "当前视图",
+    "activeLanguage": "当前语言",
+    "shellPlaceholder": "骨架占位",
+    "noBusinessLogic": "当前里程碑不包含真实业务逻辑、数据库或外部连接器。",
+    "dashboardReady": "Dashboard 骨架已为后续模块扩展做好准备。",
+    "responsiveReady": "三端响应式 Shell 模式已准备完成。",
+    "bilingualReady": "中文与 English 共用同一套稳定布局。"
+  },
+  "themes": {
+    "bright": "Bright",
+    "dark": "Dark",
+    "moon": "Moon"
+  },
+  "languages": {
+    "en": "English",
+    "zh": "中文"
+  },
+  "status": {
+    "enabled": "启用",
+    "disabled": "停用",
+    "coming-soon": "即将上线"
+  },
+  "category": {
+    "core": "核心",
+    "control": "控制",
+    "admin": "管理",
+    "future": "未来"
+  },
+  "shells": {
+    "mobile": "Mobile Shell",
+    "tablet": "Tablet Shell",
+    "desktop": "Desktop Shell",
+    "mobileCopy": "包含顶栏、紧凑 KPI 区、模块流与底部导航占位。",
+    "tabletCopy": "包含侧栏、工作区分栏、工具栏与自适应内容区域占位。",
+    "desktopCopy": "包含全局侧栏、主工作台、分析信息栏与操作面板占位。"
+  },
+  "modules": {
+    "procurement": {
+      "name": "采购",
+      "shortName": "采购"
+    },
+    "supplier": {
+      "name": "供应商",
+      "shortName": "供方"
+    },
+    "inventory": {
+      "name": "库存",
+      "shortName": "库存"
+    },
+    "pos-report": {
+      "name": "POS 报表",
+      "shortName": "报表"
+    },
+    "education": {
+      "name": "培训",
+      "shortName": "培训"
+    },
+    "task": {
+      "name": "任务",
+      "shortName": "任务"
+    }
+  }
+}
