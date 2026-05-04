@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LayoutTemplate, Layers3 } from "lucide-react";
+import { Blocks, LayoutTemplate, Layers3 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
@@ -26,6 +26,7 @@ const textCatalog = {
     pageType: "Page Type",
     back: "Back To Dashboard",
     moduleCenter: "Open Module Center",
+    components: "Open Core Components",
   },
   zh: {
     title: "ME Page Templates",
@@ -35,6 +36,7 @@ const textCatalog = {
     pageType: "页面类型",
     back: "返回 Dashboard",
     moduleCenter: "打开模块中心",
+    components: "打开核心组件",
   },
 } as const;
 
@@ -129,6 +131,10 @@ export function TemplateDemo() {
                 <Link className="shell-link-button" href="/modules">
                   <Layers3 size={16} />
                   <span>{copy.moduleCenter}</span>
+                </Link>
+                <Link className="shell-link-button" href="/components">
+                  <Blocks size={16} />
+                  <span>{copy.components}</span>
                 </Link>
               </div>
             </div>

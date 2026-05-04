@@ -57,6 +57,17 @@ The current milestone does not include real business logic or production integra
   - tablet/desktop detail = context panel
   - issue pages must support close-loop structure later
 
+## Core Components Milestone
+
+- Reusable components are now centralized under `components/data` and `components/form`
+- Page templates should reuse these components before introducing custom UI
+- Components are theme-token based
+- Components must support bilingual layout and English overflow protection
+- Component demo route lives at `/components`
+- No real business logic is included yet
+- No real API is connected
+- Future module pages should compose from these components first
+
 ## ME Brain Layer / AI Intelligence Roadmap
 
 This section defines future intelligence directions for ME only.
@@ -90,5 +101,5 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.3.0 Page Templates`
-- Delivery goal: establish schema-driven reusable pages for future ME modules without page-by-page redesign
+- Current milestone: `v0.3.1 Core Components`
+- Delivery goal: provide a stable reusable component library so future ME module pages can compose from shared UI instead of redesigning each page

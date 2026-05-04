@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME 当前新增 schema-driven 页面模板系统，让未来模块页面可以复用统一的 Dashboard、Listing、Detail、Issue、Form、Report 与 Settings 结构。",
-    "milestone": "v0.3.0 Page Templates"
+    "description": "ME 当前进一步稳定可复用核心组件库，让未来模块页面可以用统一的 KPI 卡片、状态标签、筛选栏、数据展示、抽屉、时间线与表单区块进行组合。",
+    "milestone": "v0.3.1 Core Components"
   },
   "common": {
     "theme": "主题",
@@ -44,7 +44,8 @@
     "apiScopeCount": "API 范围数量",
     "ownerRole": "负责角色",
     "sourceMapping": "来源映射",
-    "openTemplates": "打开页面模板"
+    "openTemplates": "打开页面模板",
+    "openComponents": "打开核心组件"
   },
   "themes": {
     "bright": "Bright",

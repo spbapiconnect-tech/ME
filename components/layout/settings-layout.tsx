@@ -1,7 +1,9 @@
+import { ActionBar } from "@/components/data/action-bar";
+import { DetailPanel } from "@/components/data/detail-panel";
+import { StatusChip } from "@/components/data/status-chip";
+import { PageTemplateShell } from "@/components/layout/page-template-shell";
 import type { SupportedLocale } from "@/types/module";
 import type { PageSchemaDefinition, PageTemplateDemoData } from "@/types/page-schema";
-
-import { PageTemplateShell, getLocalizedText } from "@/components/layout/page-template-shell";
 
 interface SettingsLayoutProps {
   schema: PageSchemaDefinition;
@@ -15,34 +17,35 @@ export function SettingsLayout({ schema, demoData, locale }: SettingsLayoutProps
       schema={schema}
       locale={locale}
       footer={
-        <div className="template-footer-actions">
-          {schema.actions.map((action) => (
-            <button key={action.key} className="template-action-button" type="button">
-              {getLocalizedText(action.label, locale)}
-            </button>
-          ))}
-        </div>
+        <ActionBar
+          locale={locale}
+          primaryAction={schema.actions[0] ? { key: schema.actions[0].key, label: schema.actions[0].label } : undefined}
+          secondaryActions={schema.actions.slice(1).map((action) => ({ key: action.key, label: action.label }))}
+        />
       }
     >
       <div className="template-settings-grid">
         {schema.sections.map((section) => (
-          <section key={section.key} className="template-card template-settings-card">
-            <div className="template-card-header">
-              <h3>{getLocalizedText(section.title, locale)}</h3>
-            </div>
-            <div className="template-setting-list">
-              {(section.fieldKeys ?? []).map((fieldKey) => (
-                <div key={fieldKey} className="template-setting-row">
-                  <span>{fieldKey}</span>
-                  <strong>{demoData.settingsValues[fieldKey] ?? schema.sourceMapping.sourceKey}</strong>
-                </div>
-              ))}
-            </div>
-            <div className="template-setting-note">
-              <span>{schema.apiMapping.endpoint}</span>
-              <span>{schema.sourceMapping.note}</span>
-            </div>
-          </section>
+          <DetailPanel
+            key={section.key}
+            locale={locale}
+            title={section.title}
+            sections={[
+              {
+                title: section.title,
+                rows: (section.fieldKeys ?? []).map((fieldKey) => ({
+                  label: fieldKey,
+                  value: demoData.settingsValues[fieldKey] ?? schema.sourceMapping.sourceKey,
+                })),
+              },
+            ]}
+            contextSlot={
+              <div className="template-chip-row">
+                <StatusChip label={schema.apiMapping.method} locale={locale} tone="brand" size="sm" />
+                <StatusChip label={schema.sourceMapping.sourceKey} locale={locale} tone="info" size="sm" />
+              </div>
+            }
+          />
         ))}
       </div>
     </PageTemplateShell>

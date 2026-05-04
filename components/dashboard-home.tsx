@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Layers3, LayoutDashboard, LayoutTemplate, PanelTopClose, Sparkles } from "lucide-react";
+import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, PanelTopClose, Sparkles } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -166,6 +166,10 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
                   <Link className="shell-link-button" href="/templates">
                     <LayoutTemplate size={16} />
                     <span>{messages.common.openTemplates}</span>
+                  </Link>
+                  <Link className="shell-link-button" href="/components">
+                    <Blocks size={16} />
+                    <span>{messages.common.openComponents}</span>
                   </Link>
                 </div>
               </div>

@@ -1,7 +1,9 @@
+import { DetailPanel } from "@/components/data/detail-panel";
+import { RightDrawer } from "@/components/data/right-drawer";
+import { Timeline } from "@/components/data/timeline";
+import { PageTemplateShell, getLocalizedText } from "@/components/layout/page-template-shell";
 import type { SupportedLocale } from "@/types/module";
 import type { PageSchemaDefinition, PageTemplateDemoData } from "@/types/page-schema";
-
-import { PageTemplateShell, getLocalizedText } from "@/components/layout/page-template-shell";
 
 interface DetailLayoutProps {
   schema: PageSchemaDefinition;
@@ -13,40 +15,33 @@ export function DetailLayout({ schema, demoData, locale }: DetailLayoutProps) {
   return (
     <PageTemplateShell schema={schema} locale={locale}>
       <div className="template-detail-shell">
-        <section className="template-card template-detail-main">
-          {schema.sections.map((section) => (
-            <article key={section.key} className="template-section-block">
-              <div className="template-card-header">
-                <h3>{getLocalizedText(section.title, locale)}</h3>
-              </div>
-              <div className="template-detail-grid">
-                {(section.fieldKeys ?? Object.keys(demoData.detail)).map((fieldKey) => (
-                  <div key={fieldKey} className="template-detail-item">
-                    <span>{fieldKey}</span>
-                    <strong>{demoData.detail[fieldKey] ?? "placeholder"}</strong>
-                  </div>
-                ))}
-              </div>
-            </article>
-          ))}
-        </section>
+        <DetailPanel
+          locale={locale}
+          title={schema.title}
+          description={schema.description}
+          sections={schema.sections.map((section) => ({
+            title: section.title,
+            rows: (section.fieldKeys ?? Object.keys(demoData.detail)).map((fieldKey) => ({
+              label: fieldKey,
+              value: demoData.detail[fieldKey] ?? "placeholder",
+            })),
+          }))}
+        />
 
-        <aside className="template-card template-detail-panel">
-          <div className="template-card-header">
-            <h3>{getLocalizedText(schema.tabs[1].label, locale)}</h3>
+        <RightDrawer
+          locale={locale}
+          title={schema.tabs[1].label}
+          description={{ zh: "平板/桌面上下文信息占位。", en: "Tablet and desktop context panel placeholder." }}
+          alwaysVisible
+        >
+          <Timeline locale={locale} items={demoData.timeline} />
+          <div className="template-card">
+            <div className="template-card-header">
+              <h3>{getLocalizedText(schema.tabs[2].label, locale)}</h3>
+            </div>
+            <p>{schema.apiMapping.note}</p>
           </div>
-          <div className="template-timeline-list">
-            {demoData.timeline.map((item) => (
-              <div key={`${item.title.en}-${item.timestamp}`} className="template-timeline-item">
-                <div>
-                  <strong>{getLocalizedText(item.title, locale)}</strong>
-                  <p>{item.timestamp}</p>
-                </div>
-                <span className="template-status-pill">{item.status}</span>
-              </div>
-            ))}
-          </div>
-        </aside>
+        </RightDrawer>
       </div>
     </PageTemplateShell>
   );

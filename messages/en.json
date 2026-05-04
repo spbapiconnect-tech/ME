@@ -3,8 +3,8 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME now adds schema-driven page templates so future module pages can reuse consistent Dashboard, Listing, Detail, Issue, Form, Report, and Settings structures.",
-    "milestone": "v0.3.0 Page Templates"
+    "description": "ME now stabilizes a reusable core component library so future module pages can compose KPI cards, status chips, filters, data displays, drawers, timelines, and form sections from shared building blocks.",
+    "milestone": "v0.3.1 Core Components"
   },
   "common": {
     "theme": "Theme",
@@ -44,7 +44,8 @@
     "apiScopeCount": "API Scope Count",
     "ownerRole": "Owner Role",
     "sourceMapping": "Source Mapping",
-    "openTemplates": "Open Page Templates"
+    "openTemplates": "Open Page Templates",
+    "openComponents": "Open Core Components"
   },
   "themes": {
     "bright": "Bright",

@@ -1,7 +1,10 @@
+import { ActionBar } from "@/components/data/action-bar";
+import { CardList } from "@/components/data/card-list";
+import { StatusChip } from "@/components/data/status-chip";
+import { Timeline } from "@/components/data/timeline";
+import { PageTemplateShell, getLocalizedText } from "@/components/layout/page-template-shell";
 import type { SupportedLocale } from "@/types/module";
 import type { PageSchemaDefinition, PageTemplateDemoData } from "@/types/page-schema";
-
-import { PageTemplateShell, getLocalizedText } from "@/components/layout/page-template-shell";
 
 interface IssueLayoutProps {
   schema: PageSchemaDefinition;
@@ -15,13 +18,12 @@ export function IssueLayout({ schema, demoData, locale }: IssueLayoutProps) {
       schema={schema}
       locale={locale}
       actions={
-        <div className="template-chip-row">
-          {schema.actions.map((action) => (
-            <button key={action.key} className="template-action-button" type="button">
-              {getLocalizedText(action.label, locale)}
-            </button>
-          ))}
-        </div>
+        <ActionBar
+          locale={locale}
+          primaryAction={schema.actions[2] ? { key: schema.actions[2].key, label: schema.actions[2].label } : undefined}
+          secondaryActions={schema.actions.slice(0, 2).map((action) => ({ key: action.key, label: action.label }))}
+          bulkActionLabel={{ zh: "批量闭环占位", en: "Bulk Close-Loop Placeholder" }}
+        />
       }
     >
       <div className="template-issue-shell">
@@ -33,37 +35,28 @@ export function IssueLayout({ schema, demoData, locale }: IssueLayoutProps) {
             {schema.tabs.map((tab) => (
               <div key={tab.key} className="template-board-column">
                 <div className="template-board-column-header">{getLocalizedText(tab.label, locale)}</div>
-                {demoData.issues.map((issue) => (
-                  <article key={`${tab.key}-${issue.id}`} className="template-board-card">
-                    <strong>{issue.title}</strong>
-                    <p>{issue.owner}</p>
-                    <div className="template-chip-row">
-                      <span className="template-chip">{issue.severity}</span>
-                      <span className="template-chip">{issue.dueDate}</span>
-                    </div>
-                  </article>
-                ))}
+                <CardList
+                  locale={locale}
+                  items={demoData.issues.map((issue) => ({
+                    id: `${tab.key}-${issue.id}`,
+                    title: issue.title,
+                    subtitle: issue.owner,
+                    meta: issue.dueDate,
+                    status: issue.status,
+                    actionLabel: locale === "zh" ? "闭环" : "Close Loop",
+                  }))}
+                />
               </div>
+            ))}
+          </div>
+          <div className="template-chip-row">
+            {demoData.issues.map((issue) => (
+              <StatusChip key={issue.id} label={issue.severity} locale={locale} tone="warning" size="sm" dot />
             ))}
           </div>
         </section>
 
-        <aside className="template-card template-detail-panel">
-          <div className="template-card-header">
-            <h3>{getLocalizedText(schema.sections[1].title, locale)}</h3>
-          </div>
-          <div className="template-timeline-list">
-            {demoData.timeline.map((item) => (
-              <div key={`${item.title.en}-${item.timestamp}`} className="template-timeline-item">
-                <div>
-                  <strong>{getLocalizedText(item.title, locale)}</strong>
-                  <p>{item.timestamp}</p>
-                </div>
-                <span className="template-status-pill">{item.status}</span>
-              </div>
-            ))}
-          </div>
-        </aside>
+        <Timeline locale={locale} title={schema.sections[1].title} items={demoData.timeline} />
       </div>
     </PageTemplateShell>
   );

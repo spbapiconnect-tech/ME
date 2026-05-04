@@ -3,12 +3,12 @@
 ## Foundation Layers
 
 1. `app/`: Next.js App Router entry points and global styles
-2. `components/`: dashboard, switchers, module cards, and shell placeholders
+2. `components/`: dashboard, switchers, module cards, shell placeholders, data components, and form components
 3. `config/`: typed module registry as the single source for module metadata
 4. `messages/`: English and Chinese message catalogs
 5. `types/`: platform contracts for modules, page schema, permissions, and source mapping
 6. `stores/`: lightweight client preferences for theme and language
-7. `lib/`: registry helper utilities for filtering, grouping, and stats
+7. `lib/`: registry helper utilities, localized helpers, and shared UI support logic
 
 ## Key Principles
 
@@ -63,3 +63,14 @@
   - mobile detail = single column
   - tablet/desktop detail = context panel
   - issue pages must support close-loop structure later
+
+## Core Components Milestone
+
+- Reusable components are now centralized under `components/data` and `components/form`
+- Page templates should reuse these components before introducing custom UI
+- Components are theme-token based
+- Components must support bilingual layout and English overflow protection
+- Component demo route lives at `/components`
+- No real business logic is included yet
+- No real API is connected
+- Future module pages should compose from these components first

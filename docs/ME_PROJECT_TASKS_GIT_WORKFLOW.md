@@ -9,6 +9,7 @@
 5. Module registry foundation
 6. Dashboard polish and verification
 7. Schema-driven page templates
+8. Reusable core component library
 
 ## Branch Model
 
@@ -28,6 +29,7 @@ Use Conventional Commits.
 - `feat: add ME theme switcher`
 - `feat: add ME module registry`
 - `feat: add ME page templates`
+- `feat: add ME core component library`
 - `fix: prevent ME module card overflow`
 - `docs: update ME project scope`
 
@@ -66,3 +68,14 @@ Use Conventional Commits.
   - mobile detail = single column
   - tablet/desktop detail = context panel
   - issue pages must support close-loop structure later
+
+## Core Components Milestone
+
+- Reusable components are now centralized under `components/data` and `components/form`
+- Page templates should reuse these components before introducing custom UI
+- Components are theme-token based
+- Components must support bilingual layout and English overflow protection
+- Component demo route lives at `/components`
+- No real business logic is included yet
+- No real API is connected
+- Future module pages should compose from these components first

@@ -1,7 +1,12 @@
+import { ActionBar } from "@/components/data/action-bar";
+import { CardList } from "@/components/data/card-list";
+import { DataTable } from "@/components/data/data-table";
+import { FilterBar } from "@/components/data/filter-bar";
+import { RightDrawer } from "@/components/data/right-drawer";
+import { Timeline } from "@/components/data/timeline";
+import { PageTemplateShell, getLocalizedText } from "@/components/layout/page-template-shell";
 import type { SupportedLocale } from "@/types/module";
 import type { PageSchemaDefinition, PageTemplateDemoData } from "@/types/page-schema";
-
-import { PageTemplateShell, getLocalizedText } from "@/components/layout/page-template-shell";
 
 interface ListingLayoutProps {
   schema: PageSchemaDefinition;
@@ -15,84 +20,56 @@ export function ListingLayout({ schema, demoData, locale }: ListingLayoutProps) 
       schema={schema}
       locale={locale}
       actions={
-        <div className="template-chip-row">
-          {schema.actions.map((action) => (
-            <button key={action.key} className="template-action-button" type="button">
-              {getLocalizedText(action.label, locale)}
-            </button>
-          ))}
-        </div>
+        <ActionBar
+          locale={locale}
+          primaryAction={schema.actions[0] ? { key: schema.actions[0].key, label: schema.actions[0].label } : undefined}
+          secondaryActions={schema.actions.slice(1).map((action) => ({ key: action.key, label: action.label }))}
+          bulkActionLabel={{ zh: "批量操作占位", en: "Bulk Action Placeholder" }}
+        />
       }
     >
-      <section className="template-card">
-        <div className="template-filter-row">
-          {schema.filters.map((filter) => (
-            <div key={filter.key} className="template-filter-pill">
-              <span>{getLocalizedText(filter.label, locale)}</span>
-              <small>{filter.type}</small>
-            </div>
-          ))}
-        </div>
-        <div className="template-tab-row">
-          {schema.tabs.map((tab) => (
-            <button key={tab.key} className="template-tab-button" type="button">
-              {getLocalizedText(tab.label, locale)}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="template-listing-shell">
-        <div className="template-card template-mobile-records">
-          {demoData.records.map((record, index) => (
-            <article key={`mobile-${index}`} className="template-mobile-record-card">
-              {schema.columns.map((column) => (
-                <div key={column.key} className="template-mobile-record-row">
-                  <span>{getLocalizedText(column.label, locale)}</span>
-                  <strong>{record[column.key]}</strong>
-                </div>
-              ))}
-            </article>
-          ))}
-        </div>
-
-        <div className="template-card template-table-card">
-          <table className="template-table">
-            <thead>
-              <tr>
-                {schema.columns.map((column) => (
-                  <th key={column.key}>{getLocalizedText(column.label, locale)}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {demoData.records.map((record, index) => (
-                <tr key={`row-${index}`}>
-                  {schema.columns.map((column) => (
-                    <td key={column.key}>{record[column.key]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <aside className="template-card template-listing-preview">
-          <div className="template-card-header">
-            <h3>{getLocalizedText(schema.sections[1].title, locale)}</h3>
-          </div>
-          <div className="template-timeline-list">
-            {demoData.timeline.map((item) => (
-              <div key={`${item.title.en}-${item.timestamp}`} className="template-timeline-item">
-                <div>
-                  <strong>{getLocalizedText(item.title, locale)}</strong>
-                  <p>{item.timestamp}</p>
-                </div>
-                <span className="template-status-pill">{item.status}</span>
-              </div>
+      <FilterBar
+        locale={locale}
+        filters={schema.filters}
+        searchPlaceholder={{ zh: "搜索列表占位", en: "Search list placeholder" }}
+        actionSlot={
+          <div className="template-tab-row">
+            {schema.tabs.map((tab) => (
+              <button key={tab.key} className="template-tab-button" type="button">
+                {getLocalizedText(tab.label, locale)}
+              </button>
             ))}
           </div>
-        </aside>
+        }
+      />
+
+      <section className="template-listing-shell">
+        <section className="template-card template-mobile-records">
+          <CardList
+            locale={locale}
+            items={demoData.records.map((record, index) => ({
+              id: `mobile-${index}`,
+              title: record[schema.columns[0]?.key] ?? `Record ${index + 1}`,
+              subtitle: record[schema.columns[1]?.key] ?? "--",
+              meta: record[schema.columns[2]?.key] ?? "--",
+              status: record.status ?? record.stockStatus,
+              actionLabel: locale === "zh" ? "查看" : "View",
+            }))}
+          />
+        </section>
+
+        <section className="template-card template-table-card">
+          <DataTable locale={locale} columns={schema.columns} rows={demoData.records} />
+        </section>
+
+        <RightDrawer
+          locale={locale}
+          title={schema.sections[1].title}
+          description={{ zh: "平板分栏与桌面预览抽屉占位。", en: "Tablet split preview and desktop drawer placeholder." }}
+          alwaysVisible
+        >
+          <Timeline locale={locale} items={demoData.timeline} />
+        </RightDrawer>
       </section>
     </PageTemplateShell>
   );
