@@ -26,7 +26,7 @@ function getViewportLabel(width: number, shellLabels: (typeof enMessages)["shell
     return shellLabels.mobile;
   }
 
-  if (width < 1181) {
+  if (width < 1200) {
     return shellLabels.tablet;
   }
 

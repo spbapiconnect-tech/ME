@@ -22,3 +22,15 @@
 - `TabletShell`: sidebar + workspace placeholder shell
 - `DesktopShell`: sidebar + canvas + rail placeholder shell
 - `ResponsiveShell`: chooses the active shell by viewport width while preserving one dashboard content model
+
+## Responsive Shell Milestone
+
+- Mobile breakpoint: `< 768px`
+- Tablet breakpoint: `768px - 1199px`
+- Desktop breakpoint: `>= 1200px`
+- Mobile responsibility: execution, quick actions, task cards, compact navigation
+- Tablet responsibility: manager workspace, sidebar, split-view, context drawer
+- Desktop responsibility: admin console, data grid, bulk actions, settings
+- Rule: module list must come from `config/modules.ts`
+- Rule: theme colors must come from CSS variables
+- Rule: bilingual layout must avoid English overflow
