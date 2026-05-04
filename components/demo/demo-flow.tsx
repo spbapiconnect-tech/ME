@@ -1,22 +1,30 @@
 import Link from "next/link";
 
-import { demoDashboardData } from "@/data/demo";
+import type { LocalizedText } from "@/types/module";
+import type { DemoModuleCode } from "@/data/demo";
 import { getLocalizedText } from "@/lib/localized";
 import { getModuleByCode } from "@/lib/modules";
 import type { SupportedLocale } from "@/types/module";
 
-interface DemoFlowProps {
-  locale: SupportedLocale;
+interface DemoFlowStep {
+  id: string;
+  moduleCode: DemoModuleCode;
+  title: LocalizedText;
+  description: LocalizedText;
+  signal: string;
 }
 
-export function DemoFlow({ locale }: DemoFlowProps) {
+interface DemoFlowProps {
+  locale: SupportedLocale;
+  flowSteps: DemoFlowStep[];
+}
+
+export function DemoFlow({ locale, flowSteps }: DemoFlowProps) {
   return (
     <section className="modules-panel">
       <div className="panel-header">
         <div>
-          <h2 className="shell-title">
-            {locale === "zh" ? "跨模块演示流" : "Cross-Module Demo Flow"}
-          </h2>
+          <h2 className="shell-title">{locale === "zh" ? "跨模块演示流" : "Cross-Module Demo Flow"}</h2>
           <p className="shell-copy">
             {locale === "zh"
               ? "POS Sales Signal → Inventory Risk → Procurement Suggestion → Supplier Check → Task Assignment → Education / SOP Follow-up"
@@ -25,7 +33,7 @@ export function DemoFlow({ locale }: DemoFlowProps) {
         </div>
       </div>
       <div className="demo-flow-grid">
-        {demoDashboardData.flowSteps.map((step, index) => {
+        {flowSteps.map((step, index) => {
           const moduleItem = getModuleByCode(step.moduleCode);
 
           return (

@@ -141,3 +141,9 @@ Use Conventional Commits.
 - A mock-first service layer and repository contract foundation exists.
 - Repository provider defaults to mock mode.
 - No real API/database/business implementation is included yet.
+
+## Data Provider Integration / Page Data Boundary
+
+- When updating UI pages, route-level components should read data via `lib/services/*` (or `lib/page-data/*`) instead of importing `data/*`.
+- Keep repository provider in mock mode until an API-backed repository is ready.
+- Do not add Next.js API routes, fetch/axios, or database code during this milestone.

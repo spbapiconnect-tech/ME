@@ -5,11 +5,12 @@ import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, ListTodo, PanelTopClo
 import { useEffect } from "react";
 
 import { KpiCard } from "@/components/data/kpi-card";
+import { EmptyState } from "@/components/data/empty-state";
 import { DemoFlow } from "@/components/demo/demo-flow";
 import { DemoOverview } from "@/components/demo/demo-overview";
 import { DemoModuleSwitcher } from "@/components/demo/demo-module-switcher";
 import { MockDataNotice } from "@/components/demo/mock-data-notice";
-import { demoDashboardData } from "@/data/demo";
+import type { DemoWorkspacePageData } from "@/lib/page-data";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { SupportedLocale, ThemeMode } from "@/types/module";
 
@@ -34,7 +35,11 @@ const copy = {
   },
 } as const;
 
-export function DemoWorkspace() {
+interface DemoWorkspaceProps {
+  pageData: DemoWorkspacePageData;
+}
+
+export function DemoWorkspace({ pageData }: DemoWorkspaceProps) {
   const locale = useUiPreferencesStore((state) => state.locale);
   const theme = useUiPreferencesStore((state) => state.theme);
   const hydrated = useUiPreferencesStore((state) => state.hydrated);
@@ -66,7 +71,7 @@ export function DemoWorkspace() {
             <div className="eyebrow-row">
               <span className="brand-mark">
                 <span className="brand-dot" />
-                {demoDashboardData.title[currentLocale]}
+                {pageData.dashboard.title[currentLocale]}
               </span>
               <span className="locale-chip">
                 <Workflow size={16} />
@@ -75,9 +80,9 @@ export function DemoWorkspace() {
             </div>
             <div className="hero-metadata">
               <div>
-                <h1 className="hero-title">{demoDashboardData.title[currentLocale]}</h1>
-                <p className="hero-subtitle">{demoDashboardData.subtitle[currentLocale]}</p>
-                <p className="hero-subtitle-zh">{demoDashboardData.description[currentLocale]}</p>
+                <h1 className="hero-title">{pageData.dashboard.title[currentLocale]}</h1>
+                <p className="hero-subtitle">{pageData.dashboard.subtitle[currentLocale]}</p>
+                <p className="hero-subtitle-zh">{pageData.dashboard.description[currentLocale]}</p>
                 <div className="template-chip-row">
                   <span className="template-chip template-chip--type">{currentCopy.summary}</span>
                   <span className="template-chip">v0.4.1</span>
@@ -114,6 +119,17 @@ export function DemoWorkspace() {
 
           <MockDataNotice locale={currentLocale} />
 
+          {pageData.error ? (
+            <section className="modules-panel">
+              <EmptyState
+                locale={currentLocale}
+                title={{ zh: "数据读取失败", en: "Data Load Failed" }}
+                description={{ zh: pageData.error, en: pageData.error }}
+                actionLabel={{ zh: "返回 Dashboard", en: "Back To Dashboard" }}
+              />
+            </section>
+          ) : null}
+
           <section className="modules-panel">
             <div className="panel-header">
               <div>
@@ -126,7 +142,7 @@ export function DemoWorkspace() {
               </div>
             </div>
             <div className="template-kpi-grid">
-              {demoDashboardData.heroMetrics.map((metric) => (
+              {pageData.dashboard.heroMetrics.map((metric) => (
                 <KpiCard key={metric.label.en} locale={currentLocale} label={metric.label} value={metric.value} tone="brand" />
               ))}
             </div>
@@ -138,16 +154,16 @@ export function DemoWorkspace() {
                 <h2 className="shell-title">{currentLocale === "zh" ? "快速切换模块" : "Jump To Modules"}</h2>
                 <p className="shell-copy">
                   {currentLocale === "zh"
-                    ? "所有模块页都使用 data/demo/ 中的本地 TypeScript 数据。"
-                    : "Each module page uses local TypeScript data from data/demo/."}
+                    ? "所有模块页均通过 Service Layer 读取本地 mock data。"
+                    : "Each module page reads local mock data through the service layer."}
                 </p>
               </div>
             </div>
-            <DemoModuleSwitcher locale={currentLocale} />
+            <DemoModuleSwitcher locale={currentLocale} moduleCodes={pageData.moduleCodes} />
           </section>
 
-          <DemoOverview locale={currentLocale} />
-          <DemoFlow locale={currentLocale} />
+          <DemoOverview locale={currentLocale} moduleCodes={pageData.moduleCodes} moduleDataMap={pageData.moduleDataMap} />
+          <DemoFlow locale={currentLocale} flowSteps={pageData.dashboard.flowSteps} />
         </div>
       </section>
     </main>

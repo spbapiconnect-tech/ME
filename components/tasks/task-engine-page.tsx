@@ -4,13 +4,14 @@ import Link from "next/link";
 import { Layers3, LayoutDashboard, PanelTopClose, Workflow } from "lucide-react";
 import { useEffect } from "react";
 
+import { moduleRegistry } from "@/config/modules";
+import { EmptyState } from "@/components/data/empty-state";
 import { MockDataNotice } from "@/components/demo/mock-data-notice";
 import { FilterBar } from "@/components/data/filter-bar";
 import { StatusChip } from "@/components/data/status-chip";
-import { taskRecords } from "@/data/tasks/task-records";
-import { getTaskSourceSummary, getTaskStats } from "@/lib/tasks";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { SupportedLocale, ThemeMode } from "@/types/module";
+import type { TaskRecord, TaskSourceSummaryItem, TaskStats } from "@/types/task";
 
 import { TaskActionBar } from "@/components/tasks/task-action-bar";
 import { TaskBoard } from "@/components/tasks/task-board";
@@ -34,7 +35,56 @@ const copy = {
   },
 } as const;
 
-export function TaskEnginePage() {
+function buildTaskStats(tasks: TaskRecord[]): TaskStats {
+  const stats: TaskStats = {
+    total: tasks.length,
+    overdue: 0,
+    inProgress: 0,
+    review: 0,
+    blocked: 0,
+    done: 0,
+    byPriority: { low: 0, medium: 0, high: 0, critical: 0 },
+    byStatus: { todo: 0, "in-progress": 0, review: 0, blocked: 0, done: 0, rejected: 0, overdue: 0 },
+  };
+
+  for (const task of tasks) {
+    stats.byPriority[task.priority] += 1;
+    stats.byStatus[task.status] += 1;
+
+    if (task.status === "overdue") stats.overdue += 1;
+    if (task.status === "in-progress") stats.inProgress += 1;
+    if (task.status === "review") stats.review += 1;
+    if (task.status === "blocked") stats.blocked += 1;
+    if (task.status === "done") stats.done += 1;
+  }
+
+  return stats;
+}
+
+function buildTaskSourceSummary(tasks: TaskRecord[]): TaskSourceSummaryItem[] {
+  return moduleRegistry
+    .filter((moduleItem) => ["procurement", "supplier", "inventory", "pos-report", "education", "task"].includes(moduleItem.code))
+    .map((moduleItem) => {
+      const sourceTasks = tasks.filter((task) => task.sourceModule === moduleItem.code);
+
+      return {
+        moduleCode: moduleItem.code as TaskRecord["sourceModule"],
+        total: sourceTasks.length,
+        overdue: sourceTasks.filter((task) => task.status === "overdue").length,
+        review: sourceTasks.filter((task) => task.status === "review").length,
+        route: moduleItem.code === "task" ? "/tasks" : `/demo/${moduleItem.code}`,
+      };
+    })
+    .filter((item) => item.total > 0)
+    .sort((left, right) => right.total - left.total);
+}
+
+interface TaskEnginePageProps {
+  tasks: TaskRecord[];
+  dataError?: string;
+}
+
+export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
   const locale = useUiPreferencesStore((state) => state.locale);
   const theme = useUiPreferencesStore((state) => state.theme);
   const hydrated = useUiPreferencesStore((state) => state.hydrated);
@@ -53,8 +103,8 @@ export function TaskEnginePage() {
   const currentLocale: SupportedLocale = hydrated ? locale : "en";
   const currentTheme: ThemeMode = hydrated ? theme : "bright";
   const currentCopy = copy[currentLocale];
-  const stats = getTaskStats();
-  const sourceSummary = getTaskSourceSummary();
+  const stats = buildTaskStats(tasks);
+  const sourceSummary = buildTaskSourceSummary(tasks);
 
   return (
     <main className="main-frame module-center-page">
@@ -111,6 +161,17 @@ export function TaskEnginePage() {
             tags={[{ zh: "本地任务数据", en: "Local Task Data" }, { zh: "无工作流引擎", en: "No Workflow Engine" }, { zh: "无通知服务", en: "No Notification Service" }]}
           />
 
+          {dataError ? (
+            <section className="modules-panel">
+              <EmptyState
+                locale={currentLocale}
+                title={{ zh: "数据读取失败", en: "Data Load Failed" }}
+                description={{ zh: dataError, en: dataError }}
+                actionLabel={{ zh: "返回 Demo Workspace", en: "Back To Demo Workspace" }}
+              />
+            </section>
+          ) : null}
+
           <section className="modules-panel">
             <TaskActionBar locale={currentLocale} />
           </section>
@@ -153,7 +214,7 @@ export function TaskEnginePage() {
                 </p>
               </div>
             </div>
-            <TaskBoard tasks={taskRecords} locale={currentLocale} />
+            <TaskBoard tasks={tasks} locale={currentLocale} />
           </section>
 
           <section className="demo-section-grid">
@@ -168,7 +229,7 @@ export function TaskEnginePage() {
                   </p>
                 </div>
               </div>
-              <TaskList tasks={taskRecords} locale={currentLocale} />
+              <TaskList tasks={tasks} locale={currentLocale} />
             </section>
 
             <section className="modules-panel">

@@ -10,6 +10,7 @@ import { getLocalizedText } from "@/lib/localized";
 import { getTaskById } from "@/lib/tasks";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { SupportedLocale, ThemeMode } from "@/types/module";
+import type { TaskRecord } from "@/types/task";
 
 import { TaskActionBar } from "@/components/tasks/task-action-bar";
 import { TaskDetailPanel } from "@/components/tasks/task-detail-panel";
@@ -18,9 +19,11 @@ import { TaskTimeline } from "@/components/tasks/task-timeline";
 
 interface TaskDetailPageProps {
   taskId: string;
+  task?: TaskRecord | null;
+  dataError?: string;
 }
 
-export function TaskDetailPage({ taskId }: TaskDetailPageProps) {
+export function TaskDetailPage({ taskId, task: taskProp, dataError }: TaskDetailPageProps) {
   const locale = useUiPreferencesStore((state) => state.locale);
   const theme = useUiPreferencesStore((state) => state.theme);
   const hydrated = useUiPreferencesStore((state) => state.hydrated);
@@ -38,7 +41,7 @@ export function TaskDetailPage({ taskId }: TaskDetailPageProps) {
 
   const currentLocale: SupportedLocale = hydrated ? locale : "en";
   const currentTheme: ThemeMode = hydrated ? theme : "bright";
-  const task = getTaskById(taskId);
+  const task = taskProp ?? getTaskById(taskId);
 
   if (!task) {
     return (
@@ -55,7 +58,7 @@ export function TaskDetailPage({ taskId }: TaskDetailPageProps) {
                 <div>
                   <h1 className="hero-title">{currentLocale === "zh" ? "未找到任务" : "Task Not Found"}</h1>
                   <p className="hero-subtitle">
-                    {currentLocale === "zh" ? "当前任务 ID 不在本地 mock task data 中。" : "This task ID does not exist in the local mock task data set."}
+                    {dataError ? dataError : currentLocale === "zh" ? "当前任务 ID 不在本地 mock task data 中。" : "This task ID does not exist in the local mock task data set."}
                   </p>
                 </div>
                 <div className="template-link-row">

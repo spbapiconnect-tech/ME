@@ -67,3 +67,9 @@ This plan explains how ME will move from mock data to real data without rebuildi
 - A thin service layer and repository contract foundation exists under `lib/services/` and `lib/repositories/`.
 - Repository provider defaults to mock mode.
 - No real API or database is implemented yet.
+
+## Data Provider Integration / Page Data Boundary
+
+- Selected pages now load demo/task records via the service layer instead of importing mock data directly.
+- Repository provider remains in mock mode; no real API or database is introduced.
+- The service layer + repository contracts are the stable boundary for the future `ApiRepository` implementations.

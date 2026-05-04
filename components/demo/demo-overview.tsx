@@ -1,16 +1,18 @@
 import Link from "next/link";
 
 import { StatusChip } from "@/components/data/status-chip";
-import { demoModuleCodes, demoModuleDataMap } from "@/data/demo";
+import type { DemoModuleCode, DemoModuleData } from "@/data/demo";
 import { getLocalizedText } from "@/lib/localized";
 import { getModuleByCode } from "@/lib/modules";
 import type { SupportedLocale } from "@/types/module";
 
 interface DemoOverviewProps {
   locale: SupportedLocale;
+  moduleCodes: DemoModuleCode[];
+  moduleDataMap: Record<DemoModuleCode, DemoModuleData>;
 }
 
-export function DemoOverview({ locale }: DemoOverviewProps) {
+export function DemoOverview({ locale, moduleCodes, moduleDataMap }: DemoOverviewProps) {
   return (
     <section className="modules-panel">
       <div className="panel-header">
@@ -18,17 +20,17 @@ export function DemoOverview({ locale }: DemoOverviewProps) {
           <h2 className="shell-title">{locale === "zh" ? "模块演示概览" : "Module Demo Overview"}</h2>
           <p className="shell-copy">
             {locale === "zh"
-              ? "六个演示模块均使用本地 TypeScript mock data。"
-              : "All six demo modules run on local TypeScript mock data."}
+              ? "六个演示模块均使用本地 mock data，通过 Service Layer 统一读取。"
+              : "All six demo modules use local mock data read through the service layer."}
           </p>
         </div>
       </div>
       <div className="demo-overview-grid">
-        {demoModuleCodes.map((code) => {
+        {moduleCodes.map((code) => {
           const moduleItem = getModuleByCode(code);
-          const demoData = demoModuleDataMap[code];
+          const demoData = moduleDataMap[code];
 
-          if (!moduleItem) {
+          if (!moduleItem || !demoData) {
             return null;
           }
 

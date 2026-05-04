@@ -62,3 +62,9 @@ This document defines the future API boundary for ME without implementing API. I
 - Repository contracts live under `lib/repositories/contracts.ts`.
 - Repository provider defaults to mock mode under `lib/repositories/provider.ts`.
 - No API routes or backend implementation exist yet.
+
+## Data Provider Integration / Page Data Boundary
+
+- UI pages should call the service layer and receive plain data props; UI should not call raw API endpoints directly.
+- Current repository mode remains mock; no real API/database/fetch/axios exists yet.
+- Future API repositories should implement the existing repository contracts and keep mapping inside repositories/services.

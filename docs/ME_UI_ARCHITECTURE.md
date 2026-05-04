@@ -114,3 +114,10 @@
 - No real procurement, inventory, or POS execution logic is included.
 - Demo flow is for presentation and validation only.
 
+
+## Data Provider Integration / Page Data Boundary
+
+- Enforce a page data boundary: Page / Component → Service Layer → Repository Provider → Repository.
+- Pages can resolve `DataResult` on the server and pass plain data into client components.
+- UI components should not import raw mock data modules (`data/demo`, `data/tasks`) for new work.
+- Repository provider stays mock for now; no real API/database/persistence is implemented yet.

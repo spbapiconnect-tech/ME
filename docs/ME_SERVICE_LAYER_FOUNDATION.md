@@ -37,3 +37,10 @@ This milestone introduces a service layer and repository contracts for ME.
 - No database.
 - No procurement/supplier/inventory business flows.
 - No AI/workflow/automation/rules/formulas.
+
+## Data Provider Integration / Page Data Boundary (v0.6.1)
+
+- Selected UI pages now read mock data through the service layer (Page/Component → Service Layer → Repository Provider → Mock Repository → Local Mock Data).
+- Repository mode remains mock; no real API, database, fetch, or axios exists.
+- UI work should not import `data/demo` or `data/tasks` directly for new module features.
+- Page data helpers may convert `DataResult` into plain page props and centralized empty/error handling.

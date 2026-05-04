@@ -16,17 +16,18 @@ import { StatusChip } from "@/components/data/status-chip";
 import { Timeline } from "@/components/data/timeline";
 import { DemoModuleSwitcher } from "@/components/demo/demo-module-switcher";
 import { MockDataNotice } from "@/components/demo/mock-data-notice";
-import { demoModuleCodes, getDemoModuleData } from "@/data/demo";
+import type { DemoModuleCode, DemoModuleData } from "@/data/demo";
 import { getPageSchema } from "@/config/page-schemas";
 import { getLocalizedText } from "@/lib/localized";
 import { getModuleByCode } from "@/lib/modules";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
-import type { DemoModuleCode } from "@/data/demo";
 import type { LocalizedText, SupportedLocale, ThemeMode } from "@/types/module";
 import type { PageSchemaColumn } from "@/types/page-schema";
 
 interface DemoModulePageProps {
   moduleCode: string;
+  moduleCodes: DemoModuleCode[];
+  demoData: DemoModuleData | null;
 }
 
 const copy = {
@@ -112,7 +113,7 @@ function buildReportColumns(rows: Array<Record<string, string>>): PageSchemaColu
   }));
 }
 
-export function DemoModulePage({ moduleCode }: DemoModulePageProps) {
+export function DemoModulePage({ moduleCode, moduleCodes, demoData: demoDataProp }: DemoModulePageProps) {
   const locale = useUiPreferencesStore((state) => state.locale);
   const theme = useUiPreferencesStore((state) => state.theme);
   const hydrated = useUiPreferencesStore((state) => state.hydrated);
@@ -134,8 +135,8 @@ export function DemoModulePage({ moduleCode }: DemoModulePageProps) {
   const currentLocale: SupportedLocale = hydrated ? locale : "en";
   const currentTheme: ThemeMode = hydrated ? theme : "bright";
   const currentCopy = copy[currentLocale];
-  const isValid = demoModuleCodes.includes(moduleCode as DemoModuleCode);
-  const demoData = isValid ? getDemoModuleData(moduleCode) : undefined;
+  const isValid = moduleCodes.includes(moduleCode as DemoModuleCode);
+  const demoData = isValid ? demoDataProp : null;
   const moduleItem = getModuleByCode(moduleCode);
 
   const listingSchema = useMemo(() => {
@@ -227,7 +228,7 @@ export function DemoModulePage({ moduleCode }: DemoModulePageProps) {
             <MockDataNotice locale={currentLocale} compact />
 
           <section className="control-panel">
-              <DemoModuleSwitcher locale={currentLocale} />
+              <DemoModuleSwitcher locale={currentLocale} moduleCodes={moduleCodes} />
             </section>
           </div>
         </section>
@@ -314,7 +315,7 @@ export function DemoModulePage({ moduleCode }: DemoModulePageProps) {
                 </p>
               </div>
             </div>
-            <DemoModuleSwitcher locale={currentLocale} activeModuleCode={moduleCode} />
+            <DemoModuleSwitcher locale={currentLocale} moduleCodes={moduleCodes} activeModuleCode={moduleCode} />
           </section>
 
           <section className="modules-panel">

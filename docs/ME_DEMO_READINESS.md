@@ -61,3 +61,9 @@
 - A mock-first service layer foundation exists under `lib/services/`.
 - Repository contracts and a default mock repository provider exist under `lib/repositories/`.
 - Demo routes remain local mock-data only until migration is explicitly started.
+
+## Data Provider Integration / Page Data Boundary
+
+- Demo routes should use the service layer as the single data entry point.
+- Mock repositories remain the only data source; no real API/database exists.
+- Demo UI should keep mock-data notices visible and avoid direct `data/demo` imports in page/components.
