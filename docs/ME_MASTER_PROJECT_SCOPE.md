@@ -9,7 +9,7 @@ ME is a modular store operations SaaS platform.
 
 ## Current Delivery Scope
 
-This repository currently delivers only the first Core Shell foundation.
+This repository currently delivers ME UI foundations, demo surfaces, and planning artifacts for the first business-cluster implementation stage.
 
 - App shell structure for mobile, tablet, and desktop
 - Bright, dark, and moon theme tokens
@@ -95,7 +95,7 @@ The current milestone does not include real business logic or production integra
 - No persisted skin preference is implemented yet
 - Future UI redesigns should prefer layout/skin changes before rewriting module pages
 - Current foundation status: completed as `v0.5.2-layout-engine-foundation`
-- Next recommended milestone: `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
+- Next recommended milestone: `v0.5.4 Procurement + Supplier + Inventory implementation foundation`
 
 ## ME Brain Layer / AI Intelligence Roadmap
 
@@ -130,8 +130,18 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.5.2 Layout Engine / Skin System Foundation`
-- Delivery goal: provide a presentation-ready ME prototype with polished demo pages, Task Engine surfaces, and a metadata-first Layout Engine foundation for future UI shell swaps.
+- Current milestone: `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
+- Delivery goal: define the first real ME business-cluster planning foundation across Procurement, Supplier, and Inventory without breaking the existing mock-data prototype routes.
+
+## Procurement Supplier Inventory MVP Planning
+
+- Planning only for the first real ME business cluster.
+- Procurement, Supplier, and Inventory form the first close operational loop.
+- No real API or database is implemented yet.
+- The planning follows the existing Layout Engine and Skin System foundation.
+- The next implementation step should start with a service layer and mock repository, not direct database integration.
+- Task linkage and source mapping must remain stable across the future mock-to-real transition.
+- Page contracts should stay schema-driven and renderer-compatible as implementation begins.
 
 ## Demo Pages Milestone
 

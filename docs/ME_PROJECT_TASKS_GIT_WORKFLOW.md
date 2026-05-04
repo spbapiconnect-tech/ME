@@ -14,6 +14,7 @@
 10. Task Engine demo surfaces and navigation
 11. Layout Engine / Skin System foundation
 12. Procurement + Supplier + Inventory MVP planning
+13. Procurement + Supplier + Inventory implementation foundation
 
 ## Branch Model
 
@@ -110,7 +111,17 @@ Use Conventional Commits.
 - No persisted skin preference is implemented yet
 - Future UI redesigns should prefer layout/skin changes before rewriting module pages
 - Current foundation status: completed as `v0.5.2-layout-engine-foundation`
-- Next recommended milestone: `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
+- Next recommended milestone: `v0.5.4 Procurement + Supplier + Inventory implementation foundation`
+
+## Procurement Supplier Inventory MVP Planning
+
+- `v0.5.3` is planning-only.
+- Covers Procurement + Supplier + Inventory MVP boundaries.
+- Includes data model planning.
+- Includes mock-to-real migration planning.
+- Includes API boundary planning.
+- Includes task linkage and layout-engine compatibility rules.
+- No implementation is included yet.
 
 ## Demo Pages Milestone
 

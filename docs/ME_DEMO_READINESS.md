@@ -2,8 +2,8 @@
 
 ## Current Milestone
 
-- Current milestone: `v0.5.2 Layout Engine / Skin System Foundation`
-- Current prototype status: mock-data SaaS prototype with metadata-first layout-engine previews
+- Current milestone: `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
+- Current prototype status: mock-data SaaS prototype with metadata-first layout-engine previews and business-cluster planning docs
 
 ## What Is Ready
 
@@ -16,6 +16,7 @@
 - Demo pages
 - Task Engine pages
 - Layout Engine foundation
+- Procurement Supplier Inventory MVP planning
 - Mock data flow
 
 ## What Is Not Ready
@@ -41,8 +42,16 @@
 - No persisted skin preference is implemented yet
 - Future UI redesigns should prefer layout/skin changes before rewriting module pages
 - Current foundation status: completed as `v0.5.2-layout-engine-foundation`
-- Next recommended milestone: `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
+- Next recommended milestone: `v0.5.4 Procurement + Supplier + Inventory implementation foundation`
+
+## Procurement Supplier Inventory MVP Planning
+
+- `v0.5.3` planning has started.
+- Demo routes remain mock-data only.
+- Future real MVP implementation should not break `/demo`, `/templates`, `/components`, `/modules`, `/tasks`, or `/layout-engine`.
+- Planning defines data relationships, source mapping, task linkage, API boundaries, and mock-to-real migration steps before runtime implementation begins.
+- No real database, API, approval workflow, stock engine, supplier portal, or POS integration is included in this milestone.
 
 ## Recommended Next Stage
 
-- `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
+- `v0.5.4 Procurement + Supplier + Inventory implementation foundation`
