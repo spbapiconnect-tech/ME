@@ -126,3 +126,12 @@
 - Cross-contract mapping to action/access/audit/workflow/notification is preview-only.
 - No BI engine, chart engine, SQL, database/API/backend integration, export engine, or scheduler is included.
 - Widget source mapping must remain stable when shell/layout/skin changes.
+
+
+## ME Rule Contracts Update
+- `/rules` route now provides ME Formula / Rule Placeholder Contract Foundation preview.
+- Rule metadata registry lives in `config/rules/` and helper APIs in `lib/rules.ts`.
+- Rule UI components live in `components/rules/` and are metadata-only previews.
+- No real rule/formula calculation or evaluation is implemented yet.
+- No SQL/database/API/backend/automation/task creation/notification sending/session lookup is added.
+- Rule source mapping must stay stable across layout/skin/UI redesign changes.

@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getReportWidgetPreview } from "@/lib/report-widgets";
+import { getRulesByReportWidgetKey } from "@/lib/rules";
 import type { SupportedLocale } from "@/types/module";
 import type { ReportWidgetContract } from "@/types/report-widget";
 
@@ -8,6 +9,7 @@ import { ReportWidgetChip } from "./report-widget-chip";
 
 export function ReportWidgetPreviewCard({ widget, locale }: { widget: ReportWidgetContract; locale: SupportedLocale }) {
   const preview = getReportWidgetPreview(widget);
+  const rules = getRulesByReportWidgetKey(widget.key);
 
   return (
     <Card size="sm" className="gap-3">
@@ -40,6 +42,13 @@ export function ReportWidgetPreviewCard({ widget, locale }: { widget: ReportWidg
           <div>{locale === "zh" ? "可刷新" : "Refreshable"}: {String(preview.refreshable)}</div>
           <div>{locale === "zh" ? "可下钻" : "Drill Down"}: {String(preview.drillDownEnabled)}</div>
         </div>
+        {rules.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "关联规则" : "Linked Rules"}</div>
+            {rules.map((rule) => <div key={rule.key}>{rule.key}</div>)}
+            <div>{locale === "zh" ? "仅规则元数据映射，不执行规则计算。" : "Rule metadata mapping only; no rule calculation is executed."}</div>
+          </div>
+        ) : null}
         {widget.sampleData ? (
           <div className="rounded-xl bg-muted/40 p-3">
             <div className="font-medium text-foreground/80">{locale === "zh" ? "样例数据" : "Sample Data"}</div>
@@ -49,7 +58,7 @@ export function ReportWidgetPreviewCard({ widget, locale }: { widget: ReportWidg
         <div className="rounded-xl border border-dashed border-border bg-muted/20 p-3">
           {locale === "zh"
             ? "说明：仅展示报表/看板组件元数据预览，不执行 BI 引擎、图表引擎、SQL、数据库查询、API 调用、导出或调度。"
-            : "Notice: metadata-only report/dashboard widget preview. No BI engine, chart engine, SQL, database query, API call, export, or scheduling is executed."}
+            : "Notice: metadata-only report/dashboard widget preview. No BI engine, chart execution engine, SQL, database query, API call, export, or scheduling is executed."}
         </div>
         {preview.placeholderNotice ? <div>{locale === "zh" ? preview.placeholderNotice.zh : preview.placeholderNotice.en}</div> : null}
       </CardContent>

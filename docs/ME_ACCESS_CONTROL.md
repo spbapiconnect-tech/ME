@@ -100,3 +100,12 @@ ActionContract
 - Report widget metadata lives in `config/reports/` and `lib/report-widgets.ts`.
 - Preview behavior remains metadata-only with no real auth middleware, SQL, query, export, or scheduler.
 - Keep access-to-widget mapping stable through UI redesigns.
+
+
+## ME Rule Contracts Update
+- `/rules` route now provides ME Formula / Rule Placeholder Contract Foundation preview.
+- Rule metadata registry lives in `config/rules/` and helper APIs in `lib/rules.ts`.
+- Rule UI components live in `components/rules/` and are metadata-only previews.
+- No real rule/formula calculation or evaluation is implemented yet.
+- No SQL/database/API/backend/automation/task creation/notification sending/session lookup is added.
+- Rule source mapping must stay stable across layout/skin/UI redesign changes.

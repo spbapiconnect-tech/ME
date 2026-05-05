@@ -204,6 +204,9 @@ export function AuditTrailPage() {
             <Button asChild size="sm" variant="outline">
               <Link href="/notifications">ME Notifications</Link>
             </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/rules">ME Rules</Link>
+            </Button>
           </div>
         </CardHeader>
       </Card>

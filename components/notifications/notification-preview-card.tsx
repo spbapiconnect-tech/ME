@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getWidgetsByNotificationKey } from "@/lib/report-widgets";
+import { getRulesByNotificationKey } from "@/lib/rules";
 import type { SupportedLocale } from "@/types/module";
 import type { NotificationPreview } from "@/types/notification";
 
@@ -8,6 +9,7 @@ import { NotificationChip } from "./notification-chip";
 
 export function NotificationPreviewCard({ preview, locale }: { preview: NotificationPreview; locale: SupportedLocale }) {
   const reportWidgets = getWidgetsByNotificationKey(preview.notificationKey);
+  const rules = getRulesByNotificationKey(preview.notificationKey);
 
   return (
     <Card size="sm" className="gap-3">
@@ -29,6 +31,13 @@ export function NotificationPreviewCard({ preview, locale }: { preview: Notifica
         <div>{locale === "zh" ? "人工复核" : "Human Review"}: {String(preview.humanReviewRequired)}</div>
         <div>{locale === "zh" ? "审计要求" : "Audit Required"}: {String(preview.auditRequired)}</div>
         {preview.permissionRequired ? <div>{locale === "zh" ? "权限" : "Permission"}: {preview.permissionRequired}</div> : null}
+        {rules.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "关联规则" : "Linked Rules"}</div>
+            {rules.map((rule) => <div key={rule.key}>{rule.key}</div>)}
+            <div>{locale === "zh" ? "仅规则元数据映射，不执行规则计算。" : "Rule metadata mapping only; no rule calculation is executed."}</div>
+          </div>
+        ) : null}
         <div className="rounded-xl border border-dashed border-border bg-muted/20 p-3">
           {locale === "zh"
             ? "说明：通知预览仅用于消息合同元数据。不会发送真实推送/邮件/WhatsApp/SMS/webhook，也不会触发队列、调度、后端或数据库写入。"

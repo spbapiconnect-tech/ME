@@ -157,6 +157,10 @@ export function LayoutEnginePage() {
                   <BarChart3 size={16} />
                   <span>ME Reports</span>
                 </Link>
+                <Link className="shell-link-button" href="/rules">
+                  <ShieldCheck size={16} />
+                  <span>ME Rules</span>
+                </Link>
               </div>
             </div>
           </section>

@@ -104,3 +104,12 @@ UI Button / CTA
 - Report widget contract/types live in `types/report-widget.ts`.
 - Report widget previews are metadata-only with no real data query/export/scheduling.
 - Keep action source mapping stable while UI shells/layouts change.
+
+
+## ME Rule Contracts Update
+- `/rules` route now provides ME Formula / Rule Placeholder Contract Foundation preview.
+- Rule metadata registry lives in `config/rules/` and helper APIs in `lib/rules.ts`.
+- Rule UI components live in `components/rules/` and are metadata-only previews.
+- No real rule/formula calculation or evaluation is implemented yet.
+- No SQL/database/API/backend/automation/task creation/notification sending/session lookup is added.
+- Rule source mapping must stay stable across layout/skin/UI redesign changes.

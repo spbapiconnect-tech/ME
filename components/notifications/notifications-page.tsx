@@ -134,6 +134,7 @@ export function NotificationsPage() {
             <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/layout-engine">ME Layout Engine</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/components">ME Core Components</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/rules">ME Rules</Link></Button>
           </div>
         </CardHeader>
       </Card>

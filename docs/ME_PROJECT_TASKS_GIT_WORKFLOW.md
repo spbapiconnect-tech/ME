@@ -207,3 +207,12 @@ Use Conventional Commits.
 - Add report widget helpers in `lib/report-widgets.ts`.
 - Keep report widget source mapping stable through UI layout/skin changes.
 - No real BI/chart/query/export/schedule/database/API/backend/session/middleware is added.
+
+
+## ME Rule Contracts Update
+- `/rules` route now provides ME Formula / Rule Placeholder Contract Foundation preview.
+- Rule metadata registry lives in `config/rules/` and helper APIs in `lib/rules.ts`.
+- Rule UI components live in `components/rules/` and are metadata-only previews.
+- No real rule/formula calculation or evaluation is implemented yet.
+- No SQL/database/API/backend/automation/task creation/notification sending/session lookup is added.
+- Rule source mapping must stay stable across layout/skin/UI redesign changes.

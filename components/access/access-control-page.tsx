@@ -170,6 +170,7 @@ export function AccessControlPage() {
             <Button asChild variant="outline" size="sm"><Link href="/workflow">ME Workflow</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/reports">ME Reports</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/notifications">ME Notifications</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/rules">ME Rules</Link></Button>
           </div>
         </CardHeader>
       </Card>

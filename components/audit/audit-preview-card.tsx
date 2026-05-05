@@ -3,6 +3,7 @@ import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getWidgetsByAuditEventKey } from "@/lib/report-widgets"
+import { getRulesByAuditEventKey } from "@/lib/rules"
 import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
 import type { WorkflowPreview } from "@/types/workflow"
@@ -14,6 +15,7 @@ function label(locale: SupportedLocale, zh: string, en: string) {
 
 export function AuditPreviewCard({ preview, locale, workflowPreview, notificationPreview }: { preview: AuditPreview; locale: SupportedLocale; workflowPreview?: WorkflowPreview; notificationPreview?: NotificationPreview }) {
   const reportWidgets = getWidgetsByAuditEventKey(preview.eventKey)
+  const rules = getRulesByAuditEventKey(preview.eventKey)
 
   return (
     <Card size="sm" className="gap-3">
@@ -54,6 +56,13 @@ export function AuditPreviewCard({ preview, locale, workflowPreview, notificatio
             <div>{label(locale, "状态", "Status")}: {workflowPreview.status}</div>
             <div>{label(locale, "严重级别", "Severity")}: {workflowPreview.severity}</div>
             <div>{label(locale, "仅预览，不执行真实自动化。", "Preview only; no real automation is executed.")}</div>
+          </div>
+        ) : null}
+        {rules.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{label(locale, "规则预览", "Rule Preview")}</div>
+            {rules.map((rule) => <div key={rule.key}>{rule.key}</div>)}
+            <div>{label(locale, "仅规则元数据映射，不执行规则计算。", "Rule metadata mapping only; no rule calculation is executed.")}</div>
           </div>
         ) : null}
         {reportWidgets.length > 0 ? (

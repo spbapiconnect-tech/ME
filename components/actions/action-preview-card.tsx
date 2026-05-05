@@ -8,6 +8,7 @@ import { getActionAccessPreview } from "@/lib/access"
 import { getActionWorkflowPreview } from "@/lib/workflow"
 import { getActionNotificationPreview } from "@/lib/notifications"
 import { getWidgetsByActionKey } from "@/lib/report-widgets"
+import { getRulesByActionKey } from "@/lib/rules"
 import type { ActionContract } from "@/types/action-contract"
 import type { SupportedLocale } from "@/types/module"
 
@@ -27,6 +28,7 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
   const workflowPreview = getActionWorkflowPreview(action)
   const notificationPreview = getActionNotificationPreview(action)
   const reportWidgets = getWidgetsByActionKey(action.key)
+  const rules = getRulesByActionKey(action.key)
   const label = resolveActionLabel(action, locale)
   const description = resolveActionDescription(action, locale)
 
@@ -114,6 +116,13 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
           <div>{flagLabel(locale, "通道", "Channel")}: {notificationPreview.channel}</div>
           <div>{flagLabel(locale, "仅通知元数据预览，不执行真实发送。", "Notification metadata preview only; no real sending is performed.")}</div>
         </div>
+        {rules.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+            <div className="font-medium text-foreground/80">{flagLabel(locale, "规则预览", "Rule Preview")}</div>
+            {rules.map((rule) => <div key={rule.key}>{rule.key}</div>)}
+            <div>{flagLabel(locale, "仅规则元数据映射，不执行真实规则计算。", "Rule metadata mapping only; no real rule computation is executed.")}</div>
+          </div>
+        ) : null}
         {reportWidgets.length > 0 ? (
           <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
             <div className="font-medium text-foreground/80">{flagLabel(locale, "报表组件预览", "Report Widget Preview")}</div>

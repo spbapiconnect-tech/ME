@@ -7,6 +7,7 @@ import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
 import type { WorkflowPreview } from "@/types/workflow"
 import { getWidgetsByAccessRuleKey } from "@/lib/report-widgets"
+import { getRulesByAccessRuleKey } from "@/lib/rules"
 import type { NotificationPreview } from "@/types/notification"
 
 const copy = {
@@ -39,6 +40,7 @@ export function AccessPreviewCard({
 }) {
   const t = copy[locale]
   const reportWidgets = getWidgetsByAccessRuleKey(preview.ruleKey)
+  const rules = getRulesByAccessRuleKey(preview.ruleKey)
 
   return (
     <Card size="sm" className="gap-3">
@@ -89,6 +91,13 @@ export function AccessPreviewCard({
             <div>{locale === "zh" ? "严重级别" : "Severity"}: {workflowPreview.severity}</div>
             <div>{locale === "zh" ? "需人工确认" : "Human Confirmation"}: {String(workflowPreview.humanConfirmationRequired)}</div>
             <div>{locale === "zh" ? "仅预览，不执行自动化。" : "Preview only; no automation execution."}</div>
+          </div>
+        ) : null}
+        {rules.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "规则预览" : "Rule Preview"}</div>
+            {rules.map((rule) => <div key={rule.key}>{rule.key}</div>)}
+            <div>{locale === "zh" ? "仅规则元数据映射，不执行规则计算。" : "Rule metadata mapping only; no rule calculation is executed."}</div>
           </div>
         ) : null}
         {reportWidgets.length > 0 ? (

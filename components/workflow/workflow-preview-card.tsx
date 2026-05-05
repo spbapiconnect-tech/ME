@@ -2,12 +2,14 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { WorkflowChip } from "@/components/workflow/workflow-chip";
 import { getWidgetsByWorkflowKey } from "@/lib/report-widgets";
+import { getRulesByWorkflowKey } from "@/lib/rules";
 import type { SupportedLocale } from "@/types/module";
 import type { WorkflowPreview } from "@/types/workflow";
 import type { NotificationPreview } from "@/types/notification";
 
 export function WorkflowPreviewCard({ preview, locale, notificationPreview }: { preview: WorkflowPreview; locale: SupportedLocale; notificationPreview?: NotificationPreview }) {
   const reportWidgets = getWidgetsByWorkflowKey(preview.workflowKey);
+  const rules = getRulesByWorkflowKey(preview.workflowKey);
 
   return (
     <Card size="sm" className="gap-3">
@@ -42,6 +44,13 @@ export function WorkflowPreviewCard({ preview, locale, notificationPreview }: { 
           <div>{locale === "zh" ? "审计要求" : "Audit Required"}: {String(preview.auditRequired)}</div>
           {preview.permissionRequired ? <div>{locale === "zh" ? "权限" : "Permission"}: {preview.permissionRequired}</div> : null}
         </div>
+        {rules.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "关联规则" : "Linked Rules"}</div>
+            {rules.map((rule) => <div key={rule.key}>{rule.key}</div>)}
+            <div>{locale === "zh" ? "仅规则元数据映射，不触发规则引擎。" : "Rule metadata mapping only; no rule-engine execution is triggered."}</div>
+          </div>
+        ) : null}
         {reportWidgets.length > 0 ? (
           <div className="rounded-xl bg-muted/40 p-3">
             <div className="font-medium text-foreground/80">{locale === "zh" ? "关联报表组件" : "Linked Report Widgets"}</div>
