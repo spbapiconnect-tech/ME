@@ -1,0 +1,86 @@
+import type { DashboardLayoutContract } from "@/types/report-widget";
+
+export const dashboardLayoutCatalog: DashboardLayoutContract[] = [
+  {
+    key: "dashboard.owner-overview",
+    name: { zh: "老板总览", en: "Owner Overview" },
+    description: { zh: "面向负责人，聚合销售、库存、任务和风险。", en: "Owner-facing overview with sales, inventory, tasks, and risks." },
+    targetRole: "owner",
+    targetPlan: "pro",
+    widgets: [
+      "widget.pos.salesToday",
+      "widget.inventory.lowStockRisk",
+      "widget.inventory.stockValue",
+      "widget.task.completionToday",
+      "widget.notification.messageSummary",
+      "widget.workflow.triggerSummary",
+    ],
+    status: "active",
+    layoutMode: "executive",
+    notes: { zh: "用于高层运营概览。", en: "Used for executive operations overview." },
+  },
+  {
+    key: "dashboard.store-manager",
+    name: { zh: "店长看板", en: "Store Manager" },
+    description: { zh: "门店经理关注任务、到货和预警。", en: "Store manager focus on tasks, receiving, and alerts." },
+    targetRole: "store-manager",
+    targetPlan: "starter",
+    widgets: [
+      "widget.task.completionToday",
+      "widget.task.overdueTasks",
+      "widget.procurement.receivingToday",
+      "widget.pos.refundAlerts",
+    ],
+    status: "active",
+    layoutMode: "operational",
+  },
+  {
+    key: "dashboard.procurement",
+    name: { zh: "采购控制台", en: "Procurement Console" },
+    description: { zh: "采购请求、到货和供应商问题总览。", en: "Procurement requests, receiving, and supplier issue overview." },
+    targetRole: "purchasing-manager",
+    targetPlan: "ops",
+    widgets: [
+      "widget.procurement.pendingRequests",
+      "widget.procurement.receivingToday",
+      "widget.supplier.issueSummary",
+    ],
+    status: "active",
+    layoutMode: "board",
+  },
+  {
+    key: "dashboard.inventory",
+    name: { zh: "库存驾驶舱", en: "Inventory Cockpit" },
+    description: { zh: "库存风险与价值趋势看板。", en: "Inventory risk and value trend dashboard." },
+    targetRole: "warehouse-handler",
+    targetPlan: "ops",
+    widgets: ["widget.inventory.lowStockRisk", "widget.inventory.stockValue", "widget.audit.eventSummary"],
+    status: "active",
+    layoutMode: "grid",
+  },
+  {
+    key: "dashboard.task-control",
+    name: { zh: "任务控制台", en: "Task Control" },
+    description: { zh: "任务完成、逾期与流程触发摘要。", en: "Task completion, overdue list, and workflow trigger summary." },
+    targetRole: "operations-manager",
+    targetPlan: "starter",
+    widgets: ["widget.task.completionToday", "widget.task.overdueTasks", "widget.workflow.triggerSummary"],
+    status: "active",
+    layoutMode: "list",
+  },
+  {
+    key: "dashboard.system-preview",
+    name: { zh: "系统预览", en: "System Preview" },
+    description: { zh: "仅用于元数据预览与调试的系统布局。", en: "System layout for metadata preview and debugging only." },
+    targetRole: "admin",
+    targetPlan: "enterprise",
+    widgets: ["widget.system.previewOnly", "widget.audit.eventSummary", "widget.notification.messageSummary"],
+    status: "preview-only",
+    layoutMode: "grid",
+    notes: { zh: "不执行任何真实查询、导出或调度。", en: "Executes no real query, export, or scheduling." },
+  },
+];
+
+export const dashboardLayoutCatalogByKey: Record<string, DashboardLayoutContract> = Object.fromEntries(
+  dashboardLayoutCatalog.map((item) => [item.key, item]),
+);

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, Layers3, LayoutTemplate, ListTodo, PanelTopClose, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { BarChart3, Blocks, Layers3, LayoutTemplate, ListTodo, PanelTopClose, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import { useEffect } from "react";
 
 import { ActionBar } from "@/components/data/action-bar";
@@ -135,6 +135,10 @@ export function ComponentShowcase() {
                 <Link className="shell-link-button" href="/notifications">
                   <Workflow size={16} />
                   <span>ME Notifications</span>
+                </Link>
+                <Link className="shell-link-button" href="/reports">
+                  <BarChart3 size={16} />
+                  <span>ME Reports</span>
                 </Link>
                 <Link className="shell-link-button" href="/templates">
                   <LayoutTemplate size={16} />

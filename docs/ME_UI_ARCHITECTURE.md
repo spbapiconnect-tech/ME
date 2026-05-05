@@ -173,3 +173,13 @@
 - Add notification preview components in `components/notifications/`.
 - Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
 - Keep source mapping stable across UI shell/layout/skin updates.
+
+## ME Report Widget Contract Foundation (v0.6.7)
+
+- Route: `/reports`.
+- Contract types: `types/report-widget.ts`.
+- Registries: `config/reports/`.
+- Helpers: `lib/report-widgets.ts`.
+- Components: `components/reports/`.
+- Dashboard/report widgets are metadata-only previews with no real BI/chart/query/export/schedule/database/API/backend/session logic.
+- Report widget source mapping keys must remain stable across shell/layout/skin updates.

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, LayoutTemplate, ListTodo, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { BarChart3, Blocks, LayoutTemplate, ListTodo, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { MockDataNotice } from "@/components/demo/mock-data-notice";
@@ -152,6 +152,10 @@ export function LayoutEnginePage() {
                 <Link className="shell-link-button" href="/notifications">
                   <Workflow size={16} />
                   <span>ME Notifications</span>
+                </Link>
+                <Link className="shell-link-button" href="/reports">
+                  <BarChart3 size={16} />
+                  <span>ME Reports</span>
                 </Link>
               </div>
             </div>

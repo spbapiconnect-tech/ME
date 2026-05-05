@@ -168,6 +168,7 @@ export function AccessControlPage() {
             <Button asChild variant="outline" size="sm"><Link href="/layout-engine">{t.openLayoutEngine}</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/workflow">ME Workflow</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/reports">ME Reports</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/notifications">ME Notifications</Link></Button>
           </div>
         </CardHeader>

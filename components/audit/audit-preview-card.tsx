@@ -2,6 +2,7 @@ import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { getWidgetsByAuditEventKey } from "@/lib/report-widgets"
 import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
 import type { WorkflowPreview } from "@/types/workflow"
@@ -12,6 +13,8 @@ function label(locale: SupportedLocale, zh: string, en: string) {
 }
 
 export function AuditPreviewCard({ preview, locale, workflowPreview, notificationPreview }: { preview: AuditPreview; locale: SupportedLocale; workflowPreview?: WorkflowPreview; notificationPreview?: NotificationPreview }) {
+  const reportWidgets = getWidgetsByAuditEventKey(preview.eventKey)
+
   return (
     <Card size="sm" className="gap-3">
       <CardHeader className="gap-1">
@@ -51,6 +54,13 @@ export function AuditPreviewCard({ preview, locale, workflowPreview, notificatio
             <div>{label(locale, "状态", "Status")}: {workflowPreview.status}</div>
             <div>{label(locale, "严重级别", "Severity")}: {workflowPreview.severity}</div>
             <div>{label(locale, "仅预览，不执行真实自动化。", "Preview only; no real automation is executed.")}</div>
+          </div>
+        ) : null}
+        {reportWidgets.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{label(locale, "关联报表组件", "Linked Report Widgets")}</div>
+            {reportWidgets.map((widget) => <div key={widget.key}>{widget.key}</div>)}
+            <div>{label(locale, "仅元数据映射，不执行真实报表。", "Metadata mapping only; no real report execution.")}</div>
           </div>
         ) : null}
         <div className="rounded-xl border border-dashed border-border bg-muted/20 p-3">

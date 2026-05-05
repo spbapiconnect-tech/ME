@@ -198,3 +198,12 @@ Use Conventional Commits.
 - Add notification preview components in `components/notifications/`.
 - Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
 - Keep source mapping stable across UI shell/layout/skin updates.
+
+## ME Report Widget Contract Foundation (v0.6.7)
+
+- Add `/reports` metadata preview route.
+- Add report widget registry in `config/reports/`.
+- Add report widget components in `components/reports/`.
+- Add report widget helpers in `lib/report-widgets.ts`.
+- Keep report widget source mapping stable through UI layout/skin changes.
+- No real BI/chart/query/export/schedule/database/API/backend/session/middleware is added.

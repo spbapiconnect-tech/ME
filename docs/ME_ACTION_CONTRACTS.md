@@ -97,3 +97,10 @@ UI Button / CTA
 - Add notification preview components in `components/notifications/`.
 - Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
 - Keep source mapping stable across UI shell/layout/skin updates.
+
+## ME Report Widgets Update
+- Add `/reports` metadata preview route.
+- Action contracts can now map to report widgets via `actionKey`.
+- Report widget contract/types live in `types/report-widget.ts`.
+- Report widget previews are metadata-only with no real data query/export/scheduling.
+- Keep action source mapping stable while UI shells/layouts change.

@@ -145,6 +145,7 @@ export function WorkflowPage() {
           <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline" size="sm"><Link href="/">Back To Dashboard</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/action-contracts">ME Action Contracts</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/reports">ME Reports</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/access-control">ME Access Control</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/layout-engine">ME Layout Engine</Link></Button>

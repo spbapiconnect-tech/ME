@@ -59,3 +59,10 @@ ActionContract
 
 ## Stability Rule
 Notification source mapping keys (`actionKey`, `accessRuleKey`, `auditEventKey`, `workflowKey`) must remain stable when layout, skin, or component structure changes.
+
+## ME Report Widgets Update
+- Add `/reports` metadata preview route for dashboard/report widgets.
+- Add report widget registry under `config/reports/`.
+- Add report widget components under `components/reports/`.
+- Notification metadata can map to report widget previews through `notificationKey`.
+- Report widget preview remains metadata-only: no real query/export/schedule/database/API/backend.

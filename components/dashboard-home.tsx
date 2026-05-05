@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Blocks, Layers3, LayoutDashboard, LayoutTemplate, ListTodo, PanelTopClose, ShieldCheck, Sparkles, Workflow } from "lucide-react";
+import { BarChart3, Blocks, Layers3, LayoutDashboard, LayoutTemplate, ListTodo, PanelTopClose, ShieldCheck, Sparkles, Workflow } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
 import { LanguageSwitcher } from "@/components/language-switcher";
@@ -202,6 +202,10 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
                   <Link className="shell-link-button" href="/notifications">
                     <Workflow size={16} />
                     <span>ME Notifications</span>
+                  </Link>
+                  <Link className="shell-link-button" href="/reports">
+                    <BarChart3 size={16} />
+                    <span>ME Reports</span>
                   </Link>
                 </div>
               </div>

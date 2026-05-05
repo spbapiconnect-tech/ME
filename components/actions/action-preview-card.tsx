@@ -7,6 +7,7 @@ import { getActionExecutionPreview, resolveActionDescription, resolveActionLabel
 import { getActionAccessPreview } from "@/lib/access"
 import { getActionWorkflowPreview } from "@/lib/workflow"
 import { getActionNotificationPreview } from "@/lib/notifications"
+import { getWidgetsByActionKey } from "@/lib/report-widgets"
 import type { ActionContract } from "@/types/action-contract"
 import type { SupportedLocale } from "@/types/module"
 
@@ -25,6 +26,7 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
   const auditPreview = getActionAuditPreview(action)
   const workflowPreview = getActionWorkflowPreview(action)
   const notificationPreview = getActionNotificationPreview(action)
+  const reportWidgets = getWidgetsByActionKey(action.key)
   const label = resolveActionLabel(action, locale)
   const description = resolveActionDescription(action, locale)
 
@@ -112,6 +114,13 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
           <div>{flagLabel(locale, "通道", "Channel")}: {notificationPreview.channel}</div>
           <div>{flagLabel(locale, "仅通知元数据预览，不执行真实发送。", "Notification metadata preview only; no real sending is performed.")}</div>
         </div>
+        {reportWidgets.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+            <div className="font-medium text-foreground/80">{flagLabel(locale, "报表组件预览", "Report Widget Preview")}</div>
+            {reportWidgets.map((widget) => <div key={widget.key}>{widget.key}</div>)}
+            <div>{flagLabel(locale, "仅报表元数据映射，不执行查询或图表。", "Report metadata mapping only; no query or chart execution.")}</div>
+          </div>
+        ) : null}
         <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
           <div className="font-medium text-foreground/80">{flagLabel(locale, "Workflow Preview", "Workflow Preview")}</div>
           <div>

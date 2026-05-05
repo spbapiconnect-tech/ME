@@ -66,3 +66,10 @@ ActionContract
 - Add notification preview components in `components/notifications/`.
 - Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
 - Keep source mapping stable across UI shell/layout/skin updates.
+
+## ME Report Widgets Update
+- Add `/reports` route for dashboard widget and report metadata preview.
+- Workflow metadata can map to report widget preview via `workflowKey`.
+- Report widget registry lives in `config/reports/`; helper lives in `lib/report-widgets.ts`.
+- Keep workflow/report source mapping stable when layout/skin/components are redesigned.
+- No real BI/query/export/schedule engine is added.

@@ -1,11 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getWidgetsByNotificationKey } from "@/lib/report-widgets";
 import type { SupportedLocale } from "@/types/module";
 import type { NotificationPreview } from "@/types/notification";
 
 import { NotificationChip } from "./notification-chip";
 
 export function NotificationPreviewCard({ preview, locale }: { preview: NotificationPreview; locale: SupportedLocale }) {
+  const reportWidgets = getWidgetsByNotificationKey(preview.notificationKey);
+
   return (
     <Card size="sm" className="gap-3">
       <CardHeader className="gap-1">
@@ -31,6 +34,13 @@ export function NotificationPreviewCard({ preview, locale }: { preview: Notifica
             ? "说明：通知预览仅用于消息合同元数据。不会发送真实推送/邮件/WhatsApp/SMS/webhook，也不会触发队列、调度、后端或数据库写入。"
             : "Notice: notification preview is metadata-only. It does not send real push/email/WhatsApp/SMS/webhook or trigger queues, schedulers, backend jobs, or database writes."}
         </div>
+        {reportWidgets.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "关联报表组件" : "Linked Report Widgets"}</div>
+            {reportWidgets.map((widget) => <div key={widget.key}>{widget.key}</div>)}
+            <div>{locale === "zh" ? "仅元数据映射，不执行报表查询。" : "Metadata mapping only; no report query execution."}</div>
+          </div>
+        ) : null}
         {preview.placeholderNotice ? <div>{locale === "zh" ? preview.placeholderNotice.zh : preview.placeholderNotice.en}</div> : null}
       </CardContent>
     </Card>

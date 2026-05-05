@@ -6,6 +6,7 @@ import type { AccessPreview } from "@/types/access-control"
 import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
 import type { WorkflowPreview } from "@/types/workflow"
+import { getWidgetsByAccessRuleKey } from "@/lib/report-widgets"
 import type { NotificationPreview } from "@/types/notification"
 
 const copy = {
@@ -37,6 +38,7 @@ export function AccessPreviewCard({
   notificationPreview?: NotificationPreview
 }) {
   const t = copy[locale]
+  const reportWidgets = getWidgetsByAccessRuleKey(preview.ruleKey)
 
   return (
     <Card size="sm" className="gap-3">
@@ -87,6 +89,13 @@ export function AccessPreviewCard({
             <div>{locale === "zh" ? "严重级别" : "Severity"}: {workflowPreview.severity}</div>
             <div>{locale === "zh" ? "需人工确认" : "Human Confirmation"}: {String(workflowPreview.humanConfirmationRequired)}</div>
             <div>{locale === "zh" ? "仅预览，不执行自动化。" : "Preview only; no automation execution."}</div>
+          </div>
+        ) : null}
+        {reportWidgets.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "关联报表组件" : "Linked Report Widgets"}</div>
+            {reportWidgets.map((widget) => <div key={widget.key}>{widget.key}</div>)}
+            <div>{locale === "zh" ? "仅元数据映射，不执行真实报表查询。" : "Metadata mapping only; no real report query."}</div>
           </div>
         ) : null}
         {preview.placeholderNotice ? <div>{locale === "zh" ? preview.placeholderNotice.zh : preview.placeholderNotice.en}</div> : null}

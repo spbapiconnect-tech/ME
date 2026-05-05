@@ -80,3 +80,10 @@ ActionContract
 - Add notification preview components in `components/notifications/`.
 - Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
 - Keep source mapping stable across UI shell/layout/skin updates.
+
+## ME Report Widgets Update
+- Add `/reports` metadata preview route and report widget contract catalog.
+- Audit events can map to report widgets through `auditEventKey`.
+- Report widget metadata lives in `types/report-widget.ts`, `config/reports/`, and `lib/report-widgets.ts`.
+- Report widget preview is metadata-only and does not write logs, run SQL, or execute exports/schedules.
+- Keep audit-to-widget mapping keys stable across layout/skin changes.

@@ -199,6 +199,9 @@ export function AuditTrailPage() {
               <Link href="/workflow">ME Workflow</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
+              <Link href="/reports">ME Reports</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
               <Link href="/notifications">ME Notifications</Link>
             </Button>
           </div>

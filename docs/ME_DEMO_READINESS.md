@@ -118,3 +118,11 @@
 - Add notification preview components in `components/notifications/`.
 - Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
 - Keep source mapping stable across UI shell/layout/skin updates.
+
+## ME Report Widget Contract Foundation (v0.6.7)
+
+- Route: `/reports` is available for metadata-only dashboard/report widget preview.
+- Registry: `config/reports/`; Components: `components/reports/`; Helper: `lib/report-widgets.ts`.
+- Cross-contract mapping to action/access/audit/workflow/notification is preview-only.
+- No BI engine, chart engine, SQL, database/API/backend integration, export engine, or scheduler is included.
+- Widget source mapping must remain stable when shell/layout/skin changes.

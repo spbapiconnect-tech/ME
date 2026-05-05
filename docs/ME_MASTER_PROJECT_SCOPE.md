@@ -214,3 +214,13 @@ This section defines future intelligence directions for ME only.
 - Add notification preview components in `components/notifications/`.
 - Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
 - Keep source mapping stable across UI shell/layout/skin updates.
+
+## ME Report Widget Contract Foundation (v0.6.7)
+
+- Add `/reports` metadata preview route for dashboard/report widget contracts.
+- Add report widget contract type under `types/report-widget.ts`.
+- Add report widget registries under `config/reports/`.
+- Add report widget UI components under `components/reports/`.
+- Add helper utilities under `lib/report-widgets.ts`.
+- Scope remains metadata-only: no real BI/chart/query/export/schedule/database/API/backend/session logic.
+- Report widget source mapping keys must remain stable across UI redesign iterations.
