@@ -9,9 +9,10 @@ interface PsiDetailPageProps {
   error?: string;
   rows: Array<{ key: string; value: string }>;
   backHref: string;
+  relatedActions?: Array<{ label: string; actionKey: string }>;
 }
 
-export function PsiDetailPage({ title, source, isMock, error, rows, backHref }: PsiDetailPageProps) {
+export function PsiDetailPage({ title, source, isMock, error, rows, backHref, relatedActions = [] }: PsiDetailPageProps) {
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
       <Card>
@@ -30,6 +31,18 @@ export function PsiDetailPage({ title, source, isMock, error, rows, backHref }: 
             </div>
           ))}
           {rows.length === 0 ? <div className="text-sm text-muted-foreground">No detail available</div> : null}
+        </CardContent>
+      </Card>
+
+      <Card size="sm">
+        <CardHeader><CardTitle className="text-sm">Related Action Placeholders</CardTitle></CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Link href="/psi/actions" className="text-xs text-primary hover:underline">Open PSI Actions</Link>
+          {relatedActions.map((item) => (
+            <Link key={item.actionKey} href={`/psi/actions/${item.actionKey}`} className="text-xs text-primary hover:underline">
+              {item.label}
+            </Link>
+          ))}
         </CardContent>
       </Card>
 

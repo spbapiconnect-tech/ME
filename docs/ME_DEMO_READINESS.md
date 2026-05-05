@@ -152,3 +152,11 @@
 - Add PSI services under `lib/services/psi/` and page-data helpers under `lib/page-data/psi/`.
 - Add PSI display adapters under `lib/display-adapters/psi/`.
 - Scope remains mock-only and read-only; no real database/API/write actions/approval/stock posting/supplier portal/POS/task creation.
+
+
+## ME PSI Action Draft Placeholders (v0.7.1)
+
+- Add `/psi/actions` and `/psi/actions/[actionKey]` as metadata-only action draft/form preview routes.
+- Add PSI action draft contracts in `types/psi/actions.ts` and `config/psi/action-drafts.ts`.
+- Add UI components under `components/psi/actions/` and helper utilities in `lib/psi-actions.ts`.
+- Scope remains placeholder-only: no real submit, no write service/repository method, no database/API, no approval workflow, no stock posting, no supplier portal, no task creation, and no workflow/notification execution.

@@ -20,6 +20,11 @@ export default async function PsiSupplierPage() {
       records={data.records}
       issueRecords={data.issueRecords}
       detailBasePath="/psi/supplier"
+      actionShortcuts={[
+        { label: "Add Supplier", actionKey: "psi.action.addSupplier" },
+        { label: "Review Supplier", actionKey: "psi.action.reviewSupplier" },
+        { label: "Report Supplier Issue", actionKey: "psi.action.reportSupplierIssue" },
+      ]}
     />
   );
 }

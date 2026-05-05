@@ -20,6 +20,11 @@ export default async function PsiInventoryPage() {
       records={data.records}
       issueRecords={data.issueRecords}
       detailBasePath="/psi/inventory"
+      actionShortcuts={[
+        { label: "Adjust Inventory", actionKey: "psi.action.adjustInventory" },
+        { label: "Transfer Stock", actionKey: "psi.action.transferStock" },
+        { label: "Report Inventory Issue", actionKey: "psi.action.reportInventoryIssue" },
+      ]}
     />
   );
 }

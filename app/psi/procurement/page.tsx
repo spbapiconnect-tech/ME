@@ -20,6 +20,11 @@ export default async function PsiProcurementPage() {
       records={data.records}
       issueRecords={data.issueRecords}
       detailBasePath="/psi/procurement"
+      actionShortcuts={[
+        { label: "Create Purchase Request", actionKey: "psi.action.createPurchaseRequest" },
+        { label: "Record Receiving", actionKey: "psi.action.recordReceiving" },
+        { label: "Report Purchase Issue", actionKey: "psi.action.reportPurchaseIssue" },
+      ]}
     />
   );
 }

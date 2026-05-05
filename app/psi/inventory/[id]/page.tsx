@@ -17,6 +17,11 @@ export default async function PsiInventoryDetailPage({ params }: Props) {
       error={data.error}
       rows={data.detailRows}
       backHref="/psi/inventory"
+      relatedActions={[
+        { label: "Adjust Inventory", actionKey: "psi.action.adjustInventory" },
+        { label: "Transfer Stock", actionKey: "psi.action.transferStock" },
+        { label: "Report Inventory Issue", actionKey: "psi.action.reportInventoryIssue" },
+      ]}
     />
   );
 }

@@ -14,10 +14,11 @@ interface WorkspacePageProps {
   records: DisplayRecord[];
   issueRecords: DisplayRecord[];
   detailBasePath: string;
+  actionShortcuts?: Array<{ label: string; actionKey: string }>;
 }
 
 export function PsiWorkspacePage(props: WorkspacePageProps) {
-  const { title, subtitle, source, isMock, error, stats, records, issueRecords, detailBasePath } = props;
+  const { title, subtitle, source, isMock, error, stats, records, issueRecords, detailBasePath, actionShortcuts = [] } = props;
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
@@ -40,6 +41,18 @@ export function PsiWorkspacePage(props: WorkspacePageProps) {
               <div className="text-xs text-muted-foreground">{item.label}</div>
               <div className="text-lg font-semibold">{item.value}</div>
             </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card size="sm">
+        <CardHeader><CardTitle className="text-sm">Action Shortcuts</CardTitle></CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Link href="/psi/actions" className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">Open PSI Actions</Link>
+          {actionShortcuts.map((item) => (
+            <Link key={item.actionKey} href={`/psi/actions/${item.actionKey}`} className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">
+              {item.label}
+            </Link>
           ))}
         </CardContent>
       </Card>

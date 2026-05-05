@@ -17,6 +17,11 @@ export default async function PsiSupplierDetailPage({ params }: Props) {
       error={data.error}
       rows={data.detailRows}
       backHref="/psi/supplier"
+      relatedActions={[
+        { label: "Add Supplier", actionKey: "psi.action.addSupplier" },
+        { label: "Review Supplier", actionKey: "psi.action.reviewSupplier" },
+        { label: "Report Supplier Issue", actionKey: "psi.action.reportSupplierIssue" },
+      ]}
     />
   );
 }

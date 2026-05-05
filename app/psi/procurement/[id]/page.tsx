@@ -17,6 +17,11 @@ export default async function PsiProcurementDetailPage({ params }: Props) {
       error={data.error}
       rows={data.detailRows}
       backHref="/psi/procurement"
+      relatedActions={[
+        { label: "Create Purchase Request", actionKey: "psi.action.createPurchaseRequest" },
+        { label: "Record Receiving", actionKey: "psi.action.recordReceiving" },
+        { label: "Report Purchase Issue", actionKey: "psi.action.reportPurchaseIssue" },
+      ]}
     />
   );
 }

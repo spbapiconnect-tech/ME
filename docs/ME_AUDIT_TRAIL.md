@@ -103,3 +103,11 @@ ActionContract
 - Add package preview components in `components/packages/`.
 - Keep package and plan behavior metadata-only: no real billing, payment, subscription enforcement, tenant provisioning, runtime module enable/disable, API/backend/database, or session lookup.
 - Keep package source mapping stable across layout/skin/page-template redesigns.
+
+
+## ME PSI Action Draft Placeholders (v0.7.1)
+
+- Add `/psi/actions` and `/psi/actions/[actionKey]` as metadata-only action draft/form preview routes.
+- Add PSI action draft contracts in `types/psi/actions.ts` and `config/psi/action-drafts.ts`.
+- Add UI components under `components/psi/actions/` and helper utilities in `lib/psi-actions.ts`.
+- Scope remains placeholder-only: no real submit, no write service/repository method, no database/API, no approval workflow, no stock posting, no supplier portal, no task creation, and no workflow/notification execution.
