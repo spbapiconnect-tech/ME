@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { WorkflowChip } from "@/components/workflow/workflow-chip";
 import { getWidgetsByWorkflowKey } from "@/lib/report-widgets";
+import { getPackagesByFeatureKey, getPackagesByModule } from "@/lib/packages";
 import { getRulesByWorkflowKey } from "@/lib/rules";
 import type { SupportedLocale } from "@/types/module";
 import type { WorkflowPreview } from "@/types/workflow";
@@ -10,6 +11,7 @@ import type { NotificationPreview } from "@/types/notification";
 export function WorkflowPreviewCard({ preview, locale, notificationPreview }: { preview: WorkflowPreview; locale: SupportedLocale; notificationPreview?: NotificationPreview }) {
   const reportWidgets = getWidgetsByWorkflowKey(preview.workflowKey);
   const rules = getRulesByWorkflowKey(preview.workflowKey);
+  const packages = [...getPackagesByFeatureKey(preview.workflowKey), ...getPackagesByModule("workflow")].filter((item, idx, arr) => arr.findIndex((v) => v.key === item.key) === idx);
 
   return (
     <Card size="sm" className="gap-3">
@@ -44,6 +46,13 @@ export function WorkflowPreviewCard({ preview, locale, notificationPreview }: { 
           <div>{locale === "zh" ? "审计要求" : "Audit Required"}: {String(preview.auditRequired)}</div>
           {preview.permissionRequired ? <div>{locale === "zh" ? "权限" : "Permission"}: {preview.permissionRequired}</div> : null}
         </div>
+        {packages.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "关联方案" : "Linked Packages"}</div>
+            {packages.map((item) => <div key={item.key}>{item.key}</div>)}
+            <div>{locale === "zh" ? "仅方案元数据映射，不执行真实订阅门禁。" : "Package metadata mapping only; no real subscription guard is executed."}</div>
+          </div>
+        ) : null}
         {rules.length > 0 ? (
           <div className="rounded-xl bg-muted/40 p-3">
             <div className="font-medium text-foreground/80">{locale === "zh" ? "关联规则" : "Linked Rules"}</div>

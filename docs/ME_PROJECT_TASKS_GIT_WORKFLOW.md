@@ -216,3 +216,10 @@ Use Conventional Commits.
 - No real rule/formula calculation or evaluation is implemented yet.
 - No SQL/database/API/backend/automation/task creation/notification sending/session lookup is added.
 - Rule source mapping must stay stable across layout/skin/UI redesign changes.
+
+## ME Package Contracts Update
+- Add `/packages` metadata preview route for Module Package / SaaS Plan Builder contracts.
+- Add package registries in `config/packages/` and helpers in `lib/packages.ts`.
+- Add package preview components in `components/packages/`.
+- Keep package and plan behavior metadata-only: no real billing, payment, subscription enforcement, tenant provisioning, runtime module enable/disable, API/backend/database, or session lookup.
+- Keep package source mapping stable across layout/skin/page-template redesigns.

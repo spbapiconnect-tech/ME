@@ -7,6 +7,7 @@ import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
 import type { WorkflowPreview } from "@/types/workflow"
 import { getWidgetsByAccessRuleKey } from "@/lib/report-widgets"
+import { getPackagesByFeatureKey } from "@/lib/packages"
 import { getRulesByAccessRuleKey } from "@/lib/rules"
 import type { NotificationPreview } from "@/types/notification"
 
@@ -41,6 +42,7 @@ export function AccessPreviewCard({
   const t = copy[locale]
   const reportWidgets = getWidgetsByAccessRuleKey(preview.ruleKey)
   const rules = getRulesByAccessRuleKey(preview.ruleKey)
+  const packages = getPackagesByFeatureKey(preview.ruleKey)
 
   return (
     <Card size="sm" className="gap-3">
@@ -91,6 +93,13 @@ export function AccessPreviewCard({
             <div>{locale === "zh" ? "严重级别" : "Severity"}: {workflowPreview.severity}</div>
             <div>{locale === "zh" ? "需人工确认" : "Human Confirmation"}: {String(workflowPreview.humanConfirmationRequired)}</div>
             <div>{locale === "zh" ? "仅预览，不执行自动化。" : "Preview only; no automation execution."}</div>
+          </div>
+        ) : null}
+        {packages.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "方案预览" : "Package Preview"}</div>
+            {packages.map((item) => <div key={item.key}>{item.key}</div>)}
+            <div>{locale === "zh" ? "仅方案元数据映射，不执行方案门禁。" : "Package metadata mapping only; no plan guard is executed."}</div>
           </div>
         ) : null}
         {rules.length > 0 ? (

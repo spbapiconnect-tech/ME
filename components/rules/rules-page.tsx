@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ruleContracts, ruleGroups } from "@/config/rules";
+import { getPackagesByFeatureKey, getPackagesByModule } from "@/lib/packages";
 import {
   getHumanReviewRules,
   getNotificationRules,
@@ -92,6 +93,12 @@ export function RulesPage() {
     return filteredRules.find((item) => item.key === selectedRuleKey) ?? getRuleByKey(selectedRuleKey);
   }, [filteredRules, selectedRuleKey]);
 
+  const selectedRulePackages = React.useMemo(() => {
+    if (!selectedRule) return [];
+    const mapped = [...getPackagesByFeatureKey(selectedRule.key), ...getPackagesByModule(selectedRule.source.sourceModule)];
+    return mapped.filter((item, idx, arr) => arr.findIndex((v) => v.key === item.key) === idx);
+  }, [selectedRule]);
+
   const stats = React.useMemo(() => {
     return {
       total: ruleContracts.length,
@@ -125,6 +132,7 @@ export function RulesPage() {
             <Button asChild variant="outline" size="sm"><Link href="/action-contracts">ME Action Contracts</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/access-control">ME Access Control</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/packages">ME Packages</Link></Button>
           </div>
         </CardHeader>
       </Card>
@@ -192,6 +200,7 @@ export function RulesPage() {
                 {selectedRule.source.actionKey ? <div>ActionContract key: {selectedRule.source.actionKey}</div> : null}
                 {selectedRule.source.accessRuleKey ? <div>AccessRule key: {selectedRule.source.accessRuleKey}</div> : null}
                 {selectedRule.source.auditEventKey ? <div>AuditEventContract key: {selectedRule.source.auditEventKey}</div> : null}
+                {selectedRulePackages.length > 0 ? <div>PackageContract keys: {selectedRulePackages.map((item) => item.key).join(", ")}</div> : null}
               </CardContent>
             </Card>
           ) : null}

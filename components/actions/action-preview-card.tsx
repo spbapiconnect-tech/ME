@@ -8,6 +8,7 @@ import { getActionAccessPreview } from "@/lib/access"
 import { getActionWorkflowPreview } from "@/lib/workflow"
 import { getActionNotificationPreview } from "@/lib/notifications"
 import { getWidgetsByActionKey } from "@/lib/report-widgets"
+import { getPackagesByFeatureKey } from "@/lib/packages"
 import { getRulesByActionKey } from "@/lib/rules"
 import type { ActionContract } from "@/types/action-contract"
 import type { SupportedLocale } from "@/types/module"
@@ -29,6 +30,7 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
   const notificationPreview = getActionNotificationPreview(action)
   const reportWidgets = getWidgetsByActionKey(action.key)
   const rules = getRulesByActionKey(action.key)
+  const packages = getPackagesByFeatureKey(action.key)
   const label = resolveActionLabel(action, locale)
   const description = resolveActionDescription(action, locale)
 
@@ -116,6 +118,13 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
           <div>{flagLabel(locale, "通道", "Channel")}: {notificationPreview.channel}</div>
           <div>{flagLabel(locale, "仅通知元数据预览，不执行真实发送。", "Notification metadata preview only; no real sending is performed.")}</div>
         </div>
+        {packages.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+            <div className="font-medium text-foreground/80">{flagLabel(locale, "方案预览", "Package Preview")}</div>
+            {packages.map((item) => <div key={item.key}>{item.key}</div>)}
+            <div>{flagLabel(locale, "仅方案元数据映射，不执行方案门禁。", "Package metadata mapping only; no plan guard is executed.")}</div>
+          </div>
+        ) : null}
         {rules.length > 0 ? (
           <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
             <div className="font-medium text-foreground/80">{flagLabel(locale, "规则预览", "Rule Preview")}</div>

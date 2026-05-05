@@ -3,6 +3,7 @@ import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getWidgetsByAuditEventKey } from "@/lib/report-widgets"
+import { getPackagesByFeatureKey } from "@/lib/packages"
 import { getRulesByAuditEventKey } from "@/lib/rules"
 import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
@@ -16,6 +17,7 @@ function label(locale: SupportedLocale, zh: string, en: string) {
 export function AuditPreviewCard({ preview, locale, workflowPreview, notificationPreview }: { preview: AuditPreview; locale: SupportedLocale; workflowPreview?: WorkflowPreview; notificationPreview?: NotificationPreview }) {
   const reportWidgets = getWidgetsByAuditEventKey(preview.eventKey)
   const rules = getRulesByAuditEventKey(preview.eventKey)
+  const packages = getPackagesByFeatureKey(preview.eventKey)
 
   return (
     <Card size="sm" className="gap-3">
@@ -56,6 +58,13 @@ export function AuditPreviewCard({ preview, locale, workflowPreview, notificatio
             <div>{label(locale, "状态", "Status")}: {workflowPreview.status}</div>
             <div>{label(locale, "严重级别", "Severity")}: {workflowPreview.severity}</div>
             <div>{label(locale, "仅预览，不执行真实自动化。", "Preview only; no real automation is executed.")}</div>
+          </div>
+        ) : null}
+        {packages.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{label(locale, "方案预览", "Package Preview")}</div>
+            {packages.map((item) => <div key={item.key}>{item.key}</div>)}
+            <div>{label(locale, "仅方案元数据映射，不执行订阅门禁。", "Package metadata mapping only; no subscription guard is executed.")}</div>
           </div>
         ) : null}
         {rules.length > 0 ? (

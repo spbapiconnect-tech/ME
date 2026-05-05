@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getWidgetsByNotificationKey } from "@/lib/report-widgets";
+import { getPackagesByFeatureKey } from "@/lib/packages";
 import { getRulesByNotificationKey } from "@/lib/rules";
 import type { SupportedLocale } from "@/types/module";
 import type { NotificationPreview } from "@/types/notification";
@@ -10,6 +11,7 @@ import { NotificationChip } from "./notification-chip";
 export function NotificationPreviewCard({ preview, locale }: { preview: NotificationPreview; locale: SupportedLocale }) {
   const reportWidgets = getWidgetsByNotificationKey(preview.notificationKey);
   const rules = getRulesByNotificationKey(preview.notificationKey);
+  const packages = getPackagesByFeatureKey(preview.notificationKey);
 
   return (
     <Card size="sm" className="gap-3">
@@ -31,6 +33,13 @@ export function NotificationPreviewCard({ preview, locale }: { preview: Notifica
         <div>{locale === "zh" ? "人工复核" : "Human Review"}: {String(preview.humanReviewRequired)}</div>
         <div>{locale === "zh" ? "审计要求" : "Audit Required"}: {String(preview.auditRequired)}</div>
         {preview.permissionRequired ? <div>{locale === "zh" ? "权限" : "Permission"}: {preview.permissionRequired}</div> : null}
+        {packages.length > 0 ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "关联方案" : "Linked Packages"}</div>
+            {packages.map((item) => <div key={item.key}>{item.key}</div>)}
+            <div>{locale === "zh" ? "仅方案元数据映射，不执行订阅门禁。" : "Package metadata mapping only; no subscription guard is executed."}</div>
+          </div>
+        ) : null}
         {rules.length > 0 ? (
           <div className="rounded-xl bg-muted/40 p-3">
             <div className="font-medium text-foreground/80">{locale === "zh" ? "关联规则" : "Linked Rules"}</div>
