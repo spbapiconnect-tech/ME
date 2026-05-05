@@ -68,3 +68,13 @@ This document defines the future API boundary for ME without implementing API. I
 - UI pages should call the service layer and receive plain data props; UI should not call raw API endpoints directly.
 - Current repository mode remains mock; no real API/database/fetch/axios exists yet.
 - Future API repositories should implement the existing repository contracts and keep mapping inside repositories/services.
+
+
+## ME PSI Service MVP Design (v0.7.0)
+
+- Add read-only `/psi` workspace routes for procurement/supplier/inventory.
+- Add PSI DTO contracts under `types/psi/` and PSI mock data under `data/psi/`.
+- Add PSI mock repositories under `lib/repositories/mock/psi/`.
+- Add PSI services under `lib/services/psi/` and page-data helpers under `lib/page-data/psi/`.
+- Add PSI display adapters under `lib/display-adapters/psi/`.
+- Scope remains mock-only and read-only; no real database/API/write actions/approval/stock posting/supplier portal/POS/task creation.

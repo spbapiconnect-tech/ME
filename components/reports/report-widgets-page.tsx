@@ -145,6 +145,7 @@ export function ReportWidgetsPage() {
             <Button asChild variant="outline" size="sm"><Link href="/components">ME Core Components</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/rules">ME Rules</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/packages">ME Packages</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/psi">ME PSI</Link></Button>
           </div>
         </CardHeader>
       </Card>

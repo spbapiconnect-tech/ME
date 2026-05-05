@@ -240,3 +240,13 @@ This section defines future intelligence directions for ME only.
 - Add package preview components in `components/packages/`.
 - Keep package and plan behavior metadata-only: no real billing, payment, subscription enforcement, tenant provisioning, runtime module enable/disable, API/backend/database, or session lookup.
 - Keep package source mapping stable across layout/skin/page-template redesigns.
+
+
+## ME PSI Service MVP Design (v0.7.0)
+
+- Add read-only `/psi` workspace routes for procurement/supplier/inventory.
+- Add PSI DTO contracts under `types/psi/` and PSI mock data under `data/psi/`.
+- Add PSI mock repositories under `lib/repositories/mock/psi/`.
+- Add PSI services under `lib/services/psi/` and page-data helpers under `lib/page-data/psi/`.
+- Add PSI display adapters under `lib/display-adapters/psi/`.
+- Scope remains mock-only and read-only; no real database/API/write actions/approval/stock posting/supplier portal/POS/task creation.

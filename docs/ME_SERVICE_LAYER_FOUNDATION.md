@@ -54,3 +54,13 @@ This milestone introduces a service layer and repository contracts for ME.
 - Reusable UI: `components/actions/` (ActionButton + debug cards).
 - No real permission enforcement, audit logging, workflow execution, task creation, API/database integration, or persistence.
 - Source mapping keys should remain stable even when layout/skin foundations change.
+
+
+## ME PSI Service MVP Design (v0.7.0)
+
+- Add read-only `/psi` workspace routes for procurement/supplier/inventory.
+- Add PSI DTO contracts under `types/psi/` and PSI mock data under `data/psi/`.
+- Add PSI mock repositories under `lib/repositories/mock/psi/`.
+- Add PSI services under `lib/services/psi/` and page-data helpers under `lib/page-data/psi/`.
+- Add PSI display adapters under `lib/display-adapters/psi/`.
+- Scope remains mock-only and read-only; no real database/API/write actions/approval/stock posting/supplier portal/POS/task creation.

@@ -24,3 +24,32 @@ export function resetRepositoryProvider() {
   mode = "mock";
   provider = null;
 }
+
+
+
+export function getPsiProcurementRepository() {
+  const psiRepository = getRepositoryProvider().psiProcurement;
+  if (psiRepository) {
+    return psiRepository;
+  }
+
+  return createMockRepositoryProvider().psiProcurement!;
+}
+
+export function getPsiSupplierRepository() {
+  const psiRepository = getRepositoryProvider().psiSupplier;
+  if (psiRepository) {
+    return psiRepository;
+  }
+
+  return createMockRepositoryProvider().psiSupplier!;
+}
+
+export function getPsiInventoryRepository() {
+  const psiRepository = getRepositoryProvider().psiInventory;
+  if (psiRepository) {
+    return psiRepository;
+  }
+
+  return createMockRepositoryProvider().psiInventory!;
+}

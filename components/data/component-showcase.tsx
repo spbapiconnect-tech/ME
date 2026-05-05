@@ -148,6 +148,10 @@ export function ComponentShowcase() {
                   <Package size={16} />
                   <span>ME Packages</span>
                 </Link>
+                <Link className="shell-link-button" href="/psi">
+                  <Workflow size={16} />
+                  <span>ME PSI</span>
+                </Link>
                 <Link className="shell-link-button" href="/templates">
                   <LayoutTemplate size={16} />
                   <span>{copy.templates}</span>
