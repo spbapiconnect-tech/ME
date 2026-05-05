@@ -132,6 +132,10 @@ export function ComponentShowcase() {
                   <ShieldCheck size={16} />
                   <span>{copy.auditTrail}</span>
                 </Link>
+                <Link className="shell-link-button" href="/notifications">
+                  <Workflow size={16} />
+                  <span>ME Notifications</span>
+                </Link>
                 <Link className="shell-link-button" href="/templates">
                   <LayoutTemplate size={16} />
                   <span>{copy.templates}</span>

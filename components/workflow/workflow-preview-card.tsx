@@ -3,8 +3,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { WorkflowChip } from "@/components/workflow/workflow-chip";
 import type { SupportedLocale } from "@/types/module";
 import type { WorkflowPreview } from "@/types/workflow";
+import type { NotificationPreview } from "@/types/notification";
 
-export function WorkflowPreviewCard({ preview, locale }: { preview: WorkflowPreview; locale: SupportedLocale }) {
+export function WorkflowPreviewCard({ preview, locale, notificationPreview }: { preview: WorkflowPreview; locale: SupportedLocale; notificationPreview?: NotificationPreview }) {
   return (
     <Card size="sm" className="gap-3">
       <CardHeader className="gap-1">
@@ -24,6 +25,15 @@ export function WorkflowPreviewCard({ preview, locale }: { preview: WorkflowPrev
         <div>{locale === "zh" ? preview.reason.zh : preview.reason.en}</div>
         {preview.triggerLabel ? <div>{locale === "zh" ? "触发标签" : "Trigger Label"}: {preview.triggerLabel}</div> : null}
         {preview.targetLabel ? <div>{locale === "zh" ? "目标标签" : "Target Label"}: {preview.targetLabel}</div> : null}
+        {notificationPreview ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "通知预览" : "Notification Preview"}</div>
+            <div>{notificationPreview.canSend ? (locale === "zh" ? "元数据层可发送" : "Sendable in metadata layer") : (locale === "zh" ? "元数据层不可发送" : "Not sendable in metadata layer")}</div>
+            <div>{locale === "zh" ? "状态" : "Status"}: {notificationPreview.status}</div>
+            <div>{locale === "zh" ? "通道" : "Channel"}: {notificationPreview.channel}</div>
+            <div>{locale === "zh" ? "仅通知元数据预览，不执行真实发送。" : "Notification metadata preview only; no real sending is executed."}</div>
+          </div>
+        ) : null}
         <div className="rounded-xl bg-muted/40 p-3">
           <div>{locale === "zh" ? "人工确认" : "Human Confirmation"}: {String(preview.humanConfirmationRequired)}</div>
           <div>{locale === "zh" ? "审计要求" : "Audit Required"}: {String(preview.auditRequired)}</div>

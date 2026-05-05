@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { auditEventRegistry, auditRetentionProfiles } from "@/config/audit"
 import { getAuditablePreviewEvents, getAuditEventByKey, getAuditPreview, getPlaceholderAuditEvents } from "@/lib/audit"
+import { getAuditNotificationPreview } from "@/lib/notifications"
 import { getAuditWorkflowPreview } from "@/lib/workflow"
 import { useUiPreferencesStore } from "@/stores/ui-preferences"
 import type { AuditEventType, AuditSeverity, AuditStatus } from "@/types/audit"
@@ -161,6 +162,7 @@ export function AuditTrailPage() {
   }, [selectedEvent])
 
   const selectedWorkflowPreview = React.useMemo(() => (selectedEvent ? getAuditWorkflowPreview(selectedEvent) : undefined), [selectedEvent])
+  const selectedNotificationPreview = React.useMemo(() => (selectedEvent ? getAuditNotificationPreview(selectedEvent) : undefined), [selectedEvent])
 
   const stats = React.useMemo(() => {
     return {
@@ -195,6 +197,9 @@ export function AuditTrailPage() {
             </Button>
             <Button asChild size="sm" variant="outline">
               <Link href="/workflow">ME Workflow</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/notifications">ME Notifications</Link>
             </Button>
           </div>
         </CardHeader>
@@ -322,7 +327,7 @@ export function AuditTrailPage() {
           </CardContent>
         </Card>
         <div className="grid gap-4">
-          {selectedPreview ? <AuditPreviewCard preview={selectedPreview} locale={currentLocale} workflowPreview={selectedWorkflowPreview} /> : null}
+          {selectedPreview ? <AuditPreviewCard preview={selectedPreview} locale={currentLocale} workflowPreview={selectedWorkflowPreview} notificationPreview={selectedNotificationPreview} /> : null}
           {selectedEvent ? <AuditSourceCard event={selectedEvent} locale={currentLocale} /> : null}
           {selectedEvent ? (
             <Card size="sm">
@@ -332,6 +337,7 @@ export function AuditTrailPage() {
               <CardContent className="text-xs text-muted-foreground">
                 {selectedEvent.requirement.actionKey ? <div>actionKey: {selectedEvent.requirement.actionKey}</div> : null}
                 {selectedEvent.requirement.accessRuleKey ? <div>accessRuleKey: {selectedEvent.requirement.accessRuleKey}</div> : null}
+                {selectedNotificationPreview ? <div>notificationKey: {selectedNotificationPreview.notificationKey}</div> : null}
                 {!selectedEvent.requirement.actionKey && !selectedEvent.requirement.accessRuleKey ? (
                   <div>{currentLocale === "zh" ? "当前事件未绑定 ActionContract 或 AccessRule。" : "No ActionContract or AccessRule linkage is defined for this event."}</div>
                 ) : null}

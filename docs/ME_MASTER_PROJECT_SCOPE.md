@@ -207,3 +207,10 @@ This section defines future intelligence directions for ME only.
 - Workflow source mapping keys must remain stable across layout/skin/shell redesigns.
 - Metadata-only preview: no real workflow engine, automation execution, queue/scheduler/background job, notification service, database/API/backend, task/approval creation, session lookup, or middleware.
 
+
+## ME Notification Contracts Update
+- Add `/notifications` metadata preview route.
+- Add notification contract registry in `config/notifications/`.
+- Add notification preview components in `components/notifications/`.
+- Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
+- Keep source mapping stable across UI shell/layout/skin updates.

@@ -6,6 +6,7 @@ import type { AccessPreview } from "@/types/access-control"
 import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
 import type { WorkflowPreview } from "@/types/workflow"
+import type { NotificationPreview } from "@/types/notification"
 
 const copy = {
   zh: {
@@ -27,11 +28,13 @@ export function AccessPreviewCard({
   locale,
   auditPreview,
   workflowPreview,
+  notificationPreview,
 }: {
   preview: AccessPreview
   locale: SupportedLocale
   auditPreview?: AuditPreview
   workflowPreview?: WorkflowPreview
+  notificationPreview?: NotificationPreview
 }) {
   const t = copy[locale]
 
@@ -65,6 +68,15 @@ export function AccessPreviewCard({
             <div>{locale === "zh" ? "严重级别" : "Severity"}: {auditPreview.severity}</div>
             {auditPreview.accessRuleKey ? <div>{locale === "zh" ? "访问规则" : "Access Rule"}: {auditPreview.accessRuleKey}</div> : null}
             <div>{locale === "zh" ? "仅元数据预览，不做真实审计写入。" : "Metadata preview only; no real audit writes."}</div>
+          </div>
+        ) : null}
+        {notificationPreview ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "通知预览" : "Notification Preview"}</div>
+            <div>{notificationPreview.canSend ? (locale === "zh" ? "元数据层可发送" : "Sendable in metadata layer") : (locale === "zh" ? "元数据层不可发送" : "Not sendable in metadata layer")}</div>
+            <div>{locale === "zh" ? "状态" : "Status"}: {notificationPreview.status}</div>
+            <div>{locale === "zh" ? "通道" : "Channel"}: {notificationPreview.channel}</div>
+            <div>{locale === "zh" ? "仅通知合同预览，不执行真实发送。" : "Notification contract preview only; no real sending."}</div>
           </div>
         ) : null}
         {workflowPreview ? (

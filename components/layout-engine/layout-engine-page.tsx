@@ -149,6 +149,10 @@ export function LayoutEnginePage() {
                   <Workflow size={16} />
                   <span>{currentCopy.workflow}</span>
                 </Link>
+                <Link className="shell-link-button" href="/notifications">
+                  <Workflow size={16} />
+                  <span>ME Notifications</span>
+                </Link>
               </div>
             </div>
           </section>

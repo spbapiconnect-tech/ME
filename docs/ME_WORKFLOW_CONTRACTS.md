@@ -59,3 +59,10 @@ ActionContract
 - External webhook
 - Manager review
 - Compliance trace
+
+## ME Notification Contracts Update
+- Add `/notifications` metadata preview route.
+- Add notification contract registry in `config/notifications/`.
+- Add notification preview components in `components/notifications/`.
+- Keep notification behavior metadata-only with no real sending/provider/queue/scheduler/database/API/backend/session/middleware.
+- Keep source mapping stable across UI shell/layout/skin updates.

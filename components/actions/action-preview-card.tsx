@@ -6,6 +6,7 @@ import { getActionAuditPreview } from "@/lib/audit"
 import { getActionExecutionPreview, resolveActionDescription, resolveActionLabel } from "@/lib/actions"
 import { getActionAccessPreview } from "@/lib/access"
 import { getActionWorkflowPreview } from "@/lib/workflow"
+import { getActionNotificationPreview } from "@/lib/notifications"
 import type { ActionContract } from "@/types/action-contract"
 import type { SupportedLocale } from "@/types/module"
 
@@ -23,6 +24,7 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
   const accessPreview = getActionAccessPreview(action)
   const auditPreview = getActionAuditPreview(action)
   const workflowPreview = getActionWorkflowPreview(action)
+  const notificationPreview = getActionNotificationPreview(action)
   const label = resolveActionLabel(action, locale)
   const description = resolveActionDescription(action, locale)
 
@@ -97,6 +99,18 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
           <div>{flagLabel(locale, "严重级别", "Severity")}: {auditPreview.severity}</div>
           {auditPreview.accessRuleKey ? <div>{flagLabel(locale, "访问规则", "Access Rule")}: {auditPreview.accessRuleKey}</div> : null}
           <div>{flagLabel(locale, "仅审计元数据预览，不写日志、不落库。", "Audit metadata preview only; no log writes or persistence.")}</div>
+        </div>
+        <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+          <div className="font-medium text-foreground/80">{flagLabel(locale, "Notification Preview", "Notification Preview")}</div>
+          <div>
+            {notificationPreview.canSend
+              ? flagLabel(locale, "当前在元数据层标记为可发送。", "Currently marked as sendable in metadata layer.")
+              : flagLabel(locale, "当前不可发送，仅做通知合同预览。", "Currently not sendable; notification contract preview only.")}
+          </div>
+          <div>{flagLabel(locale, "状态", "Status")}: {notificationPreview.status}</div>
+          <div>{flagLabel(locale, "级别", "Severity")}: {notificationPreview.severity}</div>
+          <div>{flagLabel(locale, "通道", "Channel")}: {notificationPreview.channel}</div>
+          <div>{flagLabel(locale, "仅通知元数据预览，不执行真实发送。", "Notification metadata preview only; no real sending is performed.")}</div>
         </div>
         <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
           <div className="font-medium text-foreground/80">{flagLabel(locale, "Workflow Preview", "Workflow Preview")}</div>

@@ -5,12 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
 import type { WorkflowPreview } from "@/types/workflow"
+import type { NotificationPreview } from "@/types/notification"
 
 function label(locale: SupportedLocale, zh: string, en: string) {
   return locale === "zh" ? zh : en
 }
 
-export function AuditPreviewCard({ preview, locale, workflowPreview }: { preview: AuditPreview; locale: SupportedLocale; workflowPreview?: WorkflowPreview }) {
+export function AuditPreviewCard({ preview, locale, workflowPreview, notificationPreview }: { preview: AuditPreview; locale: SupportedLocale; workflowPreview?: WorkflowPreview; notificationPreview?: NotificationPreview }) {
   return (
     <Card size="sm" className="gap-3">
       <CardHeader className="gap-1">
@@ -34,6 +35,15 @@ export function AuditPreviewCard({ preview, locale, workflowPreview }: { preview
           {preview.permissionRequired ? <div>{label(locale, "权限", "Permission")}: {preview.permissionRequired}</div> : null}
           {preview.accessRuleKey ? <div>{label(locale, "访问规则", "Access Rule")}: {preview.accessRuleKey}</div> : null}
         </div>
+        {notificationPreview ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{label(locale, "通知预览", "Notification Preview")}</div>
+            <div>{notificationPreview.canSend ? label(locale, "元数据层可发送", "Sendable in metadata layer") : label(locale, "元数据层不可发送", "Not sendable in metadata layer")}</div>
+            <div>{label(locale, "状态", "Status")}: {notificationPreview.status}</div>
+            <div>{label(locale, "通道", "Channel")}: {notificationPreview.channel}</div>
+            <div>{label(locale, "仅预览，不执行真实发送。", "Preview only; no real sending is executed.")}</div>
+          </div>
+        ) : null}
         {workflowPreview ? (
           <div className="rounded-xl bg-muted/40 p-3">
             <div className="font-medium text-foreground/80">{label(locale, "Workflow 预览", "Workflow Preview")}</div>

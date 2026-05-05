@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { workflowRegistry, workflowTargetCatalog } from "@/config/workflow";
 import { getHumanConfirmationWorkflows, getPlaceholderWorkflows, getWorkflowByKey, getWorkflowPreview } from "@/lib/workflow";
+import { getWorkflowNotificationPreview } from "@/lib/notifications";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { SupportedLocale } from "@/types/module";
 import type { WorkflowStatus, WorkflowTargetType, WorkflowTriggerType } from "@/types/workflow";
@@ -121,6 +122,7 @@ export function WorkflowPage() {
   }, [effectiveWorkflowKey, filteredWorkflows]);
 
   const preview = React.useMemo(() => (selectedWorkflow ? getWorkflowPreview(selectedWorkflow) : undefined), [selectedWorkflow]);
+  const notificationPreview = React.useMemo(() => (selectedWorkflow ? getWorkflowNotificationPreview(selectedWorkflow) : undefined), [selectedWorkflow]);
 
   const stats = React.useMemo(() => {
     return {
@@ -146,6 +148,7 @@ export function WorkflowPage() {
             <Button asChild variant="outline" size="sm"><Link href="/access-control">ME Access Control</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/layout-engine">ME Layout Engine</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/notifications">ME Notifications</Link></Button>
           </div>
         </CardHeader>
       </Card>
@@ -218,7 +221,7 @@ export function WorkflowPage() {
           </CardContent>
         </Card>
         <div className="grid gap-4">
-          {preview ? <WorkflowPreviewCard preview={preview} locale={currentLocale} /> : null}
+          {preview ? <WorkflowPreviewCard preview={preview} locale={currentLocale} notificationPreview={notificationPreview} /> : null}
           {selectedWorkflow ? <WorkflowSourceCard workflow={selectedWorkflow} locale={currentLocale} /> : null}
           {selectedWorkflow ? (
             <Card size="sm">
@@ -227,6 +230,7 @@ export function WorkflowPage() {
                 {selectedWorkflow.source.actionKey ? <div>ActionContract key: {selectedWorkflow.source.actionKey}</div> : null}
                 {selectedWorkflow.source.auditEventKey ? <div>AuditEventContract key: {selectedWorkflow.source.auditEventKey}</div> : null}
                 {selectedWorkflow.source.accessRuleKey ? <div>AccessRule key: {selectedWorkflow.source.accessRuleKey}</div> : null}
+                {notificationPreview ? <div>NotificationContract key: {notificationPreview.notificationKey}</div> : null}
                 {!selectedWorkflow.source.actionKey && !selectedWorkflow.source.auditEventKey && !selectedWorkflow.source.accessRuleKey ? (
                   <div>{currentLocale === "zh" ? "当前 workflow 未绑定 action/audit/access 键。" : "This workflow has no action/audit/access key linkage."}</div>
                 ) : null}

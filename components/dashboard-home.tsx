@@ -199,6 +199,10 @@ export function DashboardHome({ modules }: DashboardHomeProps) {
                     <Workflow size={16} />
                     <span>ME Workflow</span>
                   </Link>
+                  <Link className="shell-link-button" href="/notifications">
+                    <Workflow size={16} />
+                    <span>ME Notifications</span>
+                  </Link>
                 </div>
               </div>
 
