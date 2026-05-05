@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import type { AccessPreview } from "@/types/access-control"
 import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
+import type { WorkflowPreview } from "@/types/workflow"
 
 const copy = {
   zh: {
@@ -21,7 +22,17 @@ const copy = {
   },
 } as const
 
-export function AccessPreviewCard({ preview, locale, auditPreview }: { preview: AccessPreview; locale: SupportedLocale; auditPreview?: AuditPreview }) {
+export function AccessPreviewCard({
+  preview,
+  locale,
+  auditPreview,
+  workflowPreview,
+}: {
+  preview: AccessPreview
+  locale: SupportedLocale
+  auditPreview?: AuditPreview
+  workflowPreview?: WorkflowPreview
+}) {
   const t = copy[locale]
 
   return (
@@ -54,6 +65,16 @@ export function AccessPreviewCard({ preview, locale, auditPreview }: { preview: 
             <div>{locale === "zh" ? "严重级别" : "Severity"}: {auditPreview.severity}</div>
             {auditPreview.accessRuleKey ? <div>{locale === "zh" ? "访问规则" : "Access Rule"}: {auditPreview.accessRuleKey}</div> : null}
             <div>{locale === "zh" ? "仅元数据预览，不做真实审计写入。" : "Metadata preview only; no real audit writes."}</div>
+          </div>
+        ) : null}
+        {workflowPreview ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{locale === "zh" ? "Workflow 预览" : "Workflow Preview"}</div>
+            <div>{workflowPreview.canTrigger ? (locale === "zh" ? "元数据层可触发" : "Triggerable in metadata layer") : (locale === "zh" ? "元数据层不可触发" : "Not triggerable in metadata layer")}</div>
+            <div>{locale === "zh" ? "状态" : "Status"}: {workflowPreview.status}</div>
+            <div>{locale === "zh" ? "严重级别" : "Severity"}: {workflowPreview.severity}</div>
+            <div>{locale === "zh" ? "需人工确认" : "Human Confirmation"}: {String(workflowPreview.humanConfirmationRequired)}</div>
+            <div>{locale === "zh" ? "仅预览，不执行自动化。" : "Preview only; no automation execution."}</div>
           </div>
         ) : null}
         {preview.placeholderNotice ? <div>{locale === "zh" ? preview.placeholderNotice.zh : preview.placeholderNotice.en}</div> : null}

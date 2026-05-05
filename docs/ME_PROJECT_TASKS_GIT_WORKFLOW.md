@@ -179,3 +179,15 @@ Use Conventional Commits.
 - This milestone is metadata-only and preview-only.
 - No real persistence, database, API/backend, session lookup, or middleware is added.
 - Audit source mapping keys must remain stable across layout/skin/shell redesigns.
+
+## Workflow Trigger Placeholder / Automation Contract Foundation (v0.6.5)
+
+- Route: `/workflow`.
+- Workflow contract types: `types/workflow.ts`.
+- Workflow registries: `config/workflow/`.
+- Workflow helpers: `lib/workflow.ts`.
+- Workflow UI components: `components/workflow/`.
+- Action/access/audit previews can resolve workflow metadata previews through stable source keys.
+- Workflow source mapping keys must remain stable across layout/skin/shell redesigns.
+- Metadata-only preview: no real workflow engine, automation execution, queue/scheduler/background job, notification service, database/API/backend, task/approval creation, session lookup, or middleware.
+

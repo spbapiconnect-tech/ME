@@ -4,12 +4,13 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type { AuditPreview } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
+import type { WorkflowPreview } from "@/types/workflow"
 
 function label(locale: SupportedLocale, zh: string, en: string) {
   return locale === "zh" ? zh : en
 }
 
-export function AuditPreviewCard({ preview, locale }: { preview: AuditPreview; locale: SupportedLocale }) {
+export function AuditPreviewCard({ preview, locale, workflowPreview }: { preview: AuditPreview; locale: SupportedLocale; workflowPreview?: WorkflowPreview }) {
   return (
     <Card size="sm" className="gap-3">
       <CardHeader className="gap-1">
@@ -33,6 +34,15 @@ export function AuditPreviewCard({ preview, locale }: { preview: AuditPreview; l
           {preview.permissionRequired ? <div>{label(locale, "权限", "Permission")}: {preview.permissionRequired}</div> : null}
           {preview.accessRuleKey ? <div>{label(locale, "访问规则", "Access Rule")}: {preview.accessRuleKey}</div> : null}
         </div>
+        {workflowPreview ? (
+          <div className="rounded-xl bg-muted/40 p-3">
+            <div className="font-medium text-foreground/80">{label(locale, "Workflow 预览", "Workflow Preview")}</div>
+            <div>{workflowPreview.canTrigger ? label(locale, "元数据层可触发", "Triggerable in metadata layer") : label(locale, "元数据层不可触发", "Not triggerable in metadata layer")}</div>
+            <div>{label(locale, "状态", "Status")}: {workflowPreview.status}</div>
+            <div>{label(locale, "严重级别", "Severity")}: {workflowPreview.severity}</div>
+            <div>{label(locale, "仅预览，不执行真实自动化。", "Preview only; no real automation is executed.")}</div>
+          </div>
+        ) : null}
         <div className="rounded-xl border border-dashed border-border bg-muted/20 p-3">
           {label(
             locale,

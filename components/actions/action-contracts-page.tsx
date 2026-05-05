@@ -197,6 +197,9 @@ export function ActionContractsPage() {
             <Button asChild variant="outline" size="sm">
               <Link href="/audit-trail">ME Audit Trail</Link>
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/workflow">ME Workflow</Link>
+            </Button>
           </div>
         </CardHeader>
       </Card>

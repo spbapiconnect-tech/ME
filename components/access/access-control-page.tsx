@@ -15,6 +15,7 @@ import { actionRegistry } from "@/config/actions"
 import { accessRules, planRegistry, roleRegistry } from "@/config/access"
 import { getAccessPreview, getActionAccessPreview } from "@/lib/access"
 import { getAccessAuditPreview, getActionAuditPreview } from "@/lib/audit"
+import { getAccessWorkflowPreview, getActionWorkflowPreview } from "@/lib/workflow"
 import { useUiPreferencesStore } from "@/stores/ui-preferences"
 import type { AccessScope, AccessStatus } from "@/types/access-control"
 import type { SupportedLocale } from "@/types/module"
@@ -126,6 +127,8 @@ export function AccessControlPage() {
   const actionPreview = React.useMemo(() => (selectedActionKey ? getActionAccessPreview(selectedActionKey) : undefined), [selectedActionKey])
   const ruleAuditPreview = React.useMemo(() => (effectiveRule ? getAccessAuditPreview(effectiveRule.key) : undefined), [effectiveRule])
   const actionAuditPreview = React.useMemo(() => (selectedActionKey ? getActionAuditPreview(selectedActionKey) : undefined), [selectedActionKey])
+  const ruleWorkflowPreview = React.useMemo(() => (effectiveRule ? getAccessWorkflowPreview(effectiveRule.key) : undefined), [effectiveRule])
+  const actionWorkflowPreview = React.useMemo(() => (selectedActionKey ? getActionWorkflowPreview(selectedActionKey) : undefined), [selectedActionKey])
 
   const stats = React.useMemo(() => {
     const placeholder = accessRules.filter((rule) => rule.status === "placeholder" || rule.status === "coming-soon" || rule.condition.isPlaceholder).length
@@ -161,6 +164,7 @@ export function AccessControlPage() {
             <Button asChild variant="outline" size="sm"><Link href="/action-contracts">{t.openActionContracts}</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/layout-engine">{t.openLayoutEngine}</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/workflow">ME Workflow</Link></Button>
           </div>
         </CardHeader>
       </Card>
@@ -261,8 +265,8 @@ export function AccessControlPage() {
           </CardContent>
         </Card>
         <div className="grid gap-4">
-          {rulePreview ? <AccessPreviewCard preview={rulePreview} locale={currentLocale} auditPreview={ruleAuditPreview} /> : null}
-          {actionPreview ? <AccessPreviewCard preview={actionPreview} locale={currentLocale} auditPreview={actionAuditPreview} /> : null}
+          {rulePreview ? <AccessPreviewCard preview={rulePreview} locale={currentLocale} auditPreview={ruleAuditPreview} workflowPreview={ruleWorkflowPreview} /> : null}
+          {actionPreview ? <AccessPreviewCard preview={actionPreview} locale={currentLocale} auditPreview={actionAuditPreview} workflowPreview={actionWorkflowPreview} /> : null}
         </div>
       </section>
     </main>

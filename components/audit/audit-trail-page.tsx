@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { auditEventRegistry, auditRetentionProfiles } from "@/config/audit"
 import { getAuditablePreviewEvents, getAuditEventByKey, getAuditPreview, getPlaceholderAuditEvents } from "@/lib/audit"
+import { getAuditWorkflowPreview } from "@/lib/workflow"
 import { useUiPreferencesStore } from "@/stores/ui-preferences"
 import type { AuditEventType, AuditSeverity, AuditStatus } from "@/types/audit"
 import type { SupportedLocale } from "@/types/module"
@@ -159,6 +160,8 @@ export function AuditTrailPage() {
     return getAuditPreview(selectedEvent)
   }, [selectedEvent])
 
+  const selectedWorkflowPreview = React.useMemo(() => (selectedEvent ? getAuditWorkflowPreview(selectedEvent) : undefined), [selectedEvent])
+
   const stats = React.useMemo(() => {
     return {
       totalEvents: auditEventRegistry.length,
@@ -189,6 +192,9 @@ export function AuditTrailPage() {
             </Button>
             <Button asChild size="sm" variant="outline">
               <Link href="/layout-engine">{t.openLayoutEngine}</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/workflow">ME Workflow</Link>
             </Button>
           </div>
         </CardHeader>
@@ -316,7 +322,7 @@ export function AuditTrailPage() {
           </CardContent>
         </Card>
         <div className="grid gap-4">
-          {selectedPreview ? <AuditPreviewCard preview={selectedPreview} locale={currentLocale} /> : null}
+          {selectedPreview ? <AuditPreviewCard preview={selectedPreview} locale={currentLocale} workflowPreview={selectedWorkflowPreview} /> : null}
           {selectedEvent ? <AuditSourceCard event={selectedEvent} locale={currentLocale} /> : null}
           {selectedEvent ? (
             <Card size="sm">

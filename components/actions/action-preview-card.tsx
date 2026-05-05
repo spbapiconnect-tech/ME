@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getActionAuditPreview } from "@/lib/audit"
 import { getActionExecutionPreview, resolveActionDescription, resolveActionLabel } from "@/lib/actions"
 import { getActionAccessPreview } from "@/lib/access"
+import { getActionWorkflowPreview } from "@/lib/workflow"
 import type { ActionContract } from "@/types/action-contract"
 import type { SupportedLocale } from "@/types/module"
 
@@ -21,6 +22,7 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
   const preview = getActionExecutionPreview(action)
   const accessPreview = getActionAccessPreview(action)
   const auditPreview = getActionAuditPreview(action)
+  const workflowPreview = getActionWorkflowPreview(action)
   const label = resolveActionLabel(action, locale)
   const description = resolveActionDescription(action, locale)
 
@@ -95,6 +97,20 @@ export function ActionPreviewCard({ action, locale }: ActionPreviewCardProps) {
           <div>{flagLabel(locale, "严重级别", "Severity")}: {auditPreview.severity}</div>
           {auditPreview.accessRuleKey ? <div>{flagLabel(locale, "访问规则", "Access Rule")}: {auditPreview.accessRuleKey}</div> : null}
           <div>{flagLabel(locale, "仅审计元数据预览，不写日志、不落库。", "Audit metadata preview only; no log writes or persistence.")}</div>
+        </div>
+        <div className="rounded-xl bg-muted/40 p-3 text-xs text-muted-foreground">
+          <div className="font-medium text-foreground/80">{flagLabel(locale, "Workflow Preview", "Workflow Preview")}</div>
+          <div>
+            {workflowPreview.canTrigger
+              ? flagLabel(locale, "当前在元数据层标记为可触发。", "Currently marked as triggerable in metadata layer.")
+              : flagLabel(locale, "当前不可触发，仅做工作流占位/预览。", "Currently not triggerable; workflow placeholder/preview only.")}
+          </div>
+          <div>{flagLabel(locale, "状态", "Status")}: {workflowPreview.status}</div>
+          <div>{flagLabel(locale, "严重级别", "Severity")}: {workflowPreview.severity}</div>
+          <div>{flagLabel(locale, "需人工确认", "Human Confirmation")}: {String(workflowPreview.humanConfirmationRequired)}</div>
+          <div>{flagLabel(locale, "需审计", "Audit Required")}: {String(workflowPreview.auditRequired)}</div>
+          {workflowPreview.permissionRequired ? <div>{flagLabel(locale, "权限", "Permission")}: {workflowPreview.permissionRequired}</div> : null}
+          <div>{flagLabel(locale, "仅工作流元数据预览，不触发真实任务/审批/通知。", "Workflow metadata preview only; no real task/approval/notification is triggered.")}</div>
         </div>
       </CardContent>
     </Card>

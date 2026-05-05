@@ -32,6 +32,7 @@ const copy = {
     actionContracts: "Open Action Contracts",
     accessControl: "ME Access Control",
     auditTrail: "ME Audit Trail",
+    workflow: "ME Workflow",
     controls: "Foundation Controls",
     registry: "Layout And Skin Registries",
     display: "Display Model Preview",
@@ -47,6 +48,7 @@ const copy = {
     actionContracts: "打开 Action Contracts",
     accessControl: "ME Access Control",
     auditTrail: "ME Audit Trail",
+    workflow: "ME Workflow",
     controls: "基础控制台",
     registry: "布局与皮肤注册表",
     display: "显示模型预览",
@@ -142,6 +144,10 @@ export function LayoutEnginePage() {
                 <Link className="shell-link-button" href="/audit-trail">
                   <ShieldCheck size={16} />
                   <span>{currentCopy.auditTrail}</span>
+                </Link>
+                <Link className="shell-link-button" href="/workflow">
+                  <Workflow size={16} />
+                  <span>{currentCopy.workflow}</span>
                 </Link>
               </div>
             </div>
