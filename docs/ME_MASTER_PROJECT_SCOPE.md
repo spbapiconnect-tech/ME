@@ -259,6 +259,16 @@ This section defines future intelligence directions for ME only.
 - Add UI components under `components/psi/actions/` and helper utilities in `lib/psi-actions.ts`.
 - Scope remains placeholder-only: no real submit, no write service/repository method, no database/API, no approval workflow, no stock posting, no supplier portal, no task creation, and no workflow/notification execution.
 
+## ME Real Data Mapping Plan (v0.9.0)
+
+- Route: `/real-data-mapping`.
+- Contracts: `types/real-data-mapping.ts`.
+- Config: `config/real-data-mapping.ts`.
+- Helpers: `lib/real-data-mapping.ts`.
+- UI: `components/real-data/`.
+- Docs: `docs/ME_REAL_DATA_MAPPING_PLAN.md`.
+- Scope remains planning-only and read-only with no database connection, API handlers, auth/session, permission enforcement, write behavior, stock posting, approval execution, or credentials/env wiring.
+
 
 ## ME PSI Detail / Issue / Timeline Placeholder (v0.7.2)
 

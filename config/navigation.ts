@@ -341,6 +341,21 @@ const components = createItem({
   isFoundation: true,
 });
 
+const realDataMapping = createItem({
+  key: "real-data-mapping",
+  label: { zh: "真实数据映射", en: "Real Data Mapping" },
+  description: {
+    zh: "Mock 到真实数据的实体、接口与迁移规划。",
+    en: "Mock-to-real data entities, API boundaries, and migration planning.",
+  },
+  href: "/real-data-mapping",
+  group: "system-foundation",
+  status: "active",
+  tone: "muted",
+  isPrimary: false,
+  isFoundation: true,
+});
+
 const navigationIa = createItem({
   key: "navigation-ia",
   label: { zh: "导航 IA", en: "Navigation IA" },
@@ -840,6 +855,16 @@ const sidebarGroups: MeSidebarNavigationGroup[] = [
         matchPaths: ["/layout-engine"],
       }),
       createSidebarItem({
+        key: "sidebar-real-data-mapping",
+        routeKey: realDataMapping.key,
+        label: realDataMapping.label,
+        description: realDataMapping.description,
+        href: realDataMapping.href,
+        status: realDataMapping.status,
+        tone: realDataMapping.tone,
+        matchPaths: ["/real-data-mapping"],
+      }),
+      createSidebarItem({
         key: "sidebar-packages",
         routeKey: packages.key,
         label: packages.label,
@@ -941,6 +966,7 @@ export const navigationMap: MeNavigationMap = {
       items: [
         systemFoundation,
         layoutEngine,
+        realDataMapping,
         actionContracts,
         accessControl,
         roles,

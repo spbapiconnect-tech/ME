@@ -225,3 +225,10 @@
 - `types/demo-readiness.ts`, `config/demo-readiness.ts`, `lib/demo-readiness.ts`, and `components/demo-readiness/` provide the final audit contracts, metadata, helpers, and UI.
 - Homepage, topbar, demo story, demo mode, stakeholder summary, navigation, and system foundation now expose low-noise links into the final QA route.
 - No monitoring, analytics, tracking, browser automation, runtime crawler, CI changes, database, API, auth/session, or real write behavior is added.
+
+## ME Real Data Mapping Plan (v0.9.0)
+
+- `/real-data-mapping` is available as a static planning route for future entity, table, API, and migration mapping.
+- The route sits inside the shared SaaS shell and stays metadata-only.
+- It does not connect a database, API handler, auth/session layer, permission enforcement, or write behavior.
+- It exists to keep future backend work aligned to service/repository/page-data boundaries before implementation starts.

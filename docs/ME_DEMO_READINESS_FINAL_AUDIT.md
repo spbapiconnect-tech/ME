@@ -51,3 +51,6 @@ Demo Readiness Config
 - CI integration
 - presentation export QA
 - consent-based analytics only if ever needed
+
+## Related Planning Route
+- `/real-data-mapping` now documents the mock-to-real entity and API preparation layer without adding any backend runtime.

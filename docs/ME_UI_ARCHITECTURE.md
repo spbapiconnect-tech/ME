@@ -121,6 +121,8 @@
 - Pages can resolve `DataResult` on the server and pass plain data into client components.
 - UI components should not import raw mock data modules (`data/demo`, `data/tasks`) for new work.
 - Repository provider stays mock for now; no real API/database/persistence is implemented yet.
+- `/real-data-mapping` defines the planning-only bridge between current UI blocks and future entities/API boundaries.
+- Real datasource work should preserve the shell layer and replace data behind page-data/service/repository boundaries instead of rewriting route components.
 
 ## Action Source Mapping / Button Contract Foundation (v0.6.2)
 

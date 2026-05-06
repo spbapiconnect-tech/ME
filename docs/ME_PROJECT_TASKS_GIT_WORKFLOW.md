@@ -151,6 +151,7 @@ Use Conventional Commits.
 - When updating UI pages, route-level components should read data via `lib/services/*` (or `lib/page-data/*`) instead of importing `data/*`.
 - Keep repository provider in mock mode until an API-backed repository is ready.
 - Do not add Next.js API routes, fetch/axios, or database code during this milestone.
+- Use `/real-data-mapping` and `docs/ME_REAL_DATA_MAPPING_PLAN.md` as the planning reference before any real datasource integration work starts.
 
 ## Action Source Mapping / Button Contract Foundation (v0.6.2)
 
@@ -258,6 +259,12 @@ Use Conventional Commits.
 ## ME PSI Report Widget Connection (v0.7.3)
 - Add PSI report widget preview integration into existing report contract registry.
 - Keep report/PSI milestones mock-only and read-only without BI/SQL/database/API execution.
+
+## ME Real Data Mapping Plan (v0.9.0)
+
+- Add `/real-data-mapping` as the static planning route for UI surface mapping, future entities, API boundaries, and migration steps.
+- Keep the scope documentation-only, config-only, helper-only, and type-only.
+- Do not introduce database code, API route handlers, auth/session, permission enforcement, or writes in this milestone.
 
 
 ## ME Business Frontend Experience (v0.8.0)
