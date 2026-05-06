@@ -25,7 +25,7 @@ test("summary cards include What ME is, Problem / Opportunity, Roadmap, and Demo
   }
 });
 
-test("roadmap includes completed v0.8.0 through v0.8.5 and in-progress v0.8.6", () => {
+test("roadmap includes completed v0.8.0 through v0.8.7", () => {
   const roadmap = new Map(meStakeholderRoadmapItems.map((item) => [item.key, item.status]));
   for (const key of [
     "v0-8-0-business-workspace",
