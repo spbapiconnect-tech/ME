@@ -1,58 +1,88 @@
-import Link from "next/link";
+"use client";
+
+import { useMemo } from "react";
+
+import { CalendarDays, GitBranch, Search, ShieldCheck, UserCircle2 } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 import { MeMobileNav } from "@/components/navigation/me-mobile-nav";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getSidebarNavigationGroups, resolveSidebarNavigationLabel } from "@/lib/navigation";
 import type { MeNavigationLocale } from "@/types/navigation";
 
 interface MeTopbarProps {
   locale?: MeNavigationLocale;
 }
 
+function formatToday() {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date());
+}
+
 export function MeTopbar({ locale = "en" }: MeTopbarProps) {
+  const pathname = usePathname();
+
+  const activeLabel = useMemo(() => {
+    const items = getSidebarNavigationGroups().flatMap((group) => group.items);
+    const active = items.find((item) => {
+      if (!item.href) return false;
+      if (item.href === "/") return pathname === "/";
+      return pathname === item.href || pathname.startsWith(`${item.href}/`);
+    });
+
+    return active ? resolveSidebarNavigationLabel(active, locale) : "Workspace";
+  }, [locale, pathname]);
+
   return (
-    <Card size="sm" className="border-border/40 bg-card/70 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/60">
+    <Card size="sm" className="border-border/40 bg-white/86 shadow-sm shadow-slate-900/5 backdrop-blur">
       <CardContent className="grid gap-4 pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Badge>ME</Badge>
-            <span className="text-sm text-muted-foreground">
-              {locale === "zh" ? "业务导航 / 系统基础层" : "Business Navigation / System Foundation"}
-            </span>
-          </div>
           <div className="flex flex-wrap items-center gap-2">
+            <Badge>ME</Badge>
+            <Badge variant="outline">
+              <GitBranch className="size-3" />
+              develop
+            </Badge>
+            <Badge variant="outline">
+              <CalendarDays className="size-3" />
+              {formatToday()}
+            </Badge>
+            <Badge variant="secondary">{activeLabel}</Badge>
+          </div>
+          <div className="flex items-center gap-2">
             <MeMobileNav locale={locale} />
-            <Button asChild size="sm" variant="outline">
-              <Link href="/demo-mode">{locale === "zh" ? "Demo Mode" : "Demo Mode"}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/demo-story">{locale === "zh" ? "引导演示" : "Guided Demo"}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/stakeholder-summary">{locale === "zh" ? "Stakeholder Summary" : "Stakeholder Summary"}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/demo-readiness">{locale === "zh" ? "演示 QA" : "Demo Readiness"}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/navigation">{locale === "zh" ? "导航 IA" : "Navigation IA"}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/system-foundation">{locale === "zh" ? "系统基础层" : "System Foundation"}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/branches">{locale === "zh" ? "门店上下文" : "Branch Context"}</Link>
-            </Button>
+            <Badge variant="outline">
+              <UserCircle2 className="size-3" />
+              Ops Coordinator
+            </Badge>
           </div>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-3">
-          <Link href="/branches" className="rounded-2xl border border-border/50 bg-card/60 px-3 py-2 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md">
-            {locale === "zh" ? "门店选择器：全部门店 / 占位，打开门店上下文" : "Branch Selector: All Stores / Placeholder, open branch context"}
-          </Link>
-          <div className="rounded-2xl border border-border/50 bg-card/60 px-3 py-2 text-sm shadow-sm">{locale === "zh" ? "日期范围：最近 7 天 / 占位" : "Date Range: Last 7 days / Placeholder"}</div>
-          <div className="rounded-2xl border border-border/50 bg-card/60 px-3 py-2 text-sm shadow-sm">{locale === "zh" ? "搜索：工作台快速搜索 / 占位" : "Search: Workspace quick search / Placeholder"}</div>
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))]">
+          <div className="flex items-center gap-2 rounded-2xl border border-border/50 bg-slate-50/90 px-3 py-2.5 text-sm text-slate-500 shadow-sm">
+            <Search className="size-4 text-slate-400" />
+            <span>{locale === "zh" ? "搜索记录、模块或状态（占位）" : "Search records, modules, or status (placeholder)"}</span>
+          </div>
+          <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-3 py-2.5 text-sm shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Branch</p>
+            <p className="mt-1 text-slate-900">All Stores / KCH</p>
+          </div>
+          <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-3 py-2.5 text-sm shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Window</p>
+            <p className="mt-1 text-slate-900">Last 7 days</p>
+          </div>
+          <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-3 py-2.5 text-sm shadow-sm">
+            <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
+              <ShieldCheck className="size-3.5" />
+              Guardrail
+            </p>
+            <p className="mt-1 text-slate-900">{locale === "zh" ? "Mock / 只读" : "Mock / Read-only"}</p>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -32,6 +32,28 @@ export interface MeNavigationItem {
   notes?: string;
 }
 
+export interface MeSidebarNavigationItem {
+  key: string;
+  label: { zh: string; en: string };
+  description?: { zh: string; en: string };
+  href?: string;
+  status: MeNavigationItemStatus;
+  tone: MeNavigationTone;
+  badge?: { zh: string; en: string };
+  matchPaths?: string[];
+  routeKey?: string;
+  children?: MeSidebarNavigationItem[];
+}
+
+export interface MeSidebarNavigationGroup {
+  key: string;
+  title: { zh: string; en: string };
+  description?: { zh: string; en: string };
+  icon?: string;
+  items: MeSidebarNavigationItem[];
+  collapsedByDefault: boolean;
+}
+
 export interface MeNavigationGroup {
   key: string;
   title: { zh: string; en: string };
@@ -45,6 +67,7 @@ export interface MeNavigationGroup {
 export interface MeNavigationMap {
   primaryItems: MeNavigationItem[];
   groups: MeNavigationGroup[];
+  sidebarGroups: MeSidebarNavigationGroup[];
   footerItems: MeNavigationItem[];
   generatedAt: string;
   notice: { zh: string; en: string };

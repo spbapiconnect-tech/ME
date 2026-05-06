@@ -1,19 +1,17 @@
 import Link from "next/link";
 
-import { BranchSelectorPlaceholder } from "@/components/branches";
-import { DemoModeBadge, DemoModeBanner, DemoPresentationNote } from "@/components/demo-mode";
-import { BusinessActionPanel } from "@/components/business/business-action-panel";
-import { BusinessAlertCard } from "@/components/business/business-alert-card";
-import { BusinessFoundationSection } from "@/components/business/business-foundation-section";
-import { BusinessKpiCard } from "@/components/business/business-kpi-card";
-import { BusinessModuleCard } from "@/components/business/business-module-card";
-import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
+import { DemoPresentationNote } from "@/components/demo-mode";
+import {
+  MeActionBar,
+  MeDashboardShell,
+  MeListWorkspace,
+  MePageHeader,
+  MeRightRail,
+  MeWorkspaceSection,
+} from "@/components/layout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getBranchProfiles } from "@/lib/branch-context";
-import { getDemoModeBadges } from "@/lib/demo-mode";
-import { getDemoStorySteps } from "@/lib/demo-story";
-import { getStakeholderSummaryPageData } from "@/lib/stakeholder-summary";
+import { Card, CardContent } from "@/components/ui/card";
 import type { BusinessWorkspacePageData } from "@/types/business-workspace";
 
 interface BusinessWorkspacePageProps {
@@ -21,227 +19,189 @@ interface BusinessWorkspacePageProps {
 }
 
 export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
-  const branchProfiles = getBranchProfiles();
-  const demoModeBadges = getDemoModeBadges().filter((badge) => ["product-demo", "screenshot-ready", "stakeholder-review"].includes(badge.key));
-  const demoStorySteps = getDemoStorySteps();
-  const stakeholderSummaryData = getStakeholderSummaryPageData();
+  const rightRail = (
+    <MeRightRail
+      sections={[
+        {
+          title: "Workspace Status",
+          badge: "Live shell",
+          items: [
+            "Branch context: All Stores / KCH preview",
+            "Routing source: shared navigation config",
+            "Guardrail: mock and read-only only",
+          ],
+        },
+        {
+          title: "Operational Alerts",
+          description: "Current watch items carried into the dashboard shell.",
+          items: data.alerts.slice(0, 3).map((alert) => alert.title.en),
+        },
+        {
+          title: "Recent Activity",
+          items: [
+            "Business workspace shell updated",
+            "PSI, reports, and branches remain linked",
+            `Snapshot generated ${data.generatedAt}`,
+          ],
+        },
+      ]}
+    />
+  );
 
   return (
-    <main className="mx-auto flex w-full max-w-[88rem] flex-col gap-6 px-4 py-8">
-      <MeBreadcrumbs />
-      <MeTopbar />
+    <MeDashboardShell activeKey="dashboard" rightRail={rightRail}>
+      <MePageHeader
+        eyebrow="Business Workspace"
+        title="ME operational workspace"
+        description={data.subtitle.en}
+        notice={data.notice.en}
+        badges={[
+          { label: "CRM / ERP shell", variant: "secondary" },
+          { label: "Read-only", variant: "outline" },
+          { label: "Config-driven navigation", variant: "outline" },
+        ]}
+        actions={
+          <>
+            <Button asChild size="sm">
+              <Link href="/psi">Open PSI Workspace</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/reports">Open Reports</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/branches">Open Branches</Link>
+            </Button>
+          </>
+        }
+        meta={[
+          { label: "Branch", value: "All Stores / KCH" },
+          { label: "Workspace Date", value: "Last 7 days" },
+          { label: "Module Focus", value: "PSI / Reports / Roles" },
+          { label: "Snapshot", value: data.generatedAt },
+        ]}
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]">
-        <MeSidebar activeKey="dashboard" className="self-start" />
+      <MeActionBar
+        actions={[
+          { label: "Review alerts" },
+          { label: "Assign follow-up", variant: "outline" },
+          { label: "Export summary", variant: "outline" },
+          { label: "View history", variant: "ghost" },
+        ]}
+      />
 
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader className="gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <CardTitle className="text-2xl">ME Business Workspace</CardTitle>
-                  <CardDescription>Modular Store Operations Platform</CardDescription>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Button asChild size="sm">
-                    <Link href="/demo-story/business-overview">Start Guided Demo</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/demo-mode">Demo Mode</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/stakeholder-summary">Stakeholder Summary</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/demo-readiness">Demo Readiness</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/navigation">Navigation IA</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/system-foundation">System Foundation</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/roles">Roles Preview</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/branches">Branch Context</Link>
-                  </Button>
-                </div>
-              </div>
-              <CardDescription>
-                Read-only B2B workspace preview. No real database/API, writes, auth/session/middleware, billing enforcement, workflow execution, or notification sending.
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
-          <DemoModeBanner />
-
-          <Card size="sm" className="border-dashed border-border/80 bg-muted/20">
-            <CardHeader className="gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <CardTitle className="text-sm">Screenshot-ready demo</CardTitle>
-                  <CardDescription>Presentation-friendly labels keep the homepage polished without turning it into a demo-mode control panel.</CardDescription>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/demo-mode">Open Demo Mode</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-2">
-              {demoModeBadges.map((badge) => (
-                <DemoModeBadge key={badge.key} badge={badge} />
-              ))}
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {data.metrics.map((metric) => (
+          <Card key={metric.key} size="sm" className="border-border/40 bg-white/92 shadow-sm shadow-slate-900/5">
+            <CardContent className="grid gap-2 pt-4">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{metric.label.en}</p>
+              <p className="text-2xl font-semibold text-slate-950">{metric.value}</p>
+              <p className="text-sm text-slate-500">{metric.description?.en}</p>
             </CardContent>
           </Card>
+        ))}
+      </section>
 
-          <Card size="sm" className="border-dashed">
-            <CardHeader className="gap-1">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <CardTitle className="text-sm">Branch Context Preview</CardTitle>
-                  <CardDescription>Preview how the shared workspace can be reframed under All Stores, KCH, BTU, and Future Branch contexts.</CardDescription>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/branches">Open Branches</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <BranchSelectorPlaceholder branches={branchProfiles} compact />
-            </CardContent>
-          </Card>
-
-          <Card size="sm" className="border-dashed">
-            <CardHeader className="gap-1">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <CardTitle className="text-sm">ME Demo Story</CardTitle>
-                  <CardDescription>Static guided product tour placeholder that connects the homepage, navigation, roles, branches, PSI, reports, and system foundation.</CardDescription>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/demo-story">Open Demo Story</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
-              {demoStorySteps.slice(0, 4).map((step) => (
-                <div key={step.key} className="rounded-xl border border-border/70 bg-background/70 p-3">
-                  <p className="text-xs text-muted-foreground">Step {step.order}</p>
-                  <p className="text-sm font-medium">{step.title.en}</p>
-                  <p className="text-xs text-muted-foreground">{step.route}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card size="sm" className="border-dashed">
-            <CardHeader className="gap-1">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <CardTitle className="text-sm">ME Stakeholder Summary</CardTitle>
-                  <CardDescription>Presentation-ready ME overview for owner, investor, partner, and internal review conversations.</CardDescription>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/stakeholder-summary">Open Stakeholder Summary</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-3">
-              {stakeholderSummaryData.metrics.slice(0, 3).map((metric) => (
-                <div key={metric.key} className="rounded-xl border border-border/70 bg-background/70 p-3">
-                  <p className="text-xs text-muted-foreground">{metric.label.en}</p>
-                  <p className="text-lg font-semibold">{metric.value}</p>
-                  <p className="text-xs text-muted-foreground">{metric.description?.en}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card size="sm" className="border-dashed border-border/80 bg-muted/20">
-            <CardHeader className="gap-1">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <CardTitle className="text-sm">Final Demo QA</CardTitle>
-                  <CardDescription>Use Demo Readiness as the final placeholder audit before screenshots, stakeholder reviews, and live walkthroughs.</CardDescription>
-                </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/demo-readiness">Open Demo Readiness</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="grid gap-2 text-sm text-muted-foreground md:grid-cols-3">
-              <p>Review route completeness, CTA flow, and screenshot framing without changing any runtime behavior.</p>
-              <p>Keep the audit static and read-only with no monitoring, analytics, tracking, browser automation, or CI dependency.</p>
-              <p>Use it after the business workspace, Demo Story, Demo Mode, and Stakeholder Summary as the presentation close-out check.</p>
-            </CardContent>
-          </Card>
-
-          <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            {data.metrics.map((metric) => (
-              <BusinessKpiCard key={metric.key} metric={metric} />
-            ))}
-          </section>
-
-          <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-            <div className="grid gap-4">
-              <Card size="sm">
-                <CardHeader className="gap-1">
-                  <CardTitle className="text-sm">Operational Modules</CardTitle>
-                  <CardDescription>Business-first workspace modules with read-only status context</CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-3 md:grid-cols-2">
-                  {data.modules.map((moduleCard) => (
-                    <BusinessModuleCard key={moduleCard.key} moduleCard={moduleCard} />
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card size="sm">
-                <CardHeader className="gap-1">
-                  <CardTitle className="text-sm">PSI Report Preview Summary</CardTitle>
-                  <CardDescription>Generated at: {data.generatedAt}</CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-3 md:grid-cols-3">
-                  {data.metrics.slice(1, 4).map((metric) => (
-                    <div key={`summary-${metric.key}`} className="rounded-xl border border-border/70 p-3">
-                      <p className="text-xs text-muted-foreground">{metric.label.en}</p>
-                      <p className="text-lg font-semibold">{metric.value}</p>
-                      <p className="text-xs text-muted-foreground">{metric.description?.en}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              <Card size="sm">
-                <CardHeader className="gap-1">
-                  <CardTitle className="text-sm">Operational Alerts</CardTitle>
-                  <CardDescription>Risk and watchlist signals from PSI mock report aggregation</CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {data.alerts.map((alert) => (
-                    <BusinessAlertCard key={alert.key} alert={alert} />
-                  ))}
-                </CardContent>
-              </Card>
+      <MeListWorkspace
+        filters={
+          <MeWorkspaceSection
+            title="Operational Controls"
+            description="Presentation-safe action points and routing shortcuts for the main workspace."
+            contentClassName="md:grid-cols-4"
+          >
+            <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Branch scope</p>
+              <p className="mt-1 text-sm font-medium text-slate-900">All Stores / KCH</p>
             </div>
+            <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Queues</p>
+              <p className="mt-1 text-sm font-medium text-slate-900">Procurement, issues, reports</p>
+            </div>
+            <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Mode</p>
+              <p className="mt-1 text-sm font-medium text-slate-900">Mock / read-only</p>
+            </div>
+            <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Owner</p>
+              <p className="mt-1 text-sm font-medium text-slate-900">Business workspace</p>
+            </div>
+          </MeWorkspaceSection>
+        }
+        list={
+          <>
+            <MeWorkspaceSection title="Operational Modules" description="Core modules arranged as a working B2B home instead of a gallery of cards.">
+              <div className="grid gap-3 md:grid-cols-2">
+                {data.modules.map((module) => (
+                  <Link
+                    key={module.key}
+                    href={module.route}
+                    className="rounded-3xl border border-border/50 bg-slate-50/85 p-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-base font-semibold text-slate-950">{module.title.en}</p>
+                        <p className="mt-1 text-sm text-slate-500">{module.description.en}</p>
+                      </div>
+                      <Badge variant="outline">{module.status}</Badge>
+                    </div>
+                    <div className="mt-4 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Primary</p>
+                        <p>{module.primaryMetric?.en ?? "Placeholder"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Secondary</p>
+                        <p>{module.secondaryMetric?.en ?? "Read-only"}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </MeWorkspaceSection>
 
-            <BusinessActionPanel actions={data.actions} />
-          </section>
+            <MeWorkspaceSection title="Operational Alerts" description="Queue-style watch items for immediate review.">
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {data.alerts.map((alert) => (
+                  <div key={alert.key} className="rounded-3xl border border-border/50 bg-slate-50/85 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-medium text-slate-950">{alert.title.en}</p>
+                      <Badge variant="outline">{alert.sourceModule}</Badge>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600">{alert.description.en}</p>
+                    <p className="mt-3 text-xs text-slate-500">{alert.timestampLabel?.en ?? "Pending review"}</p>
+                  </div>
+                ))}
+              </div>
+            </MeWorkspaceSection>
+          </>
+        }
+        summary={
+          <>
+            <MeWorkspaceSection title="Action Panel" description="Visual actions only. No writes or workflow execution.">
+              <div className="grid gap-2">
+                {data.actions.map((action) => (
+                  <Link key={action.key} href={action.route} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3 text-sm text-slate-700 transition hover:bg-white">
+                    <p className="font-medium text-slate-950">{action.label.en}</p>
+                    <p className="mt-1 text-xs text-slate-500">{action.description?.en ?? "Placeholder action"}</p>
+                  </Link>
+                ))}
+              </div>
+            </MeWorkspaceSection>
 
-          <BusinessFoundationSection links={data.systemFoundationLinks} />
+            <MeWorkspaceSection title="Foundation Links" description="Shared admin and structure routes stay available through the shell.">
+              <div className="grid gap-2">
+                {data.systemFoundationLinks.map((link) => (
+                  <Link key={link.key} href={link.route} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white">
+                    {link.label.en}
+                  </Link>
+                ))}
+              </div>
+            </MeWorkspaceSection>
+          </>
+        }
+      />
 
-          <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. This presentation layer adds no real demo state, tracking, or persistence." />
-
-          <Card size="sm" className="border-dashed">
-            <CardHeader className="gap-1">
-              <CardTitle className="text-sm">Workspace Notice</CardTitle>
-              <CardDescription>{data.notice.en}</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-      </div>
-    </main>
+      <DemoPresentationNote description="Screenshot-ready operational shell only. All routing and data remain mock/read-only with no API, auth, workflow, or write execution added." />
+    </MeDashboardShell>
   );
 }

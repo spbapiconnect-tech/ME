@@ -1,12 +1,16 @@
 import Link from "next/link";
 
-import { BranchChip } from "@/components/branches/branch-chip";
 import { BranchProfileCard } from "@/components/branches/branch-profile-card";
 import { BranchSelectorPlaceholder } from "@/components/branches/branch-selector-placeholder";
 import { DemoPresentationNote } from "@/components/demo-mode";
-import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
+import {
+  MeActionBar,
+  MeDashboardShell,
+  MePageHeader,
+  MeRightRail,
+  MeWorkspaceSection,
+} from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { MeBranchProfile } from "@/types/branch-context";
 
 interface BranchWorkspacePageProps {
@@ -18,102 +22,113 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
   const localBranches = branches.filter((branch) => !branch.isAggregate && branch.status !== "coming-soon");
   const futureBranches = branches.filter((branch) => branch.status === "coming-soon");
 
+  const rightRail = (
+    <MeRightRail
+      sections={[
+        {
+          title: "Branch Status",
+          badge: "Preview only",
+          items: ["All Stores overview available", "KCH and BTU context visible", "Future branch remains placeholder-only"],
+        },
+        {
+          title: "Quick Context",
+          items: ["Related routes: PSI, reports, roles", "No tenant switching", "No persisted branch selection"],
+        },
+        {
+          title: "Guardrails",
+          items: ["No branch database", "No permission enforcement", "No auth or session", "No writes"],
+        },
+      ]}
+    />
+  );
+
   return (
-    <main className="mx-auto flex w-full max-w-[88rem] flex-col gap-6 px-4 py-8">
-      <MeBreadcrumbs />
-      <MeTopbar />
+    <MeDashboardShell activeKey="branches" rightRail={rightRail}>
+      <MePageHeader
+        eyebrow="Branch Workspace"
+        title="Branch context and operations status"
+        description="Branch management shell for aggregate and local operating views."
+        notice="Branch preview only. No tenant switching, no branch database, and no branch permission enforcement."
+        badges={[
+          { label: "All Stores" },
+          { label: "KCH / BTU", variant: "secondary" },
+          { label: "Read-only", variant: "outline" },
+        ]}
+        actions={
+          <>
+            <Button asChild size="sm">
+              <Link href="/psi">Open PSI</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/roles">Open Roles</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/reports">Open Reports</Link>
+            </Button>
+          </>
+        }
+        meta={[
+          { label: "Scope", value: "All Stores / KCH / BTU / Future Branch" },
+          { label: "Current Mode", value: "Context preview" },
+          { label: "Operations", value: "Status and inspection placeholders" },
+          { label: "Writes", value: "Disabled" },
+        ]}
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]">
-        <MeSidebar activeKey="branches" className="self-start" />
+      <MeActionBar
+        actions={[
+          { label: "Review branch context" },
+          { label: "Compare performance", variant: "outline" },
+          { label: "Open inspection", variant: "outline" },
+          { label: "View history", variant: "ghost" },
+        ]}
+      />
 
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader className="gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <CardTitle className="text-2xl">ME Branch Context</CardTitle>
-                  <CardDescription>Store / Branch Context Placeholder</CardDescription>
-                </div>
-                <BranchChip label="preview-only" tone="info" />
-              </div>
-              <CardDescription>
-                Branch preview only — no tenant switching, no branch database, and no branch permission enforcement.
-              </CardDescription>
-              <div className="flex flex-wrap gap-2">
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/">Back To ME Workspace</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/roles">Open Roles Preview</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/navigation">Open Navigation IA</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/demo-mode">Open Demo Mode</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/demo-story/branch-context">View In Demo Story</Link>
-                </Button>
-              </div>
-            </CardHeader>
-          </Card>
+      <MeWorkspaceSection title="Branch Selector" description="Shared branch frame for future workspace mapping.">
+        <BranchSelectorPlaceholder branches={branches} />
+      </MeWorkspaceSection>
 
-          <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. Branch context is framed for presentation only with no tenant switching or persisted branch selection." />
-
-          <BranchSelectorPlaceholder branches={branches} />
-
-          <Card size="sm" className="border-dashed">
-            <CardHeader className="gap-1">
-              <CardTitle className="text-sm">Overview</CardTitle>
-              <CardDescription>
-                Compare how ME business workspace, roles, navigation, PSI, and reports can be previewed under aggregate and branch-specific contexts before any tenant model exists.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-2 text-sm text-muted-foreground">
-              <p>UI-only and mock/read-only only.</p>
-              <p>No real tenant model, branch database, branch switching persistence, or permission enforcement.</p>
-              <p>No auth/session/middleware, API, workflow execution, notification sending, or write paths.</p>
-            </CardContent>
-          </Card>
-
-          <section className="grid gap-3">
-            <div>
-              <p className="text-sm font-semibold">Aggregate Context</p>
-              <p className="text-sm text-muted-foreground">Portfolio-style preview for headquarters and leadership review.</p>
+      <MeWorkspaceSection title="Branch Overview" description="Operational context cards instead of presentation-only tiles.">
+        <div className="grid gap-3 md:grid-cols-4">
+          {[
+            ["Total contexts", String(branches.length)],
+            ["Aggregate", String(aggregateBranches.length)],
+            ["Operational branches", String(localBranches.length)],
+            ["Future branch", String(futureBranches.length)],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{label}</p>
+              <p className="mt-1 text-xl font-semibold text-slate-950">{value}</p>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {aggregateBranches.map((branch) => (
-                <BranchProfileCard key={branch.key} branch={branch} />
-              ))}
-            </div>
-          </section>
-
-          <section className="grid gap-3">
-            <div>
-              <p className="text-sm font-semibold">Local Branch Contexts</p>
-              <p className="text-sm text-muted-foreground">Operational branch previews for store-level PSI, reporting, and role workflows.</p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {localBranches.map((branch) => (
-                <BranchProfileCard key={branch.key} branch={branch} />
-              ))}
-            </div>
-          </section>
-
-          <section className="grid gap-3">
-            <div>
-              <p className="text-sm font-semibold">Future Branch Planning</p>
-              <p className="text-sm text-muted-foreground">Placeholder for future tenant and branch onboarding flows.</p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {futureBranches.map((branch) => (
-                <BranchProfileCard key={branch.key} branch={branch} />
-              ))}
-            </div>
-          </section>
+          ))}
         </div>
-      </div>
-    </main>
+      </MeWorkspaceSection>
+
+      <MeWorkspaceSection title="All Stores" description="Portfolio-style branch overview for headquarters and leadership review.">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {aggregateBranches.map((branch) => (
+            <BranchProfileCard key={branch.key} branch={branch} />
+          ))}
+        </div>
+      </MeWorkspaceSection>
+
+      <MeWorkspaceSection title="Operational Branches" description="Store-level workspace previews for PSI, reporting, and role context.">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {localBranches.map((branch) => (
+            <BranchProfileCard key={branch.key} branch={branch} />
+          ))}
+        </div>
+      </MeWorkspaceSection>
+
+      <MeWorkspaceSection title="Future Branch Planning" description="Placeholder capacity for onboarding and inspection workflows without implementing them yet.">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {futureBranches.map((branch) => (
+            <BranchProfileCard key={branch.key} branch={branch} />
+          ))}
+        </div>
+      </MeWorkspaceSection>
+
+      <DemoPresentationNote description="Branch pages now use the same SaaS shell while remaining mock/read-only. No tenant model, persistence, auth, access enforcement, or write behavior was added." />
+    </MeDashboardShell>
   );
 }

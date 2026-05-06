@@ -1,11 +1,15 @@
 import Link from "next/link";
 
 import { DemoPresentationNote } from "@/components/demo-mode";
-import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
-import { RoleChip } from "@/components/roles/role-chip";
+import {
+  MeActionBar,
+  MeDashboardShell,
+  MePageHeader,
+  MeRightRail,
+  MeWorkspaceSection,
+} from "@/components/layout";
 import { RoleProfileCard } from "@/components/roles/role-profile-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { MeRoleProfile } from "@/types/role-workspace";
 
 interface RoleWorkspacePageProps {
@@ -16,80 +20,115 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
   const businessRoles = roles.filter((role) => role.key !== "system-admin");
   const platformRoles = roles.filter((role) => role.key === "system-admin");
 
+  const rightRail = (
+    <MeRightRail
+      sections={[
+        {
+          title: "Role Context",
+          badge: "Preview only",
+          items: ["Business roles visible", "System foundation kept accessible", "Staff and permissions remain placeholders"],
+        },
+        {
+          title: "Workspace Focus",
+          items: ["Role profiles", "Access preview", "Training placeholder", "Staff context placeholder"],
+        },
+        {
+          title: "Guardrails",
+          items: ["No auth", "No session middleware", "No permission enforcement", "No write paths"],
+        },
+      ]}
+    />
+  );
+
   return (
-    <main className="mx-auto flex w-full max-w-[88rem] flex-col gap-6 px-4 py-8">
-      <MeBreadcrumbs />
-      <MeTopbar />
+    <MeDashboardShell activeKey="roles" rightRail={rightRail}>
+      <MePageHeader
+        eyebrow="Roles & Staff"
+        title="Role profiles and staff workspace shell"
+        description="Role-based workspace framing for leadership, operations, and platform administration."
+        notice="Role preview only. No auth, session, or permission enforcement is connected."
+        badges={[
+          { label: "Roles" },
+          { label: "Permissions placeholder", variant: "secondary" },
+          { label: "Read-only", variant: "outline" },
+        ]}
+        actions={
+          <>
+            <Button asChild size="sm">
+              <Link href="/navigation">Open Navigation IA</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/system-foundation">Open System Foundation</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/branches">Open Branches</Link>
+            </Button>
+          </>
+        }
+        meta={[
+          { label: "Profiles", value: String(roles.length) },
+          { label: "Business roles", value: String(businessRoles.length) },
+          { label: "Platform roles", value: String(platformRoles.length) },
+          { label: "Write actions", value: "Disabled" },
+        ]}
+      />
 
-      <div className="grid gap-6 lg:grid-cols-[17rem_minmax(0,1fr)]">
-        <MeSidebar activeKey="roles" className="self-start" />
+      <MeActionBar
+        actions={[
+          { label: "Review role profile" },
+          { label: "Open permissions", variant: "outline" },
+          { label: "Assign training", variant: "outline" },
+          { label: "View history", variant: "ghost" },
+        ]}
+      />
 
-        <div className="flex flex-col gap-6">
-          <Card>
-            <CardHeader className="gap-2">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <CardTitle className="text-2xl">ME Role Workspaces</CardTitle>
-                  <CardDescription>Role-Based Workspace Placeholder</CardDescription>
-                </div>
-                <RoleChip label="preview-only" tone="info" />
-              </div>
-              <CardDescription>Role preview only — no auth or permission enforcement.</CardDescription>
-              <div className="flex flex-wrap gap-2">
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/demo-story/role-workspaces">View In Demo Story</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/demo-mode">Open Demo Mode</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/navigation">Open Navigation IA</Link>
-                </Button>
-              </div>
-            </CardHeader>
-          </Card>
-
-          <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. Role framing is visual only and does not introduce real permissions or session-aware mode." />
-
-          <Card size="sm" className="border-dashed">
-            <CardHeader className="gap-1">
-              <CardTitle className="text-sm">Overview</CardTitle>
-              <CardDescription>
-                Compare how the same ME platform can be previewed for business leadership, frontline execution, and system governance without introducing real sessions, permissions, or route guards.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-2 text-sm text-muted-foreground">
-              <p>UI-only and mock/read-only only.</p>
-              <p>No real auth, session, middleware, or permission enforcement.</p>
-              <p>No database, API, workflow execution, notification sending, or business writes.</p>
-            </CardContent>
-          </Card>
-
-          <section className="grid gap-3">
-            <div>
-              <p className="text-sm font-semibold">Business Roles</p>
-              <p className="text-sm text-muted-foreground">Leadership, operations, and frontline workspace perspectives.</p>
+      <MeWorkspaceSection title="Role Workspace Summary" description="Operational summary cards for the role/staff area.">
+        <div className="grid gap-3 md:grid-cols-4">
+          {[
+            ["Role profiles", String(roles.length)],
+            ["Business users", String(businessRoles.length)],
+            ["Platform admins", String(platformRoles.length)],
+            ["Permission mode", "Placeholder"],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{label}</p>
+              <p className="mt-1 text-xl font-semibold text-slate-950">{value}</p>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {businessRoles.map((role) => (
-                <RoleProfileCard key={role.key} role={role} />
-              ))}
-            </div>
-          </section>
-
-          <section className="grid gap-3">
-            <div>
-              <p className="text-sm font-semibold">Platform Roles</p>
-              <p className="text-sm text-muted-foreground">Metadata, governance, and system foundation preview.</p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {platformRoles.map((role) => (
-                <RoleProfileCard key={role.key} role={role} />
-              ))}
-            </div>
-          </section>
+          ))}
         </div>
-      </div>
-    </main>
+      </MeWorkspaceSection>
+
+      <MeWorkspaceSection title="Business Role Profiles" description="Leadership, operations, and frontline workspace perspectives.">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {businessRoles.map((role) => (
+            <RoleProfileCard key={role.key} role={role} />
+          ))}
+        </div>
+      </MeWorkspaceSection>
+
+      <MeWorkspaceSection title="Platform Administration" description="Governance and foundation access previews.">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {platformRoles.map((role) => (
+            <RoleProfileCard key={role.key} role={role} />
+          ))}
+        </div>
+      </MeWorkspaceSection>
+
+      <MeWorkspaceSection title="Placeholder Staff Surfaces" description="Reserved operational regions without implementing staff management or permission writes.">
+        <div className="grid gap-3 md:grid-cols-3">
+          {[
+            "Staff profile directory placeholder",
+            "Permission matrix placeholder",
+            "Training and certification placeholder",
+          ].map((item) => (
+            <div key={item} className="rounded-3xl border border-border/50 bg-slate-50/85 p-4 text-sm text-slate-600">
+              {item}
+            </div>
+          ))}
+        </div>
+      </MeWorkspaceSection>
+
+      <DemoPresentationNote description="Roles now sit inside the shared SaaS shell and remain visual-only. No auth, session, permission, or staff write behavior was added." />
+    </MeDashboardShell>
   );
 }
