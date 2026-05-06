@@ -1,28 +1,47 @@
+@import "tailwindcss";
+
 :root {
   color-scheme: light;
-  --background: #f4f7fb;
-  --surface: rgba(255, 255, 255, 0.84);
-  --surface-strong: rgba(255, 255, 255, 0.96);
-  --surface-soft: rgba(244, 248, 255, 0.82);
-  --border: rgba(17, 24, 39, 0.1);
-  --border-strong: rgba(17, 24, 39, 0.16);
-  --text-primary: #10203a;
-  --text-secondary: #51627d;
-  --text-muted: #6f7f99;
+  --background: #f6f8fc;
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.92);
+  --surface-soft: rgba(248, 250, 255, 0.74);
+  --border: rgba(15, 23, 42, 0.08);
+  --border-strong: rgba(15, 23, 42, 0.12);
+  --text-primary: #0f172a;
+  --text-secondary: #4b5f7a;
+  --text-muted: #6a7a94;
   --primary: #2563eb;
   --primary-soft: rgba(37, 99, 235, 0.14);
   --accent: #0f9d8a;
   --success: #1f9d62;
   --warning: #c27b12;
   --danger: #d14343;
-  --shadow-color: rgba(15, 23, 42, 0.15);
-  --hero-orb-a: rgba(37, 99, 235, 0.18);
-  --hero-orb-b: rgba(15, 157, 138, 0.12);
-  --hero-grid: rgba(37, 99, 235, 0.08);
+  --shadow-color: rgba(2, 6, 23, 0.12);
+  --hero-orb-a: rgba(37, 99, 235, 0.14);
+  --hero-orb-b: rgba(15, 157, 138, 0.1);
+  --hero-grid: rgba(37, 99, 235, 0.06);
   --radius-sm: 14px;
   --radius-md: 22px;
   --radius-lg: 30px;
   --font-sans: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+
+  --foreground: var(--text-primary);
+  --card: rgba(255, 255, 255, 0.8);
+  --card-foreground: var(--text-primary);
+  --popover: rgba(255, 255, 255, 0.9);
+  --popover-foreground: var(--text-primary);
+  --secondary: rgba(241, 245, 249, 0.7);
+  --secondary-foreground: var(--text-primary);
+  --muted: rgba(241, 245, 249, 0.55);
+  --muted-foreground: var(--text-muted);
+  --accent-foreground: var(--text-primary);
+  --primary-foreground: #ffffff;
+  --destructive: var(--danger);
+  --destructive-foreground: #ffffff;
+  --input: rgba(148, 163, 184, 0.22);
+  --ring: rgba(37, 99, 235, 0.35);
+  --radius: 1rem;
 }
 
 :root[data-theme="dark"] {

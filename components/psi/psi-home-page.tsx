@@ -37,14 +37,14 @@ export function PsiHomePage() {
           </div>
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-3">
-          <Link href="/psi/procurement" className="rounded-xl border p-4 text-sm hover:bg-muted/40">Procurement Workspace</Link>
-          <Link href="/psi/supplier" className="rounded-xl border p-4 text-sm hover:bg-muted/40">Supplier Workspace</Link>
-          <Link href="/psi/inventory" className="rounded-xl border p-4 text-sm hover:bg-muted/40">Inventory Workspace</Link>
-          <Link href="/psi/issues" className="rounded-xl border p-4 text-sm hover:bg-muted/40">PSI Issue Placeholders</Link>
-          <Link href="/psi/actions" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">PSI Action Drafts</Link>
-          <Link href="/reports" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">PSI Report Preview</Link>
-          <Link href="/demo-story/psi-operations" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">View In Demo Story</Link>
-          <Link href="/system-foundation" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">ME System Foundation</Link>
+          <Link href="/psi/procurement" className="rounded-2xl border border-border/50 bg-card/60 p-4 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md">Procurement Workspace</Link>
+          <Link href="/psi/supplier" className="rounded-2xl border border-border/50 bg-card/60 p-4 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md">Supplier Workspace</Link>
+          <Link href="/psi/inventory" className="rounded-2xl border border-border/50 bg-card/60 p-4 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md">Inventory Workspace</Link>
+          <Link href="/psi/issues" className="rounded-2xl border border-border/50 bg-card/60 p-4 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md">PSI Issue Placeholders</Link>
+          <Link href="/psi/actions" className="rounded-2xl border border-border/50 bg-card/60 p-4 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md md:col-span-3">PSI Action Drafts</Link>
+          <Link href="/reports" className="rounded-2xl border border-border/50 bg-card/60 p-4 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md md:col-span-3">PSI Report Preview</Link>
+          <Link href="/demo-story/psi-operations" className="rounded-2xl border border-border/50 bg-card/60 p-4 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md md:col-span-3">View In Demo Story</Link>
+          <Link href="/system-foundation" className="rounded-2xl border border-border/50 bg-card/60 p-4 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md md:col-span-3">ME System Foundation</Link>
         </CardContent>
       </Card>
 

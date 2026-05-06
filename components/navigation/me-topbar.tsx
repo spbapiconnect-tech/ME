@@ -12,7 +12,7 @@ interface MeTopbarProps {
 
 export function MeTopbar({ locale = "en" }: MeTopbarProps) {
   return (
-    <Card size="sm" className="border border-border/70 bg-card/95">
+    <Card size="sm" className="border-border/40 bg-card/70 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <CardContent className="grid gap-4 pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
@@ -48,11 +48,11 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
-          <Link href="/branches" className="rounded-xl border border-border/70 bg-background px-3 py-2 text-sm transition-colors hover:bg-muted/60">
+          <Link href="/branches" className="rounded-2xl border border-border/50 bg-card/60 px-3 py-2 text-sm shadow-sm transition hover:bg-card/80 hover:shadow-md">
             {locale === "zh" ? "门店选择器：全部门店 / 占位，打开门店上下文" : "Branch Selector: All Stores / Placeholder, open branch context"}
           </Link>
-          <div className="rounded-xl border border-border/70 bg-background px-3 py-2 text-sm">{locale === "zh" ? "日期范围：最近 7 天 / 占位" : "Date Range: Last 7 days / Placeholder"}</div>
-          <div className="rounded-xl border border-border/70 bg-background px-3 py-2 text-sm">{locale === "zh" ? "搜索：工作台快速搜索 / 占位" : "Search: Workspace quick search / Placeholder"}</div>
+          <div className="rounded-2xl border border-border/50 bg-card/60 px-3 py-2 text-sm shadow-sm">{locale === "zh" ? "日期范围：最近 7 天 / 占位" : "Date Range: Last 7 days / Placeholder"}</div>
+          <div className="rounded-2xl border border-border/50 bg-card/60 px-3 py-2 text-sm shadow-sm">{locale === "zh" ? "搜索：工作台快速搜索 / 占位" : "Search: Workspace quick search / Placeholder"}</div>
         </div>
       </CardContent>
     </Card>

@@ -26,7 +26,7 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
 
   return (
     <aside className={cn("hidden lg:block", className)}>
-      <Card size="sm" className="sticky top-6 border border-border/70 bg-card/95">
+      <Card size="sm" className="sticky top-6 border-border/40 bg-card/70 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <CardHeader className="gap-2">
           <div className="flex items-center justify-between gap-2">
             <CardTitle className="text-sm">ME</CardTitle>
@@ -75,7 +75,7 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
             <>
               <Separator />
               <details className="grid gap-2" open={isFoundationActive || !foundationGroup.collapsedByDefault}>
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-2 rounded-lg px-2 py-1 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:bg-muted/40">
                   <span>{foundationGroup.title[locale]}</span>
                   <Badge variant="outline">{locale === "zh" ? "次级" : "Secondary"}</Badge>
                 </summary>
