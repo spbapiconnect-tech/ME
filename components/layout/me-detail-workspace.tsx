@@ -8,7 +8,7 @@ export function MeDetailWorkspace({
   context?: ReactNode;
 }) {
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_17.5rem]">
       <div className="grid gap-4">{main}</div>
       {context ? <div className="grid gap-4">{context}</div> : null}
     </div>

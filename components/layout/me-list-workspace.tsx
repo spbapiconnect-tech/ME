@@ -14,7 +14,7 @@ export function MeListWorkspace({
   className?: string;
 }) {
   return (
-    <div className={cn("grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]", className)}>
+    <div className={cn("grid gap-4 xl:grid-cols-[minmax(0,1fr)_17.5rem]", className)}>
       <div className="grid gap-4">
         {filters}
         {list}

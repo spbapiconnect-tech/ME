@@ -11,10 +11,10 @@ interface MeActionBarAction {
 
 export function MeActionBar({ actions }: { actions: MeActionBarAction[] }) {
   return (
-    <Card size="sm" className="border-border/40 bg-white/90 shadow-sm shadow-slate-900/5">
-      <CardContent className="flex flex-wrap gap-2 pt-4">
+    <Card size="sm" className="border-border/70 bg-white/88 shadow-[0_16px_34px_-30px_rgba(15,23,42,0.18)]">
+      <CardContent className="flex flex-wrap items-center gap-2.5 pt-4">
         {actions.map((action) => (
-          <Button key={action.label} size="sm" variant={action.variant ?? "outline"}>
+          <Button key={action.label} size="sm" variant={action.variant ?? "outline"} className="min-w-[6.25rem] justify-center">
             {action.icon}
             {action.label}
           </Button>

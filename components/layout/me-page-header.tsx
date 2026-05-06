@@ -15,15 +15,15 @@ interface MePageHeaderProps {
 
 export function MePageHeader({ eyebrow, title, description, notice, badges = [], actions, meta = [] }: MePageHeaderProps) {
   return (
-    <Card className="border-border/40 bg-white/90 shadow-sm shadow-slate-900/5">
-      <CardHeader className="gap-4">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-4xl space-y-2">
-            {eyebrow ? <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{eyebrow}</p> : null}
-            <div className="space-y-1">
-              <CardTitle className="text-2xl text-slate-950">{title}</CardTitle>
-              <CardDescription className="text-sm text-slate-600">{description}</CardDescription>
-              {notice ? <CardDescription className="text-sm text-slate-500">{notice}</CardDescription> : null}
+    <Card className="border-border/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,250,254,0.92))] shadow-[0_24px_48px_-34px_rgba(15,23,42,0.18)]">
+      <CardHeader className="gap-5">
+        <div className="flex flex-wrap items-start justify-between gap-5">
+          <div className="max-w-4xl space-y-3">
+            {eyebrow ? <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">{eyebrow}</p> : null}
+            <div className="space-y-2">
+              <CardTitle className="text-[1.75rem] leading-tight text-slate-950 lg:text-[2rem]">{title}</CardTitle>
+              <CardDescription className="max-w-3xl text-[15px] text-slate-600">{description}</CardDescription>
+              {notice ? <CardDescription className="max-w-3xl text-sm text-slate-500">{notice}</CardDescription> : null}
             </div>
             {badges.length > 0 ? (
               <div className="flex flex-wrap gap-2">
@@ -35,15 +35,15 @@ export function MePageHeader({ eyebrow, title, description, notice, badges = [],
               </div>
             ) : null}
           </div>
-          {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+          {actions ? <div className="flex max-w-xl flex-wrap justify-end gap-2">{actions}</div> : null}
         </div>
 
         {meta.length > 0 ? (
-          <CardContent className="grid gap-3 border-t border-border/50 px-0 pt-4 md:grid-cols-2 xl:grid-cols-4">
+          <CardContent className="grid gap-3 border-t border-border/50 px-0 pt-5 md:grid-cols-2 xl:grid-cols-4">
             {meta.map((item) => (
-              <div key={item.label} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{item.label}</p>
-                <p className="mt-1 text-sm font-medium text-slate-900">{item.value}</p>
+              <div key={item.label} className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label}</p>
+                <p className="mt-1.5 text-sm font-semibold text-slate-900">{item.value}</p>
               </div>
             ))}
           </CardContent>

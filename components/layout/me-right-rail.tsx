@@ -13,21 +13,22 @@ interface MeRightRailSection {
 
 export function MeRightRail({ sections }: { title?: string; sections: MeRightRailSection[] }) {
   return (
-    <div className="sticky top-5 grid gap-4">
+    <div className="sticky top-5 grid gap-3">
       {sections.map((section) => (
-        <Card key={section.title} size="sm" className="border-border/40 bg-white/88 shadow-sm shadow-slate-900/5">
-          <CardHeader className="gap-1">
+        <Card key={section.title} size="sm" className="border-border/70 bg-white/86 shadow-[0_14px_30px_-28px_rgba(15,23,42,0.16)]">
+          <CardHeader className="gap-1.5">
             <div className="flex items-center justify-between gap-2">
-              <CardTitle className="text-sm text-slate-900">{section.title}</CardTitle>
+              <CardTitle className="text-[13px] text-slate-900">{section.title}</CardTitle>
               {section.badge ? <Badge variant="outline">{section.badge}</Badge> : null}
             </div>
-            {section.description ? <CardDescription className="text-xs text-slate-500">{section.description}</CardDescription> : null}
+            {section.description ? <CardDescription className="text-xs leading-5 text-slate-500">{section.description}</CardDescription> : null}
           </CardHeader>
-          <CardContent className="grid gap-2 text-sm text-slate-600">
+          <CardContent className="grid gap-2.5 text-sm text-slate-600">
             {section.content}
             {section.items?.map((item) => (
-              <div key={item} className="rounded-2xl border border-border/50 bg-slate-50/80 px-3 py-2">
-                {item}
+              <div key={item} className="flex items-start gap-2.5 rounded-xl px-1 py-0.5">
+                <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-slate-300" />
+                <span className="leading-6 text-slate-600">{item}</span>
               </div>
             ))}
           </CardContent>

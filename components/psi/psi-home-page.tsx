@@ -89,7 +89,7 @@ export function PsiHomePage() {
       <MeWorkspaceSection title="PSI Operation Modules" description="Primary entry points for daily PSI work.">
         <div className="grid gap-3 md:grid-cols-3">
           {psiModules.map((module) => (
-            <Link key={module.title} href={module.href} className="rounded-3xl border border-border/50 bg-slate-50/85 p-4 transition hover:bg-white hover:shadow-md">
+            <Link key={module.title} href={module.href} className="rounded-[24px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_18px_28px_-20px_rgba(15,23,42,0.16)]">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-base font-semibold text-slate-950">{module.title}</p>
                 <Badge variant="outline">Open</Badge>
@@ -138,9 +138,9 @@ export function PsiHomePage() {
                   ["Receiving site", "KCH backroom"],
                   ["Related task", "Low stock follow-up"],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-2xl border border-border/50 bg-slate-50/85 px-4 py-3">
-                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{label}</p>
-                    <p className="mt-1 text-sm font-medium text-slate-900">{value}</p>
+                  <div key={label} className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+                    <p className="mt-1.5 text-sm font-semibold text-slate-900">{value}</p>
                   </div>
                 ))}
               </div>
@@ -158,11 +158,11 @@ export function PsiHomePage() {
 
             <MeWorkspaceSection title="Issue and Action Preview" description="Related PSI queues surfaced beside the active request.">
               <div className="grid gap-3 md:grid-cols-2">
-                <div className="rounded-3xl border border-border/50 bg-slate-50/85 p-4">
+                <div className="rounded-[24px] bg-slate-50/88 p-4 ring-1 ring-slate-200/75">
                   <p className="text-sm font-semibold text-slate-950">Issue Preview</p>
                   <p className="mt-2 text-sm text-slate-600">Inventory buffer for KCH broth inputs dropped below target coverage and triggered the current replenishment request.</p>
                 </div>
-                <div className="rounded-3xl border border-border/50 bg-slate-50/85 p-4">
+                <div className="rounded-[24px] bg-slate-50/88 p-4 ring-1 ring-slate-200/75">
                   <p className="text-sm font-semibold text-slate-950">Action Draft Preview</p>
                   <p className="mt-2 text-sm text-slate-600">Assign branch manager review, confirm supplier delivery slot, and prepare receiving checklist for arrival.</p>
                 </div>
@@ -182,9 +182,9 @@ export function PsiHomePage() {
             />
             <MeWorkspaceSection title="Context Rail" description="Related module and quick-link placeholders.">
               <div className="grid gap-2 text-sm text-slate-600">
-                <div className="rounded-2xl border border-border/50 bg-slate-50/85 px-4 py-3">Related inventory: KCH replenishment watchlist</div>
-                <div className="rounded-2xl border border-border/50 bg-slate-50/85 px-4 py-3">Linked task: Store manager review placeholder</div>
-                <div className="rounded-2xl border border-border/50 bg-slate-50/85 px-4 py-3">Module: PSI procurement detail preview</div>
+                <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/75">Related inventory: KCH replenishment watchlist</div>
+                <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/75">Linked task: Store manager review placeholder</div>
+                <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/75">Module: PSI procurement detail preview</div>
               </div>
             </MeWorkspaceSection>
           </>

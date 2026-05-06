@@ -219,9 +219,12 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           ["Refreshable", String(stats.refreshable)],
           ["Drill down", String(stats.drillDown)],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-3xl border border-border/50 bg-white/92 px-4 py-4 shadow-sm shadow-slate-900/5">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{label}</p>
-            <p className="mt-2 text-2xl font-semibold text-slate-950">{value}</p>
+          <div key={label} className="rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] px-4 py-4 ring-1 ring-slate-200/75 shadow-[0_18px_28px_-24px_rgba(15,23,42,0.16)]">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+              <span className="h-2.5 w-2.5 rounded-full bg-blue-400/80" />
+            </div>
+            <p className="mt-2 text-[1.55rem] font-semibold tracking-[-0.02em] text-slate-950">{value}</p>
           </div>
         ))}
       </section>
@@ -258,7 +261,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
             <MeWorkspaceSection title="Widget Catalog" description={`${filteredWidgets.length} of ${reportWidgetRegistry.length} widgets visible under the current filter set.`}>
               <div className="grid gap-3">
                 {filteredWidgets.map((item) => (
-                  <button key={item.key} type="button" className="text-left" onClick={() => setSelectedWidgetKey(item.key)}>
+                  <button key={item.key} type="button" className="rounded-[24px] text-left transition hover:-translate-y-0.5" onClick={() => setSelectedWidgetKey(item.key)}>
                     <ReportWidgetCard widget={item} locale={currentLocale} />
                   </button>
                 ))}
@@ -305,7 +308,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
               <MeWorkspaceSection title="Selected Widget Layout Links" description="Layouts that currently reference the selected widget.">
                 <div className="grid gap-2">
                   {layoutBySelectedWidget.map((layout) => (
-                    <div key={layout.key} className="rounded-2xl border border-border/50 bg-slate-50/85 px-4 py-3 text-sm text-slate-700">
+                    <div key={layout.key} className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75">
                       {layout.key}
                     </div>
                   ))}

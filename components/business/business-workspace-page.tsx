@@ -92,11 +92,14 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {data.metrics.map((metric) => (
-          <Card key={metric.key} size="sm" className="border-border/40 bg-white/92 shadow-sm shadow-slate-900/5">
+          <Card key={metric.key} size="sm" className="border-border/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] shadow-[0_18px_32px_-28px_rgba(15,23,42,0.16)]">
             <CardContent className="grid gap-2 pt-4">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{metric.label.en}</p>
-              <p className="text-2xl font-semibold text-slate-950">{metric.value}</p>
-              <p className="text-sm text-slate-500">{metric.description?.en}</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{metric.label.en}</p>
+                <span className="h-2.5 w-2.5 rounded-full bg-blue-400/80" />
+              </div>
+              <p className="text-[1.7rem] font-semibold tracking-[-0.02em] text-slate-950">{metric.value}</p>
+              <p className="text-sm leading-6 text-slate-500">{metric.description?.en}</p>
             </CardContent>
           </Card>
         ))}
@@ -109,21 +112,21 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             description="Presentation-safe action points and routing shortcuts for the main workspace."
             contentClassName="md:grid-cols-4"
           >
-            <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Branch scope</p>
-              <p className="mt-1 text-sm font-medium text-slate-900">All Stores / KCH</p>
+            <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Branch scope</p>
+              <p className="mt-1.5 text-sm font-semibold text-slate-900">All Stores / KCH</p>
             </div>
-            <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Queues</p>
-              <p className="mt-1 text-sm font-medium text-slate-900">Procurement, issues, reports</p>
+            <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Queues</p>
+              <p className="mt-1.5 text-sm font-semibold text-slate-900">Procurement, issues, reports</p>
             </div>
-            <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Mode</p>
-              <p className="mt-1 text-sm font-medium text-slate-900">Mock / read-only</p>
+            <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Mode</p>
+              <p className="mt-1.5 text-sm font-semibold text-slate-900">Mock / read-only</p>
             </div>
-            <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Owner</p>
-              <p className="mt-1 text-sm font-medium text-slate-900">Business workspace</p>
+            <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Owner</p>
+              <p className="mt-1.5 text-sm font-semibold text-slate-900">Business workspace</p>
             </div>
           </MeWorkspaceSection>
         }
@@ -135,7 +138,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                   <Link
                     key={module.key}
                     href={module.route}
-                    className="rounded-3xl border border-border/50 bg-slate-50/85 p-4 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-md"
+                    className="rounded-[24px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_28px_-20px_rgba(15,23,42,0.16)]"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -162,7 +165,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Operational Alerts" description="Queue-style watch items for immediate review.">
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {data.alerts.map((alert) => (
-                  <div key={alert.key} className="rounded-3xl border border-border/50 bg-slate-50/85 p-4">
+                  <div key={alert.key} className="rounded-[24px] bg-slate-50/88 p-4 ring-1 ring-slate-200/75">
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium text-slate-950">{alert.title.en}</p>
                       <Badge variant="outline">{alert.sourceModule}</Badge>
@@ -180,7 +183,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Action Panel" description="Visual actions only. No writes or workflow execution.">
               <div className="grid gap-2">
                 {data.actions.map((action) => (
-                  <Link key={action.key} href={action.route} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3 text-sm text-slate-700 transition hover:bg-white">
+                  <Link key={action.key} href={action.route} className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
                     <p className="font-medium text-slate-950">{action.label.en}</p>
                     <p className="mt-1 text-xs text-slate-500">{action.description?.en ?? "Placeholder action"}</p>
                   </Link>
@@ -191,7 +194,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Foundation Links" description="Shared admin and structure routes stay available through the shell.">
               <div className="grid gap-2">
                 {data.systemFoundationLinks.map((link) => (
-                  <Link key={link.key} href={link.route} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-white">
+                  <Link key={link.key} href={link.route} className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 text-sm font-medium text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
                     {link.label.en}
                   </Link>
                 ))}

@@ -90,9 +90,9 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
             ["Platform admins", String(platformRoles.length)],
             ["Permission mode", "Placeholder"],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{label}</p>
-              <p className="mt-1 text-xl font-semibold text-slate-950">{value}</p>
+            <div key={label} className="rounded-[22px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] px-4 py-3.5 ring-1 ring-slate-200/75">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+              <p className="mt-1.5 text-xl font-semibold tracking-[-0.02em] text-slate-950">{value}</p>
             </div>
           ))}
         </div>
@@ -121,7 +121,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
             "Permission matrix placeholder",
             "Training and certification placeholder",
           ].map((item) => (
-            <div key={item} className="rounded-3xl border border-border/50 bg-slate-50/85 p-4 text-sm text-slate-600">
+            <div key={item} className="rounded-[24px] bg-slate-50/88 p-4 text-sm text-slate-600 ring-1 ring-slate-200/75">
               {item}
             </div>
           ))}

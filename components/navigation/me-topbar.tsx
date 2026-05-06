@@ -39,8 +39,8 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
   }, [locale, pathname]);
 
   return (
-    <Card size="sm" className="border-border/40 bg-white/86 shadow-sm shadow-slate-900/5 backdrop-blur">
-      <CardContent className="grid gap-4 pt-4">
+    <Card size="sm" className="border-border/70 bg-white/84 shadow-[0_16px_34px_-30px_rgba(15,23,42,0.16)] backdrop-blur">
+      <CardContent className="grid gap-3 pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
             <Badge>ME</Badge>
@@ -63,25 +63,25 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
           </div>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))]">
-          <div className="flex items-center gap-2 rounded-2xl border border-border/50 bg-slate-50/90 px-3 py-2.5 text-sm text-slate-500 shadow-sm">
+        <div className="grid gap-2.5 lg:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,1fr))]">
+          <div className="flex items-center gap-2 rounded-2xl bg-slate-50/88 px-3.5 py-2.5 text-sm text-slate-500 ring-1 ring-slate-200/70">
             <Search className="size-4 text-slate-400" />
             <span>{locale === "zh" ? "搜索记录、模块或状态（占位）" : "Search records, modules, or status (placeholder)"}</span>
           </div>
-          <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-3 py-2.5 text-sm shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Branch</p>
-            <p className="mt-1 text-slate-900">All Stores / KCH</p>
+          <div className="rounded-2xl bg-slate-50/88 px-3.5 py-2.5 text-sm ring-1 ring-slate-200/70">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Branch</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">All Stores / KCH</p>
           </div>
-          <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-3 py-2.5 text-sm shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">Window</p>
-            <p className="mt-1 text-slate-900">Last 7 days</p>
+          <div className="rounded-2xl bg-slate-50/88 px-3.5 py-2.5 text-sm ring-1 ring-slate-200/70">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Window</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">Last 7 days</p>
           </div>
-          <div className="rounded-2xl border border-border/50 bg-slate-50/90 px-3 py-2.5 text-sm shadow-sm">
-            <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
+          <div className="rounded-2xl bg-slate-50/88 px-3.5 py-2.5 text-sm ring-1 ring-slate-200/70">
+            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               <ShieldCheck className="size-3.5" />
               Guardrail
             </p>
-            <p className="mt-1 text-slate-900">{locale === "zh" ? "Mock / 只读" : "Mock / Read-only"}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">{locale === "zh" ? "Mock / 只读" : "Mock / Read-only"}</p>
           </div>
         </div>
       </CardContent>

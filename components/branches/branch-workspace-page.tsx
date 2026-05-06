@@ -96,9 +96,9 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
             ["Operational branches", String(localBranches.length)],
             ["Future branch", String(futureBranches.length)],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-2xl border border-border/50 bg-slate-50/90 px-4 py-3">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{label}</p>
-              <p className="mt-1 text-xl font-semibold text-slate-950">{value}</p>
+            <div key={label} className="rounded-[22px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] px-4 py-3.5 ring-1 ring-slate-200/75">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+              <p className="mt-1.5 text-xl font-semibold tracking-[-0.02em] text-slate-950">{value}</p>
             </div>
           ))}
         </div>
