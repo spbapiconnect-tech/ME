@@ -109,6 +109,7 @@ export function PackagesPage() {
             <Button asChild variant="outline" size="sm"><Link href="/access-control">ME Access Control</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/psi">ME PSI</Link></Button>
+            <Button asChild variant="outline" size="sm"><Link href="/system-foundation">ME System Foundation</Link></Button>
           </div>
         </CardHeader>
       </Card>

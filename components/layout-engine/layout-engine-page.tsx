@@ -169,6 +169,10 @@ export function LayoutEnginePage() {
                   <Workflow size={16} />
                   <span>ME PSI</span>
                 </Link>
+                <Link className="shell-link-button" href="/system-foundation">
+                  <Workflow size={16} />
+                  <span>ME System Foundation</span>
+                </Link>
               </div>
             </div>
           </section>

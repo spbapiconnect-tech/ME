@@ -199,3 +199,12 @@
 - Add package preview components in `components/packages/`.
 - Keep package and plan behavior metadata-only: no real billing, payment, subscription enforcement, tenant provisioning, runtime module enable/disable, API/backend/database, or session lookup.
 - Keep package source mapping stable across layout/skin/page-template redesigns.
+
+
+## ME Business Frontend Experience (v0.8.0)
+
+- Homepage `/` is now business-first and renders `ME Business Workspace`.
+- New page-data helper `lib/page-data/business-workspace-page-data.ts` composes PSI report page-data into B2B workspace metrics/modules/alerts/actions.
+- New secondary route `/system-foundation` consolidates foundation/admin metadata routes without removing original foundation pages.
+- Foundation routes (`/layout-engine`, `/action-contracts`, `/access-control`, `/audit-trail`, `/workflow`, `/notifications`, `/reports`, `/rules`, `/packages`, `/psi`) remain active.
+- Scope remains UI-only, mock/read-only only; no real database/API/write/auth/session/middleware/billing/workflow execution/notification sending.

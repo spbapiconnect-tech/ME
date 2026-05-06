@@ -272,3 +272,11 @@ This section defines future intelligence directions for ME only.
 - `/reports` now has a PSI business preview panel using read-only mock page-data outputs.
 - Added `lib/display-adapters/psi/reports.adapter.ts` and `lib/page-data/psi/reports-page-data.ts`.
 - No real BI/chart/query/export/scheduling/database/API/backend/session/middleware added.
+
+
+## ME Business Frontend Workspace Scope (v0.8.0)
+
+- Homepage experience shifts from foundation link hub to business workspace-first B2B surface.
+- `/system-foundation` is added as a secondary navigation hub for platform contracts and metadata foundations.
+- Existing foundation pages and PSI routes are retained and not removed.
+- Delivery remains UI/front-end only with mock/read-only data and no real database, API, writes, auth/session/middleware, billing enforcement, workflow execution, or notification sending.

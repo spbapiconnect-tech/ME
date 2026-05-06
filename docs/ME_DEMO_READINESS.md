@@ -173,3 +173,11 @@
 ## ME PSI Report Widget Connection (v0.7.3)
 - `/reports` includes ME PSI Report Preview based on PSI page-data and display adapters.
 - Current readiness remains mock/read-only with no BI engine, chart execution, SQL, database, API, export, or schedule.
+
+
+## ME Business Frontend Experience (v0.8.0)
+
+- Main homepage is now business-first (`ME Business Workspace`) for B2B demo readiness.
+- New `/system-foundation` route keeps platform contract/foundation pages discoverable but secondary to business operations UI.
+- Existing foundation routes and PSI routes still exist and remain available.
+- Readiness still remains mock/read-only only with no real database/API/write/auth/session/middleware/billing/workflow execution/notification sending.

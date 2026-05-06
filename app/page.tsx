@@ -1,6 +1,7 @@
-import { DashboardHome } from "@/components/dashboard-home";
-import { moduleRegistry } from "@/config/modules";
+import { BusinessWorkspacePage } from "@/components/business";
+import { getBusinessWorkspacePageData } from "@/lib/page-data/business-workspace-page-data";
 
-export default function HomePage() {
-  return <DashboardHome modules={moduleRegistry} />;
+export default async function HomePage() {
+  const data = await getBusinessWorkspacePageData();
+  return <BusinessWorkspacePage data={data} />;
 }

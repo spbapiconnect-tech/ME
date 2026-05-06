@@ -254,3 +254,11 @@ Use Conventional Commits.
 ## ME PSI Report Widget Connection (v0.7.3)
 - Add PSI report widget preview integration into existing report contract registry.
 - Keep report/PSI milestones mock-only and read-only without BI/SQL/database/API execution.
+
+
+## ME Business Frontend Experience (v0.8.0)
+
+- Add business-first homepage workspace and keep foundation pages as secondary/admin tools.
+- Add `/system-foundation` route for metadata contracts and platform foundations.
+- Keep `/layout-engine`, `/action-contracts`, `/access-control`, `/audit-trail`, `/workflow`, `/notifications`, `/reports`, `/rules`, `/packages`, and `/psi` routes available.
+- Keep milestone scope UI-only and mock/read-only only with no real database/API/write/auth/session/middleware/billing/workflow execution/notification sending.
