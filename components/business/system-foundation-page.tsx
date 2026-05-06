@@ -24,6 +24,7 @@ export function SystemFoundationPage() {
             <Button asChild size="sm" variant="outline"><Link href="/navigation">Open Navigation IA</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/reports">Open Reports</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/roles">Open Roles Preview</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link href="/branches">Open Branch Context</Link></Button>
           </div>
         </CardHeader>
       </Card>
@@ -40,6 +41,7 @@ export function SystemFoundationPage() {
         <CardContent className="grid gap-2 text-sm text-muted-foreground">
           <p>UI-only foundation navigation. No real database, API, write operation, workflow execution, or notification sending is connected.</p>
           <p>`/roles` remains a preview-only bridge to future role-aware navigation and permission foundations without any runtime enforcement.</p>
+          <p>`/branches` previews future tenant/store scope and selector foundations without adding a real branch database, switching persistence, or access enforcement.</p>
         </CardContent>
       </Card>
     </main>

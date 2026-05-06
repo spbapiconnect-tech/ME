@@ -2,8 +2,8 @@
 
 ## Current Milestone
 
-- Current milestone: `v0.8.2 Role-Based Workspace Placeholders`
-- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, and metadata-first foundation pages
+- Current milestone: `v0.8.3 Store / Branch Context Placeholder`
+- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, branch context placeholders, and metadata-first foundation pages
 
 ## What Is Ready
 
@@ -194,3 +194,9 @@
 - `/roles` and `/roles/[roleKey]` are available as UI-only placeholder routes for role-based workspace review
 - navigation and foundation pages now link to the role preview without introducing route hiding or access enforcement
 - readiness remains mock/read-only only with no real auth/session, permission enforcement, database/API, workflow, notification, or task execution changes
+
+## ME Branch Context Placeholders (v0.8.3)
+
+- `/branches` and `/branches/[branchKey]` are available as UI-only placeholder routes for store / branch context review
+- business workspace, topbar, navigation, roles, and system foundation now link into the branch preview without changing runtime access rules
+- readiness remains mock/read-only only with no real tenant model, branch database, selector persistence, auth/session, permission enforcement, database/API, workflow, notification, or task execution changes

@@ -168,6 +168,24 @@ const posReports = createItem({
   relatedModule: "pos-report",
 });
 
+const branches = createItem({
+  key: "branches",
+  label: { zh: "门店上下文", en: "Branches" },
+  description: {
+    zh: "门店 / 分店上下文占位与未来选择器预览。",
+    en: "Store and branch context placeholder with future selector preview.",
+  },
+  href: "/branches",
+  group: "business",
+  status: "preview-only",
+  tone: "info",
+  badge: { zh: "预览", en: "Preview" },
+  isPrimary: false,
+  isFoundation: false,
+  relatedModule: "branch-overview",
+  notes: "Preview-only route. No tenant switching, branch database, or permission enforcement is connected.",
+});
+
 const systemFoundation = createItem({
   key: "system-foundation",
   label: { zh: "系统基础层", en: "System Foundation" },
@@ -376,7 +394,7 @@ export const navigationMap: MeNavigationMap = {
       title: { zh: "业务", en: "Business" },
       description: { zh: "面向业务运营的主导航。", en: "Primary navigation for business operations." },
       groupType: "business",
-      items: [dashboard, businessWorkspace, psiWorkspace],
+      items: [dashboard, businessWorkspace, psiWorkspace, branches],
       collapsedByDefault: false,
       isFoundationGroup: false,
     },

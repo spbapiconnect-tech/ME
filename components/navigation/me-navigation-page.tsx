@@ -31,6 +31,9 @@ export function MeNavigationPage() {
               <Button asChild size="sm" variant="outline">
                 <Link href="/system-foundation">Open System Foundation</Link>
               </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/branches">Open Branch Context</Link>
+              </Button>
             </div>
           </div>
           <CardDescription>{navigation.notice.en}</CardDescription>
@@ -89,12 +92,30 @@ export function MeNavigationPage() {
 
       <Card size="sm" className="border-dashed">
         <CardHeader className="gap-1">
+          <CardTitle className="text-sm">Branch Context Preview</CardTitle>
+          <CardDescription>
+            `/branches` previews branch-aware navigation and workspace framing without adding tenant switching, branch persistence, or permission enforcement.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href="/branches">Open Branch Context</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/reports">Open Reports</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card size="sm" className="border-dashed">
+        <CardHeader className="gap-1">
           <CardTitle className="text-sm">Notes</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-2 text-sm text-muted-foreground">
           <p>UI-only.</p>
           <p>No permission enforcement.</p>
           <p>No auth/session.</p>
+          <p>No tenant or branch switching persistence.</p>
           <p>Foundation routes remain accessible.</p>
         </CardContent>
       </Card>

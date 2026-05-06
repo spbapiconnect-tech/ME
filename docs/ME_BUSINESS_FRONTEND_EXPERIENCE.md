@@ -61,3 +61,10 @@ PSI Page Data
 - keep role workspaces preview-only and mock/read-only only
 - use shared navigation plus role metadata helpers to describe future role-based workspaces
 - keep `/navigation`, `/system-foundation`, `/psi`, `/reports`, and `/packages` intact
+
+## ME Branch Context Placeholders (v0.8.3)
+
+- add a lightweight `/branches` entry from the business workspace and topbar without cluttering the homepage
+- add branch selector placeholder UI for All Stores, KCH, BTU, and Future Branch with no persistence
+- reuse shared navigation, role preview, PSI, and report routes to show branch-aware framing only
+- keep `/navigation`, `/system-foundation`, `/roles`, `/psi`, `/reports`, and `/packages` intact with no real tenant or branch permission enforcement

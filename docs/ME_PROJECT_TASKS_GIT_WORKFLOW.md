@@ -49,6 +49,7 @@ Use Conventional Commits.
 - `/tasks` navigation remains reachable from the main demo surfaces
 - `/layout-engine` navigation remains reachable from the main demo and foundation surfaces
 - `/roles` remains reachable from the homepage, `/navigation`, and `/system-foundation` without changing runtime access rules
+- `/branches` remains reachable from the homepage, topbar, `/navigation`, `/roles`, and `/system-foundation` without changing runtime access rules
 
 ## Module Registry Milestone
 
@@ -276,4 +277,11 @@ Use Conventional Commits.
 - Add `config/roles.ts`, `types/role-workspace.ts`, `lib/role-workspace.ts`, `components/roles/`, `/roles`, and `/roles/[roleKey]` as placeholder-only role preview surfaces.
 - Add shared navigation linkage for `/roles` through `config/navigation.ts` before hardcoding more page-level links.
 - Verify no real auth/session, permission enforcement, route guards, database/API, workflow, notification, or write behavior is added.
+- Keep `.write_test` untouched, unstaged, and uncommitted.
+
+## ME Branch Context Placeholders (v0.8.3)
+
+- Add `config/branches.ts`, `types/branch-context.ts`, `lib/branch-context.ts`, `components/branches/`, `/branches`, and `/branches/[branchKey]` as placeholder-only branch preview surfaces.
+- Add shared navigation linkage for `/branches` through `config/navigation.ts` before hardcoding more page-level links.
+- Verify no real tenant model, branch database, selector persistence, auth/session, permission enforcement, route guards, database/API, workflow, notification, task execution, or write behavior is added.
 - Keep `.write_test` untouched, unstaged, and uncommitted.

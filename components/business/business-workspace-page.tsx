@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BranchSelectorPlaceholder } from "@/components/branches";
 import { BusinessActionPanel } from "@/components/business/business-action-panel";
 import { BusinessAlertCard } from "@/components/business/business-alert-card";
 import { BusinessFoundationSection } from "@/components/business/business-foundation-section";
@@ -7,6 +8,7 @@ import { BusinessKpiCard } from "@/components/business/business-kpi-card";
 import { BusinessModuleCard } from "@/components/business/business-module-card";
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
+import { getBranchProfiles } from "@/lib/branch-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { BusinessWorkspacePageData } from "@/types/business-workspace";
 
@@ -15,6 +17,8 @@ interface BusinessWorkspacePageProps {
 }
 
 export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
+  const branchProfiles = getBranchProfiles();
+
   return (
     <main className="mx-auto flex w-full max-w-[88rem] flex-col gap-6 px-4 py-8">
       <MeBreadcrumbs />
@@ -41,12 +45,32 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                   <Button asChild variant="outline" size="sm">
                     <Link href="/roles">Roles Preview</Link>
                   </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/branches">Branch Context</Link>
+                  </Button>
                 </div>
               </div>
               <CardDescription>
                 Read-only B2B workspace preview. No real database/API, writes, auth/session/middleware, billing enforcement, workflow execution, or notification sending.
               </CardDescription>
             </CardHeader>
+          </Card>
+
+          <Card size="sm" className="border-dashed">
+            <CardHeader className="gap-1">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <CardTitle className="text-sm">Branch Context Preview</CardTitle>
+                  <CardDescription>Preview how the shared workspace can be reframed under All Stores, KCH, BTU, and Future Branch contexts.</CardDescription>
+                </div>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/branches">Open Branches</Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <BranchSelectorPlaceholder branches={branchProfiles} compact />
+            </CardContent>
           </Card>
 
           <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">

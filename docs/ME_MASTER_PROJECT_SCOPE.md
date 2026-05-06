@@ -130,8 +130,8 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.8.2 Role-Based Workspace Placeholders`
-- Delivery goal: extend the existing mock-data prototype with role workspace placeholders and role-aware navigation previews without breaking the existing business, PSI, reports, packages, or foundation routes.
+- Current milestone: `v0.8.3 Store / Branch Context Placeholder`
+- Delivery goal: extend the existing mock-data prototype with branch context placeholders and branch-aware previews for business workspace, roles, navigation, PSI, and reports without breaking the existing business, PSI, reports, packages, or foundation routes.
 
 ## Procurement Supplier Inventory MVP Planning
 
@@ -293,3 +293,9 @@ This section defines future intelligence directions for ME only.
 - Add role workspace placeholder routes for leadership, operations, frontline, and system governance previews.
 - Keep role awareness descriptive only; no real auth, session, permission enforcement, middleware, database, API, or write capability is introduced.
 - Reuse shared navigation and foundation surfaces instead of creating a separate runtime access system.
+
+## ME Branch Context Placeholders (v0.8.3)
+
+- Add branch context placeholder routes for All Stores, KCH, BTU, and Future Branch previews.
+- Reuse shared business workspace, role preview, navigation, PSI, and report routes to describe branch-aware behavior before a tenant model exists.
+- Keep branch awareness descriptive only; no real tenant model, branch database, selector persistence, auth/session, permission enforcement, middleware, database, API, or write capability is introduced.

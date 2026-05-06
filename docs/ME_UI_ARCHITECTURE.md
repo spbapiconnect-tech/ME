@@ -228,3 +228,14 @@
 - Components: `components/roles/`
 - Navigation integration stays config-driven through `config/navigation.ts` and `lib/navigation.ts`
 - Scope remains preview-only with no real auth/session, permission middleware, database, API, or write path
+
+## ME Branch Context Placeholders (v0.8.3)
+
+- Route overview: `/branches`
+- Branch detail route: `/branches/[branchKey]`
+- Contracts: `types/branch-context.ts`
+- Registry: `config/branches.ts`
+- Helpers: `lib/branch-context.ts`
+- Components: `components/branches/`
+- Navigation integration stays config-driven through `config/navigation.ts` and `lib/navigation.ts`
+- Scope remains preview-only with no real tenant model, branch database, branch switching persistence, auth/session, middleware, API, or write path

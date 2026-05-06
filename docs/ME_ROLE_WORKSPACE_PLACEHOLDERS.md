@@ -48,3 +48,8 @@ Role Profile Config
 - add tenant/store scope
 - add admin role assignment
 - add audit on role changes
+
+## ME Branch Context Placeholders (v0.8.3)
+- `/branches` and `/branches/[branchKey]` now provide branch-aware placeholder previews that roles can link into
+- role detail pages can point to branch context previews without applying runtime role/branch filtering
+- branch preview continues to reuse shared navigation and PSI/report routes with no real tenant/branch permission enforcement

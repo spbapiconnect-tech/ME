@@ -29,11 +29,16 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
             <Button asChild size="sm" variant="outline">
               <Link href="/system-foundation">{locale === "zh" ? "系统基础层" : "System Foundation"}</Link>
             </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/branches">{locale === "zh" ? "门店上下文" : "Branch Context"}</Link>
+            </Button>
           </div>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
-          <div className="rounded-xl border border-border/70 bg-background px-3 py-2 text-sm">{locale === "zh" ? "门店选择器：北区 / 占位" : "Store Selector: North Region / Placeholder"}</div>
+          <Link href="/branches" className="rounded-xl border border-border/70 bg-background px-3 py-2 text-sm transition-colors hover:bg-muted/60">
+            {locale === "zh" ? "门店选择器：全部门店 / 占位，打开门店上下文" : "Branch Selector: All Stores / Placeholder, open branch context"}
+          </Link>
           <div className="rounded-xl border border-border/70 bg-background px-3 py-2 text-sm">{locale === "zh" ? "日期范围：最近 7 天 / 占位" : "Date Range: Last 7 days / Placeholder"}</div>
           <div className="rounded-xl border border-border/70 bg-background px-3 py-2 text-sm">{locale === "zh" ? "搜索：工作台快速搜索 / 占位" : "Search: Workspace quick search / Placeholder"}</div>
         </div>

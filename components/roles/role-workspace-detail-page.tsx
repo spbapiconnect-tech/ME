@@ -73,6 +73,9 @@ export function RoleWorkspaceDetailPage({ data, roleKey }: RoleWorkspaceDetailPa
                 <Button asChild size="sm" variant="outline">
                   <Link href="/navigation">Navigation IA</Link>
                 </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/branches">Branch Context</Link>
+                </Button>
               </div>
             </CardHeader>
           </Card>
@@ -113,6 +116,23 @@ export function RoleWorkspaceDetailPage({ data, roleKey }: RoleWorkspaceDetailPa
           </section>
 
           <RoleNavigationPreview navigationPreview={data.navigationPreview} foundationPreview={data.foundationPreview} />
+
+          <Card size="sm" className="border-dashed">
+            <CardHeader className="gap-1">
+              <CardTitle className="text-sm">Branch Context Preview</CardTitle>
+              <CardDescription>
+                Role pages can now link into `/branches` to show how the same role workspace may be previewed under All Stores or branch-specific contexts without runtime filtering.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              <Button asChild size="sm" variant="outline">
+                <Link href="/branches">Open Branch Context</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/branches/all-stores">Open All Stores Preview</Link>
+              </Button>
+            </CardContent>
+          </Card>
 
           <Card size="sm" className="border-dashed">
             <CardHeader className="gap-1">

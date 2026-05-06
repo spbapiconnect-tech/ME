@@ -52,3 +52,9 @@ Navigation Config
 - keep `Roles` secondary inside shared navigation IA with no auth/session or permission enforcement
 - expose the route from homepage, `/navigation`, and `/system-foundation` without changing global route accessibility
 - treat role-aware navigation as descriptive preview only until real auth, session, and route guards exist
+
+## ME Branch Context Placeholders (v0.8.3)
+- add `/branches` as a preview-only route for store / branch context placeholders and future selector discussions
+- add `config/branches.ts`, `types/branch-context.ts`, `lib/branch-context.ts`, and `components/branches/`
+- expose the route from homepage, topbar, `/navigation`, `/roles`, and `/system-foundation`
+- keep branch-aware navigation descriptive only with no real tenant switching, branch database, or permission enforcement
