@@ -58,3 +58,8 @@ Role Profile Config
 - `/roles` now links into `/demo-story/role-workspaces` to support a guided stakeholder demo
 - role preview remains descriptive only with no persisted progress, analytics, or tracking
 - demo story metadata lives in `config/demo-story.ts` and UI lives in `components/demo-story/`
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+- `/roles` can now surface screenshot-ready notes for stakeholder walkthroughs and proposal review
+- add `/demo-mode`, `config/demo-mode.ts`, and `components/demo-mode/` without adding auth/session, permission enforcement, persistence, analytics, or tracking
+- role framing remains visual only and mock/read-only only

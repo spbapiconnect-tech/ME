@@ -305,3 +305,9 @@ This section defines future intelligence directions for ME only.
 - Add `types/demo-story.ts`, `config/demo-story.ts`, `lib/demo-story.ts`, and `components/demo-story/` as a static guided product-tour layer.
 - Add `/demo-story` and `/demo-story/[stepKey]` routes.
 - Keep the scope UI-only and mock/read-only only with no onboarding engine, persisted progress, analytics, tracking, personalization, database, API, auth/session, or write behavior.
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+
+- Add a screenshot-ready demo presentation layer with `/demo-mode`, `types/demo-mode.ts`, `config/demo-mode.ts`, `lib/demo-mode.ts`, and `components/demo-mode/`.
+- Keep scope UI-only and mock/read-only only with no real demo engine, persistence, localStorage/sessionStorage, analytics, tracking, personalization, database, API, auth/session, or write path.
+- Keep existing homepage, navigation, roles, branches, PSI, reports, system foundation, and packages routes intact.

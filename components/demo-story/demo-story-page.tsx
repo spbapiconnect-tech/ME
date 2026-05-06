@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DemoModeBanner, DemoPresentationNote } from "@/components/demo-mode";
 import { DemoStoryStepCard } from "@/components/demo-story/demo-story-step-card";
 import { DemoStoryTimeline } from "@/components/demo-story/demo-story-timeline";
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
@@ -37,6 +38,9 @@ export function DemoStoryPage({ data }: DemoStoryPageProps) {
                       <Link href={`/demo-story/${firstStep.key}`}>Start Guided Demo</Link>
                     </Button>
                     <Button asChild size="sm" variant="outline">
+                      <Link href="/demo-mode">Open Demo Mode</Link>
+                    </Button>
+                    <Button asChild size="sm" variant="outline">
                       <Link href={firstStep.route}>Open First Route</Link>
                     </Button>
                   </div>
@@ -44,6 +48,8 @@ export function DemoStoryPage({ data }: DemoStoryPageProps) {
               </div>
             </CardHeader>
           </Card>
+
+          <DemoModeBanner />
 
           <Card size="sm" className="border-dashed">
             <CardHeader className="gap-1">
@@ -57,6 +63,8 @@ export function DemoStoryPage({ data }: DemoStoryPageProps) {
               <p>The actual business, navigation, role, branch, PSI, report, and system foundation routes remain unchanged.</p>
             </CardContent>
           </Card>
+
+          <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. Use `/demo-mode` for route framing and walkthrough guidance." />
 
           <DemoStoryTimeline steps={data.steps} />
 

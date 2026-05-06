@@ -100,7 +100,13 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
           <div className="grid gap-2">
             <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{locale === "zh" ? "次级链接" : "Footer / Secondary"}</p>
             {navigation.footerItems.map((item) => (
-              <Button key={item.key} asChild variant="ghost" size="sm" className="justify-start">
+              <Button
+                key={item.key}
+                asChild
+                variant={isActive(item, activeKey) ? "secondary" : "ghost"}
+                size="sm"
+                className="justify-start"
+              >
                 <Link href={item.href}>{resolveNavigationLabel(item, locale)}</Link>
               </Button>
             ))}

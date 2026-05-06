@@ -1,9 +1,10 @@
 import Link from "next/link";
 
+import { DemoPresentationNote } from "@/components/demo-mode";
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
-import { Button } from "@/components/ui/button";
 import { RoleChip } from "@/components/roles/role-chip";
 import { RoleProfileCard } from "@/components/roles/role-profile-card";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { MeRoleProfile } from "@/types/role-workspace";
 
@@ -33,12 +34,13 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
                 </div>
                 <RoleChip label="preview-only" tone="info" />
               </div>
-              <CardDescription>
-                Role preview only — no auth or permission enforcement.
-              </CardDescription>
+              <CardDescription>Role preview only — no auth or permission enforcement.</CardDescription>
               <div className="flex flex-wrap gap-2">
                 <Button asChild size="sm" variant="outline">
                   <Link href="/demo-story/role-workspaces">View In Demo Story</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/demo-mode">Open Demo Mode</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
                   <Link href="/navigation">Open Navigation IA</Link>
@@ -46,6 +48,8 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
               </div>
             </CardHeader>
           </Card>
+
+          <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. Role framing is visual only and does not introduce real permissions or session-aware mode." />
 
           <Card size="sm" className="border-dashed">
             <CardHeader className="gap-1">

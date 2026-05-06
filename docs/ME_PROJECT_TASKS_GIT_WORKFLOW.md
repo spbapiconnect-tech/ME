@@ -292,3 +292,10 @@ Use Conventional Commits.
 - Add `components/demo-story/` and `/demo-story` routes as static product-tour placeholders only.
 - Verify no onboarding engine, persisted progress, analytics, tracking, personalization, database/API, auth/session, or write behavior is introduced.
 - Keep `.write_test` untouched, unstaged, and uncommitted.
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+
+- Add `config/demo-mode.ts` before hardcoding screenshot-ready framing rules into page components.
+- Add `components/demo-mode/` and `/demo-mode` as a static presentation layer only.
+- Verify no demo toggle, persisted state, localStorage/sessionStorage, analytics, tracking, personalization, database/API, auth/session, or write behavior is introduced.
+- Keep `.write_test` untouched, unstaged, and uncommitted.

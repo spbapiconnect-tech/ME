@@ -251,3 +251,8 @@
 - Components: `components/demo-story/`
 - This layer sits above existing business, navigation, roles, branches, PSI, reports, and system foundation routes as static storytelling metadata only.
 - No persisted progress, analytics, tracking, personalization, database, API, auth/session, or write path is added.
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+- add `types/demo-mode.ts`, `config/demo-mode.ts`, and `lib/demo-mode.ts` as a static presentation metadata layer
+- add `components/demo-mode/` for badges, banners, screenshot cards, checklist UI, and reusable presentation notes
+- `/demo-mode` sits above existing business, navigation, role, branch, PSI, report, and foundation routes with no persistence, analytics, tracking, database, or API

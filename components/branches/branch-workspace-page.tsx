@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BranchChip } from "@/components/branches/branch-chip";
 import { BranchProfileCard } from "@/components/branches/branch-profile-card";
 import { BranchSelectorPlaceholder } from "@/components/branches/branch-selector-placeholder";
+import { DemoPresentationNote } from "@/components/demo-mode";
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,11 +50,16 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
                   <Link href="/navigation">Open Navigation IA</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
+                  <Link href="/demo-mode">Open Demo Mode</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
                   <Link href="/demo-story/branch-context">View In Demo Story</Link>
                 </Button>
               </div>
             </CardHeader>
           </Card>
+
+          <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. Branch context is framed for presentation only with no tenant switching or persisted branch selection." />
 
           <BranchSelectorPlaceholder branches={branches} />
 

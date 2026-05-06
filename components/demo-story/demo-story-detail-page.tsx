@@ -1,10 +1,11 @@
 import Link from "next/link";
 
+import { DemoModeBanner, DemoPresentationNote } from "@/components/demo-mode";
+import { DemoStoryChip } from "@/components/demo-story/demo-story-chip";
 import { DemoStoryProgressPlaceholder } from "@/components/demo-story/demo-story-progress-placeholder";
 import { DemoStoryRouteCard } from "@/components/demo-story/demo-story-route-card";
 import { DemoStoryTimeline } from "@/components/demo-story/demo-story-timeline";
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
-import { DemoStoryChip } from "@/components/demo-story/demo-story-chip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getNextDemoStoryStep, getPreviousDemoStoryStep } from "@/lib/demo-story";
@@ -53,11 +54,16 @@ export function DemoStoryDetailPage({ data }: DemoStoryDetailPageProps) {
                   <Link href={step.route}>{step.primaryCta.en}</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
+                  <Link href="/demo-mode">Open Demo Mode</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
                   <Link href="/demo-story">All Story Steps</Link>
                 </Button>
               </div>
             </CardHeader>
           </Card>
+
+          <DemoModeBanner />
 
           <DemoStoryProgressPlaceholder stepKey={step.key} />
 
@@ -69,6 +75,8 @@ export function DemoStoryDetailPage({ data }: DemoStoryDetailPageProps) {
               </CardDescription>
             </CardHeader>
           </Card>
+
+          <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. Use `/demo-mode` to frame this step for stakeholder screenshots." />
 
           <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
             <Card size="sm" className="border border-border/70 bg-card/95">

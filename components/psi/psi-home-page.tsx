@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DemoPresentationNote } from "@/components/demo-mode";
 import { MeBreadcrumbs } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +26,9 @@ export function PsiHomePage() {
             no supplier portal, and no write operations.
           </CardDescription>
           <div className="flex flex-wrap gap-2">
+            <Button asChild size="sm" variant="outline">
+              <Link href="/demo-mode">Open Demo Mode</Link>
+            </Button>
             {quickLinks.map((item) => (
               <Button key={item.key} asChild size="sm" variant="outline">
                 <Link href={item.href}>{resolveNavigationLabel(item)}</Link>
@@ -43,6 +47,8 @@ export function PsiHomePage() {
           <Link href="/system-foundation" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">ME System Foundation</Link>
         </CardContent>
       </Card>
+
+      <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. PSI surfaces stay presentational with no approvals, posting, supplier portal, or write execution." />
 
       <Card size="sm">
         <CardHeader>

@@ -206,3 +206,9 @@
 - `/demo-story` and `/demo-story/[stepKey]` are available as guided product tour placeholders for stakeholder demos.
 - Story data stays static and metadata-only.
 - No onboarding engine, persisted progress, local storage, analytics, tracking, personalization, database, or API is added.
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+
+- `/demo-mode` is available as a screenshot-ready polish placeholder for stakeholder reviews and proposal walkthroughs.
+- `config/demo-mode.ts`, `lib/demo-mode.ts`, and `components/demo-mode/` provide static presentation metadata and UI helpers.
+- No real demo mode state, persisted settings, localStorage/sessionStorage, analytics, tracking, personalization, database, or API is added.

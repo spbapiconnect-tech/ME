@@ -1,16 +1,18 @@
 import Link from "next/link";
 
 import { BranchSelectorPlaceholder } from "@/components/branches";
+import { DemoModeBadge, DemoModeBanner, DemoPresentationNote } from "@/components/demo-mode";
 import { BusinessActionPanel } from "@/components/business/business-action-panel";
 import { BusinessAlertCard } from "@/components/business/business-alert-card";
 import { BusinessFoundationSection } from "@/components/business/business-foundation-section";
 import { BusinessKpiCard } from "@/components/business/business-kpi-card";
 import { BusinessModuleCard } from "@/components/business/business-module-card";
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
-import { getDemoStorySteps } from "@/lib/demo-story";
 import { Button } from "@/components/ui/button";
-import { getBranchProfiles } from "@/lib/branch-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getBranchProfiles } from "@/lib/branch-context";
+import { getDemoModeBadges } from "@/lib/demo-mode";
+import { getDemoStorySteps } from "@/lib/demo-story";
 import type { BusinessWorkspacePageData } from "@/types/business-workspace";
 
 interface BusinessWorkspacePageProps {
@@ -19,6 +21,7 @@ interface BusinessWorkspacePageProps {
 
 export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
   const branchProfiles = getBranchProfiles();
+  const demoModeBadges = getDemoModeBadges().filter((badge) => ["product-demo", "screenshot-ready", "stakeholder-review"].includes(badge.key));
   const demoStorySteps = getDemoStorySteps();
 
   return (
@@ -42,6 +45,9 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                     <Link href="/demo-story/business-overview">Start Guided Demo</Link>
                   </Button>
                   <Button asChild variant="outline" size="sm">
+                    <Link href="/demo-mode">Demo Mode</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
                     <Link href="/navigation">Navigation IA</Link>
                   </Button>
                   <Button asChild variant="outline" size="sm">
@@ -59,6 +65,27 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                 Read-only B2B workspace preview. No real database/API, writes, auth/session/middleware, billing enforcement, workflow execution, or notification sending.
               </CardDescription>
             </CardHeader>
+          </Card>
+
+          <DemoModeBanner />
+
+          <Card size="sm" className="border-dashed border-border/80 bg-muted/20">
+            <CardHeader className="gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <CardTitle className="text-sm">Screenshot-ready demo</CardTitle>
+                  <CardDescription>Presentation-friendly labels keep the homepage polished without turning it into a demo-mode control panel.</CardDescription>
+                </div>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/demo-mode">Open Demo Mode</Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              {demoModeBadges.map((badge) => (
+                <DemoModeBadge key={badge.key} badge={badge} />
+              ))}
+            </CardContent>
           </Card>
 
           <Card size="sm" className="border-dashed">
@@ -154,6 +181,8 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
           </section>
 
           <BusinessFoundationSection links={data.systemFoundationLinks} />
+
+          <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. This presentation layer adds no real demo state, tracking, or persistence." />
 
           <Card size="sm" className="border-dashed">
             <CardHeader className="gap-1">

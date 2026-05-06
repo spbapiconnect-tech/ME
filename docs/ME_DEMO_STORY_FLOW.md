@@ -50,3 +50,8 @@ Demo Story Config
 - add branch-specific tour
 - add user onboarding state
 - add customer demo mode
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+- add `/demo-mode` as the screenshot-ready presentation overview for stakeholder walkthroughs
+- add `config/demo-mode.ts`, `lib/demo-mode.ts`, and `components/demo-mode/` as a static presentation layer above the existing demo story
+- keep the layer placeholder-only with no persisted demo state, no localStorage/sessionStorage, no analytics, and no tracking

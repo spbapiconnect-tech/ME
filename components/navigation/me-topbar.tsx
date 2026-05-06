@@ -24,6 +24,9 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
           <div className="flex flex-wrap items-center gap-2">
             <MeMobileNav locale={locale} />
             <Button asChild size="sm" variant="outline">
+              <Link href="/demo-mode">{locale === "zh" ? "Demo Mode" : "Demo Mode"}</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
               <Link href="/demo-story">{locale === "zh" ? "引导演示" : "Guided Demo"}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">

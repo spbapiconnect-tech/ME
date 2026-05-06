@@ -82,3 +82,8 @@ PSI Page Data
 - homepage now exposes a `Start Guided Demo` entry into `/demo-story/business-overview`
 - business-first workspace remains the main ME homepage while the story layer only connects existing routes
 - no persisted progress, analytics, tracking, personalization, database, or API is added
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+- homepage can now show screenshot-ready demo badges and a subtle presentation banner without displacing the business dashboard
+- add `/demo-mode`, `config/demo-mode.ts`, `lib/demo-mode.ts`, and `components/demo-mode/` as UI-only presentation helpers
+- no real demo engine, persisted state, localStorage/sessionStorage, analytics, or tracking is introduced

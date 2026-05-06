@@ -3,6 +3,7 @@
 import Link from "next/link";
 import * as React from "react";
 
+import { DemoPresentationNote } from "@/components/demo-mode";
 import { DashboardLayoutCard } from "@/components/reports/dashboard-layout-card";
 import { ReportWidgetCard } from "@/components/reports/report-widget-card";
 import { ReportWidgetPreviewCard } from "@/components/reports/report-widget-preview-card";
@@ -146,6 +147,9 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           </CardDescription>
           <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline" size="sm">
+              <Link href="/demo-mode">Open Demo Mode</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
               <Link href="/demo-story/report-preview">View In Demo Story</Link>
             </Button>
             {quickLinks.map((item) => (
@@ -156,6 +160,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           </div>
         </CardHeader>
       </Card>
+
+      <DemoPresentationNote description="Screenshot-ready placeholder — all data is mock/read-only. Report preview remains metadata-only with no BI execution, export engine, or scheduling." />
 
       <Card size="sm">
         <CardHeader className="gap-1"><CardTitle className="text-sm">Widget Stats</CardTitle></CardHeader>

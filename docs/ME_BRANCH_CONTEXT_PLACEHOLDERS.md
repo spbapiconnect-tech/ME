@@ -54,3 +54,8 @@ Branch Profile Config
 - `/branches` now links into `/demo-story/branch-context` as part of the guided product narrative
 - branch context continues to reuse shared navigation, PSI, and reports routes with no persisted progress or tracking
 - demo story metadata lives in `config/demo-story.ts` and UI lives in `components/demo-story/`
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+- `/branches` can now show screenshot-ready presentation notes that link to `/demo-mode`
+- demo framing continues to reuse shared navigation, PSI, and reports routes with no tenant model, no persistence, no analytics, and no tracking
+- screenshot metadata lives in `config/demo-mode.ts` and reusable presentation UI lives in `components/demo-mode/`

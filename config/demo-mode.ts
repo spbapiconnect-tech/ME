@@ -1,0 +1,317 @@
+import type {
+  MeDemoModeBadge,
+  MeDemoModeLocalizedText,
+  MeDemoModePageData,
+  MeDemoScreenshotSection,
+  MeDemoWalkthroughItem,
+} from "@/types/demo-mode";
+
+function localized(zh: string, en: string): MeDemoModeLocalizedText {
+  return { zh, en };
+}
+
+function createBadge(badge: MeDemoModeBadge): MeDemoModeBadge {
+  return badge;
+}
+
+function createScreenshotSection(section: MeDemoScreenshotSection): MeDemoScreenshotSection {
+  return section;
+}
+
+function createWalkthroughItem(item: MeDemoWalkthroughItem): MeDemoWalkthroughItem {
+  return item;
+}
+
+export const meDemoModeGeneratedAt = "2026-05-06T00:00:00.000Z";
+
+export const meDemoModeNotice = localized(
+  "ME Demo Mode 仅用于截图与演示呈现。它是静态展示层，不包含真实 Demo Mode 状态、持久化设置、本地存储、分析、追踪、个性化、数据库或 API。",
+  "ME Demo Mode is for screenshots and stakeholder presentation only. It is a static presentation layer with no real demo-mode state, persisted setting, local storage, analytics, tracking, personalization, database, or API.",
+);
+
+export const meDemoModeBadges: MeDemoModeBadge[] = [
+  createBadge({
+    key: "product-demo",
+    label: localized("产品演示", "Product Demo"),
+    description: localized("适用于产品总览、开场页与业务工作台截图。", "Use on product overview, opener slides, and business workspace screenshots."),
+    variant: "product-demo",
+    tone: "success",
+    isPlaceholder: true,
+  }),
+  createBadge({
+    key: "screenshot-ready",
+    label: localized("截图就绪", "Screenshot Ready"),
+    description: localized("适用于提案、评审与资料页的展示 framing。", "Frames pages for screenshots, proposals, and review decks."),
+    variant: "screenshot-ready",
+    tone: "info",
+    isPlaceholder: true,
+  }),
+  createBadge({
+    key: "stakeholder-review",
+    label: localized("评审版", "Stakeholder Review"),
+    description: localized("适合业务评审与高层 walkthrough。", "Suitable for business review and executive walkthroughs."),
+    variant: "stakeholder-review",
+    tone: "warning",
+    isPlaceholder: true,
+  }),
+  createBadge({
+    key: "guided-walkthrough",
+    label: localized("导览流程", "Walkthrough"),
+    description: localized("用于链接 Demo Story 与推荐讲解路径。", "Connects Demo Story to the recommended presentation sequence."),
+    variant: "walkthrough",
+    tone: "neutral",
+    isPlaceholder: true,
+  }),
+  createBadge({
+    key: "proposal-ready",
+    label: localized("提案可用", "Proposal"),
+    description: localized("用于静态提案页、截图页与产品包装说明。", "Supports static proposal pages, screenshot surfaces, and packaging narratives."),
+    variant: "proposal",
+    tone: "muted",
+    isPlaceholder: true,
+  }),
+  createBadge({
+    key: "placeholder-only",
+    label: localized("仅占位", "Placeholder"),
+    description: localized("明确当前仅为展示层，不启用真实 Demo 功能。", "Makes clear the current layer is presentation-only and not a real demo engine."),
+    variant: "placeholder",
+    tone: "danger",
+    isPlaceholder: true,
+  }),
+];
+
+export const meDemoScreenshotSections: MeDemoScreenshotSection[] = [
+  createScreenshotSection({
+    key: "homepage-overview-shot",
+    title: localized("首页总览截图", "Homepage Overview Shot"),
+    description: localized("以首页业务工作台作为演示开场，突出 KPI、模块与经营语境。", "Use the homepage business workspace as the opener to highlight KPI context, modules, and executive framing."),
+    route: "/",
+    surface: "homepage",
+    recommendedShot: localized("截取顶部工作台标题、KPI 行与首屏模块。", "Capture the workspace heading, KPI row, and first module band."),
+    framingTips: [
+      localized("保持业务工作台为主，不要把系统基础层放在画面中心。", "Keep the business workspace dominant and avoid centering system-foundation links."),
+      localized("优先展示 KPI 与运营模块，不要滚动到过深位置。", "Prioritize KPIs and operating modules without scrolling too deep."),
+    ],
+    highlightKeys: ["product-demo", "screenshot-ready"],
+    tone: "success",
+    isPlaceholder: true,
+  }),
+  createScreenshotSection({
+    key: "guided-story-shot",
+    title: localized("导览故事截图", "Guided Story Shot"),
+    description: localized("展示 ME 如何把业务、导航、角色、门店与 PSI 讲成一个完整故事。", "Show how ME ties business, navigation, roles, branches, and PSI into one guided story."),
+    route: "/demo-story",
+    surface: "demo-story",
+    recommendedShot: localized("截取故事总览标题、时间线与前两组故事卡。", "Capture the story overview heading, timeline, and first two story groups."),
+    framingTips: [
+      localized("优先展示时间线与说明区，帮助听众快速进入上下文。", "Lead with the timeline and intro block so viewers understand the presentation flow."),
+      localized("保留静态提示语，强调没有真实进度持久化。", "Keep the static notice visible to emphasize the lack of persisted progress."),
+    ],
+    highlightKeys: ["guided-walkthrough", "placeholder-only"],
+    tone: "info",
+    isPlaceholder: true,
+  }),
+  createScreenshotSection({
+    key: "role-preview-shot",
+    title: localized("角色工作区截图", "Role Preview Shot"),
+    description: localized("展示同一产品在不同角色视角下的叙事切换。", "Show how the same product is framed across different role perspectives."),
+    route: "/roles",
+    surface: "roles",
+    recommendedShot: localized("截取页面标题与角色卡网格。", "Capture the page title and the role-card grid."),
+    framingTips: [
+      localized("让业务角色卡优先进入视口。", "Keep business role cards inside the first viewport."),
+      localized("保留只读说明，避免被误解为真实权限控制。", "Keep the read-only note visible to avoid implying real permission control."),
+    ],
+    highlightKeys: ["stakeholder-review", "placeholder-only"],
+    tone: "info",
+    isPlaceholder: true,
+  }),
+  createScreenshotSection({
+    key: "branch-context-shot",
+    title: localized("门店上下文截图", "Branch Context Shot"),
+    description: localized("说明总部到门店的上下文切换如何影响讲解 framing。", "Explain how HQ-to-branch context changes the presentation frame."),
+    route: "/branches",
+    surface: "branches",
+    recommendedShot: localized("截取门店上下文标题、选择器占位与门店卡。", "Capture the branch-context title, selector placeholder, and branch cards."),
+    framingTips: [
+      localized("优先展示 All Stores 与示范门店并置。", "Show All Stores alongside a pilot branch for contrast."),
+      localized("避免滚动到 Future Branch 之前就截屏结束。", "Do not stop before the Future Branch placeholder appears when that story matters."),
+    ],
+    highlightKeys: ["screenshot-ready", "proposal-ready"],
+    tone: "info",
+    isPlaceholder: true,
+  }),
+  createScreenshotSection({
+    key: "psi-operations-shot",
+    title: localized("PSI 运营截图", "PSI Operations Shot"),
+    description: localized("突出采购、供应商、库存与问题占位如何构成运营闭环。", "Highlight how procurement, supplier, inventory, and issue placeholders form the operations loop."),
+    route: "/psi",
+    surface: "psi",
+    recommendedShot: localized("截取 PSI 标题区与跨模块循环说明。", "Capture the PSI header and cross-module loop note."),
+    framingTips: [
+      localized("保持路由入口卡都在可见范围内。", "Keep the route-entry cards visible in the viewport."),
+      localized("用说明文字强调无真实审批、过账或写操作。", "Use the copy to reinforce there is no live approval, posting, or write flow."),
+    ],
+    highlightKeys: ["product-demo", "stakeholder-review"],
+    tone: "warning",
+    isPlaceholder: true,
+  }),
+  createScreenshotSection({
+    key: "report-preview-shot",
+    title: localized("报表预览截图", "Report Preview Shot"),
+    description: localized("用报表与 PSI 预览小部件作为演示中段或收尾总结。", "Use reports and PSI widgets as a mid-demo or closing recap surface."),
+    route: "/reports",
+    surface: "reports",
+    recommendedShot: localized("截取报表标题区、统计卡与 PSI 预览面板。", "Capture the report header, stats cards, and PSI preview panel."),
+    framingTips: [
+      localized("优先选择信息最完整的一屏，不必展示全部筛选器。", "Pick the most information-rich viewport instead of showing every filter."),
+      localized("保留 metadata-only 说明，避免被解读为真实 BI 能力。", "Keep the metadata-only notice visible so the page is not read as live BI."),
+    ],
+    highlightKeys: ["screenshot-ready", "proposal-ready"],
+    tone: "success",
+    isPlaceholder: true,
+  }),
+  createScreenshotSection({
+    key: "system-foundation-shot",
+    title: localized("系统基础层截图", "System Foundation Shot"),
+    description: localized("把业务展示映射回平台契约与元数据基础。", "Map the business presentation back to platform contracts and metadata foundations."),
+    route: "/system-foundation",
+    surface: "system-foundation",
+    recommendedShot: localized("截取系统基础层标题与 foundation group 首屏。", "Capture the system-foundation header and the first visible portion of the foundation group."),
+    framingTips: [
+      localized("保持其为次级页，不要把它当作首页开场。", "Keep it as a secondary page rather than the opening shot."),
+      localized("搭配讲解未来扩展性，而不是当前运行能力。", "Frame it around extensibility rather than current runtime capability."),
+    ],
+    highlightKeys: ["stakeholder-review", "placeholder-only"],
+    tone: "muted",
+    isPlaceholder: true,
+  }),
+  createScreenshotSection({
+    key: "navigation-ia-shot",
+    title: localized("导航 IA 截图", "Navigation IA Shot"),
+    description: localized("展示业务导航与系统基础层之间的清晰层级。", "Show the clear hierarchy between business navigation and the system-foundation layer."),
+    route: "/navigation",
+    surface: "navigation",
+    recommendedShot: localized("截取主导航预览与 Footer / Secondary 区块。", "Capture the primary navigation preview and the Footer / Secondary section."),
+    framingTips: [
+      localized("让主导航区块与次级链接同时出现在画面中。", "Keep both the primary navigation and secondary links visible together."),
+      localized("说明 Demo Mode 入口只是静态展示层，不是切换开关。", "Explain that the Demo Mode entry is a static surface, not a runtime toggle."),
+    ],
+    highlightKeys: ["guided-walkthrough", "screenshot-ready"],
+    tone: "info",
+    isPlaceholder: true,
+  }),
+];
+
+export const meDemoWalkthroughItems: MeDemoWalkthroughItem[] = [
+  createWalkthroughItem({
+    key: "open-business-workspace",
+    order: 1,
+    title: localized("打开业务工作台", "Open Business Workspace"),
+    description: localized("从首页建立经营视角与产品定位。", "Use the homepage to establish the business perspective and product positioning."),
+    route: "/",
+    surface: "homepage",
+    checkedByDefault: true,
+    isPlaceholder: true,
+  }),
+  createWalkthroughItem({
+    key: "start-guided-demo",
+    order: 2,
+    title: localized("开始引导演示", "Start Guided Demo"),
+    description: localized("通过 Demo Story 串联后续页面。", "Use Demo Story to frame the rest of the presentation."),
+    route: "/demo-story",
+    surface: "demo-story",
+    checkedByDefault: true,
+    isPlaceholder: true,
+  }),
+  createWalkthroughItem({
+    key: "show-navigation-ia",
+    order: 3,
+    title: localized("展示导航 IA", "Show Navigation IA"),
+    description: localized("说明业务导航与基础层导航的关系。", "Explain how business navigation and foundation navigation fit together."),
+    route: "/navigation",
+    surface: "navigation",
+    checkedByDefault: false,
+    isPlaceholder: true,
+  }),
+  createWalkthroughItem({
+    key: "show-role-workspaces",
+    order: 4,
+    title: localized("展示角色工作区", "Show Role Workspaces"),
+    description: localized("用角色页面说明同一产品的多视角呈现。", "Use the role pages to show multiple perspectives in the same product."),
+    route: "/roles",
+    surface: "roles",
+    checkedByDefault: false,
+    isPlaceholder: true,
+  }),
+  createWalkthroughItem({
+    key: "show-branch-context",
+    order: 5,
+    title: localized("展示门店上下文", "Show Branch Context"),
+    description: localized("说明总部、试点门店与未来门店的 framing。", "Frame HQ, pilot branch, and future branch storytelling."),
+    route: "/branches",
+    surface: "branches",
+    checkedByDefault: false,
+    isPlaceholder: true,
+  }),
+  createWalkthroughItem({
+    key: "show-psi-operations",
+    order: 6,
+    title: localized("展示 PSI 运营层", "Show PSI Operations"),
+    description: localized("把业务层叙事连接到采购、供应商与库存。", "Connect the business narrative to procurement, supplier, and inventory surfaces."),
+    route: "/psi",
+    surface: "psi",
+    checkedByDefault: false,
+    isPlaceholder: true,
+  }),
+  createWalkthroughItem({
+    key: "show-report-preview",
+    order: 7,
+    title: localized("展示报表预览", "Show Report Preview"),
+    description: localized("用只读报表作为演示总结页。", "Use read-only reports as a presentation recap."),
+    route: "/reports",
+    surface: "reports",
+    checkedByDefault: false,
+    isPlaceholder: true,
+  }),
+  createWalkthroughItem({
+    key: "show-system-foundation",
+    order: 8,
+    title: localized("展示系统基础层", "Show System Foundation"),
+    description: localized("补充平台契约、元数据与未来扩展能力。", "Close with platform contracts, metadata, and future extensibility."),
+    route: "/system-foundation",
+    surface: "system-foundation",
+    checkedByDefault: false,
+    isPlaceholder: true,
+  }),
+  createWalkthroughItem({
+    key: "explain-future-roadmap",
+    order: 9,
+    title: localized("说明未来路线", "Explain Future Roadmap"),
+    description: localized("强调当前只是静态展示层，未来再进入真实 Demo / Customer 模式。", "Clarify that the current layer is static only and that real demo or customer mode comes later."),
+    route: "/demo-mode",
+    surface: "demo-story",
+    checkedByDefault: false,
+    isPlaceholder: true,
+  }),
+];
+
+export const meDemoModePageData: MeDemoModePageData = {
+  title: localized("ME Demo Mode", "ME Demo Mode"),
+  subtitle: localized("截图就绪抛光占位层", "Screenshot-Ready Polish Placeholder"),
+  badges: meDemoModeBadges,
+  screenshotSections: meDemoScreenshotSections,
+  walkthroughItems: meDemoWalkthroughItems,
+  recommendedRouteSequence: [
+    "/",
+    "/demo-story",
+    "/navigation",
+    "/roles",
+    "/branches",
+    "/psi",
+    "/reports",
+    "/system-foundation",
+  ],
+  generatedAt: meDemoModeGeneratedAt,
+  notice: meDemoModeNotice,
+};

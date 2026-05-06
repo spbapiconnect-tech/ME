@@ -67,3 +67,8 @@ Navigation Config
 - add `/demo-story` and `/demo-story/[stepKey]` as guided product tour placeholders
 - keep navigation IA as the source route map while demo story provides route-to-route narrative only
 - no persisted progress, no analytics, and no tracking are added
+
+## ME Demo Mode Screenshot Ready (v0.8.5)
+- add `Demo Mode` to the footer / secondary navigation group with route `/demo-mode`
+- `config/navigation.ts` remains the source of truth while `config/demo-mode.ts` adds screenshot-ready metadata only
+- no persisted state, analytics, or tracking is added to navigation surfaces
