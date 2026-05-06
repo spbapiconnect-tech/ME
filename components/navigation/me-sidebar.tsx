@@ -22,6 +22,7 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
   const navigation = getNavigationMap();
   const primaryGroups = navigation.groups.filter((group) => !group.isFoundationGroup);
   const foundationGroup = navigation.groups.find((group) => group.isFoundationGroup);
+  const isFoundationActive = Boolean(foundationGroup?.items.some((item) => isActive(item, activeKey)));
 
   return (
     <aside className={cn("hidden lg:block", className)}>
@@ -73,7 +74,7 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
           {foundationGroup ? (
             <>
               <Separator />
-              <details className="grid gap-2" open={!foundationGroup.collapsedByDefault}>
+              <details className="grid gap-2" open={isFoundationActive || !foundationGroup.collapsedByDefault}>
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-2 text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
                   <span>{foundationGroup.title[locale]}</span>
                   <Badge variant="outline">{locale === "zh" ? "次级" : "Secondary"}</Badge>

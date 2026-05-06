@@ -229,6 +229,23 @@ const auditTrail = createItem({
   isFoundation: true,
 });
 
+const roles = createItem({
+  key: "roles",
+  label: { zh: "角色工作区", en: "Roles" },
+  description: {
+    zh: "角色工作区占位与未来权限映射预览。",
+    en: "Role workspace placeholder and future permission mapping preview.",
+  },
+  href: "/roles",
+  group: "system-foundation",
+  status: "preview-only",
+  tone: "info",
+  badge: { zh: "预览", en: "Preview" },
+  isPrimary: false,
+  isFoundation: true,
+  notes: "Preview-only route. No auth or permission enforcement is connected.",
+});
+
 const workflow = createItem({
   key: "workflow",
   label: { zh: "工作流", en: "Workflow" },
@@ -391,6 +408,7 @@ export const navigationMap: MeNavigationMap = {
         layoutEngine,
         actionContracts,
         accessControl,
+        roles,
         auditTrail,
         workflow,
         notifications,

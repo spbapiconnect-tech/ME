@@ -2,8 +2,8 @@
 
 ## Current Milestone
 
-- Current milestone: `v0.8.1 B2B Sidebar / Navigation IA`
-- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, and metadata-first foundation pages
+- Current milestone: `v0.8.2 Role-Based Workspace Placeholders`
+- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, and metadata-first foundation pages
 
 ## What Is Ready
 
@@ -188,3 +188,9 @@
 - `config/navigation.ts` and `components/navigation/` provide the new shared navigation layer.
 - Foundation routes remain active and accessible but visually secondary to the business workspace.
 - Readiness remains UI-only and mock/read-only only with no auth/session, permission enforcement, database/API, or real write paths.
+
+## ME Role Workspace Placeholders (v0.8.2)
+
+- `/roles` and `/roles/[roleKey]` are available as UI-only placeholder routes for role-based workspace review
+- navigation and foundation pages now link to the role preview without introducing route hiding or access enforcement
+- readiness remains mock/read-only only with no real auth/session, permission enforcement, database/API, workflow, notification, or task execution changes

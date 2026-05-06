@@ -27,6 +27,7 @@ test("system foundation group includes required routes", () => {
     "/layout-engine",
     "/action-contracts",
     "/access-control",
+    "/roles",
     "/audit-trail",
     "/workflow",
     "/notifications",
@@ -53,10 +54,12 @@ test("operations group includes required PSI routes", () => {
 
 test("navigation helpers resolve items by key and group", () => {
   const item = getNavigationItemByKey("navigation-ia");
+  const roles = getNavigationItemByKey("roles");
   const group = getNavigationGroupByKey("reports");
   assert.equal(item?.href, "/navigation");
+  assert.equal(roles?.href, "/roles");
   assert.equal(group?.items.some((groupItem) => groupItem.key === "reports"), true);
-  assert.ok(getFoundationNavigationItems().length >= 9);
+  assert.ok(getFoundationNavigationItems().length >= 10);
 });
 
 test("/navigation route imports without crashing", async () => {

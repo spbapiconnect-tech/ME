@@ -23,6 +23,7 @@ export function SystemFoundationPage() {
             <Button asChild size="sm" variant="outline"><Link href="/">Back To ME Workspace</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/navigation">Open Navigation IA</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/reports">Open Reports</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link href="/roles">Open Roles Preview</Link></Button>
           </div>
         </CardHeader>
       </Card>
@@ -36,8 +37,9 @@ export function SystemFoundationPage() {
             Foundation routes remain secondary to the business workspace and stay available without auth, session, or permission enforcement.
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          UI-only foundation navigation. No real database, API, write operation, workflow execution, or notification sending is connected.
+        <CardContent className="grid gap-2 text-sm text-muted-foreground">
+          <p>UI-only foundation navigation. No real database, API, write operation, workflow execution, or notification sending is connected.</p>
+          <p>`/roles` remains a preview-only bridge to future role-aware navigation and permission foundations without any runtime enforcement.</p>
         </CardContent>
       </Card>
     </main>

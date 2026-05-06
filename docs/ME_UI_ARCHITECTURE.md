@@ -217,3 +217,14 @@
 - `/navigation` is the showcase route for primary business navigation, grouped operations navigation, reports, and secondary system foundation links.
 - Business workspace and system foundation pages now consume the shared navigation config instead of manual link arrays where safe.
 - No auth/session, permission-aware hiding, middleware, database, API, or route guard integration is implemented yet.
+
+## ME Role Workspace Placeholders (v0.8.2)
+
+- Route overview: `/roles`
+- Role detail route: `/roles/[roleKey]`
+- Contracts: `types/role-workspace.ts`
+- Registry: `config/roles.ts`
+- Helpers: `lib/role-workspace.ts`
+- Components: `components/roles/`
+- Navigation integration stays config-driven through `config/navigation.ts` and `lib/navigation.ts`
+- Scope remains preview-only with no real auth/session, permission middleware, database, API, or write path

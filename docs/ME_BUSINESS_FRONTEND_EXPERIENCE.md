@@ -54,3 +54,10 @@ PSI Page Data
 - Add `components/navigation/` for sidebar, topbar, mobile nav, breadcrumbs, and reusable navigation cards/groups.
 - Homepage now uses shared navigation UI while keeping business pages dominant and foundation routes secondary.
 - Scope remains UI-only and mock/read-only only with no real auth/session, permission enforcement, database/API, or route guard.
+
+## ME Role Workspace Placeholders (v0.8.2)
+
+- add a lightweight `/roles` entry from the business workspace without turning the homepage into a role selector
+- keep role workspaces preview-only and mock/read-only only
+- use shared navigation plus role metadata helpers to describe future role-based workspaces
+- keep `/navigation`, `/system-foundation`, `/psi`, `/reports`, and `/packages` intact

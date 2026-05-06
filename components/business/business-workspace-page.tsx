@@ -38,6 +38,9 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                   <Button asChild variant="outline" size="sm">
                     <Link href="/system-foundation">System Foundation</Link>
                   </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/roles">Roles Preview</Link>
+                  </Button>
                 </div>
               </div>
               <CardDescription>

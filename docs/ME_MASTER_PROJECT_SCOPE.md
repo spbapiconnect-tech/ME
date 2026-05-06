@@ -130,8 +130,8 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.8.1 B2B Sidebar / Navigation IA`
-- Delivery goal: define the first real ME business-cluster planning foundation across Procurement, Supplier, and Inventory without breaking the existing mock-data prototype routes.
+- Current milestone: `v0.8.2 Role-Based Workspace Placeholders`
+- Delivery goal: extend the existing mock-data prototype with role workspace placeholders and role-aware navigation previews without breaking the existing business, PSI, reports, packages, or foundation routes.
 
 ## Procurement Supplier Inventory MVP Planning
 
@@ -287,3 +287,9 @@ This section defines future intelligence directions for ME only.
 - Keep foundation routes active but secondary through shared navigation config and reusable navigation components.
 - Add `/navigation`, `config/navigation.ts`, `lib/navigation.ts`, and `components/navigation/`.
 - Do not add auth/session, permission enforcement, database/API integration, real writes, workflow execution, or notification sending.
+
+## ME Role Workspace Placeholders (v0.8.2)
+
+- Add role workspace placeholder routes for leadership, operations, frontline, and system governance previews.
+- Keep role awareness descriptive only; no real auth, session, permission enforcement, middleware, database, API, or write capability is introduced.
+- Reuse shared navigation and foundation surfaces instead of creating a separate runtime access system.

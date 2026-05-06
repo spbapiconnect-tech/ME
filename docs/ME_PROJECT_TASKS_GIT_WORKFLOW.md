@@ -48,6 +48,7 @@ Use Conventional Commits.
 - No real business logic or connectors were introduced
 - `/tasks` navigation remains reachable from the main demo surfaces
 - `/layout-engine` navigation remains reachable from the main demo and foundation surfaces
+- `/roles` remains reachable from the homepage, `/navigation`, and `/system-foundation` without changing runtime access rules
 
 ## Module Registry Milestone
 
@@ -269,3 +270,10 @@ Use Conventional Commits.
 - Keep `/navigation` reachable from the homepage and `/system-foundation` during reviews.
 - Treat `components/navigation/` as the shared navigation layer for sidebar, topbar, mobile nav, and breadcrumbs.
 - Verify foundation routes remain reachable and that no auth/session, permission enforcement, database/API, or route guards are introduced.
+
+## ME Role Workspace Placeholders (v0.8.2)
+
+- Add `config/roles.ts`, `types/role-workspace.ts`, `lib/role-workspace.ts`, `components/roles/`, `/roles`, and `/roles/[roleKey]` as placeholder-only role preview surfaces.
+- Add shared navigation linkage for `/roles` through `config/navigation.ts` before hardcoding more page-level links.
+- Verify no real auth/session, permission enforcement, route guards, database/API, workflow, notification, or write behavior is added.
+- Keep `.write_test` untouched, unstaged, and uncommitted.

@@ -72,6 +72,23 @@ export function MeNavigationPage() {
 
       <Card size="sm" className="border-dashed">
         <CardHeader className="gap-1">
+          <CardTitle className="text-sm">Role Workspace Preview</CardTitle>
+          <CardDescription>
+            `/roles` previews how navigation can be described for different role workspaces without hiding routes or adding real access control.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button asChild size="sm" variant="outline">
+            <Link href="/roles">Open Roles Preview</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/access-control">Open Access Control</Link>
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card size="sm" className="border-dashed">
+        <CardHeader className="gap-1">
           <CardTitle className="text-sm">Notes</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-2 text-sm text-muted-foreground">

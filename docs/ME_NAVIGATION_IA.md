@@ -46,3 +46,9 @@ Navigation Config
 - tenant-specific module menu
 - route guard integration
 - mobile shell improvements
+
+## ME Role Workspace Placeholders (v0.8.2)
+- add `/roles` as a preview-only route for role workspace placeholders and future permission-aware navigation discussions
+- keep `Roles` secondary inside shared navigation IA with no auth/session or permission enforcement
+- expose the route from homepage, `/navigation`, and `/system-foundation` without changing global route accessibility
+- treat role-aware navigation as descriptive preview only until real auth, session, and route guards exist
