@@ -22,6 +22,7 @@ export function SystemFoundationPage() {
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="outline"><Link href="/">Back To ME Workspace</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/navigation">Open Navigation IA</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link href="/demo-story/system-foundation">View In Demo Story</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/reports">Open Reports</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/roles">Open Roles Preview</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/branches">Open Branch Context</Link></Button>
@@ -42,6 +43,7 @@ export function SystemFoundationPage() {
           <p>UI-only foundation navigation. No real database, API, write operation, workflow execution, or notification sending is connected.</p>
           <p>`/roles` remains a preview-only bridge to future role-aware navigation and permission foundations without any runtime enforcement.</p>
           <p>`/branches` previews future tenant/store scope and selector foundations without adding a real branch database, switching persistence, or access enforcement.</p>
+          <p>`/demo-story` now reconnects foundation routes back into the business narrative without adding onboarding state, analytics, or tracking.</p>
         </CardContent>
       </Card>
     </main>

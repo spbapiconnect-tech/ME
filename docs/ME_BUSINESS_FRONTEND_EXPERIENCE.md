@@ -16,6 +16,8 @@
 - no billing/subscription enforcement
 - no workflow execution
 - no notification sending
+- no persisted guided demo progress
+- no analytics or tracking
 
 ## Architecture
 PSI Page Data
@@ -35,6 +37,13 @@ PSI Page Data
 - Training / Education Progress Placeholder
 - System Alerts
 - Foundation Tools
+
+## Implementation
+- guided demo entry route lives at `/demo-story`
+- demo story metadata lives in `config/demo-story.ts`
+- demo story helpers live in `lib/demo-story.ts`
+- demo story UI lives in `components/demo-story/`
+- homepage can link into the demo story without changing runtime behavior
 
 ## Future Migration
 - real B2B sidebar
@@ -68,3 +77,8 @@ PSI Page Data
 - add branch selector placeholder UI for All Stores, KCH, BTU, and Future Branch with no persistence
 - reuse shared navigation, role preview, PSI, and report routes to show branch-aware framing only
 - keep `/navigation`, `/system-foundation`, `/roles`, `/psi`, `/reports`, and `/packages` intact with no real tenant or branch permission enforcement
+
+## ME Demo Story Flow (v0.8.4)
+- homepage now exposes a `Start Guided Demo` entry into `/demo-story/business-overview`
+- business-first workspace remains the main ME homepage while the story layer only connects existing routes
+- no persisted progress, analytics, tracking, personalization, database, or API is added

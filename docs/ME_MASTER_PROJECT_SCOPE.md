@@ -130,8 +130,8 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.8.3 Store / Branch Context Placeholder`
-- Delivery goal: extend the existing mock-data prototype with branch context placeholders and branch-aware previews for business workspace, roles, navigation, PSI, and reports without breaking the existing business, PSI, reports, packages, or foundation routes.
+- Current milestone: `v0.8.4 Demo Story Flow / Guided Product Tour Placeholder`
+- Delivery goal: extend the existing mock-data prototype with a guided demo story flow that connects business workspace, navigation, roles, branches, PSI, reports, and system foundation without breaking the existing business, PSI, reports, packages, or foundation routes.
 
 ## Procurement Supplier Inventory MVP Planning
 
@@ -299,3 +299,9 @@ This section defines future intelligence directions for ME only.
 - Add branch context placeholder routes for All Stores, KCH, BTU, and Future Branch previews.
 - Reuse shared business workspace, role preview, navigation, PSI, and report routes to describe branch-aware behavior before a tenant model exists.
 - Keep branch awareness descriptive only; no real tenant model, branch database, selector persistence, auth/session, permission enforcement, middleware, database, API, or write capability is introduced.
+
+## ME Demo Story Flow (v0.8.4)
+
+- Add `types/demo-story.ts`, `config/demo-story.ts`, `lib/demo-story.ts`, and `components/demo-story/` as a static guided product-tour layer.
+- Add `/demo-story` and `/demo-story/[stepKey]` routes.
+- Keep the scope UI-only and mock/read-only only with no onboarding engine, persisted progress, analytics, tracking, personalization, database, API, auth/session, or write behavior.

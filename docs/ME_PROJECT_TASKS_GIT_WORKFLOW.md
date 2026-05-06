@@ -285,3 +285,10 @@ Use Conventional Commits.
 - Add shared navigation linkage for `/branches` through `config/navigation.ts` before hardcoding more page-level links.
 - Verify no real tenant model, branch database, selector persistence, auth/session, permission enforcement, route guards, database/API, workflow, notification, task execution, or write behavior is added.
 - Keep `.write_test` untouched, unstaged, and uncommitted.
+
+## ME Demo Story Flow (v0.8.4)
+
+- Add `config/demo-story.ts` before hardcoding guided-demo route sequences into page components.
+- Add `components/demo-story/` and `/demo-story` routes as static product-tour placeholders only.
+- Verify no onboarding engine, persisted progress, analytics, tracking, personalization, database/API, auth/session, or write behavior is introduced.
+- Keep `.write_test` untouched, unstaged, and uncommitted.

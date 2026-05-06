@@ -239,3 +239,15 @@
 - Components: `components/branches/`
 - Navigation integration stays config-driven through `config/navigation.ts` and `lib/navigation.ts`
 - Scope remains preview-only with no real tenant model, branch database, branch switching persistence, auth/session, middleware, API, or write path
+
+
+## ME Demo Story Flow (v0.8.4)
+
+- Route overview: `/demo-story`
+- Step detail route: `/demo-story/[stepKey]`
+- Contracts: `types/demo-story.ts`
+- Registry: `config/demo-story.ts`
+- Helpers: `lib/demo-story.ts`
+- Components: `components/demo-story/`
+- This layer sits above existing business, navigation, roles, branches, PSI, reports, and system foundation routes as static storytelling metadata only.
+- No persisted progress, analytics, tracking, personalization, database, API, auth/session, or write path is added.

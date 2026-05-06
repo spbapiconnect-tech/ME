@@ -48,6 +48,9 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
                 <Button asChild size="sm" variant="outline">
                   <Link href="/navigation">Open Navigation IA</Link>
                 </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/demo-story/branch-context">View In Demo Story</Link>
+                </Button>
               </div>
             </CardHeader>
           </Card>

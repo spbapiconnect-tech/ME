@@ -47,7 +47,7 @@ const widgetTypeOptions: Array<ReportWidgetType | "all"> = [
 
 const statusOptions: Array<ReportWidgetStatus | "all"> = ["all", "active", "preview-only", "placeholder", "coming-soon", "blocked", "disabled"];
 const severityOptions: Array<ReportWidgetSeverity | "all"> = ["all", "neutral", "low", "medium", "high", "critical"];
-const quickNavigationKeys = ["dashboard", "psi-workspace", "navigation-ia", "system-foundation"] as const;
+const quickNavigationKeys = ["dashboard", "psi-workspace", "demo-story", "system-foundation"] as const;
 
 function groupBy(values: string[]) {
   return values.reduce<Record<string, number>>((acc, value) => {
@@ -145,6 +145,9 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
               : "Metadata-only report widget preview: no BI engine, chart execution engine, SQL, database query, API/backend, export engine, or scheduled sending."}
           </CardDescription>
           <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/demo-story/report-preview">View In Demo Story</Link>
+            </Button>
             {quickLinks.map((item) => (
               <Button key={item.key} asChild variant="outline" size="sm">
                 <Link href={item.href}>{resolveNavigationLabel(item, currentLocale)}</Link>

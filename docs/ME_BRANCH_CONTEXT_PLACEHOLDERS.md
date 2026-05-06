@@ -49,3 +49,8 @@ Branch Profile Config
 - add branch-aware reports
 - add branch-scoped PSI data
 - add audit on branch switching
+
+## ME Demo Story Flow (v0.8.4)
+- `/branches` now links into `/demo-story/branch-context` as part of the guided product narrative
+- branch context continues to reuse shared navigation, PSI, and reports routes with no persisted progress or tracking
+- demo story metadata lives in `config/demo-story.ts` and UI lives in `components/demo-story/`

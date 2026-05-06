@@ -350,6 +350,23 @@ const navigationIa = createItem({
   isFoundation: false,
 });
 
+const demoStory = createItem({
+  key: "demo-story",
+  label: { zh: "Demo Story", en: "Demo Story" },
+  description: {
+    zh: "ME 引导演示故事流占位入口。",
+    en: "Guided ME product narrative placeholder entry.",
+  },
+  href: "/demo-story",
+  group: "footer",
+  status: "preview-only",
+  tone: "info",
+  badge: { zh: "导览", en: "Tour" },
+  isPrimary: false,
+  isFoundation: false,
+  notes: "Static guided demo story placeholder. No onboarding state, analytics, tracking, or personalization is connected.",
+});
+
 const modules = createItem({
   key: "modules",
   label: { zh: "模块中心", en: "Modules" },
@@ -439,7 +456,7 @@ export const navigationMap: MeNavigationMap = {
       isFoundationGroup: true,
     },
   ],
-  footerItems: [modules, demo, templates],
+  footerItems: [demoStory, modules, demo, templates],
   generatedAt: "2026-05-06T00:00:00.000Z",
   notice: {
     zh: "当前导航 IA 仅用于 UI/导航演示，不包含认证、权限、数据库、API 或真实写操作。",

@@ -7,6 +7,7 @@ import { BusinessFoundationSection } from "@/components/business/business-founda
 import { BusinessKpiCard } from "@/components/business/business-kpi-card";
 import { BusinessModuleCard } from "@/components/business/business-module-card";
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
+import { getDemoStorySteps } from "@/lib/demo-story";
 import { Button } from "@/components/ui/button";
 import { getBranchProfiles } from "@/lib/branch-context";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ interface BusinessWorkspacePageProps {
 
 export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
   const branchProfiles = getBranchProfiles();
+  const demoStorySteps = getDemoStorySteps();
 
   return (
     <main className="mx-auto flex w-full max-w-[88rem] flex-col gap-6 px-4 py-8">
@@ -36,6 +38,9 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                   <CardDescription>Modular Store Operations Platform</CardDescription>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  <Button asChild size="sm">
+                    <Link href="/demo-story/business-overview">Start Guided Demo</Link>
+                  </Button>
                   <Button asChild variant="outline" size="sm">
                     <Link href="/navigation">Navigation IA</Link>
                   </Button>
@@ -70,6 +75,29 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             </CardHeader>
             <CardContent>
               <BranchSelectorPlaceholder branches={branchProfiles} compact />
+            </CardContent>
+          </Card>
+
+          <Card size="sm" className="border-dashed">
+            <CardHeader className="gap-1">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <CardTitle className="text-sm">ME Demo Story</CardTitle>
+                  <CardDescription>Static guided product tour placeholder that connects the homepage, navigation, roles, branches, PSI, reports, and system foundation.</CardDescription>
+                </div>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/demo-story">Open Demo Story</Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+              {demoStorySteps.slice(0, 4).map((step) => (
+                <div key={step.key} className="rounded-xl border border-border/70 bg-background/70 p-3">
+                  <p className="text-xs text-muted-foreground">Step {step.order}</p>
+                  <p className="text-sm font-medium">{step.title.en}</p>
+                  <p className="text-xs text-muted-foreground">{step.route}</p>
+                </div>
+              ))}
             </CardContent>
           </Card>
 

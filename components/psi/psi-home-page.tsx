@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getNavigationItemByKey, resolveNavigationLabel } from "@/lib/navigation";
 
-const quickNavigationKeys = ["dashboard", "reports", "navigation-ia", "system-foundation"] as const;
+const quickNavigationKeys = ["dashboard", "reports", "demo-story", "system-foundation"] as const;
 
 export function PsiHomePage() {
   const quickLinks = quickNavigationKeys
@@ -39,6 +39,7 @@ export function PsiHomePage() {
           <Link href="/psi/issues" className="rounded-xl border p-4 text-sm hover:bg-muted/40">PSI Issue Placeholders</Link>
           <Link href="/psi/actions" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">PSI Action Drafts</Link>
           <Link href="/reports" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">PSI Report Preview</Link>
+          <Link href="/demo-story/psi-operations" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">View In Demo Story</Link>
           <Link href="/system-foundation" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">ME System Foundation</Link>
         </CardContent>
       </Card>

@@ -14,6 +14,8 @@
 - no database/API
 - no real route guard
 - no user-specific navigation
+- no persisted guided demo progress
+- no onboarding analytics or tracking
 
 ## Navigation Groups
 - Business
@@ -36,6 +38,8 @@ Navigation Config
 - helpers live in `lib/navigation.ts`
 - reusable UI lives in `components/navigation/`
 - showcase route lives at `/navigation`
+- guided product-tour overview lives at `/demo-story`
+- demo story metadata lives in `config/demo-story.ts` and `components/demo-story/`
 - homepage and selected pages consume the shared navigation map
 
 ## Future Migration
@@ -58,3 +62,8 @@ Navigation Config
 - add `config/branches.ts`, `types/branch-context.ts`, `lib/branch-context.ts`, and `components/branches/`
 - expose the route from homepage, topbar, `/navigation`, `/roles`, and `/system-foundation`
 - keep branch-aware navigation descriptive only with no real tenant switching, branch database, or permission enforcement
+
+## ME Demo Story Flow (v0.8.4)
+- add `/demo-story` and `/demo-story/[stepKey]` as guided product tour placeholders
+- keep navigation IA as the source route map while demo story provides route-to-route narrative only
+- no persisted progress, no analytics, and no tracking are added

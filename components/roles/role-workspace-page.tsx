@@ -1,4 +1,7 @@
+import Link from "next/link";
+
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
+import { Button } from "@/components/ui/button";
 import { RoleChip } from "@/components/roles/role-chip";
 import { RoleProfileCard } from "@/components/roles/role-profile-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +36,14 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
               <CardDescription>
                 Role preview only — no auth or permission enforcement.
               </CardDescription>
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/demo-story/role-workspaces">View In Demo Story</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/navigation">Open Navigation IA</Link>
+                </Button>
+              </div>
             </CardHeader>
           </Card>
 

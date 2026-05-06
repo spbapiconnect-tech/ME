@@ -29,6 +29,9 @@ export function MeNavigationPage() {
                 <Link href="/">Back To ME Workspace</Link>
               </Button>
               <Button asChild size="sm" variant="outline">
+                <Link href="/demo-story/navigation-ia">View In Demo Story</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
                 <Link href="/system-foundation">Open System Foundation</Link>
               </Button>
               <Button asChild size="sm" variant="outline">
@@ -38,6 +41,23 @@ export function MeNavigationPage() {
           </div>
           <CardDescription>{navigation.notice.en}</CardDescription>
         </CardHeader>
+      </Card>
+
+      <Card size="sm" className="border-dashed">
+        <CardHeader className="gap-1">
+          <CardTitle className="text-sm">Guided Demo Story</CardTitle>
+          <CardDescription>
+            `/demo-story` turns this navigation IA into a route-to-route product story without adding onboarding state, analytics, or tracking.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Button asChild size="sm">
+            <Link href="/demo-story/navigation-ia">Open Navigation Story Step</Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/demo-story">All Story Steps</Link>
+          </Button>
+        </CardContent>
       </Card>
 
       <Card size="sm">

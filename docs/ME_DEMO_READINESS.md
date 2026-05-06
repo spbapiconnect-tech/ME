@@ -2,8 +2,8 @@
 
 ## Current Milestone
 
-- Current milestone: `v0.8.3 Store / Branch Context Placeholder`
-- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, branch context placeholders, and metadata-first foundation pages
+- Current milestone: `v0.8.4 Demo Story Flow / Guided Product Tour Placeholder`
+- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, branch context placeholders, demo story flow placeholders, and metadata-first foundation pages
 
 ## What Is Ready
 
@@ -200,3 +200,9 @@
 - `/branches` and `/branches/[branchKey]` are available as UI-only placeholder routes for store / branch context review
 - business workspace, topbar, navigation, roles, and system foundation now link into the branch preview without changing runtime access rules
 - readiness remains mock/read-only only with no real tenant model, branch database, selector persistence, auth/session, permission enforcement, database/API, workflow, notification, or task execution changes
+
+## ME Demo Story Flow (v0.8.4)
+
+- `/demo-story` and `/demo-story/[stepKey]` are available as guided product tour placeholders for stakeholder demos.
+- Story data stays static and metadata-only.
+- No onboarding engine, persisted progress, local storage, analytics, tracking, personalization, database, or API is added.

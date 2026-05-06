@@ -53,3 +53,8 @@ Role Profile Config
 - `/branches` and `/branches/[branchKey]` now provide branch-aware placeholder previews that roles can link into
 - role detail pages can point to branch context previews without applying runtime role/branch filtering
 - branch preview continues to reuse shared navigation and PSI/report routes with no real tenant/branch permission enforcement
+
+## ME Demo Story Flow (v0.8.4)
+- `/roles` now links into `/demo-story/role-workspaces` to support a guided stakeholder demo
+- role preview remains descriptive only with no persisted progress, analytics, or tracking
+- demo story metadata lives in `config/demo-story.ts` and UI lives in `components/demo-story/`
