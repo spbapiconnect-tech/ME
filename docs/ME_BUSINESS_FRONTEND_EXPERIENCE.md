@@ -45,3 +45,12 @@ PSI Page Data
 - real POS report data
 - real permissions
 - tenant-specific workspace
+
+## ME Navigation IA (v0.8.1)
+
+- Add `/navigation` as the ME business navigation and system foundation map preview.
+- Add `config/navigation.ts` as the shared route map source of truth for grouped navigation.
+- Add `types/navigation.ts` and `lib/navigation.ts` for UI-safe navigation contracts and helpers.
+- Add `components/navigation/` for sidebar, topbar, mobile nav, breadcrumbs, and reusable navigation cards/groups.
+- Homepage now uses shared navigation UI while keeping business pages dominant and foundation routes secondary.
+- Scope remains UI-only and mock/read-only only with no real auth/session, permission enforcement, database/API, or route guard.

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import * as React from "react";
 
+import { MeBreadcrumbs } from "@/components/navigation";
 import { PackageCard } from "@/components/packages/package-card";
 import { PackageGroupCard } from "@/components/packages/package-group-card";
 import { PackagePreviewCard } from "@/components/packages/package-preview-card";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { packageContracts, packageGroups } from "@/config/packages";
+import { getNavigationItemByKey, resolveNavigationLabel } from "@/lib/navigation";
 import {
   getEnterprisePackages,
   getPackageByKey,
@@ -24,6 +26,7 @@ import type { PackageCategory, PackageStatus, PackageTier } from "@/types/packag
 const categoryOptions: Array<PackageCategory | "all"> = ["all", "base-plan", "module-pack", "role-pack", "industry-pack", "add-on", "enterprise", "system"];
 const tierOptions: Array<PackageTier | "all"> = ["all", "starter", "ops", "pro", "enterprise", "custom"];
 const statusOptions: Array<PackageStatus | "all"> = ["all", "active", "preview-only", "placeholder", "coming-soon", "blocked", "disabled"];
+const quickNavigationKeys = ["dashboard", "system-foundation", "navigation-ia", "reports"] as const;
 
 function groupBy(values: string[]) {
   return values.reduce<Record<string, number>>((acc, value) => {
@@ -49,6 +52,9 @@ export function PackagesPage() {
   }, [hydrated, locale, theme]);
 
   const currentLocale: SupportedLocale = hydrated ? locale : "en";
+  const quickLinks = quickNavigationKeys
+    .map((key) => getNavigationItemByKey(key))
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   const [categoryFilter, setCategoryFilter] = React.useState<PackageCategory | "all">("all");
   const [tierFilter, setTierFilter] = React.useState<PackageTier | "all">("all");
@@ -90,6 +96,8 @@ export function PackagesPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
+      <MeBreadcrumbs locale={currentLocale} />
+
       <Card>
         <CardHeader className="gap-2">
           <CardTitle className="text-xl">ME Packages</CardTitle>
@@ -100,16 +108,11 @@ export function PackagesPage() {
               : "Metadata-only package/plan preview. No real billing, payment, subscription enforcement, tenant provisioning, runtime module enable/disable, API/backend/database, or session lookup."}
           </CardDescription>
           <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline" size="sm"><Link href="/">Back To Dashboard</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/rules">ME Rules</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/reports">ME Reports</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/notifications">ME Notifications</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/workflow">ME Workflow</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/action-contracts">ME Action Contracts</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/access-control">ME Access Control</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/psi">ME PSI</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/system-foundation">ME System Foundation</Link></Button>
+            {quickLinks.map((item) => (
+              <Button key={item.key} asChild variant="outline" size="sm">
+                <Link href={item.href}>{resolveNavigationLabel(item, currentLocale)}</Link>
+              </Button>
+            ))}
           </div>
         </CardHeader>
       </Card>

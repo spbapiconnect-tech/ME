@@ -262,3 +262,10 @@ Use Conventional Commits.
 - Add `/system-foundation` route for metadata contracts and platform foundations.
 - Keep `/layout-engine`, `/action-contracts`, `/access-control`, `/audit-trail`, `/workflow`, `/notifications`, `/reports`, `/rules`, `/packages`, and `/psi` routes available.
 - Keep milestone scope UI-only and mock/read-only only with no real database/API/write/auth/session/middleware/billing/workflow execution/notification sending.
+
+## ME Navigation IA (v0.8.1)
+
+- Add `config/navigation.ts` before hardcoding new navigation links into page components.
+- Keep `/navigation` reachable from the homepage and `/system-foundation` during reviews.
+- Treat `components/navigation/` as the shared navigation layer for sidebar, topbar, mobile nav, and breadcrumbs.
+- Verify foundation routes remain reachable and that no auth/session, permission enforcement, database/API, or route guards are introduced.

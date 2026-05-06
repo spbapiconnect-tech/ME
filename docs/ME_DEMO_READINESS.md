@@ -2,8 +2,8 @@
 
 ## Current Milestone
 
-- Current milestone: `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
-- Current prototype status: mock-data SaaS prototype with metadata-first layout-engine previews and business-cluster planning docs
+- Current milestone: `v0.8.1 B2B Sidebar / Navigation IA`
+- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, and metadata-first foundation pages
 
 ## What Is Ready
 
@@ -181,3 +181,10 @@
 - New `/system-foundation` route keeps platform contract/foundation pages discoverable but secondary to business operations UI.
 - Existing foundation routes and PSI routes still exist and remain available.
 - Readiness still remains mock/read-only only with no real database/API/write/auth/session/middleware/billing/workflow execution/notification sending.
+
+## ME Navigation IA (v0.8.1)
+
+- `/navigation` is available for business navigation and system foundation IA preview.
+- `config/navigation.ts` and `components/navigation/` provide the new shared navigation layer.
+- Foundation routes remain active and accessible but visually secondary to the business workspace.
+- Readiness remains UI-only and mock/read-only only with no auth/session, permission enforcement, database/API, or real write paths.

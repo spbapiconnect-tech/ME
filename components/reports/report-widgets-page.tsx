@@ -8,6 +8,7 @@ import { ReportWidgetCard } from "@/components/reports/report-widget-card";
 import { ReportWidgetPreviewCard } from "@/components/reports/report-widget-preview-card";
 import { ReportWidgetSourceCard } from "@/components/reports/report-widget-source-card";
 import { PsiReportDashboardPanel } from "@/components/reports/psi-report-dashboard-panel";
+import { MeBreadcrumbs } from "@/components/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +22,7 @@ import {
   getRefreshableWidgets,
   getReportWidgetByKey,
 } from "@/lib/report-widgets";
+import { getNavigationItemByKey, resolveNavigationLabel } from "@/lib/navigation";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { SupportedLocale } from "@/types/module";
 import type { DashboardLayoutContract, ReportWidgetSeverity, ReportWidgetStatus, ReportWidgetType } from "@/types/report-widget";
@@ -45,6 +47,7 @@ const widgetTypeOptions: Array<ReportWidgetType | "all"> = [
 
 const statusOptions: Array<ReportWidgetStatus | "all"> = ["all", "active", "preview-only", "placeholder", "coming-soon", "blocked", "disabled"];
 const severityOptions: Array<ReportWidgetSeverity | "all"> = ["all", "neutral", "low", "medium", "high", "critical"];
+const quickNavigationKeys = ["dashboard", "psi-workspace", "navigation-ia", "system-foundation"] as const;
 
 function groupBy(values: string[]) {
   return values.reduce<Record<string, number>>((acc, value) => {
@@ -74,6 +77,9 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
   }, [hydrated, locale, theme]);
 
   const currentLocale: SupportedLocale = hydrated ? locale : "en";
+  const quickLinks = quickNavigationKeys
+    .map((key) => getNavigationItemByKey(key))
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   const [widgetTypeFilter, setWidgetTypeFilter] = React.useState<ReportWidgetType | "all">("all");
   const [sourceModuleFilter, setSourceModuleFilter] = React.useState<string>("all");
@@ -127,6 +133,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
+      <MeBreadcrumbs locale={currentLocale} />
+
       <Card>
         <CardHeader className="gap-2">
           <CardTitle className="text-xl">ME Reports</CardTitle>
@@ -137,17 +145,11 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
               : "Metadata-only report widget preview: no BI engine, chart execution engine, SQL, database query, API/backend, export engine, or scheduled sending."}
           </CardDescription>
           <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline" size="sm"><Link href="/">Back To Dashboard</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/notifications">ME Notifications</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/workflow">ME Workflow</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/action-contracts">ME Action Contracts</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/access-control">ME Access Control</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/layout-engine">ME Layout Engine</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/components">ME Core Components</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/rules">ME Rules</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/packages">ME Packages</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/psi">ME PSI</Link></Button>
+            {quickLinks.map((item) => (
+              <Button key={item.key} asChild variant="outline" size="sm">
+                <Link href={item.href}>{resolveNavigationLabel(item, currentLocale)}</Link>
+              </Button>
+            ))}
           </div>
         </CardHeader>
       </Card>

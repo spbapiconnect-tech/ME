@@ -1,24 +1,17 @@
 import Link from "next/link";
 
+import { MeBreadcrumbs, MeNavigationGroup } from "@/components/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-const foundationCards = [
-  { key: "layout-engine", title: "Layout Engine", route: "/layout-engine", description: "Layout/skin and renderer foundations." },
-  { key: "action-contracts", title: "Action Contracts", route: "/action-contracts", description: "Action metadata contracts and mapping." },
-  { key: "access-control", title: "Access Control", route: "/access-control", description: "Permission and role contract previews." },
-  { key: "audit-trail", title: "Audit Trail", route: "/audit-trail", description: "Audit contract metadata previews." },
-  { key: "workflow", title: "Workflow", route: "/workflow", description: "Workflow trigger and contract placeholders." },
-  { key: "notifications", title: "Notifications", route: "/notifications", description: "Notification contract placeholders only." },
-  { key: "reports", title: "Reports", route: "/reports", description: "Report widget and source contract previews." },
-  { key: "rules", title: "Rules", route: "/rules", description: "Rule and formula contract foundations." },
-  { key: "packages", title: "Packages", route: "/packages", description: "SaaS package/plan metadata previews." },
-  { key: "psi", title: "PSI Foundation", route: "/psi", description: "Read-only PSI workspace and report placeholders." },
-] as const;
+import { getNavigationGroupByKey } from "@/lib/navigation";
 
 export function SystemFoundationPage() {
+  const foundationGroup = getNavigationGroupByKey("system-foundation");
+
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
+      <MeBreadcrumbs />
+
       <Card>
         <CardHeader className="gap-2">
           <CardTitle className="text-2xl">ME System Foundation</CardTitle>
@@ -28,26 +21,25 @@ export function SystemFoundationPage() {
           </CardDescription>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" variant="outline"><Link href="/">Back To ME Workspace</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link href="/navigation">Open Navigation IA</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/reports">Open Reports</Link></Button>
           </div>
         </CardHeader>
       </Card>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {foundationCards.map((item) => (
-          <Card key={item.key} size="sm" className="h-full">
-            <CardHeader className="gap-1">
-              <CardTitle className="text-base">{item.title}</CardTitle>
-              <CardDescription>{item.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild size="sm" variant="outline">
-                <Link href={item.route}>Open {item.title}</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </section>
+      {foundationGroup ? <MeNavigationGroup group={foundationGroup} /> : null}
+
+      <Card size="sm" className="border-dashed">
+        <CardHeader className="gap-1">
+          <CardTitle className="text-sm">Foundation Notice</CardTitle>
+          <CardDescription>
+            Foundation routes remain secondary to the business workspace and stay available without auth, session, or permission enforcement.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          UI-only foundation navigation. No real database, API, write operation, workflow execution, or notification sending is connected.
+        </CardContent>
+      </Card>
     </main>
   );
 }

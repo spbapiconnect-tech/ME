@@ -208,3 +208,12 @@
 - New secondary route `/system-foundation` consolidates foundation/admin metadata routes without removing original foundation pages.
 - Foundation routes (`/layout-engine`, `/action-contracts`, `/access-control`, `/audit-trail`, `/workflow`, `/notifications`, `/reports`, `/rules`, `/packages`, `/psi`) remain active.
 - Scope remains UI-only, mock/read-only only; no real database/API/write/auth/session/middleware/billing/workflow execution/notification sending.
+
+## ME Navigation IA (v0.8.1)
+
+- Shared navigation source of truth lives in `config/navigation.ts`.
+- Navigation contracts live in `types/navigation.ts` and helpers live in `lib/navigation.ts`.
+- Reusable navigation UI lives in `components/navigation/`.
+- `/navigation` is the showcase route for primary business navigation, grouped operations navigation, reports, and secondary system foundation links.
+- Business workspace and system foundation pages now consume the shared navigation config instead of manual link arrays where safe.
+- No auth/session, permission-aware hiding, middleware, database, API, or route guard integration is implemented yet.

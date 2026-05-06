@@ -130,7 +130,7 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.5.3 Procurement + Supplier + Inventory MVP Planning`
+- Current milestone: `v0.8.1 B2B Sidebar / Navigation IA`
 - Delivery goal: define the first real ME business-cluster planning foundation across Procurement, Supplier, and Inventory without breaking the existing mock-data prototype routes.
 
 ## Procurement Supplier Inventory MVP Planning
@@ -280,3 +280,10 @@ This section defines future intelligence directions for ME only.
 - `/system-foundation` is added as a secondary navigation hub for platform contracts and metadata foundations.
 - Existing foundation pages and PSI routes are retained and not removed.
 - Delivery remains UI/front-end only with mock/read-only data and no real database, API, writes, auth/session/middleware, billing enforcement, workflow execution, or notification sending.
+
+## ME Navigation IA (v0.8.1)
+
+- Add a clean B2B SaaS navigation IA across business, operations, reports, and system foundation groups.
+- Keep foundation routes active but secondary through shared navigation config and reusable navigation components.
+- Add `/navigation`, `config/navigation.ts`, `lib/navigation.ts`, and `components/navigation/`.
+- Do not add auth/session, permission enforcement, database/API integration, real writes, workflow execution, or notification sending.
