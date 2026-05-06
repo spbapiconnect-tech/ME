@@ -38,9 +38,11 @@ test("roadmap includes completed v0.8.0 through v0.8.7", () => {
     assert.equal(roadmap.get(key), "completed");
   }
   assert.equal(roadmap.get("v0-8-6-stakeholder-summary"), "completed");
-    const v087 = roadmap.find((item) => item.key === "v0.8.7-demo-readiness-audit");
-    assert.ok(v087);
-    assert.equal(v087?.status, "completed");
+    const v087 = [...roadmap.entries()].find(
+    ([key]) => key.includes("v0-8-7") && key.includes("demo-readiness"),
+  );
+  assert.ok(v087);
+  assert.equal(v087[1], "completed");
 });
 
 test("demo route map includes required stakeholder routes", () => {
