@@ -2,8 +2,8 @@
 
 ## Current Milestone
 
-- Current milestone: `v0.8.4 Demo Story Flow / Guided Product Tour Placeholder`
-- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, branch context placeholders, demo story flow placeholders, and metadata-first foundation pages
+- Current milestone: `v0.8.6 Investor / Stakeholder Summary Page Placeholder`
+- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, branch context placeholders, demo story flow placeholders, demo mode presentation framing, stakeholder summary placeholders, and metadata-first foundation pages
 
 ## What Is Ready
 
@@ -212,3 +212,9 @@
 - `/demo-mode` is available as a screenshot-ready polish placeholder for stakeholder reviews and proposal walkthroughs.
 - `config/demo-mode.ts`, `lib/demo-mode.ts`, and `components/demo-mode/` provide static presentation metadata and UI helpers.
 - No real demo mode state, persisted settings, localStorage/sessionStorage, analytics, tracking, personalization, database, or API is added.
+
+## ME Stakeholder Summary (v0.8.6)
+
+- `/stakeholder-summary` is available as a static owner / investor / partner overview placeholder.
+- `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` provide the summary metadata, helper utilities, and screenshot-ready UI.
+- No investor portal, CRM, share tracking, analytics, user tracking, personalization, database, or API is added.

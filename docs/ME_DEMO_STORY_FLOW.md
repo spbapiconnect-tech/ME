@@ -41,6 +41,12 @@ Demo Story Config
 - story helpers live in `lib/demo-story.ts`
 - story UI components live in `components/demo-story/`
 - existing business, navigation, role, branch, PSI, report, and foundation pages link into the guided story without changing runtime behavior
+- `/stakeholder-summary` is the presentation-ready next step after the guided route sequence and remains static/read-only only
+
+## ME Stakeholder Summary (v0.8.6)
+- add `/stakeholder-summary` as the closing summary page for owner, investor, partner, and internal-team walkthroughs
+- keep the transition from `/demo-story` to `/stakeholder-summary` static only with no CRM, share tracking, analytics, or session behavior
+- reuse `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` for the presentation layer
 
 ## Future Migration
 - add persisted progress

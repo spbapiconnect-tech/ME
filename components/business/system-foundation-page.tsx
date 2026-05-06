@@ -24,6 +24,7 @@ export function SystemFoundationPage() {
             <Button asChild size="sm" variant="outline"><Link href="/">Back To ME Workspace</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/navigation">Open Navigation IA</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/demo-mode">Open Demo Mode</Link></Button>
+            <Button asChild size="sm" variant="outline"><Link href="/stakeholder-summary">Open Stakeholder Summary</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/demo-story/system-foundation">View In Demo Story</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/reports">Open Reports</Link></Button>
             <Button asChild size="sm" variant="outline"><Link href="/roles">Open Roles Preview</Link></Button>
@@ -49,6 +50,7 @@ export function SystemFoundationPage() {
           <p>`/branches` previews future tenant/store scope and selector foundations without adding a real branch database, switching persistence, or access enforcement.</p>
           <p>`/demo-story` now reconnects foundation routes back into the business narrative without adding onboarding state, analytics, or tracking.</p>
           <p>`/demo-mode` adds screenshot framing only and does not enable a real presentation mode engine.</p>
+          <p>`/stakeholder-summary` turns the existing routes into a presentation-ready overview without adding an investor portal, CRM, analytics, or sharing permissions.</p>
         </CardContent>
       </Card>
     </main>

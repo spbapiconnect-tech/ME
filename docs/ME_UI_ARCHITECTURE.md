@@ -256,3 +256,8 @@
 - add `types/demo-mode.ts`, `config/demo-mode.ts`, and `lib/demo-mode.ts` as a static presentation metadata layer
 - add `components/demo-mode/` for badges, banners, screenshot cards, checklist UI, and reusable presentation notes
 - `/demo-mode` sits above existing business, navigation, role, branch, PSI, report, and foundation routes with no persistence, analytics, tracking, database, or API
+
+## ME Stakeholder Summary (v0.8.6)
+- add `types/stakeholder-summary.ts`, `config/stakeholder-summary.ts`, and `lib/stakeholder-summary.ts` as the static stakeholder-presentation metadata layer
+- add `components/stakeholder-summary/` for summary chips, metric cards, roadmap cards, route map UI, and the summary page shell
+- `/stakeholder-summary` sits above existing business, demo, role, branch, PSI, report, and foundation routes with no investor portal, CRM, sharing permissions, analytics, storage, database, or API

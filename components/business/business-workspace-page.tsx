@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { getBranchProfiles } from "@/lib/branch-context";
 import { getDemoModeBadges } from "@/lib/demo-mode";
 import { getDemoStorySteps } from "@/lib/demo-story";
+import { getStakeholderSummaryPageData } from "@/lib/stakeholder-summary";
 import type { BusinessWorkspacePageData } from "@/types/business-workspace";
 
 interface BusinessWorkspacePageProps {
@@ -23,6 +24,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
   const branchProfiles = getBranchProfiles();
   const demoModeBadges = getDemoModeBadges().filter((badge) => ["product-demo", "screenshot-ready", "stakeholder-review"].includes(badge.key));
   const demoStorySteps = getDemoStorySteps();
+  const stakeholderSummaryData = getStakeholderSummaryPageData();
 
   return (
     <main className="mx-auto flex w-full max-w-[88rem] flex-col gap-6 px-4 py-8">
@@ -46,6 +48,9 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                   </Button>
                   <Button asChild variant="outline" size="sm">
                     <Link href="/demo-mode">Demo Mode</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/stakeholder-summary">Stakeholder Summary</Link>
                   </Button>
                   <Button asChild variant="outline" size="sm">
                     <Link href="/navigation">Navigation IA</Link>
@@ -123,6 +128,29 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                   <p className="text-xs text-muted-foreground">Step {step.order}</p>
                   <p className="text-sm font-medium">{step.title.en}</p>
                   <p className="text-xs text-muted-foreground">{step.route}</p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card size="sm" className="border-dashed">
+            <CardHeader className="gap-1">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <CardTitle className="text-sm">ME Stakeholder Summary</CardTitle>
+                  <CardDescription>Presentation-ready ME overview for owner, investor, partner, and internal review conversations.</CardDescription>
+                </div>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/stakeholder-summary">Open Stakeholder Summary</Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="grid gap-3 md:grid-cols-3">
+              {stakeholderSummaryData.metrics.slice(0, 3).map((metric) => (
+                <div key={metric.key} className="rounded-xl border border-border/70 bg-background/70 p-3">
+                  <p className="text-xs text-muted-foreground">{metric.label.en}</p>
+                  <p className="text-lg font-semibold">{metric.value}</p>
+                  <p className="text-xs text-muted-foreground">{metric.description?.en}</p>
                 </div>
               ))}
             </CardContent>

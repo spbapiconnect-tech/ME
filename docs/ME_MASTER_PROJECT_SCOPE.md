@@ -130,8 +130,8 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.8.4 Demo Story Flow / Guided Product Tour Placeholder`
-- Delivery goal: extend the existing mock-data prototype with a guided demo story flow that connects business workspace, navigation, roles, branches, PSI, reports, and system foundation without breaking the existing business, PSI, reports, packages, or foundation routes.
+- Current milestone: `v0.8.6 Investor / Stakeholder Summary Page Placeholder`
+- Delivery goal: extend the existing mock-data prototype with a presentation-ready stakeholder summary that connects business workspace, navigation, demo routes, roles, branches, PSI, reports, and system foundation without breaking the existing business, PSI, reports, packages, or foundation routes.
 
 ## Procurement Supplier Inventory MVP Planning
 
@@ -311,3 +311,9 @@ This section defines future intelligence directions for ME only.
 - Add a screenshot-ready demo presentation layer with `/demo-mode`, `types/demo-mode.ts`, `config/demo-mode.ts`, `lib/demo-mode.ts`, and `components/demo-mode/`.
 - Keep scope UI-only and mock/read-only only with no real demo engine, persistence, localStorage/sessionStorage, analytics, tracking, personalization, database, API, auth/session, or write path.
 - Keep existing homepage, navigation, roles, branches, PSI, reports, system foundation, and packages routes intact.
+
+## ME Stakeholder Summary (v0.8.6)
+
+- Add `types/stakeholder-summary.ts`, `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` as a presentation-ready summary layer.
+- Add `/stakeholder-summary` as a static overview for owners, investors, partners, operators, and internal reviewers.
+- Keep scope UI-only and mock/read-only only with no investor portal, CRM, share tracking, analytics, personalization, database, API, auth/session, or write path.

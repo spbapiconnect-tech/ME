@@ -385,6 +385,23 @@ const demoMode = createItem({
   notes: "Static demo presentation placeholder. No real demo mode state, persistence, analytics, tracking, or personalization is connected.",
 });
 
+const stakeholderSummary = createItem({
+  key: "stakeholder-summary",
+  label: { zh: "Stakeholder Summary", en: "Stakeholder Summary" },
+  description: {
+    zh: "ME 面向 owner、investor、partner 的静态总结页。",
+    en: "Static ME summary for owners, investors, partners, and internal stakeholders.",
+  },
+  href: "/stakeholder-summary",
+  group: "footer",
+  status: "preview-only",
+  tone: "muted",
+  badge: { zh: "提案", en: "Review" },
+  isPrimary: false,
+  isFoundation: false,
+  notes: "Static stakeholder summary placeholder. No investor portal, CRM, analytics, tracking, or sharing permissions are connected.",
+});
+
 const modules = createItem({
   key: "modules",
   label: { zh: "模块中心", en: "Modules" },
@@ -474,7 +491,7 @@ export const navigationMap: MeNavigationMap = {
       isFoundationGroup: true,
     },
   ],
-  footerItems: [demoStory, demoMode, modules, demo, templates],
+  footerItems: [demoStory, demoMode, stakeholderSummary, modules, demo, templates],
   generatedAt: "2026-05-06T00:00:00.000Z",
   notice: {
     zh: "当前导航 IA 仅用于 UI/导航演示，不包含认证、权限、数据库、API 或真实写操作。",

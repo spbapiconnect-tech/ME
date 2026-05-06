@@ -50,6 +50,7 @@ Use Conventional Commits.
 - `/layout-engine` navigation remains reachable from the main demo and foundation surfaces
 - `/roles` remains reachable from the homepage, `/navigation`, and `/system-foundation` without changing runtime access rules
 - `/branches` remains reachable from the homepage, topbar, `/navigation`, `/roles`, and `/system-foundation` without changing runtime access rules
+- `/stakeholder-summary` remains reachable from navigation, homepage, demo story, demo mode, and `/system-foundation` without adding CRM, analytics, tracking, or sharing permissions
 
 ## Module Registry Milestone
 
@@ -298,4 +299,11 @@ Use Conventional Commits.
 - Add `config/demo-mode.ts` before hardcoding screenshot-ready framing rules into page components.
 - Add `components/demo-mode/` and `/demo-mode` as a static presentation layer only.
 - Verify no demo toggle, persisted state, localStorage/sessionStorage, analytics, tracking, personalization, database/API, auth/session, or write behavior is introduced.
+- Keep `.write_test` untouched, unstaged, and uncommitted.
+
+## ME Stakeholder Summary (v0.8.6)
+
+- Add `config/stakeholder-summary.ts` before hardcoding summary sections or route maps into page components.
+- Add `components/stakeholder-summary/` and `/stakeholder-summary` as a static presentation layer only.
+- Verify no investor portal, CRM, share tracking, analytics, personalization, storage API, database/API, auth/session, or write behavior is introduced.
 - Keep `.write_test` untouched, unstaged, and uncommitted.

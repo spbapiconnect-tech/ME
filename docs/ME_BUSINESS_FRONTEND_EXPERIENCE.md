@@ -87,3 +87,9 @@ PSI Page Data
 - homepage can now show screenshot-ready demo badges and a subtle presentation banner without displacing the business dashboard
 - add `/demo-mode`, `config/demo-mode.ts`, `lib/demo-mode.ts`, and `components/demo-mode/` as UI-only presentation helpers
 - no real demo engine, persisted state, localStorage/sessionStorage, analytics, or tracking is introduced
+
+## ME Stakeholder Summary (v0.8.6)
+- homepage now exposes a small `Stakeholder Summary` CTA while keeping the business dashboard dominant
+- add `/stakeholder-summary`, `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` as a presentation-ready summary layer
+- add secondary navigation and topbar links to the stakeholder overview without removing existing routes
+- keep the milestone static/read-only only with no investor portal, CRM, share tracking, analytics, user tracking, personalization, database, or API
