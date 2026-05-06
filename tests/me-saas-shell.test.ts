@@ -23,6 +23,9 @@ test("layout shell exports import without crashing", async () => {
   assert.equal(typeof layout.MePageHeader, "function");
   assert.equal(typeof layout.MeRightRail, "function");
   assert.equal(typeof layout.MeDetailWorkspace, "function");
+  assert.equal(typeof layout.MeDataTable, "function");
+  assert.equal(typeof layout.MeTabs, "function");
+  assert.equal(typeof layout.MeStatusTimeline, "function");
 });
 
 test("main workspace routes import without crashing", async () => {
@@ -42,6 +45,20 @@ test("main workspace routes import without crashing", async () => {
   for (const route of routes) {
     assert.equal(typeof route.default, "function");
   }
+});
+
+test("psi detail page and detail components import without crashing", async () => {
+  const [psiRoute, detailWorkspace, dataTable, tabs] = await Promise.all([
+    import("../app/psi/page"),
+    import("../components/layout/me-detail-workspace"),
+    import("../components/layout/me-data-table"),
+    import("../components/layout/me-tabs"),
+  ]);
+
+  assert.equal(typeof psiRoute.default, "function");
+  assert.equal(typeof detailWorkspace.MeDetailWorkspace, "function");
+  assert.equal(typeof dataTable.MeDataTable, "function");
+  assert.equal(typeof tabs.MeTabs, "function");
 });
 
 test("shell and navigation helpers contain no fetch/axios or storage usage", async () => {
