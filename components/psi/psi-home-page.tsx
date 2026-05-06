@@ -78,19 +78,21 @@ export function PsiHomePage() {
       />
 
       <MeWorkspaceSection title="PSI Operation Modules" description="Primary entry points for daily PSI work.">
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 xl:grid-cols-3">
           {psiModules.map((module) => (
             <Link
               key={module.title}
               href={module.href}
-              className="rounded-[24px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_18px_28px_-20px_rgba(15,23,42,0.16)]"
+              className="rounded-[22px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_18px_24px_-20px_rgba(15,23,42,0.14)]"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-base font-semibold text-slate-950">{module.title}</p>
                 <Badge variant="outline">Open</Badge>
               </div>
               <p className="mt-2 text-sm text-slate-600">{module.description}</p>
-              <p className="mt-4 text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{module.metric}</p>
+              <div className="mt-4 border-t border-slate-200/80 pt-3">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{module.metric}</p>
+              </div>
             </Link>
           ))}
         </div>
@@ -116,6 +118,7 @@ export function PsiHomePage() {
       <MeActionBar
         actions={[
           { label: "Review", href: "#" },
+          { label: "Open queue", variant: "secondary", href: "#" },
           { label: "Assign", variant: "outline", href: "#" },
           { label: "Export", variant: "outline", href: "#" },
           { label: "Add Note", variant: "outline", href: "#" },
@@ -141,7 +144,7 @@ export function PsiHomePage() {
         main={
           <>
             <MeWorkspaceSection title="Overview" description="Structured request information for procurement review.">
-              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+              <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_17rem]">
                 <div className="grid gap-3 md:grid-cols-2">
                   {[
                     ["Request ID", "PR-KCH-0001"],
@@ -161,7 +164,7 @@ export function PsiHomePage() {
                     </div>
                   ))}
                 </div>
-                <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
+                <div className="rounded-[20px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Procurement Note</p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     This request was raised from the KCH inventory risk watchlist after broth-input coverage dropped below target. Supplier terms are known, but the branch receiving slot still needs review.
@@ -215,22 +218,22 @@ export function PsiHomePage() {
               />
             </MeWorkspaceSection>
 
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+            <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_20rem]">
               <MeWorkspaceSection title="Supplier and Receiving" description="Operational context tied to vendor and branch receiving readiness.">
                 <div className="grid gap-3">
                   <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
+                    <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Supplier</p>
                       <p className="mt-1.5 text-sm font-semibold text-slate-900">ABC Food Supply</p>
                       <p className="mt-1 text-sm text-slate-600">Preferred supplier with known lead times and current quote attached.</p>
                     </div>
-                    <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
+                    <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Receiving</p>
                       <p className="mt-1.5 text-sm font-semibold text-slate-900">KCH backroom slot pending</p>
                       <p className="mt-1 text-sm text-slate-600">Receiving team is available tomorrow morning after review release.</p>
                     </div>
                   </div>
-                  <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
+                  <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Linked Inventory Status</p>
                     <p className="mt-1.5 text-sm text-slate-600">
                       Inventory coverage for the KCH broth line is below target and this request is linked to the active replenishment watchlist. No posting or stock movement occurs from this screen.
@@ -282,7 +285,7 @@ export function PsiHomePage() {
         }
       />
 
-      <Card size="sm" className="border-border/60 bg-white/90 shadow-[0_16px_26px_-24px_rgba(15,23,42,0.14)]">
+      <Card size="sm" className="border-border/60 bg-white/90 shadow-[0_16px_24px_-26px_rgba(15,23,42,0.12)]">
         <CardContent className="grid gap-3 pt-4 md:grid-cols-2 xl:grid-cols-4">
           {[
             ["Object", "Procurement request"],

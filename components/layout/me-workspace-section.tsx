@@ -21,8 +21,8 @@ export function MeWorkspaceSection({
   contentClassName,
 }: MeWorkspaceSectionProps) {
   return (
-    <Card size="sm" className={cn("border-border/70 bg-white/92 shadow-[0_18px_38px_-32px_rgba(15,23,42,0.18)]", className)}>
-      <CardHeader className="gap-2.5">
+    <Card size="sm" className={cn("border-border/60 bg-white/92 shadow-[0_16px_28px_-30px_rgba(15,23,42,0.13)]", className)}>
+      <CardHeader className="gap-2">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <CardTitle className="text-[15px] text-slate-900">{title}</CardTitle>
@@ -31,7 +31,7 @@ export function MeWorkspaceSection({
           {actions}
         </div>
       </CardHeader>
-      <CardContent className={cn("grid gap-3.5", contentClassName)}>{children}</CardContent>
+      <CardContent className={cn("grid gap-3", contentClassName)}>{children}</CardContent>
     </Card>
   );
 }

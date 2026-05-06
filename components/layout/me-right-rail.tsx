@@ -13,9 +13,9 @@ interface MeRightRailSection {
 
 export function MeRightRail({ sections, sticky = true }: { title?: string; sections: MeRightRailSection[]; sticky?: boolean }) {
   return (
-    <div className={sticky ? "sticky top-5 grid gap-3" : "grid gap-3"}>
+    <div className={sticky ? "grid gap-3 xl:sticky xl:top-5" : "grid gap-3"}>
       {sections.map((section) => (
-        <Card key={section.title} size="sm" className="border-border/70 bg-white/86 shadow-[0_14px_30px_-28px_rgba(15,23,42,0.16)]">
+        <Card key={section.title} size="sm" className="border-border/60 bg-white/88 shadow-[0_16px_28px_-30px_rgba(15,23,42,0.14)]">
           <CardHeader className="gap-1.5">
             <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-[13px] text-slate-900">{section.title}</CardTitle>
@@ -26,7 +26,7 @@ export function MeRightRail({ sections, sticky = true }: { title?: string; secti
           <CardContent className="grid gap-2.5 text-sm text-slate-600">
             {section.content}
             {section.items?.map((item) => (
-              <div key={item} className="flex items-start gap-2.5 rounded-xl px-1 py-0.5">
+              <div key={item} className="flex items-start gap-2.5 rounded-xl border-b border-slate-100/80 px-0 py-2 last:border-b-0 last:pb-0">
                 <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-slate-300" />
                 <span className="leading-6 text-slate-600">{item}</span>
               </div>

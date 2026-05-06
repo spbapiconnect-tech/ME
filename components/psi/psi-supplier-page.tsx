@@ -75,6 +75,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
       <MeActionBar
         actions={[
           { label: "Review Supplier", href: "#" },
+          { label: "Open issue queue", variant: "secondary", href: "#" },
           { label: "Assign Follow-up", variant: "outline", href: "#" },
           { label: "Export Profile", variant: "outline", href: "#" },
           { label: "Add Note", variant: "outline", href: "#" },
@@ -136,7 +137,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
               />
             </MeWorkspaceSection>
 
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+            <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_20rem]">
               <MeWorkspaceSection title="Orders and Issues" description="Recent linked procurement records and current supplier issues.">
                 <div className="grid gap-4">
                   <MeDataTable

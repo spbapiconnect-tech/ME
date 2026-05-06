@@ -194,6 +194,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
       <MeActionBar
         actions={[
           { label: "Refresh preview" },
+          { label: "Open filter set", variant: "secondary" },
           { label: "Export", variant: "outline" },
           { label: "Share deck", variant: "outline" },
           { label: "View history", variant: "ghost" },
@@ -210,7 +211,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         ]}
       />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
         {[
           ["Total widgets", String(stats.total)],
           ["Active", String(stats.active)],
@@ -219,7 +220,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           ["Refreshable", String(stats.refreshable)],
           ["Drill down", String(stats.drillDown)],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-[24px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] px-4 py-4 ring-1 ring-slate-200/75 shadow-[0_18px_28px_-24px_rgba(15,23,42,0.16)]">
+          <div key={label} className="rounded-[22px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] px-4 py-4 ring-1 ring-slate-200/75 shadow-[0_16px_24px_-24px_rgba(15,23,42,0.14)]">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
               <span className="h-2.5 w-2.5 rounded-full bg-blue-400/80" />
@@ -237,7 +238,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
 
       <MeListWorkspace
         filters={
-          <MeWorkspaceSection title="Report Filters" description="Operational filtering shell for the widget registry." contentClassName="md:grid-cols-4">
+          <MeWorkspaceSection title="Report Filters" description="Operational filtering shell for the widget registry." contentClassName="xl:grid-cols-4">
             <Select value={widgetTypeFilter} onValueChange={(value) => setWidgetTypeFilter(value as ReportWidgetType | "all")}>
               <SelectTrigger size="sm"><SelectValue placeholder="Widget Type" /></SelectTrigger>
               <SelectContent>{widgetTypeOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
@@ -288,6 +289,19 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           <>
             {selectedWidget ? <ReportWidgetPreviewCard widget={selectedWidget} locale={currentLocale} /> : null}
             {selectedWidget ? <ReportWidgetSourceCard widget={selectedWidget} locale={currentLocale} /> : null}
+            <MeWorkspaceSection title="Computed Metrics Preview" description="Operational metric placeholders before any report runtime is connected.">
+              <div className="grid gap-2">
+                {[
+                  "Branch performance variance remains a computed placeholder.",
+                  "Export center is preview-only and does not generate files.",
+                  "Widget refresh is visual only and does not call an API.",
+                ].map((item) => (
+                  <div key={item} className="rounded-[18px] bg-slate-50/88 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-200/70">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </MeWorkspaceSection>
             <MeWorkspaceSection title="Widget Mix" description="Current registry distribution.">
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(stats.byType).map(([key, value]) => (

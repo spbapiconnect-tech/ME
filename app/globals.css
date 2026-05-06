@@ -2,37 +2,37 @@
 
 :root {
   color-scheme: light;
-  --background: #f4f7fb;
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-strong: rgba(255, 255, 255, 0.94);
-  --surface-soft: rgba(247, 250, 255, 0.92);
-  --border: rgba(15, 23, 42, 0.06);
-  --border-strong: rgba(15, 23, 42, 0.09);
+  --background: #eff4fa;
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-strong: rgba(255, 255, 255, 0.96);
+  --surface-soft: rgba(246, 249, 253, 0.94);
+  --border: rgba(15, 23, 42, 0.055);
+  --border-strong: rgba(15, 23, 42, 0.085);
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #7a8aa2;
   --primary: #2563eb;
-  --primary-soft: rgba(37, 99, 235, 0.1);
+  --primary-soft: rgba(37, 99, 235, 0.11);
   --accent: #0f9d8a;
   --success: #1f9d62;
   --warning: #c27b12;
   --danger: #d14343;
-  --shadow-color: rgba(15, 23, 42, 0.08);
-  --shadow-color-strong: rgba(15, 23, 42, 0.12);
-  --hero-orb-a: rgba(59, 130, 246, 0.1);
-  --hero-orb-b: rgba(148, 163, 184, 0.12);
-  --hero-grid: rgba(148, 163, 184, 0.05);
-  --radius-sm: 16px;
-  --radius-md: 22px;
-  --radius-lg: 28px;
+  --shadow-color: rgba(15, 23, 42, 0.075);
+  --shadow-color-strong: rgba(15, 23, 42, 0.11);
+  --hero-orb-a: rgba(59, 130, 246, 0.11);
+  --hero-orb-b: rgba(148, 163, 184, 0.11);
+  --hero-grid: rgba(148, 163, 184, 0.035);
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 26px;
   --font-sans: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 
   --foreground: var(--text-primary);
-  --card: rgba(255, 255, 255, 0.9);
+  --card: rgba(255, 255, 255, 0.92);
   --card-foreground: var(--text-primary);
   --popover: rgba(255, 255, 255, 0.9);
   --popover-foreground: var(--text-primary);
-  --secondary: rgba(241, 245, 249, 0.85);
+  --secondary: rgba(241, 245, 249, 0.9);
   --secondary-foreground: var(--text-primary);
   --muted: rgba(241, 245, 249, 0.78);
   --muted-foreground: var(--text-muted);
@@ -40,8 +40,8 @@
   --primary-foreground: #ffffff;
   --destructive: var(--danger);
   --destructive-foreground: #ffffff;
-  --input: rgba(148, 163, 184, 0.14);
-  --ring: rgba(37, 99, 235, 0.22);
+  --input: rgba(148, 163, 184, 0.12);
+  --ring: rgba(37, 99, 235, 0.18);
   --radius: 1rem;
 }
 
@@ -105,9 +105,9 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top left, var(--hero-orb-a), transparent 36%),
-    radial-gradient(circle at 85% 12%, var(--hero-orb-b), transparent 30%),
-    linear-gradient(180deg, color-mix(in srgb, var(--background) 90%, #ffffff 10%), #eef3f9 42%, var(--background));
+    radial-gradient(circle at top left, var(--hero-orb-a), transparent 34%),
+    radial-gradient(circle at 84% 9%, var(--hero-orb-b), transparent 28%),
+    linear-gradient(180deg, color-mix(in srgb, var(--background) 92%, #ffffff 8%), #edf3f9 42%, var(--background));
   color: var(--text-primary);
   font-family: var(--font-sans);
 }
@@ -129,6 +129,22 @@ button {
 
 ::selection {
   background: rgba(37, 99, 235, 0.14);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.45);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .main-frame {

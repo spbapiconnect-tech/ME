@@ -84,15 +84,16 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
       <MeActionBar
         actions={[
           { label: "Review alerts" },
+          { label: "Open queue", variant: "secondary" },
           { label: "Assign follow-up", variant: "outline" },
           { label: "Export summary", variant: "outline" },
           { label: "View history", variant: "ghost" },
         ]}
       />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {data.metrics.map((metric) => (
-          <Card key={metric.key} size="sm" className="border-border/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] shadow-[0_18px_32px_-28px_rgba(15,23,42,0.16)]">
+          <Card key={metric.key} size="sm" className="border-border/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.95))] shadow-[0_16px_24px_-24px_rgba(15,23,42,0.14)]">
             <CardContent className="grid gap-2 pt-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{metric.label.en}</p>
@@ -109,7 +110,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
         filters={
           <MeWorkspaceSection
             title="Operational Controls"
-            description="Presentation-safe action points and routing shortcuts for the main workspace."
+            description="Branch scope, density, and route shortcuts for the main workspace."
             contentClassName="md:grid-cols-4"
           >
             <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
@@ -125,20 +126,20 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
               <p className="mt-1.5 text-sm font-semibold text-slate-900">Mock / read-only</p>
             </div>
             <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Owner</p>
-              <p className="mt-1.5 text-sm font-semibold text-slate-900">Business workspace</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Display</p>
+              <p className="mt-1.5 text-sm font-semibold text-slate-900">Desktop / Comfortable</p>
             </div>
           </MeWorkspaceSection>
         }
         list={
           <>
             <MeWorkspaceSection title="Operational Modules" description="Core modules arranged as a working B2B home instead of a gallery of cards.">
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 xl:grid-cols-2">
                 {data.modules.map((module) => (
                   <Link
                     key={module.key}
                     href={module.route}
-                    className="rounded-[24px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_28px_-20px_rgba(15,23,42,0.16)]"
+                    className="rounded-[22px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_24px_-20px_rgba(15,23,42,0.14)]"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -147,7 +148,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                       </div>
                       <Badge variant="outline">{module.status}</Badge>
                     </div>
-                    <div className="mt-4 grid gap-2 text-sm text-slate-600 md:grid-cols-2">
+                    <div className="mt-4 grid gap-3 border-t border-slate-200/80 pt-3 text-sm text-slate-600 md:grid-cols-2">
                       <div>
                         <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Primary</p>
                         <p>{module.primaryMetric?.en ?? "Placeholder"}</p>
@@ -165,7 +166,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Operational Alerts" description="Queue-style watch items for immediate review.">
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {data.alerts.map((alert) => (
-                  <div key={alert.key} className="rounded-[24px] bg-slate-50/88 p-4 ring-1 ring-slate-200/75">
+                  <div key={alert.key} className="rounded-[22px] bg-slate-50/88 p-4 ring-1 ring-slate-200/75">
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium text-slate-950">{alert.title.en}</p>
                       <Badge variant="outline">{alert.sourceModule}</Badge>
@@ -183,7 +184,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Action Panel" description="Visual actions only. No writes or workflow execution.">
               <div className="grid gap-2">
                 {data.actions.map((action) => (
-                  <Link key={action.key} href={action.route} className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
+                  <Link key={action.key} href={action.route} className="rounded-[20px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
                     <p className="font-medium text-slate-950">{action.label.en}</p>
                     <p className="mt-1 text-xs text-slate-500">{action.description?.en ?? "Placeholder action"}</p>
                   </Link>
@@ -194,7 +195,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Foundation Links" description="Shared admin and structure routes stay available through the shell.">
               <div className="grid gap-2">
                 {data.systemFoundationLinks.map((link) => (
-                  <Link key={link.key} href={link.route} className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 text-sm font-medium text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
+                  <Link key={link.key} href={link.route} className="rounded-[20px] bg-slate-50/88 px-4 py-3.5 text-sm font-medium text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
                     {link.label.en}
                   </Link>
                 ))}

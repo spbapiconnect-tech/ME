@@ -75,6 +75,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
       <MeActionBar
         actions={[
           { label: "Review Stock", href: "#" },
+          { label: "Open risk watch", variant: "secondary", href: "#" },
           { label: "Link Procurement", variant: "outline", href: "#" },
           { label: "Export Stock Card", variant: "outline", href: "#" },
           { label: "Add Note", variant: "outline", href: "#" },
@@ -139,7 +140,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
               />
             </MeWorkspaceSection>
 
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+            <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_20rem]">
               <MeWorkspaceSection title="Expiry and Procurement" description="Operational watch items tied to stock quality and replenishment.">
                 <div className="grid gap-3">
                   <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">

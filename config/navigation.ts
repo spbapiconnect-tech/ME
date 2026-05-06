@@ -356,6 +356,22 @@ const realDataMapping = createItem({
   isFoundation: true,
 });
 
+const displaySettings = createItem({
+  key: "display-settings",
+  label: { zh: "显示设置", en: "Display Settings" },
+  description: {
+    zh: "桌面、平板、手机显示密度与布局预览。",
+    en: "Preview display density and layout behavior across desktop, tablet, and phone.",
+  },
+  href: "/display-settings",
+  group: "system-foundation",
+  status: "active",
+  tone: "muted",
+  badge: { zh: "预览", en: "Preview" },
+  isPrimary: false,
+  isFoundation: true,
+});
+
 const navigationIa = createItem({
   key: "navigation-ia",
   label: { zh: "导航 IA", en: "Navigation IA" },
@@ -834,6 +850,17 @@ const sidebarGroups: MeSidebarNavigationGroup[] = [
         matchPaths: ["/navigation"],
       }),
       createSidebarItem({
+        key: "sidebar-display-settings",
+        routeKey: displaySettings.key,
+        label: displaySettings.label,
+        description: displaySettings.description,
+        href: displaySettings.href,
+        status: displaySettings.status,
+        tone: displaySettings.tone,
+        badge: displaySettings.badge,
+        matchPaths: ["/display-settings"],
+      }),
+      createSidebarItem({
         key: "sidebar-system-foundation",
         routeKey: systemFoundation.key,
         label: systemFoundation.label,
@@ -965,6 +992,7 @@ export const navigationMap: MeNavigationMap = {
       groupType: "system",
       items: [
         systemFoundation,
+        displaySettings,
         layoutEngine,
         realDataMapping,
         actionContracts,

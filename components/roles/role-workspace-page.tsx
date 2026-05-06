@@ -4,8 +4,10 @@ import { DemoPresentationNote } from "@/components/demo-mode";
 import {
   MeActionBar,
   MeDashboardShell,
+  MeDataTable,
   MePageHeader,
   MeRightRail,
+  MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
 import { RoleProfileCard } from "@/components/roles/role-profile-card";
@@ -76,9 +78,21 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
       <MeActionBar
         actions={[
           { label: "Review role profile" },
+          { label: "Open access view", variant: "secondary" },
           { label: "Open permissions", variant: "outline" },
           { label: "Assign training", variant: "outline" },
           { label: "View history", variant: "ghost" },
+        ]}
+      />
+
+      <MeTabs
+        style="detail"
+        tabs={[
+          { label: "Overview", active: true },
+          { label: "Role Profiles" },
+          { label: "Staff Mapping" },
+          { label: "Access Groups" },
+          { label: "Activity" },
         ]}
       />
 
@@ -105,6 +119,32 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
           ))}
         </div>
       </MeWorkspaceSection>
+
+      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <MeWorkspaceSection title="Staff Mapping Preview" description="Future user-to-role mapping stays visible without introducing auth or persistence.">
+          <MeDataTable
+            embedded
+            columns={["Staff", "Role", "Branch", "Access scope", "Status"]}
+            rows={[
+              ["Store manager placeholder", "Branch manager", "KCH", "Operations and reports", "Preview only"],
+              ["Purchasing placeholder", "Procurement lead", "All Stores", "PSI and supplier detail", "Preview only"],
+              ["System admin placeholder", "System admin", "Global", "Foundation routes", "Preview only"],
+            ]}
+          />
+        </MeWorkspaceSection>
+
+        <MeWorkspaceSection title="Access Group Preview" description="Admin-style permission framing without runtime enforcement.">
+          <MeDataTable
+            embedded
+            columns={["Group", "Surface", "Mode", "Guardrail"]}
+            rows={[
+              ["Operations review", "PSI / Branches", "Read-only", "No approval execution"],
+              ["Reporting review", "Reports", "Read-only", "No export runtime"],
+              ["Foundation admin", "System routes", "Preview-only", "No auth/session enforced"],
+            ]}
+          />
+        </MeWorkspaceSection>
+      </div>
 
       <MeWorkspaceSection title="Platform Administration" description="Governance and foundation access previews.">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

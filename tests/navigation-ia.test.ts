@@ -24,6 +24,7 @@ test("system foundation group includes required routes", () => {
   assert.ok(group);
   const routes = new Set(group?.items.map((item) => item.href));
   for (const route of [
+    "/display-settings",
     "/layout-engine",
     "/action-contracts",
     "/access-control",
@@ -77,6 +78,11 @@ test("system foundation route imports without crashing", async () => {
   assert.equal(typeof route.default, "function");
 });
 
+test("display settings route imports without crashing", async () => {
+  const route = await import("../app/display-settings/page");
+  assert.equal(typeof route.default, "function");
+});
+
 test("navigation helper contains no fetch or axios", async () => {
   const helper = await readFile("lib/navigation.ts", "utf8");
   assert.equal(helper.includes("fetch("), false);
@@ -124,4 +130,10 @@ test("navigation config exports expected primary destinations", () => {
   for (const key of ["dashboard", "psi-workspace", "reports", "system-foundation"]) {
     assert.equal(primaryKeys.includes(key), true);
   }
+});
+
+test("navigation config includes display settings route", () => {
+  const foundationGroup = getNavigationGroupByKey("system-foundation");
+  assert.ok(foundationGroup);
+  assert.equal(foundationGroup?.items.some((item) => item.key === "display-settings" && item.href === "/display-settings"), true);
 });

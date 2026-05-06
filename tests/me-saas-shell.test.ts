@@ -32,9 +32,12 @@ test("main workspace routes import without crashing", async () => {
   const routes = await Promise.all([
     import("../app/page"),
     import("../app/psi/page"),
+    import("../app/psi/supplier/page"),
+    import("../app/psi/inventory/page"),
     import("../app/reports/page"),
     import("../app/branches/page"),
     import("../app/roles/page"),
+    import("../app/display-settings/page"),
     import("../app/demo-mode/page"),
     import("../app/demo-readiness/page"),
     import("../app/stakeholder-summary/page"),
@@ -75,6 +78,7 @@ test("shell and navigation helpers contain no fetch/axios or storage usage", asy
     "components/layout/me-right-rail.tsx",
     "components/navigation/me-sidebar.tsx",
     "components/navigation/me-topbar.tsx",
+    "components/display-settings/display-settings-page.tsx",
     "lib/navigation.ts",
   ];
   const text = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
@@ -90,6 +94,7 @@ test(".write_test is not referenced in shell files", async () => {
     "components/layout/me-page-header.tsx",
     "components/navigation/me-sidebar.tsx",
     "components/navigation/me-topbar.tsx",
+    "components/display-settings/display-settings-page.tsx",
     "config/navigation.ts",
   ];
   const text = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");

@@ -19,16 +19,19 @@ export function MeDashboardShell({
   contentClassName,
 }: MeDashboardShellProps) {
   return (
-    <main className={cn("mx-auto flex min-h-screen w-full max-w-[98rem] flex-col gap-4 px-4 py-4 lg:px-5 lg:py-5", className)}>
+    <main className={cn("mx-auto flex min-h-screen w-full max-w-[110rem] flex-col gap-3 px-3 py-3 sm:px-4 sm:py-4 xl:px-6 xl:py-5", className)}>
       <MeBreadcrumbs />
       <MeTopbar />
 
-      <div className="grid items-start gap-4 lg:grid-cols-[17.5rem_minmax(0,1fr)] xl:grid-cols-[17.5rem_minmax(0,1fr)_18.5rem]">
+      <div className="grid min-w-0 items-start gap-3 lg:grid-cols-[15.5rem_minmax(0,1fr)] xl:grid-cols-[15.5rem_minmax(0,1fr)_18.25rem] 2xl:grid-cols-[16rem_minmax(0,1fr)_19rem] 2xl:gap-4">
         <MeSidebar activeKey={activeKey} className="self-start" />
 
-        <div className={cn("grid min-w-0 gap-4", contentClassName)}>{children}</div>
+        <div className={cn("grid min-w-0 gap-3 xl:gap-4", contentClassName)}>
+          {children}
+          {rightRail ? <div className="grid gap-3 xl:hidden">{rightRail}</div> : null}
+        </div>
 
-        {rightRail ? <div className="hidden xl:block xl:pl-1">{rightRail}</div> : null}
+        {rightRail ? <div className="hidden xl:block xl:min-w-0 xl:pl-1">{rightRail}</div> : null}
       </div>
     </main>
   );

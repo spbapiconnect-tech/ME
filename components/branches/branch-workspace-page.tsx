@@ -91,6 +91,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
       <MeActionBar
         actions={[
           { label: "Review branch context" },
+          { label: "Open branch queue", variant: "secondary" },
           { label: "Compare performance", variant: "outline" },
           { label: "Open inspection", variant: "outline" },
           { label: "View history", variant: "ghost" },
@@ -102,7 +103,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
       </MeWorkspaceSection>
 
       <MeWorkspaceSection title="Branch Overview" description="Operational context cards instead of presentation-only tiles.">
-        <div className="grid gap-3 md:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {[
             ["Total contexts", String(branches.length)],
             ["Aggregate", String(aggregateBranches.length)],

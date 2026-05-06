@@ -47,7 +47,7 @@ function renderSidebarItem(item: MeSidebarNavigationItem, pathname: string, loca
         <Link
           href={item.href}
           className={cn(
-            "group flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 text-sm transition-all duration-150",
+            "group flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-150",
             depth > 0 && "ml-4 pl-4",
             isActive
               ? "bg-[linear-gradient(180deg,rgba(239,246,255,0.98),rgba(224,231,255,0.88))] text-blue-700 shadow-[inset_0_0_0_1px_rgba(191,219,254,0.8)]"
@@ -72,7 +72,7 @@ function renderSidebarItem(item: MeSidebarNavigationItem, pathname: string, loca
       ) : (
         <div
           className={cn(
-            "flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 text-sm text-slate-400",
+            "flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-400",
             depth > 0 && "ml-4 pl-4",
           )}
         >
@@ -100,19 +100,19 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
 
   return (
     <aside className={cn("hidden lg:block", className)}>
-      <Card className="sticky top-5 max-h-[calc(100vh-2.5rem)] overflow-hidden border-border/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(246,249,253,0.92))] shadow-[0_18px_40px_-34px_rgba(15,23,42,0.18)]">
+      <Card className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-hidden border-border/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(246,249,253,0.93))] shadow-[0_18px_36px_-34px_rgba(15,23,42,0.16)]">
         <div className="border-b border-border/50 px-5 py-4">
           <div className="flex items-center justify-between gap-2">
             <div className="space-y-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">ME Platform</p>
               <p className="text-sm font-semibold text-slate-950">Operational workspace</p>
-              <p className="text-xs text-slate-500">Navigation shell</p>
+              <p className="text-xs text-slate-500">Shared B-end navigation</p>
             </div>
             <Badge variant="outline">{locale === "zh" ? "只读" : "Read-only"}</Badge>
           </div>
         </div>
 
-        <div className="grid gap-3 overflow-y-auto px-3 py-4">
+        <div className="grid gap-2.5 overflow-y-auto px-3 py-3">
           {sidebarGroups.map((group) => {
             const Icon = group.icon ? iconMap[group.icon as keyof typeof iconMap] : LayoutDashboard;
             const isGroupActive = group.items.some((item) => hasActiveSidebarChild(pathname, item) || isExplicitlyActive(item, activeKey));
@@ -121,19 +121,19 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
               <details
                 key={group.key}
                 className={cn(
-                  "group rounded-[24px] border border-transparent bg-transparent",
-                  isGroupActive && "bg-slate-50/70",
+                  "group rounded-[22px] border border-transparent bg-transparent",
+                  isGroupActive && "bg-slate-50/75",
                 )}
                 open={isGroupActive || !group.collapsedByDefault}
               >
                 <summary
                   className={cn(
-                    "flex list-none items-center justify-between gap-3 rounded-[20px] px-3 py-2.5 transition-colors",
-                    isGroupActive ? "bg-blue-50/60" : "hover:bg-slate-50/90",
+                    "flex list-none items-center justify-between gap-3 rounded-[18px] px-3 py-2.5 transition-colors",
+                    isGroupActive ? "bg-blue-50/70" : "hover:bg-slate-50/90",
                   )}
                 >
                   <span className="flex items-center gap-3">
-                    <span className={cn("rounded-xl p-2", isGroupActive ? "bg-white text-blue-700 shadow-sm" : "bg-slate-100/90 text-slate-500")}>
+                    <span className={cn("rounded-lg p-2", isGroupActive ? "bg-white text-blue-700 shadow-sm" : "bg-slate-100/90 text-slate-500")}>
                       <Icon className="size-4" />
                     </span>
                     <span className="min-w-0">
