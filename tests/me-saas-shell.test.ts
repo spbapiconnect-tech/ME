@@ -48,17 +48,25 @@ test("main workspace routes import without crashing", async () => {
 });
 
 test("psi detail page and detail components import without crashing", async () => {
-  const [psiRoute, detailWorkspace, dataTable, tabs] = await Promise.all([
+  const [psiRoute, supplierRoute, inventoryRoute, detailWorkspace, dataTable, tabs, supplierPage, inventoryPage] = await Promise.all([
     import("../app/psi/page"),
+    import("../app/psi/supplier/page"),
+    import("../app/psi/inventory/page"),
     import("../components/layout/me-detail-workspace"),
     import("../components/layout/me-data-table"),
     import("../components/layout/me-tabs"),
+    import("../components/psi/psi-supplier-page"),
+    import("../components/psi/psi-inventory-page"),
   ]);
 
   assert.equal(typeof psiRoute.default, "function");
+  assert.equal(typeof supplierRoute.default, "function");
+  assert.equal(typeof inventoryRoute.default, "function");
   assert.equal(typeof detailWorkspace.MeDetailWorkspace, "function");
   assert.equal(typeof dataTable.MeDataTable, "function");
   assert.equal(typeof tabs.MeTabs, "function");
+  assert.equal(typeof supplierPage.PsiSupplierPage, "function");
+  assert.equal(typeof inventoryPage.PsiInventoryPage, "function");
 });
 
 test("shell and navigation helpers contain no fetch/axios or storage usage", async () => {

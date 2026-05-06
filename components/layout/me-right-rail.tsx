@@ -11,9 +11,9 @@ interface MeRightRailSection {
   badge?: string;
 }
 
-export function MeRightRail({ sections }: { title?: string; sections: MeRightRailSection[] }) {
+export function MeRightRail({ sections, sticky = true }: { title?: string; sections: MeRightRailSection[]; sticky?: boolean }) {
   return (
-    <div className="sticky top-5 grid gap-3">
+    <div className={sticky ? "sticky top-5 grid gap-3" : "grid gap-3"}>
       {sections.map((section) => (
         <Card key={section.title} size="sm" className="border-border/70 bg-white/86 shadow-[0_14px_30px_-28px_rgba(15,23,42,0.16)]">
           <CardHeader className="gap-1.5">

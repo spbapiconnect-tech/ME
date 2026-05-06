@@ -6,8 +6,13 @@ import { DemoPresentationNote } from "@/components/demo-mode";
 import {
   MeActionBar,
   MeDashboardShell,
+  MeDataTable,
+  MeDetailWorkspace,
   MePageHeader,
+  MeRecordSummary,
   MeRightRail,
+  MeStatusTimeline,
+  MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
 import { Button } from "@/components/ui/button";
@@ -26,17 +31,25 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
     <MeRightRail
       sections={[
         {
-          title: "Branch Status",
-          badge: "Preview only",
-          items: ["All Stores overview available", "KCH and BTU context visible", "Future branch remains placeholder-only"],
+          title: "Branch Context",
+          badge: "KCH",
+          items: ["Local operations scope", "PSI, reports, and roles linked", "Manager placeholder remains visual-only"],
         },
         {
-          title: "Quick Context",
-          items: ["Related routes: PSI, reports, roles", "No tenant switching", "No persisted branch selection"],
+          title: "Active Modules",
+          items: ["PSI operational preview", "Reports workspace", "Roles and staff preview"],
+        },
+        {
+          title: "Recent Activity",
+          items: ["KCH branch context reviewed", "Inventory watch linked to PSI", "Issue queue remains placeholder-only"],
         },
         {
           title: "Guardrails",
-          items: ["No branch database", "No permission enforcement", "No auth or session", "No writes"],
+          items: ["No branch database", "No branch switching persistence", "No permission enforcement", "No writes"],
+        },
+        {
+          title: "Next Steps",
+          items: ["Review branch summary", "Open PSI for branch context", "Export local branch summary if needed"],
         },
       ]}
     />
@@ -103,6 +116,133 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
           ))}
         </div>
       </MeWorkspaceSection>
+
+      <MeRecordSummary
+        title="KCH"
+        subtitle="Branch detail preview"
+        status="Active"
+        guardrail="Branch preview only"
+        meta={[
+          { label: "Scope", value: "Local operations" },
+          { label: "Manager", value: "Placeholder" },
+          { label: "Linked modules", value: "PSI / Reports / Roles" },
+          { label: "Context", value: "KCH branch view" },
+          { label: "Issue watch", value: "2 open placeholders" },
+          { label: "Inventory status", value: "Replenishment review active" },
+          { label: "Reports status", value: "Weekly view ready" },
+          { label: "Last updated", value: "Today 15:05" },
+        ]}
+      />
+
+      <MeActionBar
+        actions={[
+          { label: "Review Branch", href: "#" },
+          { label: "Open PSI", variant: "outline", href: "/psi" },
+          { label: "Open Reports", variant: "outline", href: "/reports" },
+          { label: "Export Summary", variant: "outline", href: "#" },
+          { label: "View History", variant: "ghost", href: "#" },
+        ]}
+      />
+
+      <MeTabs
+        style="detail"
+        tabs={[
+          { label: "Overview", active: true },
+          { label: "Operations" },
+          { label: "Staff" },
+          { label: "Inventory" },
+          { label: "Reports" },
+          { label: "Issues", badge: "2" },
+          { label: "Activity" },
+        ]}
+      />
+
+      <MeDetailWorkspace
+        main={
+          <>
+            <MeWorkspaceSection title="Overview" description="Branch profile fields and local operating scope.">
+              <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+                <div className="grid gap-3 md:grid-cols-2">
+                  {[
+                    ["Branch", "KCH"],
+                    ["Status", "Active"],
+                    ["Scope", "Local operations"],
+                    ["Manager", "Placeholder"],
+                    ["Linked modules", "PSI / Reports / Roles"],
+                    ["Inventory watch", "Replenishment review active"],
+                    ["Issue load", "2 open placeholders"],
+                    ["Report cadence", "Weekly operating review"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+                      <p className="mt-1.5 text-sm font-semibold text-slate-900">{value}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Branch Note</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    KCH is the local branch context used to frame PSI, reports, and staff previews. This remains a shell-only branch record with no tenant persistence or permission enforcement.
+                  </p>
+                </div>
+              </div>
+            </MeWorkspaceSection>
+
+            <MeWorkspaceSection title="Operations" description="Compact operating rows and branch-linked issue context.">
+              <MeDataTable
+                embedded
+                columns={["Area", "Status", "Owner", "Notes"]}
+                rows={[
+                  ["PSI operations", "Watch", "Purchasing", "Procurement review linked to replenishment queue"],
+                  ["Inventory readiness", "Active", "Warehouse", "Freezer and dry storage tracked in mock scope"],
+                  ["Staff alignment", "Placeholder", "Branch manager", "No live staffing model connected"],
+                ]}
+              />
+            </MeWorkspaceSection>
+
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+              <MeWorkspaceSection title="Issues and Linked Modules" description="Branch-facing issue rows and module references.">
+                <div className="grid gap-4">
+                  <MeDataTable
+                    embedded
+                    columns={["Issue", "Module", "Status", "Action"]}
+                    rows={[
+                      ["Low-stock review", "PSI", "Open", "Link procurement placeholder"],
+                      ["Weekly performance variance", "Reports", "Watch", "Review report workspace"],
+                    ]}
+                  />
+                  <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Linked Modules</p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      PSI, reports, and roles remain the active linked modules for this branch preview. No tenant-aware switching or branch-specific permissions are applied.
+                    </p>
+                  </div>
+                </div>
+              </MeWorkspaceSection>
+
+              <MeStatusTimeline
+                embedded
+                title="Activity"
+                items={[
+                  { title: "Branch context reviewed", description: "KCH selected as the current local branch frame.", time: "09:00" },
+                  { title: "PSI link opened", description: "Procurement and inventory previews remain available for KCH.", time: "10:15" },
+                  { title: "Issue watch linked", description: "Low-stock branch issue attached to operating overview.", time: "12:05" },
+                  { title: "Report preview updated", description: "Weekly review remains visible from the branch context.", time: "15:05" },
+                ]}
+              />
+            </div>
+          </>
+        }
+        context={
+          <MeWorkspaceSection title="Branch Modules" description="Local branch links and context pointers.">
+            <div className="grid gap-2 text-sm text-slate-600">
+              <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">PSI workspace linked for local replenishment review</div>
+              <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">Reports workspace linked for branch performance review</div>
+              <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">Roles preview linked for local staff context</div>
+            </div>
+          </MeWorkspaceSection>
+        }
+      />
 
       <MeWorkspaceSection title="All Stores" description="Portfolio-style branch overview for headquarters and leadership review.">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
