@@ -44,6 +44,9 @@ export function DemoStoryPage({ data }: DemoStoryPageProps) {
                       <Link href="/stakeholder-summary">Open Stakeholder Summary</Link>
                     </Button>
                     <Button asChild size="sm" variant="outline">
+                      <Link href="/demo-readiness">Open Demo Readiness</Link>
+                    </Button>
+                    <Button asChild size="sm" variant="outline">
                       <Link href={firstStep.route}>Open First Route</Link>
                     </Button>
                   </div>
@@ -74,17 +77,22 @@ export function DemoStoryPage({ data }: DemoStoryPageProps) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <CardTitle className="text-sm">Presentation Next Step</CardTitle>
-                  <CardDescription>After the guided route walkthrough, open the stakeholder summary to close with product positioning, roadmap, and route map context.</CardDescription>
+                  <CardDescription>After the guided route walkthrough, open the stakeholder summary and final QA route to close with product positioning, roadmap, route map context, and readiness checks.</CardDescription>
                 </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/stakeholder-summary">Open Stakeholder Summary</Link>
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button asChild size="sm" variant="outline">
+                    <Link href="/stakeholder-summary">Open Stakeholder Summary</Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href="/demo-readiness">Open Demo Readiness</Link>
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="grid gap-2 text-sm text-muted-foreground md:grid-cols-3">
               <p>Transition from route-by-route storytelling into a single-page ME summary.</p>
               <p>Keep the closing narrative static and presentation-ready with no progress tracking or CRM behavior.</p>
-              <p>Use it for owner, investor, partner, and internal review discussions.</p>
+              <p>Use `/demo-readiness` after the summary to run the final static QA review for owner, investor, partner, and internal walkthroughs.</p>
             </CardContent>
           </Card>
 

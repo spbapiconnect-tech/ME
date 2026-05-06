@@ -130,8 +130,8 @@ This section defines future intelligence directions for ME only.
 ## Milestone Track
 
 - Current branch: `develop`
-- Current milestone: `v0.8.6 Investor / Stakeholder Summary Page Placeholder`
-- Delivery goal: extend the existing mock-data prototype with a presentation-ready stakeholder summary that connects business workspace, navigation, demo routes, roles, branches, PSI, reports, and system foundation without breaking the existing business, PSI, reports, packages, or foundation routes.
+- Current milestone: `v0.8.7 Demo Readiness Final Audit Placeholder`
+- Delivery goal: extend the existing mock-data prototype with a final presentation-readiness audit that connects business workspace, navigation, demo routes, stakeholder summary, roles, branches, PSI, reports, and system foundation without breaking the existing business, PSI, reports, packages, or foundation routes.
 
 ## Procurement Supplier Inventory MVP Planning
 
@@ -317,3 +317,9 @@ This section defines future intelligence directions for ME only.
 - Add `types/stakeholder-summary.ts`, `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` as a presentation-ready summary layer.
 - Add `/stakeholder-summary` as a static overview for owners, investors, partners, operators, and internal reviewers.
 - Keep scope UI-only and mock/read-only only with no investor portal, CRM, share tracking, analytics, personalization, database, API, auth/session, or write path.
+
+## ME Demo Readiness Final Audit (v0.8.7)
+
+- Add `types/demo-readiness.ts`, `config/demo-readiness.ts`, `lib/demo-readiness.ts`, and `components/demo-readiness/` as a static final QA layer.
+- Add `/demo-readiness` as the presentation-ready closing audit after Demo Story, Demo Mode, and Stakeholder Summary.
+- Keep scope UI-only and mock/read-only only with no monitoring, analytics, tracking, browser automation, runtime crawler, CI changes, database, API, auth/session, or write path.

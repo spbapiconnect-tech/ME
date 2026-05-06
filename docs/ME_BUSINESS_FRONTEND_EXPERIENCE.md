@@ -93,3 +93,9 @@ PSI Page Data
 - add `/stakeholder-summary`, `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` as a presentation-ready summary layer
 - add secondary navigation and topbar links to the stakeholder overview without removing existing routes
 - keep the milestone static/read-only only with no investor portal, CRM, share tracking, analytics, user tracking, personalization, database, or API
+
+## ME Demo Readiness Final Audit (v0.8.7)
+- homepage now exposes a small `Demo Readiness` CTA while keeping the business workspace dominant
+- add `/demo-readiness`, `config/demo-readiness.ts`, `lib/demo-readiness.ts`, `types/demo-readiness.ts`, and `components/demo-readiness/` as a final presentation QA layer
+- add low-noise links from homepage, topbar, demo story, demo mode, stakeholder summary, navigation, and system foundation without breaking existing routes
+- keep the milestone static/read-only only with no monitoring, analytics, tracking, browser automation, runtime crawler, CI changes, database, API, auth/session, or write behavior

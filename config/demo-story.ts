@@ -241,18 +241,19 @@ export const meDemoStorySteps: MeDemoStoryStep[] = [
     tone: "muted",
     status: "coming-soon",
     route: "/demo-story",
-    relatedRoutes: ["/packages", "/rules", "/notifications"],
+    relatedRoutes: ["/stakeholder-summary", "/demo-readiness", "/packages", "/rules", "/notifications"],
     primaryCta: { zh: "返回导览总览", en: "Return To Demo Story" },
     secondaryCta: { zh: "查看未来路线", en: "View Roadmap" },
     sourceModules: ["demo-story", "packages", "rules", "notifications"],
     highlights: [
       { zh: "静态导览先服务于 stakeholder demo", en: "The static tour serves stakeholder demos first" },
+      { zh: "现可衔接 Stakeholder Summary 与 Demo Readiness 作为演示收尾", en: "It now hands off into Stakeholder Summary and Demo Readiness for the presentation close" },
       { zh: "未来再迁移到真实 onboarding / guided tour engine", en: "A real onboarding or guided-tour engine can be added later" },
       { zh: "当前不引入任何用户级状态或个性化", en: "No user-level state or personalization is introduced now" },
     ],
     proofPoints: [
       { zh: "未来可连接套餐、规则、通知等基础能力", en: "Future work can connect packages, rules, and notifications foundations" },
-      { zh: "当前 `/demo-story` 只是故事编排层", en: "Current `/demo-story` is a story-orchestration layer only" },
+      { zh: "当前 `/demo-story` 只是故事编排层，并把结尾引向 `/stakeholder-summary` 与 `/demo-readiness`", en: "Current `/demo-story` is a story-orchestration layer that now closes through `/stakeholder-summary` and `/demo-readiness`" },
       { zh: "无持久化进度、analytics、tracking 或 personalization", en: "No persisted progress, analytics, tracking, or personalization is added" },
     ],
     placeholderNotice: {

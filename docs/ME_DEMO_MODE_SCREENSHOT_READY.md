@@ -41,11 +41,17 @@ Demo Mode Config
 - demo mode UI lives in `components/demo-mode/`
 - homepage, demo story, roles, branches, PSI, reports, and system foundation can all expose screenshot-ready notes without changing runtime behavior
 - `/stakeholder-summary` can be used as the presentation closing page after the screenshot-ready route sequence without adding CRM, analytics, or sharing permissions
+- `/demo-readiness` can be used as the final placeholder QA pass after the closing page to review route completeness and screenshot framing without browser automation or CI changes
 
 ## ME Stakeholder Summary (v0.8.6)
 - add `/stakeholder-summary` as the static owner / investor / partner overview placeholder that follows the demo route sequence
 - keep the stakeholder layer presentation-only with no investor portal, no CRM, no analytics, no user tracking, and no sharing permissions
 - reuse `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` instead of creating a parallel portal flow
+
+## ME Demo Readiness Final Audit (v0.8.7)
+- add `/demo-readiness` as the static final QA route after `/demo-mode` and `/stakeholder-summary`
+- keep the milestone UI-only and mock/read-only only with no monitoring SDK, analytics, tracking, runtime crawler, browser automation, or CI integration
+- keep screenshot review as presenter-driven and manual rather than automated
 
 ## Future Migration
 - persisted demo mode toggle

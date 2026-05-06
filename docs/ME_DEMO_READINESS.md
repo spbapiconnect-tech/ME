@@ -2,8 +2,8 @@
 
 ## Current Milestone
 
-- Current milestone: `v0.8.6 Investor / Stakeholder Summary Page Placeholder`
-- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, branch context placeholders, demo story flow placeholders, demo mode presentation framing, stakeholder summary placeholders, and metadata-first foundation pages
+- Current milestone: `v0.8.7 Demo Readiness Final Audit Placeholder`
+- Current prototype status: mock-data SaaS prototype with business-first workspace, shared navigation IA, role workspace placeholders, branch context placeholders, demo story flow placeholders, demo mode presentation framing, stakeholder summary placeholders, demo readiness final audit placeholders, and metadata-first foundation pages
 
 ## What Is Ready
 
@@ -218,3 +218,10 @@
 - `/stakeholder-summary` is available as a static owner / investor / partner overview placeholder.
 - `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` provide the summary metadata, helper utilities, and screenshot-ready UI.
 - No investor portal, CRM, share tracking, analytics, user tracking, personalization, database, or API is added.
+
+## ME Demo Readiness Final Audit (v0.8.7)
+
+- `/demo-readiness` is available as a static final presentation QA placeholder.
+- `types/demo-readiness.ts`, `config/demo-readiness.ts`, `lib/demo-readiness.ts`, and `components/demo-readiness/` provide the final audit contracts, metadata, helpers, and UI.
+- Homepage, topbar, demo story, demo mode, stakeholder summary, navigation, and system foundation now expose low-noise links into the final QA route.
+- No monitoring, analytics, tracking, browser automation, runtime crawler, CI changes, database, API, auth/session, or real write behavior is added.

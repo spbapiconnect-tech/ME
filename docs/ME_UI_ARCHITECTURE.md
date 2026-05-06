@@ -261,3 +261,8 @@
 - add `types/stakeholder-summary.ts`, `config/stakeholder-summary.ts`, and `lib/stakeholder-summary.ts` as the static stakeholder-presentation metadata layer
 - add `components/stakeholder-summary/` for summary chips, metric cards, roadmap cards, route map UI, and the summary page shell
 - `/stakeholder-summary` sits above existing business, demo, role, branch, PSI, report, and foundation routes with no investor portal, CRM, sharing permissions, analytics, storage, database, or API
+
+## ME Demo Readiness Final Audit (v0.8.7)
+- add `types/demo-readiness.ts`, `config/demo-readiness.ts`, and `lib/demo-readiness.ts` as the static presentation-QA metadata layer
+- add `components/demo-readiness/` for metric cards, guardrail cards, route-map UI, checklist sections, and the final audit page shell
+- `/demo-readiness` sits above existing business, demo, stakeholder, role, branch, PSI, report, and foundation routes with no monitoring, analytics, tracking, browser automation, runtime crawler, CI, database, API, auth/session, or write path

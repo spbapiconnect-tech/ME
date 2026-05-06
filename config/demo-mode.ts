@@ -294,6 +294,16 @@ export const meDemoWalkthroughItems: MeDemoWalkthroughItem[] = [
     checkedByDefault: false,
     isPlaceholder: true,
   }),
+  createWalkthroughItem({
+    key: "run-final-demo-qa",
+    order: 10,
+    title: localized("运行最终演示 QA", "Run Final Demo QA"),
+    description: localized("用 Demo Readiness 收尾，统一检查路由、截图 framing 与范围边界。", "Close with Demo Readiness to review routes, screenshot framing, and scope guardrails in one place."),
+    route: "/demo-readiness",
+    surface: "demo-story",
+    checkedByDefault: false,
+    isPlaceholder: true,
+  }),
 ];
 
 export const meDemoModePageData: MeDemoModePageData = {
@@ -311,6 +321,8 @@ export const meDemoModePageData: MeDemoModePageData = {
     "/psi",
     "/reports",
     "/system-foundation",
+    "/stakeholder-summary",
+    "/demo-readiness",
   ],
   generatedAt: meDemoModeGeneratedAt,
   notice: meDemoModeNotice,

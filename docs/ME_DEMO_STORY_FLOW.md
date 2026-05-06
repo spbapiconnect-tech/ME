@@ -42,11 +42,17 @@ Demo Story Config
 - story UI components live in `components/demo-story/`
 - existing business, navigation, role, branch, PSI, report, and foundation pages link into the guided story without changing runtime behavior
 - `/stakeholder-summary` is the presentation-ready next step after the guided route sequence and remains static/read-only only
+- `/demo-readiness` is the final placeholder QA follow-up after `/stakeholder-summary`, keeping route checks, screenshot framing, and scope guardrails visible in one static review step
 
 ## ME Stakeholder Summary (v0.8.6)
 - add `/stakeholder-summary` as the closing summary page for owner, investor, partner, and internal-team walkthroughs
 - keep the transition from `/demo-story` to `/stakeholder-summary` static only with no CRM, share tracking, analytics, or session behavior
 - reuse `config/stakeholder-summary.ts`, `lib/stakeholder-summary.ts`, and `components/stakeholder-summary/` for the presentation layer
+
+## ME Demo Readiness Final Audit (v0.8.7)
+- add `/demo-readiness` as the static final QA checkpoint after the guided walkthrough and stakeholder summary
+- keep the handoff from `/demo-story` to `/stakeholder-summary` to `/demo-readiness` static only with no monitoring, analytics, tracking, browser automation, runtime crawler, or CI changes
+- reuse `config/demo-readiness.ts`, `lib/demo-readiness.ts`, and `components/demo-readiness/` for the final audit layer
 
 ## Future Migration
 - add persisted progress

@@ -51,6 +51,9 @@ export function StakeholderSummaryPage({ data }: StakeholderSummaryPageProps) {
                     <Link href="/demo-mode">Open Demo Mode</Link>
                   </Button>
                   <Button asChild size="sm" variant="outline">
+                    <Link href="/demo-readiness">Open Demo Readiness</Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
                     <Link href="/">Open Business Workspace</Link>
                   </Button>
                 </div>
@@ -140,6 +143,23 @@ export function StakeholderSummaryPage({ data }: StakeholderSummaryPageProps) {
             <div className="grid gap-4">
               {routeMapCard ? <StakeholderSummaryCard card={routeMapCard} /> : null}
               {nextStepsCard ? <StakeholderSummaryCard card={nextStepsCard} /> : null}
+              <Card size="sm" className="border-dashed border-border/80 bg-muted/20">
+                <CardHeader className="gap-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-sm">Final Demo QA</CardTitle>
+                      <CardDescription>Close the stakeholder conversation with the static Demo Readiness audit before screenshots, handoff notes, or next-step discussions.</CardDescription>
+                    </div>
+                    <Button asChild size="sm" variant="outline">
+                      <Link href="/demo-readiness">Open Demo Readiness</Link>
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="grid gap-2 text-sm text-muted-foreground">
+                  <p>Review the final route checklist, CTA consistency, and screenshot framing from one placeholder-only page.</p>
+                  <p>Keep the wrap-up static with no investor tracking, CRM sync, analytics, sharing permissions, browser automation, or CI workflow.</p>
+                </CardContent>
+              </Card>
             </div>
           </section>
         </div>

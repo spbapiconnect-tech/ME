@@ -41,7 +41,12 @@ Stakeholder Summary Config
 - stakeholder metadata lives in `config/stakeholder-summary.ts`
 - stakeholder helpers live in `lib/stakeholder-summary.ts`
 - stakeholder UI lives in `components/stakeholder-summary/`
-- homepage, topbar, demo story, demo mode, navigation, and system foundation can link into the stakeholder summary without changing runtime behavior
+- homepage, topbar, demo story, demo mode, navigation, system foundation, and demo readiness can link into the stakeholder summary without changing runtime behavior
+
+## ME Demo Readiness Final Audit (v0.8.7)
+- add `/demo-readiness` as the static final QA route that follows the stakeholder summary close
+- keep the final audit presentation-only with no investor tracking, CRM sync, analytics, share tracking, browser automation, runtime crawler, or CI changes
+- reuse the existing summary and demo route map context while adding a final presentation-readiness checkpoint
 
 ## Future Migration
 - shareable stakeholder deck

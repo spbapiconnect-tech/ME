@@ -57,11 +57,11 @@ export const meStakeholderSummaryMetrics: MeStakeholderSummaryMetric[] = [
   createMetric({
     key: "demo-routes",
     label: localized("演示路由数", "Demo Routes"),
-    value: "9",
+    value: "10",
     tone: "info",
     description: localized(
-      "把首页、Demo Story、Demo Mode、导航、角色、门店、PSI、报表与系统基础层串成可讲解路径。",
-      "Connects the homepage, Demo Story, Demo Mode, navigation, roles, branches, PSI, reports, and system foundation into one explainable path.",
+      "把首页、Demo Story、Demo Mode、导航、角色、门店、PSI、报表、Stakeholder Summary 与最终 QA 串成可讲解路径。",
+      "Connects the homepage, Demo Story, Demo Mode, navigation, roles, branches, PSI, reports, Stakeholder Summary, and the final QA route into one explainable path.",
     ),
   }),
   createMetric({
@@ -180,7 +180,7 @@ export const meStakeholderSummaryCards: MeStakeholderSummaryCard[] = [
     proofPoints: [
       localized("`config/navigation.ts` 仍是导航单一事实来源。", "`config/navigation.ts` remains the single source of truth."),
       localized("`/navigation` 已存在并保持工作。", "`/navigation` already exists and remains working."),
-      localized("新增 Stakeholder Summary 作为次级链接接入。", "The new Stakeholder Summary plugs in as a secondary link."),
+      localized("Stakeholder Summary 与 Demo Readiness 作为次级链接接入。", "Stakeholder Summary and Demo Readiness plug in as secondary links."),
     ],
     isPlaceholder: true,
   }),
@@ -354,7 +354,7 @@ export const meStakeholderSummaryCards: MeStakeholderSummaryCard[] = [
     ],
     proofPoints: [
       localized("已覆盖 v0.8.0 到 v0.8.5 的已完成阶段。", "Covers completed milestones from v0.8.0 through v0.8.5."),
-      localized("v0.8.6 标记为 Stakeholder Summary in-progress。", "Marks v0.8.6 as Stakeholder Summary in-progress."),
+      localized("v0.8.6 标记为 Stakeholder Summary 完成，v0.8.7 标记为 Demo Readiness Final Audit 完成。", "Marks v0.8.6 Stakeholder Summary and v0.8.7 Demo Readiness Final Audit as completed milestones."),
       localized("v0.9.x 和 v1.0.0 作为后续规划展示。", "Keeps v0.9.x and v1.0.0 as forward-looking roadmap entries."),
     ],
     isPlaceholder: true,
@@ -374,7 +374,7 @@ export const meStakeholderSummaryCards: MeStakeholderSummaryCard[] = [
       localized("当前仅作为静态链接清单，不做分享记录。", "Acts as a static link sequence only with no sharing records."),
     ],
     proofPoints: [
-      localized("覆盖 `/`、`/demo-story`、`/demo-mode`、`/navigation`、`/roles`、`/branches`、`/psi`、`/reports`、`/system-foundation`。", "Covers `/`, `/demo-story`, `/demo-mode`, `/navigation`, `/roles`, `/branches`, `/psi`, `/reports`, and `/system-foundation`."),
+      localized("覆盖 `/`、`/demo-story`、`/demo-mode`、`/navigation`、`/roles`、`/branches`、`/psi`、`/reports`、`/system-foundation` 与 `/demo-readiness`。", "Covers `/`, `/demo-story`, `/demo-mode`, `/navigation`, `/roles`, `/branches`, `/psi`, `/reports`, `/system-foundation`, and `/demo-readiness`."),
       localized("链接直接复用现有可访问路由。", "Links directly reuse existing reachable routes."),
       localized("没有分享权限、访问记录或点击追踪。", "There are no sharing permissions, access logs, or click tracking."),
     ],
@@ -455,10 +455,18 @@ export const meStakeholderRoadmapItems: MeStakeholderRoadmapItem[] = [
   createRoadmapItem({
     key: "v0-8-6-stakeholder-summary",
     title: localized("v0.8.6 Stakeholder Summary", "v0.8.6 Stakeholder Summary"),
-    description: localized("面向 owner、investor、partner 与内部团队的静态总结页进行中。", "Static summary page for owners, investors, partners, and internal teams is in progress."),
-    status: "in-progress",
+    description: localized("面向 owner、investor、partner 与内部团队的静态总结页已完成。", "Static summary page for owners, investors, partners, and internal teams completed."),
+    status: "completed",
     route: "/stakeholder-summary",
-    tag: "in-progress",
+    tag: "completed",
+  }),
+  createRoadmapItem({
+    key: "v0-8-7-demo-readiness-final-audit",
+    title: localized("v0.8.7 Demo Readiness Final Audit", "v0.8.7 Demo Readiness Final Audit"),
+    description: localized("最终演示 QA 审计页与跨页面收尾链接已完成。", "Final presentation QA audit route and cross-page closing links completed."),
+    status: "completed",
+    route: "/demo-readiness",
+    tag: "completed",
   }),
   createRoadmapItem({
     key: "v0-9-x-api-database-prep",
@@ -538,6 +546,13 @@ export const meStakeholderDemoRouteMap: MeStakeholderDemoRoute[] = [
     title: localized("系统基础层", "ME System Foundation"),
     description: localized("解释未来平台契约与扩展能力。", "Explain future platform contracts and extensibility."),
     route: "/system-foundation",
+    tone: "muted",
+  }),
+  createDemoRoute({
+    key: "demo-readiness",
+    title: localized("最终演示 QA", "ME Demo Readiness"),
+    description: localized("以静态最终审计收尾，检查路由、截图 framing 与范围边界。", "Close with the static final audit to review routes, screenshot framing, and scope guardrails."),
+    route: "/demo-readiness",
     tone: "muted",
   }),
 ];

@@ -53,6 +53,9 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                     <Link href="/stakeholder-summary">Stakeholder Summary</Link>
                   </Button>
                   <Button asChild variant="outline" size="sm">
+                    <Link href="/demo-readiness">Demo Readiness</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm">
                     <Link href="/navigation">Navigation IA</Link>
                   </Button>
                   <Button asChild variant="outline" size="sm">
@@ -153,6 +156,25 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                   <p className="text-xs text-muted-foreground">{metric.description?.en}</p>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card size="sm" className="border-dashed border-border/80 bg-muted/20">
+            <CardHeader className="gap-1">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <CardTitle className="text-sm">Final Demo QA</CardTitle>
+                  <CardDescription>Use Demo Readiness as the final placeholder audit before screenshots, stakeholder reviews, and live walkthroughs.</CardDescription>
+                </div>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/demo-readiness">Open Demo Readiness</Link>
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="grid gap-2 text-sm text-muted-foreground md:grid-cols-3">
+              <p>Review route completeness, CTA flow, and screenshot framing without changing any runtime behavior.</p>
+              <p>Keep the audit static and read-only with no monitoring, analytics, tracking, browser automation, or CI dependency.</p>
+              <p>Use it after the business workspace, Demo Story, Demo Mode, and Stakeholder Summary as the presentation close-out check.</p>
             </CardContent>
           </Card>
 

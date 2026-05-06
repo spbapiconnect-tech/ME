@@ -51,6 +51,7 @@ Use Conventional Commits.
 - `/roles` remains reachable from the homepage, `/navigation`, and `/system-foundation` without changing runtime access rules
 - `/branches` remains reachable from the homepage, topbar, `/navigation`, `/roles`, and `/system-foundation` without changing runtime access rules
 - `/stakeholder-summary` remains reachable from navigation, homepage, demo story, demo mode, and `/system-foundation` without adding CRM, analytics, tracking, or sharing permissions
+- `/demo-readiness` remains reachable from homepage, topbar, demo story, demo mode, stakeholder summary, navigation, and `/system-foundation` without adding monitoring, analytics, tracking, browser automation, runtime crawler, or CI changes
 
 ## Module Registry Milestone
 
@@ -306,4 +307,11 @@ Use Conventional Commits.
 - Add `config/stakeholder-summary.ts` before hardcoding summary sections or route maps into page components.
 - Add `components/stakeholder-summary/` and `/stakeholder-summary` as a static presentation layer only.
 - Verify no investor portal, CRM, share tracking, analytics, personalization, storage API, database/API, auth/session, or write behavior is introduced.
+- Keep `.write_test` untouched, unstaged, and uncommitted.
+
+## ME Demo Readiness Final Audit (v0.8.7)
+
+- Add `config/demo-readiness.ts` before hardcoding final audit sections or route-check lists into page components.
+- Add `components/demo-readiness/` and `/demo-readiness` as a static presentation-QA layer only.
+- Verify no monitoring, analytics, tracking, browser automation, runtime crawler, CI, database/API, auth/session, or write behavior is introduced.
 - Keep `.write_test` untouched, unstaged, and uncommitted.

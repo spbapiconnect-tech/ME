@@ -367,7 +367,6 @@ const demoStory = createItem({
   notes: "Static guided demo story placeholder. No onboarding state, analytics, tracking, or personalization is connected.",
 });
 
-
 const demoMode = createItem({
   key: "demo-mode",
   label: { zh: "Demo Mode", en: "Demo Mode" },
@@ -400,6 +399,23 @@ const stakeholderSummary = createItem({
   isPrimary: false,
   isFoundation: false,
   notes: "Static stakeholder summary placeholder. No investor portal, CRM, analytics, tracking, or sharing permissions are connected.",
+});
+
+const demoReadiness = createItem({
+  key: "demo-readiness",
+  label: { zh: "Demo Readiness", en: "Demo Readiness" },
+  description: {
+    zh: "ME 最终演示就绪审计占位入口。",
+    en: "Final ME presentation QA audit placeholder entry.",
+  },
+  href: "/demo-readiness",
+  group: "footer",
+  status: "preview-only",
+  tone: "muted",
+  badge: { zh: "QA", en: "QA" },
+  isPrimary: false,
+  isFoundation: false,
+  notes: "Static presentation QA placeholder. No monitoring, analytics, tracking, browser automation, runtime crawling, or CI changes are connected.",
 });
 
 const modules = createItem({
@@ -491,7 +507,7 @@ export const navigationMap: MeNavigationMap = {
       isFoundationGroup: true,
     },
   ],
-  footerItems: [demoStory, demoMode, stakeholderSummary, modules, demo, templates],
+  footerItems: [demoStory, demoMode, stakeholderSummary, demoReadiness, modules, demo, templates],
   generatedAt: "2026-05-06T00:00:00.000Z",
   notice: {
     zh: "当前导航 IA 仅用于 UI/导航演示，不包含认证、权限、数据库、API 或真实写操作。",

@@ -40,6 +40,9 @@ export function DemoModePage({ data }: DemoModePageProps) {
                     <Link href="/stakeholder-summary">Open Stakeholder Summary</Link>
                   </Button>
                   <Button asChild size="sm" variant="outline">
+                    <Link href="/demo-readiness">Open Demo Readiness</Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
                     <Link href="/">Open Business Workspace</Link>
                   </Button>
                 </div>
@@ -100,17 +103,22 @@ export function DemoModePage({ data }: DemoModePageProps) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <CardTitle className="text-sm">Presentation Next Step</CardTitle>
-                  <CardDescription>Use the stakeholder summary as the presentation close after screenshot framing and route walkthrough prep.</CardDescription>
+                  <CardDescription>Use the stakeholder summary and final QA route as the presentation close after screenshot framing and route walkthrough prep.</CardDescription>
                 </div>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/stakeholder-summary">Open Stakeholder Summary</Link>
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button asChild size="sm" variant="outline">
+                    <Link href="/stakeholder-summary">Open Stakeholder Summary</Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <Link href="/demo-readiness">Open Demo Readiness</Link>
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="grid gap-2 text-sm text-muted-foreground md:grid-cols-3">
               <p>Summarize ME as a product, business opportunity, and modular platform in one page.</p>
               <p>Keep the presentation static and read-only with no investor portal, CRM, analytics, or sharing permissions.</p>
-              <p>Use it after `/demo-story` or `/demo-mode` when the conversation shifts from screens to the investment narrative.</p>
+              <p>Finish with `/demo-readiness` to run the final placeholder QA review after `/demo-story`, `/demo-mode`, and the stakeholder close.</p>
             </CardContent>
           </Card>
 
