@@ -1,0 +1,28 @@
+# ME PSI Detail Lifecycle Timeline Placeholder (v0.7.2)
+
+## Scope
+- Placeholder-only PSI detail enhancements.
+- No real status transitions.
+- No real issue updates.
+- No real audit persistence.
+- No real task creation.
+- No real workflow trigger.
+- No real notification sending.
+- No database/API/backend/middleware/session lookup.
+
+## Implemented Routes
+- `/psi/procurement/[id]`
+- `/psi/supplier/[id]`
+- `/psi/inventory/[id]`
+- `/psi/issues`
+
+## Detail Panels
+- Summary header
+- Key fields
+- Lifecycle strip
+- Timeline placeholder
+- Linked records
+- Insights
+- Related action placeholders
+- Related task placeholders
+- Source/mock notice

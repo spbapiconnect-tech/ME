@@ -60,3 +60,17 @@ export type {
   PsiActionFieldType,
   PsiActionSection,
 } from "./actions";
+
+export type {
+  PsiDetailInsight,
+  PsiDetailPanelData,
+  PsiIssueLifecycleStage,
+  PsiLifecycleEventType,
+  PsiLifecycleStatus,
+  PsiLinkedRecord,
+  PsiTimelineActor,
+  PsiTimelineActorType,
+  PsiTimelineEvent,
+  PsiTimelineSource,
+  PsiTimelineTone,
+} from "./lifecycle";

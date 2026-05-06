@@ -45,6 +45,10 @@ export function PsiActionDetailPage({ action, actionKey }: PsiActionDetailPagePr
             Back to ME PSI Actions
           </Link>
         </CardContent>
+          <div className="mt-2 flex flex-wrap gap-3 text-xs">
+            <Link href="/psi/issues" className="text-primary hover:underline">Open PSI Issues</Link>
+            <Link href="/psi/procurement" className="text-primary hover:underline">Lifecycle/timeline placeholders in PSI details</Link>
+          </div>
       </Card>
 
       <PsiActionFormPreview action={action} locale={locale} />

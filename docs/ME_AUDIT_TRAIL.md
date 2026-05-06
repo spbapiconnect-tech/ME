@@ -111,3 +111,12 @@ ActionContract
 - Add PSI action draft contracts in `types/psi/actions.ts` and `config/psi/action-drafts.ts`.
 - Add UI components under `components/psi/actions/` and helper utilities in `lib/psi-actions.ts`.
 - Scope remains placeholder-only: no real submit, no write service/repository method, no database/API, no approval workflow, no stock posting, no supplier portal, no task creation, and no workflow/notification execution.
+
+
+## ME PSI Detail / Issue / Timeline Placeholder (v0.7.2)
+
+- Add PSI detail placeholder sections: summary header, key fields, lifecycle strip, timeline, linked records, insights, related actions, related tasks, source/mock notice.
+- Add `/psi/issues` combined issue placeholder route for procurement/supplier/inventory issue previews.
+- Add workspace issue preview badges for status/priority/source/related-action/lifecycle placeholder context.
+- Keep all behaviors read-only and preview-only.
+- No real status transition, issue update, audit write, task creation, workflow trigger, notification sending, database/API/backend/middleware/session integration.

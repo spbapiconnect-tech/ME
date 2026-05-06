@@ -17,6 +17,7 @@ export default async function PsiSupplierDetailPage({ params }: Props) {
       error={data.error}
       rows={data.detailRows}
       backHref="/psi/supplier"
+      detailPanelData={data.detailPanelData}
       relatedActions={[
         { label: "Add Supplier", actionKey: "psi.action.addSupplier" },
         { label: "Review Supplier", actionKey: "psi.action.reviewSupplier" },

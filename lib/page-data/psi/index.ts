@@ -18,3 +18,9 @@ export {
   type PsiInventoryDetailPageData,
   type PsiInventoryWorkspacePageData,
 } from "./inventory-page-data";
+
+export {
+  getPsiIssuesPageData,
+  type PsiIssuePlaceholderRow,
+  type PsiIssuesPageData,
+} from "./issues-page-data";

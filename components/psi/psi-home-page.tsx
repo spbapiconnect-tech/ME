@@ -18,6 +18,7 @@ export function PsiHomePage() {
           <Link href="/psi/procurement" className="rounded-xl border p-4 text-sm hover:bg-muted/40">Procurement Workspace</Link>
           <Link href="/psi/supplier" className="rounded-xl border p-4 text-sm hover:bg-muted/40">Supplier Workspace</Link>
           <Link href="/psi/inventory" className="rounded-xl border p-4 text-sm hover:bg-muted/40">Inventory Workspace</Link>
+          <Link href="/psi/issues" className="rounded-xl border p-4 text-sm hover:bg-muted/40">PSI Issue Placeholders</Link>
           <Link href="/psi/actions" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">PSI Action Drafts</Link>
         </CardContent>
       </Card>
