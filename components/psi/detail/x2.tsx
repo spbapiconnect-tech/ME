@@ -54,6 +54,7 @@ export function PsiWorkspaceLayoutV072(props: PsiWorkspaceLayoutV072Props) {
         <CardContent className="flex flex-wrap gap-2">
           <Link href="/psi/actions" className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">Open PSI Actions</Link>
           <Link href="/psi/issues" className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">Open PSI Issues</Link>
+          <Link href="/reports" className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">PSI Report Preview</Link>
           {actionShortcuts.map((item) => (
             <Link key={item.actionKey} href={`/psi/actions/${item.actionKey}`} className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">
               {item.label}

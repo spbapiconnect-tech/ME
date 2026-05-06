@@ -87,6 +87,9 @@ export function PsiDetailLayoutV072({
           <Link href="/psi/actions" className="text-primary hover:underline">
             Open PSI Actions
           </Link>
+          <Link href="/reports" className="text-primary hover:underline">
+            Open PSI Report Preview
+          </Link>
         </CardContent>
       </Card>
 

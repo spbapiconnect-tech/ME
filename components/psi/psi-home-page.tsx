@@ -20,6 +20,7 @@ export function PsiHomePage() {
           <Link href="/psi/inventory" className="rounded-xl border p-4 text-sm hover:bg-muted/40">Inventory Workspace</Link>
           <Link href="/psi/issues" className="rounded-xl border p-4 text-sm hover:bg-muted/40">PSI Issue Placeholders</Link>
           <Link href="/psi/actions" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">PSI Action Drafts</Link>
+          <Link href="/reports" className="rounded-xl border p-4 text-sm hover:bg-muted/40 md:col-span-3">PSI Report Preview</Link>
         </CardContent>
       </Card>
 

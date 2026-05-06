@@ -42,6 +42,7 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
               <div className="mt-2 flex flex-wrap gap-3 text-xs">
                 {row.detailHref ? <Link href={row.detailHref} className="text-primary hover:underline">Open module detail</Link> : null}
                 {row.actionHref ? <Link href={row.actionHref} className="text-primary hover:underline">Open action placeholder</Link> : null}
+                <Link href="/reports" className="text-primary hover:underline">PSI Report Preview</Link>
               </div>
             </div>
           ))}

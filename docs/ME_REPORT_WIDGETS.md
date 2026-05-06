@@ -86,3 +86,9 @@ Report widget source mapping keys (`actionKey`, `accessRuleKey`, `auditEventKey`
 - Add package preview components in `components/packages/`.
 - Keep package and plan behavior metadata-only: no real billing, payment, subscription enforcement, tenant provisioning, runtime module enable/disable, API/backend/database, or session lookup.
 - Keep package source mapping stable across layout/skin/page-template redesigns.
+
+## ME PSI Report Widget Connection (v0.7.3)
+- Add `/reports` PSI preview panel that renders PSI read-only mock business widgets.
+- Add PSI report page-data helper: `lib/page-data/psi/reports-page-data.ts`.
+- Add PSI report adapter: `lib/display-adapters/psi/reports.adapter.ts`.
+- Keep metadata-only contract behavior: no real BI/chart/SQL/database/API/backend/export/schedule.

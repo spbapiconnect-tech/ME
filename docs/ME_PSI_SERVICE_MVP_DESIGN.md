@@ -56,3 +56,8 @@ PSI DTO
 - Add workspace issue preview badges for status/priority/source/related-action/lifecycle placeholder context.
 - Keep all behaviors read-only and preview-only.
 - No real status transition, issue update, audit write, task creation, workflow trigger, notification sending, database/API/backend/middleware/session integration.
+
+## ME PSI Report Widget Connection (v0.7.3)
+- Add PSI report preview DTOs under `types/psi/reports.ts`.
+- Add PSI report adapter and page-data bridge for `/reports` preview panel.
+- Scope remains read-only mock preview with no BI/chart/SQL/database/API/backend.

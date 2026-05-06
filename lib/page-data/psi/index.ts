@@ -24,3 +24,10 @@ export {
   type PsiIssuePlaceholderRow,
   type PsiIssuesPageData,
 } from "./issues-page-data";
+
+export {
+  getPsiModuleReportPageData,
+  getPsiReportDashboardPageData,
+  getPsiReportWidgetPreviewData,
+  type PsiReportModuleCode,
+} from "./reports-page-data";

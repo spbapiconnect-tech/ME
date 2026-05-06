@@ -26,3 +26,8 @@
 - Related action placeholders
 - Related task placeholders
 - Source/mock notice
+
+## ME PSI Report Widget Connection Note
+- `/reports` now includes PSI issue summary and lifecycle summary preview widgets.
+- Data comes from `lib/page-data/psi/reports-page-data.ts` via PSI report adapter layer.
+- Still read-only and metadata-only; no BI/SQL/database/API execution.

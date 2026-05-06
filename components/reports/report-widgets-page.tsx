@@ -7,6 +7,7 @@ import { DashboardLayoutCard } from "@/components/reports/dashboard-layout-card"
 import { ReportWidgetCard } from "@/components/reports/report-widget-card";
 import { ReportWidgetPreviewCard } from "@/components/reports/report-widget-preview-card";
 import { ReportWidgetSourceCard } from "@/components/reports/report-widget-source-card";
+import { PsiReportDashboardPanel } from "@/components/reports/psi-report-dashboard-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +24,7 @@ import {
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { SupportedLocale } from "@/types/module";
 import type { DashboardLayoutContract, ReportWidgetSeverity, ReportWidgetStatus, ReportWidgetType } from "@/types/report-widget";
+import type { PsiReportDashboardData } from "@/types/psi";
 
 const widgetTypeOptions: Array<ReportWidgetType | "all"> = [
   "all",
@@ -55,7 +57,7 @@ function getLayoutsByWidget(widgetKey: string): DashboardLayoutContract[] {
   return dashboardLayoutCatalog.filter((layout) => layout.widgets.includes(widgetKey));
 }
 
-export function ReportWidgetsPage() {
+export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: PsiReportDashboardData | null } = {}) {
   const locale = useUiPreferencesStore((state) => state.locale);
   const theme = useUiPreferencesStore((state) => state.theme);
   const hydrated = useUiPreferencesStore((state) => state.hydrated);
@@ -165,6 +167,22 @@ export function ReportWidgetsPage() {
           <div className="flex flex-wrap gap-1.5 text-xs">{Object.entries(stats.bySourceModule).map(([key, value]) => <Badge key={key} variant="outline">{key}: {value}</Badge>)}</div>
         </CardContent>
       </Card>
+
+      {psiDashboardData ? (
+        <Card size="sm">
+          <CardHeader className="gap-1">
+            <CardTitle className="text-sm">ME PSI Report Preview</CardTitle>
+            <CardDescription>
+              {currentLocale === "zh"
+                ? "PSI 业务 mock 数据只读预览区：不执行 BI 引擎、SQL、数据库查询、API、导出或调度。"
+                : "Read-only PSI mock business preview: no BI engine, SQL, database query, API, export, or scheduling."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3">
+            <PsiReportDashboardPanel data={psiDashboardData} locale={currentLocale} />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card size="sm">
         <CardHeader className="gap-1"><CardTitle className="text-sm">Filters</CardTitle></CardHeader>

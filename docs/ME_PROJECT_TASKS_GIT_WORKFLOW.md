@@ -250,3 +250,7 @@ Use Conventional Commits.
 - Add workspace issue preview badges for status/priority/source/related-action/lifecycle placeholder context.
 - Keep all behaviors read-only and preview-only.
 - No real status transition, issue update, audit write, task creation, workflow trigger, notification sending, database/API/backend/middleware/session integration.
+
+## ME PSI Report Widget Connection (v0.7.3)
+- Add PSI report widget preview integration into existing report contract registry.
+- Keep report/PSI milestones mock-only and read-only without BI/SQL/database/API execution.

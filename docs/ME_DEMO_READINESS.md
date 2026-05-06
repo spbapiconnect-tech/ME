@@ -169,3 +169,7 @@
 - Add workspace issue preview badges for status/priority/source/related-action/lifecycle placeholder context.
 - Keep all behaviors read-only and preview-only.
 - No real status transition, issue update, audit write, task creation, workflow trigger, notification sending, database/API/backend/middleware/session integration.
+
+## ME PSI Report Widget Connection (v0.7.3)
+- `/reports` includes ME PSI Report Preview based on PSI page-data and display adapters.
+- Current readiness remains mock/read-only with no BI engine, chart execution, SQL, database, API, export, or schedule.

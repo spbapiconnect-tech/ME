@@ -74,3 +74,13 @@ export type {
   PsiTimelineSource,
   PsiTimelineTone,
 } from "./lifecycle";
+
+
+export type {
+  PsiReportDashboardData,
+  PsiReportListItem,
+  PsiReportMetric,
+  PsiReportMetricTone,
+  PsiReportWidgetData,
+  PsiReportWidgetPreviewKind,
+} from "./reports";

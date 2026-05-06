@@ -267,3 +267,8 @@ This section defines future intelligence directions for ME only.
 - Add workspace issue preview badges for status/priority/source/related-action/lifecycle placeholder context.
 - Keep all behaviors read-only and preview-only.
 - No real status transition, issue update, audit write, task creation, workflow trigger, notification sending, database/API/backend/middleware/session integration.
+
+## ME PSI Report Widget Connection (v0.7.3)
+- `/reports` now has a PSI business preview panel using read-only mock page-data outputs.
+- Added `lib/display-adapters/psi/reports.adapter.ts` and `lib/page-data/psi/reports-page-data.ts`.
+- No real BI/chart/query/export/scheduling/database/API/backend/session/middleware added.
