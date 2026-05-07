@@ -90,6 +90,7 @@ test("branch helper contains no fetch or axios", async () => {
 test("no forbidden legacy brand names in branch docs config and components", async () => {
   const files = [
     "config/branches.ts",
+    "components/branches/branch-management-figma-page.tsx",
     "components/branches/branch-workspace-page.tsx",
     "components/branches/branch-workspace-detail-page.tsx",
     "docs/ME_BRANCH_CONTEXT_PLACEHOLDERS.md",
@@ -104,6 +105,7 @@ test(".write_test is not referenced in branch workspace files", async () => {
   const files = [
     "config/branches.ts",
     "lib/branch-context.ts",
+    "components/branches/branch-management-figma-page.tsx",
     "components/branches/branch-workspace-page.tsx",
     "docs/ME_BRANCH_CONTEXT_PLACEHOLDERS.md",
   ];

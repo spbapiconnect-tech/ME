@@ -106,6 +106,7 @@ test(".write_test is not referenced in shell files", async () => {
 test("primary customer-facing pages do not expose legacy demo wording", async () => {
   const files = [
     "components/business/business-workspace-page.tsx",
+    "components/branches/branch-management-figma-page.tsx",
     "components/branches/branch-workspace-page.tsx",
     "components/psi/psi-home-page.tsx",
     "components/psi/psi-supplier-page.tsx",

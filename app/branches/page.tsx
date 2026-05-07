@@ -1,6 +1,5 @@
-import { BranchWorkspacePage } from "@/components/branches";
-import { getBranchProfiles } from "@/lib/branch-context";
+import { BranchManagementFigmaPage } from "@/components/branches/branch-management-figma-page";
 
 export default function BranchesPage() {
-  return <BranchWorkspacePage branches={getBranchProfiles()} />;
+  return <BranchManagementFigmaPage />;
 }
