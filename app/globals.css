@@ -22,27 +22,28 @@
   --hero-orb-a: rgba(37, 99, 235, 0.05);
   --hero-orb-b: rgba(148, 163, 184, 0.08);
   --hero-grid: rgba(148, 163, 184, 0.03);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --font-sans: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
 
   --foreground: var(--text-primary);
-  --card: rgba(255, 255, 255, 0.96);
+  --card: #ffffff;
   --card-foreground: var(--text-primary);
-  --popover: rgba(255, 255, 255, 0.9);
+  --popover: #ffffff;
   --popover-foreground: var(--text-primary);
-  --secondary: rgba(241, 245, 249, 0.96);
+  --secondary: #f1f5f9;
   --secondary-foreground: var(--text-primary);
-  --muted: rgba(241, 245, 249, 0.78);
+  --muted: #f1f5f9;
   --muted-foreground: var(--text-muted);
+  --accent: #eff6ff;
   --accent-foreground: var(--text-primary);
   --primary-foreground: #ffffff;
   --destructive: var(--danger);
   --destructive-foreground: #ffffff;
-  --input: rgba(226, 232, 240, 0.95);
+  --input: #dbe3ef;
   --ring: rgba(37, 99, 235, 0.18);
-  --radius: 1rem;
+  --radius: 0.75rem;
 }
 
 :root[data-theme="dark"] {
@@ -66,6 +67,22 @@
   --hero-orb-a: rgba(102, 162, 255, 0.2);
   --hero-orb-b: rgba(64, 192, 174, 0.16);
   --hero-grid: rgba(102, 162, 255, 0.12);
+  --foreground: var(--text-primary);
+  --card: #0f192f;
+  --card-foreground: var(--text-primary);
+  --popover: #111f3a;
+  --popover-foreground: var(--text-primary);
+  --secondary: rgba(17, 31, 58, 0.94);
+  --secondary-foreground: var(--text-primary);
+  --muted: rgba(17, 31, 58, 0.78);
+  --muted-foreground: var(--text-muted);
+  --accent: rgba(102, 162, 255, 0.16);
+  --accent-foreground: var(--text-primary);
+  --primary-foreground: #061121;
+  --destructive: var(--danger);
+  --destructive-foreground: #23070a;
+  --input: rgba(148, 163, 184, 0.22);
+  --ring: rgba(102, 162, 255, 0.32);
 }
 
 :root[data-theme="moon"] {
@@ -89,6 +106,22 @@
   --hero-orb-a: rgba(140, 168, 255, 0.2);
   --hero-orb-b: rgba(134, 209, 255, 0.14);
   --hero-grid: rgba(140, 168, 255, 0.1);
+  --foreground: var(--text-primary);
+  --card: #19223e;
+  --card-foreground: var(--text-primary);
+  --popover: #1f2a4c;
+  --popover-foreground: var(--text-primary);
+  --secondary: rgba(31, 42, 76, 0.92);
+  --secondary-foreground: var(--text-primary);
+  --muted: rgba(31, 42, 76, 0.76);
+  --muted-foreground: var(--text-muted);
+  --accent: rgba(140, 168, 255, 0.16);
+  --accent-foreground: var(--text-primary);
+  --primary-foreground: #091020;
+  --destructive: var(--danger);
+  --destructive-foreground: #240a10;
+  --input: rgba(157, 174, 215, 0.22);
+  --ring: rgba(140, 168, 255, 0.34);
 }
 
 * {
@@ -104,11 +137,8 @@ body {
 body {
   min-height: 100vh;
   overflow-x: hidden;
-  background:
-    radial-gradient(circle at top left, var(--hero-orb-a), transparent 30%),
-    radial-gradient(circle at 84% 9%, var(--hero-orb-b), transparent 24%),
-    linear-gradient(180deg, #f8fafc 0%, var(--background) 44%, #f5f7fb 100%);
-  color: var(--text-primary);
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-sans);
 }
 

@@ -67,8 +67,8 @@ test("/branches route imports without crashing", async () => {
   assert.equal(typeof route.default, "function");
 });
 
-test("/branches/[branchKey] route imports without crashing", async () => {
-  const route = await import("../app/branches/[branchKey]/page");
+test("/branches/[id] route imports without crashing", async () => {
+  const route = await import("../app/branches/[id]/page");
   assert.equal(typeof route.default, "function");
 });
 
@@ -90,7 +90,8 @@ test("branch helper contains no fetch or axios", async () => {
 test("no forbidden legacy brand names in branch docs config and components", async () => {
   const files = [
     "config/branches.ts",
-    "components/branches/branch-management-figma-page.tsx",
+    "components/branches/branch-erp-page.tsx",
+    "components/branches/branch-erp-detail-page.tsx",
     "components/branches/branch-workspace-page.tsx",
     "components/branches/branch-workspace-detail-page.tsx",
     "docs/ME_BRANCH_CONTEXT_PLACEHOLDERS.md",
@@ -105,7 +106,8 @@ test(".write_test is not referenced in branch workspace files", async () => {
   const files = [
     "config/branches.ts",
     "lib/branch-context.ts",
-    "components/branches/branch-management-figma-page.tsx",
+    "components/branches/branch-erp-page.tsx",
+    "components/branches/branch-erp-detail-page.tsx",
     "components/branches/branch-workspace-page.tsx",
     "docs/ME_BRANCH_CONTEXT_PLACEHOLDERS.md",
   ];
