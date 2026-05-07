@@ -14,7 +14,7 @@ interface MeActionBarAction {
 
 export function MeActionBar({ actions }: { actions: MeActionBarAction[] }) {
   return (
-    <Card size="sm" className="border-border/60 bg-white/90 shadow-[0_14px_26px_-28px_rgba(15,23,42,0.14)]">
+    <Card size="sm" className="border-border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
       <CardContent className="flex flex-wrap items-center gap-2 pt-4">
         {actions.map((action) =>
           action.href ? (

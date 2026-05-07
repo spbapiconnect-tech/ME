@@ -11,7 +11,7 @@ interface MeRecordSummaryProps {
 
 export function MeRecordSummary({ title, subtitle, status, guardrail, meta }: MeRecordSummaryProps) {
   return (
-    <Card size="sm" className="border-border/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.985),rgba(248,250,254,0.95))] shadow-[0_18px_28px_-26px_rgba(15,23,42,0.14)]">
+    <Card size="sm" className="border-border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
       <CardHeader className="gap-4">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="min-w-0 space-y-1.5">

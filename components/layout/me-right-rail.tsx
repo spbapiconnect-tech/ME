@@ -15,7 +15,7 @@ export function MeRightRail({ sections, sticky = true }: { title?: string; secti
   return (
     <div className={sticky ? "grid gap-3 xl:sticky xl:top-5" : "grid gap-3"}>
       {sections.map((section) => (
-        <Card key={section.title} size="sm" className="border-border/60 bg-white/88 shadow-[0_16px_28px_-30px_rgba(15,23,42,0.14)]">
+        <Card key={section.title} size="sm" className="border-border bg-[#F8FAFC] shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
           <CardHeader className="gap-1.5">
             <div className="flex items-center justify-between gap-2">
               <CardTitle className="text-[13px] text-slate-900">{section.title}</CardTitle>

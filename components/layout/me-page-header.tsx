@@ -15,14 +15,14 @@ interface MePageHeaderProps {
 
 export function MePageHeader({ eyebrow, title, description, notice, badges = [], actions, meta = [] }: MePageHeaderProps) {
   return (
-    <Card className="border-border/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.975),rgba(247,250,254,0.94))] shadow-[0_22px_40px_-34px_rgba(15,23,42,0.16)]">
+    <Card className="border-border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
       <CardHeader className="gap-4">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="min-w-0 max-w-5xl space-y-3">
             {eyebrow ? <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">{eyebrow}</p> : null}
             <div className="space-y-2">
-              <CardTitle className="text-[1.6rem] leading-tight text-slate-950 sm:text-[1.8rem] xl:text-[2rem]">{title}</CardTitle>
-              <CardDescription className="max-w-4xl text-[14px] leading-6 text-slate-600 sm:text-[15px]">{description}</CardDescription>
+              <CardTitle className="text-[1.45rem] leading-tight text-slate-950 sm:text-[1.6rem] xl:text-[1.75rem]">{title}</CardTitle>
+              <CardDescription className="max-w-4xl text-[13px] leading-6 text-slate-600">{description}</CardDescription>
               {notice ? <CardDescription className="max-w-4xl text-[13px] leading-6 text-slate-500">{notice}</CardDescription> : null}
             </div>
             {badges.length > 0 ? (

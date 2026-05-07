@@ -21,7 +21,7 @@ export function MeWorkspaceSection({
   contentClassName,
 }: MeWorkspaceSectionProps) {
   return (
-    <Card size="sm" className={cn("border-border/60 bg-white/92 shadow-[0_16px_28px_-30px_rgba(15,23,42,0.13)]", className)}>
+    <Card size="sm" className={cn("border-border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]", className)}>
       <CardHeader className="gap-2">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

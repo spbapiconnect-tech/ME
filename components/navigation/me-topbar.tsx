@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 
 import { MeMobileNav } from "@/components/navigation/me-mobile-nav";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { getSidebarNavigationGroups, resolveSidebarNavigationLabel } from "@/lib/navigation";
 import type { MeNavigationLocale } from "@/types/navigation";
 
@@ -39,9 +38,9 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
   }, [locale, pathname]);
 
   return (
-    <Card size="sm" className="border-border/60 bg-white/86 shadow-[0_16px_28px_-30px_rgba(15,23,42,0.14)] backdrop-blur">
-      <CardContent className="grid gap-3 pt-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="border-b border-border bg-white/92 px-0 py-2">
+      <div className="grid gap-2">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <Badge>ME</Badge>
             <Badge variant="outline">
@@ -63,27 +62,27 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
           </div>
         </div>
 
-        <div className="grid gap-2.5 xl:grid-cols-[minmax(0,1.5fr)_repeat(4,minmax(0,0.8fr))]">
-          <div className="flex min-w-0 items-center gap-2 rounded-xl bg-slate-50/88 px-3.5 py-2.5 text-sm text-slate-500 ring-1 ring-slate-200/70">
+        <div className="grid gap-2 xl:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,0.85fr))]">
+          <div className="flex min-w-0 items-center gap-2 rounded-[8px] border border-border bg-slate-50 px-3 py-2 text-sm text-slate-500">
             <Search className="size-4 text-slate-400" />
             <span className="truncate">{locale === "zh" ? "搜索记录、模块或状态（占位）" : "Search records, modules, or status"}</span>
           </div>
-          <div className="rounded-xl bg-slate-50/88 px-3.5 py-2.5 text-sm ring-1 ring-slate-200/70">
+          <div className="rounded-[8px] border border-border bg-slate-50 px-3 py-2 text-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Branch</p>
             <p className="mt-1 text-sm font-semibold text-slate-900">All Stores / KCH</p>
           </div>
-          <div className="rounded-xl bg-slate-50/88 px-3.5 py-2.5 text-sm ring-1 ring-slate-200/70">
+          <div className="rounded-[8px] border border-border bg-slate-50 px-3 py-2 text-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Window</p>
             <p className="mt-1 text-sm font-semibold text-slate-900">Last 7 days</p>
           </div>
-          <div className="rounded-xl bg-slate-50/88 px-3.5 py-2.5 text-sm ring-1 ring-slate-200/70">
+          <div className="rounded-[8px] border border-border bg-slate-50 px-3 py-2 text-sm">
             <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               <ShieldCheck className="size-3.5" />
               Guardrail
             </p>
             <p className="mt-1 text-sm font-semibold text-slate-900">{locale === "zh" ? "Mock / 只读" : "Mock / Read-only"}</p>
           </div>
-          <div className="rounded-xl bg-slate-50/88 px-3.5 py-2.5 text-sm ring-1 ring-slate-200/70">
+          <div className="rounded-[8px] border border-border bg-slate-50 px-3 py-2 text-sm">
             <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
               <Monitor className="size-3.5" />
               Display
@@ -91,7 +90,7 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
             <p className="mt-1 text-sm font-semibold text-slate-900">Desktop / Comfortable</p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

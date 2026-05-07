@@ -17,7 +17,7 @@ export function DemoPresentationNote({
   hrefLabel = "Open Demo Mode",
 }: DemoPresentationNoteProps) {
   return (
-    <Card size="sm" className="border-dashed border-border/80 bg-muted/20">
+    <Card size="sm" className="border-border bg-[#F8FAFC] shadow-none">
       <CardHeader className="gap-1">
         <CardTitle className="text-sm">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
