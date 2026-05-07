@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import Link from "next/link";
@@ -10,6 +12,7 @@ interface MeActionBarAction {
   variant?: "default" | "outline" | "secondary" | "ghost";
   icon?: ReactNode;
   href?: string;
+  onClick?: () => void;
 }
 
 export function MeActionBar({ actions }: { actions: MeActionBarAction[] }) {
@@ -25,7 +28,13 @@ export function MeActionBar({ actions }: { actions: MeActionBarAction[] }) {
               </Link>
             </Button>
           ) : (
-            <Button key={action.label} size="sm" variant={action.variant ?? "outline"} className="min-w-[6.5rem] justify-center sm:justify-start">
+            <Button
+              key={action.label}
+              size="sm"
+              variant={action.variant ?? "outline"}
+              className="min-w-[6.5rem] justify-center sm:justify-start"
+              onClick={action.onClick}
+            >
               {action.icon}
               {action.label}
             </Button>

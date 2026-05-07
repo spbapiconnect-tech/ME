@@ -194,7 +194,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         }
         badges={[
           { label: "Reports" },
-          { label: "Current release", variant: "outline" },
+          { label: "Report center", variant: "outline" },
           { label: "Export center", variant: "secondary" },
         ]}
         actions={

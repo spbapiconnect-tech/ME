@@ -1,12 +1,15 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface MeTabsProps {
   style?: "pill" | "detail";
   tabs: Array<{ label: string; active?: boolean; badge?: string }>;
+  onTabChange?: (label: string) => void;
 }
 
-export function MeTabs({ tabs, style = "pill" }: MeTabsProps) {
+export function MeTabs({ tabs, style = "pill", onTabChange }: MeTabsProps) {
   return (
     <div
       className={cn(
@@ -17,8 +20,10 @@ export function MeTabs({ tabs, style = "pill" }: MeTabsProps) {
       )}
     >
       {tabs.map((tab) => (
-        <div
+        <button
+          type="button"
           key={tab.label}
+          onClick={() => onTabChange?.(tab.label)}
           className={cn(
             "shrink-0 flex items-center gap-2 text-sm font-medium transition-colors",
             style === "pill" && "rounded-xl px-3.5 py-2",
@@ -35,7 +40,7 @@ export function MeTabs({ tabs, style = "pill" }: MeTabsProps) {
           <span>{tab.label}</span>
           {tab.badge ? <Badge variant={tab.active ? "default" : "outline"}>{tab.badge}</Badge> : null}
           {style === "detail" && tab.active ? <span className="absolute inset-x-2 bottom-[-1px] h-0.5 rounded-full bg-blue-600" /> : null}
-        </div>
+        </button>
       ))}
     </div>
   );

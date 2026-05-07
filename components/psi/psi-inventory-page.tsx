@@ -32,7 +32,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         badges={[
           { label: "Inventory detail" },
           { label: "Warehouse workspace", variant: "secondary" },
-          { label: "Current release", variant: "outline" },
+          { label: "Inventory control", variant: "outline" },
         ]}
         actions={
           <>
@@ -59,7 +59,6 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         title="SKU-KCH-0007"
         subtitle="Coated Fries"
         status="Low Stock"
-        guardrail="Current release scope"
         meta={[
           { label: "Branch", value: "KCH" },
           { label: "Storage", value: "Freezer" },
@@ -194,9 +193,9 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
                 items: ["Review stock card", "Confirm inbound timing", "Export stock card if needed"],
               },
               {
-                title: "Guardrail",
-                badge: "Current release",
-                items: ["No stock posting", "No inventory updates", "No task creation", "No API writes"],
+                title: "Operating Notes",
+                badge: "Inventory view",
+                items: ["Warehouse review remains active", "Procurement linkage is visible", "Movement history stays in sync with the workspace", "Follow-up actions can be escalated from this page"],
               },
             ]}
           />

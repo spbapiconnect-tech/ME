@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,9 +9,12 @@ interface MeDataTableProps {
   columns: string[];
   rows: ReactNode[][];
   embedded?: boolean;
+  selectableRows?: boolean;
+  selectedRowIndex?: number;
+  onRowSelect?: (index: number) => void;
 }
 
-function TableMarkup({ columns, rows }: Pick<MeDataTableProps, "columns" | "rows">) {
+function TableMarkup({ columns, rows, selectableRows, selectedRowIndex, onRowSelect }: Pick<MeDataTableProps, "columns" | "rows" | "selectableRows" | "selectedRowIndex" | "onRowSelect">) {
   return (
     <table className="min-w-full border-separate border-spacing-0 text-left text-sm">
       <thead>
@@ -23,10 +28,26 @@ function TableMarkup({ columns, rows }: Pick<MeDataTableProps, "columns" | "rows
       </thead>
       <tbody>
         {rows.map((row, index) => (
-          <tr key={index} className="transition-colors hover:bg-slate-50/75">
+          <tr
+            key={index}
+            className="transition-colors hover:bg-slate-50/75"
+          >
             {row.map((cell, cellIndex) => (
-              <td key={cellIndex} className="border-b border-slate-100 px-3 py-2.5 align-top text-[13px] text-slate-700">
-                {cell}
+              <td
+                key={cellIndex}
+                className="border-b border-slate-100 px-3 py-2.5 align-top text-[13px] text-slate-700"
+              >
+                {cellIndex === 0 && selectableRows ? (
+                  <button
+                    type="button"
+                    onClick={() => onRowSelect?.(index)}
+                    className={`block w-full text-left ${selectedRowIndex === index ? "font-semibold text-blue-700" : ""}`}
+                  >
+                    {cell}
+                  </button>
+                ) : (
+                  cell
+                )}
               </td>
             ))}
           </tr>
@@ -36,12 +57,12 @@ function TableMarkup({ columns, rows }: Pick<MeDataTableProps, "columns" | "rows
   );
 }
 
-export function MeDataTable({ title, columns, rows, embedded = false }: MeDataTableProps) {
+export function MeDataTable({ title, columns, rows, embedded = false, selectableRows = false, selectedRowIndex, onRowSelect }: MeDataTableProps) {
   if (embedded) {
     return (
       <div className="overflow-x-auto">
         {title ? <div className="px-1 pb-3 text-sm font-semibold text-slate-900">{title}</div> : null}
-        <TableMarkup columns={columns} rows={rows} />
+        <TableMarkup columns={columns} rows={rows} selectableRows={selectableRows} selectedRowIndex={selectedRowIndex} onRowSelect={onRowSelect} />
       </div>
     );
   }
@@ -54,7 +75,7 @@ export function MeDataTable({ title, columns, rows, embedded = false }: MeDataTa
         </CardHeader>
       ) : null}
       <CardContent className="overflow-x-auto pt-1">
-        <TableMarkup columns={columns} rows={rows} />
+        <TableMarkup columns={columns} rows={rows} selectableRows={selectableRows} selectedRowIndex={selectedRowIndex} onRowSelect={onRowSelect} />
       </CardContent>
     </Card>
   );

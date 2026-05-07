@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { MeShellController } from "@/components/layout/me-shell-controller";
 import { MeBreadcrumbs, MeSidebar, MeTopbar } from "@/components/navigation";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ export function MeDashboardShell({
 }: MeDashboardShellProps) {
   return (
     <main className={cn("mx-auto flex min-h-screen w-full max-w-[110rem] flex-col gap-3 px-3 py-3 sm:px-4 sm:py-4 xl:px-6 xl:py-5", className)}>
+      <MeShellController />
       <MeBreadcrumbs />
       <MeTopbar />
 

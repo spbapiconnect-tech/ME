@@ -11,11 +11,11 @@ const buttonVariants = cva(
       variant: {
         default: "bg-[linear-gradient(180deg,#3b82f6,#2563eb)] text-primary-foreground shadow-[0_1px_2px_rgba(37,99,235,0.24)] hover:bg-[linear-gradient(180deg,#3b82f6,#1d4ed8)] hover:shadow-[0_8px_20px_-16px_rgba(37,99,235,0.35)]",
         outline:
-          "border-border bg-white text-slate-700 shadow-none hover:border-slate-300 hover:bg-slate-50 hover:text-slate-950 aria-expanded:bg-muted/60 aria-expanded:text-foreground",
+          "border-border bg-[var(--surface-strong)] text-[var(--text-secondary)] shadow-none hover:border-[var(--border-strong)] hover:bg-[var(--surface-soft)] hover:text-[var(--text-primary)] aria-expanded:bg-muted/60 aria-expanded:text-foreground",
         secondary:
-          "border border-slate-200 bg-slate-100 text-slate-700 shadow-none hover:bg-slate-200/80 hover:text-slate-900 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "border border-border bg-[var(--surface-soft)] text-[var(--text-secondary)] shadow-none hover:bg-[var(--surface)] hover:text-[var(--text-primary)] aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
-          "text-muted-foreground hover:bg-slate-100/90 hover:text-foreground aria-expanded:bg-muted/60 aria-expanded:text-foreground dark:hover:bg-muted/40",
+          "text-muted-foreground hover:bg-[var(--surface-soft)] hover:text-foreground aria-expanded:bg-muted/60 aria-expanded:text-foreground dark:hover:bg-muted/40",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",

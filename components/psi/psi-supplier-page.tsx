@@ -32,7 +32,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
         badges={[
           { label: "Supplier detail" },
           { label: "Operations workspace", variant: "secondary" },
-          { label: "Current release", variant: "outline" },
+          { label: "Supplier operations", variant: "outline" },
         ]}
         actions={
           <>
@@ -59,7 +59,6 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
         title="ABC Food Supply"
         subtitle="Supplier profile"
         status="Active / Review Needed"
-        guardrail="Current release scope"
         meta={[
           { label: "Branch coverage", value: "KCH / BTU" },
           { label: "Category", value: "Food Supply" },
@@ -191,9 +190,9 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
                 items: ["Review current quote", "Confirm next delivery slot", "Export profile if needed"],
               },
               {
-                title: "Guardrail",
-                badge: "Current release",
-                items: ["No supplier portal", "No API writes", "No note submission", "No workflow execution"],
+                title: "Operating Notes",
+                badge: "Supplier view",
+                items: ["Portal coordination managed centrally", "Document uploads reviewed in workspace", "Operational history remains visible", "Activity follows workspace actions"],
               },
             ]}
           />

@@ -89,6 +89,20 @@ const inventory = createItem({
   relatedModule: "inventory",
 });
 
+const receiving = createItem({
+  key: "receiving",
+  label: { zh: "收货", en: "Receiving" },
+  description: { zh: "收货、差异与质检工作区。", en: "Receiving, variance, and quality check workspace." },
+  href: "/psi/receiving",
+  group: "operations",
+  status: "active",
+  tone: "neutral",
+  badge: { zh: "收货", en: "Receiving" },
+  isPrimary: false,
+  isFoundation: false,
+  relatedModule: "receiving",
+});
+
 const psiActions = createItem({
   key: "psi-actions",
   label: { zh: "PSI 动作", en: "PSI Actions" },
@@ -378,6 +392,32 @@ const finance = createItem({
   isPrimary: false,
   isFoundation: false,
   relatedModule: "finance",
+});
+
+const settings = createItem({
+  key: "settings",
+  label: { zh: "系统设置", en: "Settings" },
+  description: { zh: "公司、显示、语言与安全配置。", en: "Company, display, language, and security configuration." },
+  href: "/settings",
+  group: "system-foundation",
+  status: "active",
+  tone: "muted",
+  badge: { zh: "设置", en: "Settings" },
+  isPrimary: false,
+  isFoundation: true,
+});
+
+const integration = createItem({
+  key: "integration",
+  label: { zh: "集成管理", en: "Integration" },
+  description: { zh: "POS、打印机、API 与同步管理。", en: "POS, printer, API, and sync management." },
+  href: "/integration",
+  group: "system-foundation",
+  status: "active",
+  tone: "muted",
+  badge: { zh: "集成", en: "Integration" },
+  isPrimary: false,
+  isFoundation: true,
 });
 
 const workflow = createItem({
@@ -724,11 +764,14 @@ const sidebarGroups: MeSidebarNavigationGroup[] = [
       }),
       createSidebarItem({
         key: "sidebar-receiving",
-        label: { zh: "收货", en: "Receiving" },
-        description: { zh: "收货工作区预览占位。", en: "Receiving workspace placeholder." },
-        status: "coming-soon",
-        tone: "muted",
-        badge: { zh: "Soon", en: "Soon" },
+        routeKey: receiving.key,
+        label: receiving.label,
+        description: receiving.description,
+        href: receiving.href,
+        status: receiving.status,
+        tone: receiving.tone,
+        badge: receiving.badge,
+        matchPaths: ["/psi/receiving"],
       }),
       createSidebarItem({
         key: "sidebar-psi-issues",
@@ -1057,6 +1100,28 @@ const sidebarGroups: MeSidebarNavigationGroup[] = [
         matchPaths: ["/system-foundation"],
       }),
       createSidebarItem({
+        key: "sidebar-settings",
+        routeKey: settings.key,
+        label: settings.label,
+        description: settings.description,
+        href: settings.href,
+        status: settings.status,
+        tone: settings.tone,
+        badge: settings.badge,
+        matchPaths: ["/settings"],
+      }),
+      createSidebarItem({
+        key: "sidebar-integration",
+        routeKey: integration.key,
+        label: integration.label,
+        description: integration.description,
+        href: integration.href,
+        status: integration.status,
+        tone: integration.tone,
+        badge: integration.badge,
+        matchPaths: ["/integration"],
+      }),
+      createSidebarItem({
         key: "sidebar-layout-engine",
         routeKey: layoutEngine.key,
         label: layoutEngine.label,
@@ -1157,7 +1222,7 @@ export const navigationMap: MeNavigationMap = {
       title: { zh: "运营", en: "Operations" },
       description: { zh: "门店、PSI、人员与食品运营工作区。", en: "Store, PSI, people, and food-operations workspaces." },
       groupType: "operations",
-      items: [procurement, supplier, inventory, psiActions, psiIssues, inspection, issues, tasks, staff, schedule, training, sop, expiry],
+      items: [procurement, supplier, inventory, receiving, psiActions, psiIssues, inspection, issues, tasks, staff, schedule, training, sop, expiry],
       collapsedByDefault: false,
       isFoundationGroup: false,
     },
@@ -1177,6 +1242,8 @@ export const navigationMap: MeNavigationMap = {
       groupType: "system",
       items: [
         systemFoundation,
+        settings,
+        integration,
         displaySettings,
         layoutEngine,
         realDataMapping,

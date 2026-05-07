@@ -12,9 +12,9 @@ interface DemoPresentationNoteProps {
 
 export function DemoPresentationNote({
   title = "Workspace Note",
-  description = "Current release scope for this workspace.",
+  description = "Operational notes for this workspace.",
   href = "/system-foundation",
-  hrefLabel = "Open System Foundation",
+  hrefLabel = "Open System Center",
 }: DemoPresentationNoteProps) {
   return (
     <Card size="sm" className="border-border bg-[#F8FAFC] shadow-none">

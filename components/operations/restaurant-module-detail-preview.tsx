@@ -1,13 +1,23 @@
+"use client";
+
+import Link from "next/link";
+
 import { MeWorkspaceSection } from "@/components/layout";
 import type { RestaurantModuleSection } from "@/config/restaurant-modules";
 
 import { RestaurantModuleTable } from "./restaurant-module-table";
 
-export function RestaurantModuleDetailPreview({ section }: { section: RestaurantModuleSection }) {
+interface RestaurantModuleDetailPreviewProps {
+  section: RestaurantModuleSection;
+  selectedRowIndex?: number;
+  onRowSelect?: (index: number) => void;
+}
+
+export function RestaurantModuleDetailPreview({ section, selectedRowIndex, onRowSelect }: RestaurantModuleDetailPreviewProps) {
   if (section.kind === "table") {
     return (
       <MeWorkspaceSection title={section.title} description={section.description}>
-        <RestaurantModuleTable columns={section.columns} rows={section.rows} />
+        <RestaurantModuleTable columns={section.columns} rows={section.rows} selectedRowIndex={selectedRowIndex} onRowSelect={onRowSelect} />
       </MeWorkspaceSection>
     );
   }
@@ -31,7 +41,12 @@ export function RestaurantModuleDetailPreview({ section }: { section: Restaurant
   if (section.kind === "note") {
     return (
       <MeWorkspaceSection title={section.title} description={section.description}>
-        <p className="text-sm leading-6 text-slate-600">{section.body}</p>
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_16rem]">
+          <p className="text-sm leading-6 text-slate-600">{section.body}</p>
+          <Link href="/tasks" className="rounded-[10px] border border-border bg-slate-50 px-4 py-3 text-sm font-medium text-blue-700 transition hover:bg-slate-100">
+            Open follow-up tasks
+          </Link>
+        </div>
       </MeWorkspaceSection>
     );
   }

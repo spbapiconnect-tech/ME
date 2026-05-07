@@ -29,7 +29,7 @@ export function PsiHomePage() {
       sections={[
         {
           title: "PSI Status",
-          badge: "Current release",
+          badge: "Live view",
           items: ["Procurement queue visible", "Supplier risks surfaced", "Inventory follow-up remains coordinated through the workspace"],
         },
         {
@@ -102,7 +102,6 @@ export function PsiHomePage() {
         title="PR-KCH-0001"
         subtitle="Procurement request"
         status="Pending Review"
-        guardrail="Current release scope"
         meta={[
           { label: "Branch", value: "KCH" },
           { label: "Supplier", value: "ABC Food Supply" },
@@ -276,8 +275,8 @@ export function PsiHomePage() {
                 items: ["Review request amount", "Confirm receiving window", "Export or attach document if needed"],
               },
               {
-                title: "Guardrail",
-                badge: "Current release",
+                title: "Operating Notes",
+                badge: "Live view",
                 items: ["No approval execution", "No task creation", "No notification sending", "No write behavior"],
               },
             ]}

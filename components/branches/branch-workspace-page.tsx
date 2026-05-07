@@ -82,7 +82,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         }
         meta={[
           { label: "Scope", value: "All Stores / KCH / BTU / Expansion Branch" },
-          { label: "Current Mode", value: "Context workspace" },
+          { label: "Current Mode", value: "Operations workspace" },
           { label: "Operations", value: "Status and inspection context" },
           { label: "View", value: "Branch operations" },
         ]}
@@ -122,7 +122,6 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         title="KCH"
         subtitle="Branch detail"
         status="Active"
-        guardrail="Current release scope"
         meta={[
           { label: "Scope", value: "Local operations" },
           { label: "Manager", value: "Branch manager" },

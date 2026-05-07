@@ -11,6 +11,7 @@ import {
   hasActiveSidebarChild,
   resolveSidebarNavigationLabel,
 } from "@/lib/navigation";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import { cn } from "@/lib/utils";
 import type { MeNavigationLocale, MeSidebarNavigationItem } from "@/types/navigation";
 
@@ -35,6 +36,15 @@ const iconMap = {
 
 function isExplicitlyActive(item: MeSidebarNavigationItem, activeKey?: string) {
   return item.routeKey === activeKey || item.key === activeKey;
+}
+
+function normalizeBadgeLabel(label: string, locale: MeNavigationLocale) {
+  const normalized = label.toLowerCase();
+  if (normalized === "soon" || normalized === "preview") {
+    return locale === "zh" ? "规划中" : "Roadmap";
+  }
+
+  return label;
 }
 
 function renderSidebarItem(item: MeSidebarNavigationItem, pathname: string, locale: MeNavigationLocale, activeKey?: string, depth = 0) {
@@ -66,7 +76,7 @@ function renderSidebarItem(item: MeSidebarNavigationItem, pathname: string, loca
               <p className="truncate font-medium">{label}</p>
             </div>
           </div>
-          {item.badge ? <Badge variant={isActive ? "default" : "outline"}>{item.badge[locale]}</Badge> : null}
+          {item.badge ? <Badge variant={isActive ? "default" : "outline"}>{normalizeBadgeLabel(item.badge[locale], locale)}</Badge> : null}
         </Link>
       ) : (
         <div
@@ -81,7 +91,7 @@ function renderSidebarItem(item: MeSidebarNavigationItem, pathname: string, loca
               <p className="truncate font-medium">{label}</p>
             </div>
           </div>
-          <Badge variant="outline">{item.badge?.[locale] ?? "Planned"}</Badge>
+          <Badge variant="outline">{normalizeBadgeLabel(item.badge?.[locale] ?? (locale === "zh" ? "规划中" : "Roadmap"), locale)}</Badge>
         </div>
       )}
 
@@ -94,6 +104,8 @@ function renderSidebarItem(item: MeSidebarNavigationItem, pathname: string, loca
 
 export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProps) {
   const pathname = usePathname();
+  const storeLocale = useUiPreferencesStore((state) => state.locale);
+  const resolvedLocale = storeLocale ?? locale;
   const sidebarGroups = getSidebarNavigationGroups();
 
   return (
@@ -102,11 +114,11 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
         <div className="border-b border-border px-4 py-3.5">
           <div className="flex items-center justify-between gap-2">
             <div className="space-y-1">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">ME Platform</p>
-              <p className="text-sm font-semibold text-slate-950">Restaurant operations</p>
-              <p className="text-xs text-slate-500">Enterprise navigation</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">ME Branch ERP</p>
+              <p className="text-sm font-semibold text-slate-950">{resolvedLocale === "zh" ? "餐饮运营系统" : "Restaurant Operations"}</p>
+              <p className="text-xs text-slate-500">{resolvedLocale === "zh" ? "模块导航" : "Module Navigation"}</p>
             </div>
-            <Badge variant="outline">{locale === "zh" ? "当前版本" : "Current release"}</Badge>
+            <Badge variant="outline">{resolvedLocale === "zh" ? "企业版" : "Enterprise"}</Badge>
           </div>
         </div>
 
@@ -135,14 +147,14 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
                       <Icon className="size-3.5" />
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{group.title[locale]}</span>
+                      <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{group.title[resolvedLocale]}</span>
                     </span>
                   </span>
                   <ChevronDown className="size-4 text-slate-400 transition-transform group-open:rotate-180" />
                 </summary>
 
                 <div className="mt-1 grid gap-1 px-1 pb-2">
-                  {group.items.map((item) => renderSidebarItem(item, pathname, locale, activeKey))}
+                  {group.items.map((item) => renderSidebarItem(item, pathname, resolvedLocale, activeKey))}
                 </div>
               </details>
             );

@@ -13,7 +13,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { getNavigationMap, resolveNavigationLabel } from "@/lib/navigation";
+import { getSidebarNavigationGroups, resolveSidebarNavigationLabel } from "@/lib/navigation";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { MeNavigationLocale } from "@/types/navigation";
 
 interface MeMobileNavProps {
@@ -22,50 +23,52 @@ interface MeMobileNavProps {
 
 export function MeMobileNav({ locale = "en" }: MeMobileNavProps) {
   const pathname = usePathname();
-  const navigation = getNavigationMap();
+  const storeLocale = useUiPreferencesStore((state) => state.locale);
+  const setLocale = useUiPreferencesStore((state) => state.setLocale);
+  const theme = useUiPreferencesStore((state) => state.theme);
+  const setTheme = useUiPreferencesStore((state) => state.setTheme);
+  const resolvedLocale = storeLocale ?? locale;
+  const sidebarGroups = getSidebarNavigationGroups();
 
   return (
     <Sheet>
       <SheetTrigger asChild>
         <Button variant="outline" size="sm" className="lg:hidden">
           <Menu className="size-4" />
-          <span>{locale === "zh" ? "导航" : "Navigate"}</span>
+          <span>{resolvedLocale === "zh" ? "导航" : "Navigate"}</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>ME</SheetTitle>
-          <SheetDescription>{navigation.notice[locale]}</SheetDescription>
+          <SheetTitle>{resolvedLocale === "zh" ? "ME 门店 ERP" : "ME Branch ERP"}</SheetTitle>
+          <SheetDescription>{resolvedLocale === "zh" ? "跨模块运营导航" : "Cross-module operations navigation"}</SheetDescription>
         </SheetHeader>
         <div className="grid gap-6 px-6 pb-6">
           <div className="grid gap-2">
-            <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{locale === "zh" ? "主导航" : "Primary"}</p>
-            {navigation.primaryItems.map((item) => (
-              <Button key={item.key} asChild variant={pathname === item.href ? "default" : "outline"} size="sm" className="justify-start">
-                <Link href={item.href}>{resolveNavigationLabel(item, locale)}</Link>
-              </Button>
-            ))}
+            <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{resolvedLocale === "zh" ? "显示" : "Display"}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant={resolvedLocale === "en" ? "default" : "outline"} onClick={() => setLocale("en")}>English</Button>
+              <Button size="sm" variant={resolvedLocale === "zh" ? "default" : "outline"} onClick={() => setLocale("zh")}>中文</Button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {(["bright", "dark", "moon"] as const).map((value) => (
+                <Button key={value} size="sm" variant={theme === value ? "default" : "outline"} onClick={() => setTheme(value)}>
+                  {value === "bright" ? "Bright" : value === "dark" ? "Dark" : "Moon"}
+                </Button>
+              ))}
+            </div>
           </div>
 
-          {navigation.groups.map((group) => (
+          {sidebarGroups.map((group) => (
             <div key={group.key} className="grid gap-2">
-              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{group.title[locale]}</p>
+              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{group.title[resolvedLocale]}</p>
               {group.items.map((item) => (
-                <Button key={item.key} asChild variant={pathname === item.href ? "secondary" : "ghost"} size="sm" className="justify-start">
-                  <Link href={item.href}>{resolveNavigationLabel(item, locale)}</Link>
+                <Button key={item.key} asChild={Boolean(item.href)} variant={pathname === item.href ? "secondary" : "ghost"} size="sm" className="justify-start">
+                  {item.href ? <Link href={item.href}>{resolveSidebarNavigationLabel(item, resolvedLocale)}</Link> : <span>{resolveSidebarNavigationLabel(item, resolvedLocale)}</span>}
                 </Button>
               ))}
             </div>
           ))}
-
-          <div className="grid gap-2">
-            <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{locale === "zh" ? "次级链接" : "Footer / Secondary"}</p>
-            {navigation.footerItems.map((item) => (
-              <Button key={item.key} asChild variant={pathname === item.href ? "secondary" : "ghost"} size="sm" className="justify-start">
-                <Link href={item.href}>{resolveNavigationLabel(item, locale)}</Link>
-              </Button>
-            ))}
-          </div>
         </div>
       </SheetContent>
     </Sheet>

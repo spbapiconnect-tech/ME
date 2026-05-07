@@ -16,7 +16,7 @@ export function BranchSelectorPlaceholder({ branches, selectedBranchKey, compact
   return (
     <Card size="sm" className="border border-border/70 bg-card/95">
       <CardHeader className="gap-1">
-        <CardTitle className="text-sm">Branch Context Switcher</CardTitle>
+        <CardTitle className="text-sm">Branch Directory</CardTitle>
         <CardDescription>
           Review branch workspaces, operating status, and linked modules from a shared management surface.
         </CardDescription>
@@ -50,7 +50,7 @@ export function BranchSelectorPlaceholder({ branches, selectedBranchKey, compact
           })}
         </div>
         <div className="rounded-xl border border-dashed border-border/70 p-3 text-xs text-muted-foreground">
-          Branch context is shared across operations, reporting, staffing, and inventory review.
+          Branch selection drives operations, reporting, staffing, and inventory review across the shared platform.
         </div>
       </CardContent>
     </Card>

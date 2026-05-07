@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { getNavigationMap, resolveNavigationLabel } from "@/lib/navigation";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { MeNavigationItem, MeNavigationLocale } from "@/types/navigation";
 
 interface MeBreadcrumbsProps {
@@ -30,6 +31,8 @@ function fallbackLabel(segment: string) {
 
 export function MeBreadcrumbs({ locale = "en" }: MeBreadcrumbsProps) {
   const pathname = usePathname();
+  const storeLocale = useUiPreferencesStore((state) => state.locale);
+  const resolvedLocale = storeLocale ?? locale;
   const segments = pathname.split("/").filter(Boolean);
   const crumbs = segments.map((segment, index) => {
     const href = `/${segments.slice(0, index + 1).join("/")}`;
@@ -37,7 +40,7 @@ export function MeBreadcrumbs({ locale = "en" }: MeBreadcrumbsProps) {
 
     return {
       href,
-      label: item ? resolveNavigationLabel(item, locale) : fallbackLabel(segment),
+      label: item ? resolveNavigationLabel(item, resolvedLocale) : fallbackLabel(segment),
     };
   });
 
@@ -49,7 +52,7 @@ export function MeBreadcrumbs({ locale = "en" }: MeBreadcrumbsProps) {
       {pathname === "/" ? (
         <>
           <ChevronRight className="size-3" />
-          <span>{locale === "zh" ? "仪表盘" : "Dashboard"}</span>
+          <span>{resolvedLocale === "zh" ? "工作台" : "Dashboard"}</span>
         </>
       ) : null}
       {crumbs.map((crumb, index) => (

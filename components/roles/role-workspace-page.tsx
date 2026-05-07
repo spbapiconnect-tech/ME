@@ -27,7 +27,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
       sections={[
         {
           title: "Role Context",
-          badge: "Current release",
+          badge: "Access review",
           items: ["Business roles visible", "System foundation kept accessible", "Staff and access structure remain visible"],
         },
         {
@@ -136,11 +136,11 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
         <MeWorkspaceSection title="Access Groups" description="Module-level access structure for store, operations, and platform administration.">
           <MeDataTable
             embedded
-            columns={["Group", "Surface", "Mode", "Guardrail"]}
+            columns={["Group", "Surface", "Mode", "Operating Rule"]}
             rows={[
               ["Operations review", "PSI / Branches", "Visibility", "No approval execution"],
               ["Reporting review", "Reports", "Visibility", "No export runtime"],
-              ["Foundation admin", "System routes", "Current release", "No auth/session enforced"],
+              ["Foundation admin", "System routes", "Customer preview", "Access workflow managed centrally"],
             ]}
           />
         </MeWorkspaceSection>
