@@ -119,9 +119,9 @@ export function getReportWidgetPreview(widgetOrKey: string | ReportWidgetContrac
   if (hardBlocked) {
     reason = buildText("当前组件状态不可渲染，仅保留合同元数据。", "Widget status is not renderable and remains contract metadata only.");
   } else if (previewOnlyBlocked) {
-    reason = buildText("当前为 preview-only 且未开启样例预览。", "Widget is preview-only and sample preview is not enabled.");
+    reason = buildText("当前组件保留为已配置状态，尚未开放可视化渲染。", "Widget remains in a configured state and is not yet open for visual rendering.");
   } else if (widget.status === "preview-only") {
-    reason = buildText("当前为样例预览渲染，不连接真实查询。", "Widget renders as sample preview and is not connected to real queries.");
+    reason = buildText("当前组件以目录渲染方式展示，不连接真实查询。", "Widget renders in catalog mode and is not connected to real queries.");
   }
 
   return {

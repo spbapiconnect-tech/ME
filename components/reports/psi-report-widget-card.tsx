@@ -28,8 +28,8 @@ export function PsiReportWidgetCard({ widget, locale }: PsiReportWidgetCardProps
       <CardContent className="grid gap-2 text-xs text-muted-foreground">
         <div className="flex flex-wrap gap-1.5">
           <Badge variant="outline">module: {widget.sourceModule}</Badge>
-          <Badge variant="outline">mock: {String(widget.isMock)}</Badge>
-          <Badge variant="outline">placeholder: {String(widget.isPlaceholder)}</Badge>
+          <Badge variant="outline">catalog: {String(widget.isMock)}</Badge>
+          <Badge variant="outline">planned: {String(widget.isPlaceholder)}</Badge>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {widget.metrics.slice(0, 4).map((metric) => (

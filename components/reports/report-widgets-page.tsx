@@ -55,6 +55,33 @@ const widgetTypeOptions: Array<ReportWidgetType | "all"> = [
 const statusOptions: Array<ReportWidgetStatus | "all"> = ["all", "active", "preview-only", "placeholder", "coming-soon", "blocked", "disabled"];
 const severityOptions: Array<ReportWidgetSeverity | "all"> = ["all", "neutral", "low", "medium", "high", "critical"];
 
+const widgetTypeOptionLabel: Record<ReportWidgetType | "all", string> = {
+  all: "All types",
+  kpi: "KPI",
+  chart: "Chart",
+  table: "Table",
+  list: "List",
+  "status-summary": "Status Summary",
+  trend: "Trend",
+  distribution: "Distribution",
+  alert: "Alert",
+  "task-summary": "Task Summary",
+  "workflow-summary": "Workflow Summary",
+  "notification-summary": "Notification Summary",
+  "audit-summary": "Audit Summary",
+  placeholder: "Planned Surface",
+};
+
+const statusOptionLabel: Record<ReportWidgetStatus | "all", string> = {
+  all: "All status",
+  active: "Active",
+  "preview-only": "Configured",
+  placeholder: "Planned",
+  "coming-soon": "Planned Delivery",
+  blocked: "Blocked",
+  disabled: "Disabled",
+};
+
 function groupBy(values: string[]) {
   return values.reduce<Record<string, number>>((acc, value) => {
     acc[value] = (acc[value] ?? 0) + 1;
@@ -135,8 +162,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
       sections={[
         {
           title: "Report Readiness",
-          badge: "Metadata only",
-          items: [`${stats.active} active widgets`, `${stats.exportable} export-ready placeholders`, `${stats.refreshable} refresh-capable previews`],
+          badge: "Catalog scope",
+          items: [`${stats.active} active widgets`, `${stats.exportable} export planning surfaces`, `${stats.refreshable} refresh-capable review surfaces`],
         },
         {
           title: "Current Focus",
@@ -167,8 +194,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         }
         badges={[
           { label: "Reports" },
-          { label: "Read-only", variant: "outline" },
-          { label: "Export placeholders", variant: "secondary" },
+          { label: "Current release", variant: "outline" },
+          { label: "Export planning", variant: "secondary" },
         ]}
         actions={
           <>
@@ -179,13 +206,13 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
               <Link href="/branches">Open Branches</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/demo-mode">Open Demo Mode</Link>
+              <Link href="/reports/pos">Open POS Reports</Link>
             </Button>
           </>
         }
         meta={[
           { label: "Overview", value: "PSI report workspace" },
-          { label: "Export center", value: "Placeholder only" },
+          { label: "Export center", value: "Planned delivery" },
           { label: "Filter mode", value: "Interactive shell" },
           { label: "Layouts", value: `${dashboardLayoutCatalog.length} presets` },
         ]}
@@ -204,10 +231,10 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
       <MeTabs
         tabs={[
           { label: "Overview", active: true },
-          { label: "POS Reports", badge: "Soon" },
-          { label: "Sales Analytics", badge: "Soon" },
-          { label: "Branch Performance", badge: "Soon" },
-          { label: "Export Center", badge: "Soon" },
+          { label: "POS Reports", badge: "Planned" },
+          { label: "Sales Analytics", badge: "Planned" },
+          { label: "Branch Performance", badge: "Planned" },
+          { label: "Export Center", badge: "Planned" },
         ]}
       />
 
@@ -215,7 +242,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         {[
           ["Total widgets", String(stats.total)],
           ["Active", String(stats.active)],
-          ["Placeholder", String(stats.placeholder)],
+          ["Planned", String(stats.placeholder)],
           ["Exportable", String(stats.exportable)],
           ["Refreshable", String(stats.refreshable)],
           ["Drill down", String(stats.drillDown)],
@@ -231,7 +258,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
       </section>
 
       {psiDashboardData ? (
-        <MeWorkspaceSection title="PSI Report Preview" description="Read-only PSI operational summary inside the shared reporting shell.">
+        <MeWorkspaceSection title="PSI Report Preview" description="PSI operational summary inside the shared reporting shell.">
           <PsiReportDashboardPanel data={psiDashboardData} locale={currentLocale} />
         </MeWorkspaceSection>
       ) : null}
@@ -241,7 +268,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           <MeWorkspaceSection title="Report Filters" description="Operational filtering shell for the widget registry." contentClassName="xl:grid-cols-4">
             <Select value={widgetTypeFilter} onValueChange={(value) => setWidgetTypeFilter(value as ReportWidgetType | "all")}>
               <SelectTrigger size="sm"><SelectValue placeholder="Widget Type" /></SelectTrigger>
-              <SelectContent>{widgetTypeOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+              <SelectContent>{widgetTypeOptions.map((value) => <SelectItem key={value} value={value}>{widgetTypeOptionLabel[value]}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
               <SelectTrigger size="sm"><SelectValue placeholder="Source Module" /></SelectTrigger>
@@ -249,7 +276,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
             </Select>
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ReportWidgetStatus | "all")}>
               <SelectTrigger size="sm"><SelectValue placeholder="Status" /></SelectTrigger>
-              <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
+              <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{statusOptionLabel[value]}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={severityFilter} onValueChange={(value) => setSeverityFilter(value as ReportWidgetSeverity | "all")}>
               <SelectTrigger size="sm"><SelectValue placeholder="Severity" /></SelectTrigger>
@@ -289,11 +316,11 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           <>
             {selectedWidget ? <ReportWidgetPreviewCard widget={selectedWidget} locale={currentLocale} /> : null}
             {selectedWidget ? <ReportWidgetSourceCard widget={selectedWidget} locale={currentLocale} /> : null}
-            <MeWorkspaceSection title="Computed Metrics Preview" description="Operational metric placeholders before any report runtime is connected.">
+            <MeWorkspaceSection title="Computed Metrics" description="Operational metric framing for the current report workspace.">
               <div className="grid gap-2">
                 {[
-                  "Branch performance variance remains a computed placeholder.",
-                  "Export center is preview-only and does not generate files.",
+                  "Branch performance variance remains scheduled for computed service delivery.",
+                  "Export center remains part of the planned reporting workflow.",
                   "Widget refresh is visual only and does not call an API.",
                 ].map((item) => (
                   <div key={item} className="rounded-[18px] bg-slate-50/88 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-200/70">
@@ -333,7 +360,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         }
       />
 
-      <DemoPresentationNote description="Report routing and data remain metadata-only. No BI runtime, export engine, scheduler, fetch/axios integration, or storage persistence was introduced." />
+      <DemoPresentationNote description="The reports workspace now uses the shared customer-facing shell with widget catalog, PSI summary, and layout references. BI runtime, export delivery, scheduler integration, and data services remain in later phases." />
     </MeDashboardShell>
   );
 }

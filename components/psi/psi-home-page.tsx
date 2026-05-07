@@ -29,8 +29,8 @@ export function PsiHomePage() {
       sections={[
         {
           title: "PSI Status",
-          badge: "Read-only",
-          items: ["Procurement queue visible", "Supplier risks surfaced", "Inventory actions remain placeholder-only"],
+          badge: "Current release",
+          items: ["Procurement queue visible", "Supplier risks surfaced", "Inventory follow-up remains coordinated through the workspace"],
         },
         {
           title: "Recent Activity",
@@ -50,7 +50,7 @@ export function PsiHomePage() {
         eyebrow="PSI Workspace"
         title="Procurement, supplier, and inventory operations"
         description="Operational PSI shell with review queues, detail preview, and related context panels."
-        notice="Read-only foundation with mock repositories only. No database/API, stock posting, approval workflow, supplier portal, or write operations."
+        notice="Current release supports PSI visibility, review context, and linked navigation. Stock posting, approval workflow, supplier portal, and execution flows remain outside this release."
         badges={[
           { label: "Procurement" },
           { label: "Supplier", variant: "secondary" },
@@ -102,7 +102,7 @@ export function PsiHomePage() {
         title="PR-KCH-0001"
         subtitle="Procurement request"
         status="Pending Review"
-        guardrail="Mock / Read-only"
+        guardrail="Current release scope"
         meta={[
           { label: "Branch", value: "KCH" },
           { label: "Supplier", value: "ABC Food Supply" },
@@ -136,7 +136,7 @@ export function PsiHomePage() {
           { label: "Supplier" },
           { label: "Receiving" },
           { label: "Activity" },
-          { label: "Attachments", badge: "Soon" },
+          { label: "Attachments", badge: "Planned" },
         ]}
       />
 
@@ -269,7 +269,7 @@ export function PsiHomePage() {
               },
               {
                 title: "Related Records",
-                items: ["Inventory risk: Low stock replenishment", "Task placeholder: Store manager review", "Attachments: 2 files linked"],
+                items: ["Inventory risk: Low stock replenishment", "Task coordination: Store manager review", "Attachments: 2 files linked"],
               },
               {
                 title: "Next Steps",
@@ -277,7 +277,7 @@ export function PsiHomePage() {
               },
               {
                 title: "Guardrail",
-                badge: "Read-only",
+                badge: "Current release",
                 items: ["No approval execution", "No task creation", "No notification sending", "No write behavior"],
               },
             ]}
@@ -291,7 +291,7 @@ export function PsiHomePage() {
             ["Object", "Procurement request"],
             ["Side panel", "Approval, inventory, related records"],
             ["Tabs", "Overview, Items, Supplier, Receiving, Activity, Attachments"],
-            ["Behavior", "Mock / read-only"],
+            ["Behavior", "Operational visibility"],
           ].map(([label, value]) => (
             <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b xl:border-b-0 xl:pb-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
@@ -301,7 +301,7 @@ export function PsiHomePage() {
         </CardContent>
       </Card>
 
-      <DemoPresentationNote description="PSI now uses a denser procurement-detail workspace pattern with object header, action toolbar, tabs, table, activity, and side context. It remains mock/read-only with no approvals, writes, tasks, or notifications." />
+      <DemoPresentationNote description="PSI now uses the production detail-workspace pattern with object header, action toolbar, tabs, table, activity, and side context. Approval execution, write actions, tasks, and notifications remain scheduled for later phases." />
     </MeDashboardShell>
   );
 }

@@ -8,42 +8,39 @@
 
 ## UI Foundation
 
-- CSS variables for the bright, dark, and moon themes
+- Tailwind CSS
+- shared ME layout primitives in `components/layout/*`
+- shared ME operational module renderer in `components/operations/*`
 - Lucide React for iconography
-- Zustand for lightweight client preferences
 
-## Current Development Focus
+## State / Helpers
 
-- Build a stable Core Shell before business logic
-- Keep the stack simple and maintainable
-- Avoid database and connector dependencies in the current milestone
+- Zustand for lightweight client preferences only
+- typed config and helper layers under `config/*`, `lib/*`, and `types/*`
 
-## ME Brain Layer / AI Intelligence Roadmap
+## Product Rule
 
-This roadmap section documents future intelligence candidates for ME without adding implementation in the current repository scope.
+The stack should stay simple and maintainable.
 
-- Status: roadmap only
-- Not implemented in the current milestone
-- No API calls
-- No model inference code
-- No Hugging Face model integration at this stage
+ME should not add unnecessary infrastructure during UI governance work.
 
-### Forecast Engine
+## Current Backend Status
 
-- Candidate resources: Amazon Chronos / Chronos-Bolt, TimesFM, Lag-Llama
-- Use cases: POS sales forecast, inventory consumption forecast, reorder suggestion, procurement planning, stock risk prediction
-- Status: roadmap / not implemented
+This repository remains **planning-only** for connected business runtime:
 
-### SQL Intelligence
+- No real database
+- No real API
+- No auth/session runtime
+- No workflow engine
+- No notification backend
+- No implementation is included yet for production integrations
 
-- Candidate resources: Defog SQLCoder, Text-to-SQL, SQL Guard
-- Use cases: natural language reporting, AI data analyst, dashboard drill-down, read-only business query generation
-- Security rule: generated SQL must be read-only `SELECT`, tenant-scoped, table-whitelisted, row-limited, and auditable
-- Status: roadmap / not implemented
+## Governance Compatibility
 
-### Document Intelligence
+Any future dependency or stack change must remain compatible with:
 
-- Candidate resources: LayoutLMv3-style document AI, OCR, invoice parser, receipt parser
-- Use cases: supplier invoice extraction, delivery order parsing, purchase document comparison, contract field extraction
-- License note: verify commercial license before production use
-- Status: roadmap / not implemented
+- [DESIGN.md](./DESIGN.md)
+- [ME_UI_METRICS.md](./ME_UI_METRICS.md)
+- [ME_VISUAL_SYSTEM.md](./ME_VISUAL_SYSTEM.md)
+- [ME_MODULE_ARCHITECTURE.md](./ME_MODULE_ARCHITECTURE.md)
+- [ME_DATA_FORMULA_BRAIN_SEPARATION.md](./ME_DATA_FORMULA_BRAIN_SEPARATION.md)

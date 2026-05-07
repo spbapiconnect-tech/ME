@@ -28,11 +28,11 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         eyebrow="PSI Inventory"
         title="Inventory stock detail"
         description="Stock profile, movement context, expiry visibility, and linked procurement records using the shared detail pattern."
-        notice={`Source: ${source}. Inventory preview remains ${isMock ? "mock/read-only" : "read-only"} with no posting, no stock updates, and no writes.`}
+        notice={`Source: ${source}. ${isMock ? "Current data is served through the product catalog layer." : "Current data is served through the connected source layer."} This release supports stock visibility, risk tracking, and procurement linkage. Posting, stock updates, and execution flows remain outside this release.`}
         badges={[
           { label: "Inventory detail" },
-          { label: "Warehouse preview", variant: "secondary" },
-          { label: "Read-only", variant: "outline" },
+          { label: "Warehouse workspace", variant: "secondary" },
+          { label: "Current release", variant: "outline" },
         ]}
         actions={
           <>
@@ -59,7 +59,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         title="SKU-KCH-0007"
         subtitle="Coated Fries"
         status="Low Stock"
-        guardrail="Mock / Read-only"
+        guardrail="Current release scope"
         meta={[
           { label: "Branch", value: "KCH" },
           { label: "Storage", value: "Freezer" },
@@ -133,7 +133,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
                 embedded
                 columns={["Date", "Movement", "Qty", "Reference", "Status"]}
                 rows={[
-                  ["Today 08:20", "Outlet issue", "-12", "SO-KCH-091", "Posted placeholder"],
+                  ["Today 08:20", "Outlet issue", "-12", "SO-KCH-091", "Posted in prior cycle"],
                   ["Yesterday 17:10", "Receiving", "+18", "RCV-KCH-044", "Linked to last inbound"],
                   ["Yesterday 11:00", "Transfer out", "-8", "TR-KCH-009", "Complete"],
                 ]}
@@ -146,14 +146,14 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
                   <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Expiry Watch</p>
                     <p className="mt-1.5 text-sm font-semibold text-slate-900">No immediate expiry risk</p>
-                    <p className="mt-1 text-sm text-slate-600">Nearest mock expiry window is 19 days out and remains outside escalation range.</p>
+                    <p className="mt-1 text-sm text-slate-600">Nearest tracked expiry window is 19 days out and remains outside escalation range.</p>
                   </div>
                   <MeDataTable
                     embedded
                     columns={["Procurement", "ETA", "Qty", "Status"]}
                     rows={[
                       ["PR-KCH-0001", "Tomorrow 09:00", "24 bags", "Pending review"],
-                      ["PR-KCH-0009", "This week", "18 bags", "Draft placeholder"],
+                      ["PR-KCH-0009", "This week", "18 bags", "Planned replenishment"],
                     ]}
                   />
                 </div>
@@ -183,11 +183,11 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
               },
               {
                 title: "Expiry Watch",
-                items: ["No immediate expiry risk", "Next mock expiry in 19 days", "Freezer storage stable"],
+                items: ["No immediate expiry risk", "Next tracked expiry in 19 days", "Freezer storage stable"],
               },
               {
                 title: "Related Context",
-                items: ["Supplier: ABC Food Supply", "Linked task: Warehouse review placeholder", "Procurement: PR-KCH-0001"],
+                items: ["Supplier: ABC Food Supply", "Warehouse review: inventory follow-up", "Procurement: PR-KCH-0001"],
               },
               {
                 title: "Next Steps",
@@ -195,7 +195,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
               },
               {
                 title: "Guardrail",
-                badge: "Read-only",
+                badge: "Current release",
                 items: ["No stock posting", "No inventory updates", "No task creation", "No API writes"],
               },
             ]}
@@ -203,7 +203,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         }
       />
 
-      <DemoPresentationNote description="Inventory detail preview now uses the shared detail-workspace pattern. It remains mock/read-only with no stock posting, no movement execution, and no write behavior." />
+      <DemoPresentationNote description="Inventory detail now uses the shared production detail-workspace pattern. Stock posting, movement execution, and write behavior remain scheduled for later phases." />
     </MeDashboardShell>
   );
 }

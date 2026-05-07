@@ -11,10 +11,10 @@ interface DemoPresentationNoteProps {
 }
 
 export function DemoPresentationNote({
-  title = "Screenshot-ready placeholder",
-  description = "Screenshot-ready placeholder — all data is mock/read-only.",
-  href = "/demo-mode",
-  hrefLabel = "Open Demo Mode",
+  title = "Workspace Note",
+  description = "Current release scope for this workspace.",
+  href = "/system-foundation",
+  hrefLabel = "Open System Foundation",
 }: DemoPresentationNoteProps) {
   return (
     <Card size="sm" className="border-border bg-[#F8FAFC] shadow-none">

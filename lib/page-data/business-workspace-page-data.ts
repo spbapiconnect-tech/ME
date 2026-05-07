@@ -39,7 +39,7 @@ function moduleCards(params: {
     {
       key: "psi-workspace",
       title: { zh: "PSI 工作区", en: "PSI Workspace" },
-      description: { zh: "采购、供应商、库存一体化运营视图（只读）", en: "Integrated procurement, supplier, and inventory operations view (read-only)." },
+      description: { zh: "采购、供应商、库存一体化运营视图。", en: "Integrated procurement, supplier, and inventory operations view." },
       status: "healthy",
       tone: "info",
       route: "/psi",
@@ -60,7 +60,7 @@ function moduleCards(params: {
     {
       key: "supplier",
       title: { zh: "供应商", en: "Supplier" },
-      description: { zh: "供应商问题与评分只读汇总", en: "Read-only supplier issue and rating summary." },
+      description: { zh: "供应商问题与评分汇总。", en: "Supplier issue and rating summary." },
       status: params.supplierIssues >= 4 ? "risk" : "watch",
       tone: riskToneByCount(params.supplierIssues),
       route: "/psi/supplier",
@@ -143,7 +143,7 @@ function moduleCards(params: {
     {
       key: "pos-report",
       title: { zh: "POS 报表", en: "POS Report" },
-      description: { zh: "销售日报、门店波动与导出占位预览", en: "Daily sales, branch variance, and export placeholder preview." },
+      description: { zh: "销售日报、门店波动与导出规划总览。", en: "Daily sales, branch variance, and export planning overview." },
       status: "watch",
       tone: "info",
       route: "/reports/pos",
@@ -224,7 +224,7 @@ function actionsList(): BusinessWorkspaceAction[] {
     {
       key: "action-open-reports",
       label: { zh: "查看报表预览", en: "Open Report Preview" },
-      description: { zh: "进入 PSI 报表聚合看板（只读）。", en: "Open read-only PSI report aggregation dashboard." },
+      description: { zh: "进入 PSI 报表聚合看板。", en: "Open the PSI report aggregation workspace." },
       route: "/reports",
       tone: "success",
       sourceModule: "reports",
@@ -330,7 +330,7 @@ export async function getBusinessWorkspacePageData(): Promise<BusinessWorkspaceP
         value: healthScore,
         unit: { zh: "分", en: "pts" },
         tone: Number(healthScore) >= 85 ? "success" : Number(healthScore) >= 70 ? "info" : "warning",
-        description: { zh: "仅为 mock 健康评分预览。", en: "Mock health score preview only." },
+        description: { zh: "当前窗口下的 PSI 健康视图。", en: "Current PSI health view for the active reporting window." },
         route: "/reports",
       },
     ],
@@ -349,8 +349,8 @@ export async function getBusinessWorkspacePageData(): Promise<BusinessWorkspaceP
       { key: "packages", label: { zh: "Packages", en: "Packages" }, route: "/packages" },
     ],
     notice: {
-      zh: "当前页面仅提供业务工作台 UI 与 PSI mock 数据只读预览；不连接数据库/API，不执行写入、权限校验、审批、通知或工作流。",
-      en: "This page provides a business workspace UI with read-only PSI mock previews only; no database/API, write actions, permission enforcement, approvals, notifications, or workflow execution.",
+      zh: "当前页面提供面向门店与总部的业务可视化工作台；审批、过账、通知与自动化能力仍在后续阶段交付。",
+      en: "This workspace provides operational visibility for branch and head-office teams. Approvals, posting, notifications, and automation remain in later release phases.",
     },
   };
 }

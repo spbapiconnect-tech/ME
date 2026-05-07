@@ -60,7 +60,7 @@ export function RestaurantModulePage({ module }: { module: RestaurantModuleDefin
       ) : null}
 
       {preview.filters?.length ? (
-        <MeWorkspaceSection title="Workspace Filters" description="Read-only selectors and operating context for the current module preview.">
+        <MeWorkspaceSection title="Workspace Filters" description="Scoped selectors and operating context for the current module surface.">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {preview.filters.map((filterItem) => (
               <div key={filterItem.label} className="rounded-[10px] border border-border bg-slate-50 px-4 py-3.5">

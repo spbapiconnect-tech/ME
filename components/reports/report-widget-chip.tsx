@@ -15,9 +15,9 @@ interface ReportWidgetChipProps {
 
 const statusLabel: Record<ReportWidgetStatus, { zh: string; en: string }> = {
   active: { zh: "已启用", en: "Active" },
-  "preview-only": { zh: "仅预览", en: "Preview-Only" },
-  placeholder: { zh: "占位", en: "Placeholder" },
-  "coming-soon": { zh: "即将上线", en: "Coming Soon" },
+  "preview-only": { zh: "已配置", en: "Configured" },
+  placeholder: { zh: "规划中", en: "Planned" },
+  "coming-soon": { zh: "规划交付", en: "Planned Delivery" },
   blocked: { zh: "阻止", en: "Blocked" },
   disabled: { zh: "禁用", en: "Disabled" },
 };
@@ -43,7 +43,7 @@ const typeLabel: Record<ReportWidgetType, { zh: string; en: string }> = {
   "workflow-summary": { zh: "流程摘要", en: "Workflow Summary" },
   "notification-summary": { zh: "通知摘要", en: "Notification Summary" },
   "audit-summary": { zh: "审计摘要", en: "Audit Summary" },
-  placeholder: { zh: "占位", en: "Placeholder" },
+  placeholder: { zh: "规划组件", en: "Planned Surface" },
 };
 
 const sizeLabel: Record<ReportWidgetSize, { zh: string; en: string }> = {

@@ -28,11 +28,11 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
         eyebrow="PSI Supplier"
         title="Supplier operations detail"
         description="Supplier profile, contact context, linked orders, and issue visibility inside the shared detail workspace pattern."
-        notice={`Source: ${source}. Supplier preview remains ${isMock ? "mock/read-only" : "read-only"} with no supplier portal, writes, or execution.`}
+        notice={`Source: ${source}. ${isMock ? "Current data is served through the product catalog layer." : "Current data is served through the connected source layer."} This release supports supplier visibility, contact context, and linked order review. Supplier portal, note submission, and execution flows remain outside this release.`}
         badges={[
           { label: "Supplier detail" },
-          { label: "Operations preview", variant: "secondary" },
-          { label: "Read-only", variant: "outline" },
+          { label: "Operations workspace", variant: "secondary" },
+          { label: "Current release", variant: "outline" },
         ]}
         actions={
           <>
@@ -59,7 +59,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
         title="ABC Food Supply"
         subtitle="Supplier profile"
         status="Active / Review Needed"
-        guardrail="Mock / Read-only"
+        guardrail="Current release scope"
         meta={[
           { label: "Branch coverage", value: "KCH / BTU" },
           { label: "Category", value: "Food Supply" },
@@ -146,7 +146,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
                     rows={[
                       ["PR-KCH-0001", "KCH", "RM 3,480", "Pending review"],
                       ["PR-BTU-0004", "BTU", "RM 2,140", "Awaiting quote refresh"],
-                      ["PR-KCH-0007", "KCH", "RM 1,260", "Delivered placeholder"],
+                      ["PR-KCH-0007", "KCH", "RM 1,260", "Delivered this cycle"],
                     ]}
                   />
                   <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
@@ -192,7 +192,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
               },
               {
                 title: "Guardrail",
-                badge: "Read-only",
+                badge: "Current release",
                 items: ["No supplier portal", "No API writes", "No note submission", "No workflow execution"],
               },
             ]}
@@ -200,7 +200,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
         }
       />
 
-      <DemoPresentationNote description="Supplier detail preview now uses the shared detail-workspace pattern. It remains mock/read-only with no supplier portal, no write actions, and no API execution." />
+      <DemoPresentationNote description="Supplier detail now uses the shared production detail-workspace pattern. Portal connectivity, note submission, and execution flows remain outside the current release." />
     </MeDashboardShell>
   );
 }

@@ -33,15 +33,15 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         {
           title: "Branch Context",
           badge: "KCH",
-          items: ["Local operations scope", "PSI, reports, and roles linked", "Manager placeholder remains visual-only"],
+          items: ["Local operations scope", "PSI, reports, and roles linked", "Manager context remains visible for branch review"],
         },
         {
           title: "Active Modules",
-          items: ["PSI operational preview", "Reports workspace", "Roles and staff preview"],
+          items: ["PSI operational workspace", "Reports workspace", "Roles and staff workspace"],
         },
         {
           title: "Recent Activity",
-          items: ["KCH branch context reviewed", "Inventory watch linked to PSI", "Issue queue remains placeholder-only"],
+          items: ["KCH branch context reviewed", "Inventory watch linked to PSI", "Issue queue remains under manager review"],
         },
         {
           title: "Guardrails",
@@ -61,11 +61,11 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         eyebrow="Branch Workspace"
         title="Branch context and operations status"
         description="Branch management shell for aggregate and local operating views."
-        notice="Branch preview only. No tenant switching, no branch database, and no branch permission enforcement."
+        notice="Current release supports branch context, operations visibility, and linked module review. Tenant switching, branch persistence, and permission enforcement remain outside this release."
         badges={[
           { label: "All Stores" },
           { label: "KCH / BTU", variant: "secondary" },
-          { label: "Read-only", variant: "outline" },
+          { label: "Current release", variant: "outline" },
         ]}
         actions={
           <>
@@ -82,8 +82,8 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         }
         meta={[
           { label: "Scope", value: "All Stores / KCH / BTU / Future Branch" },
-          { label: "Current Mode", value: "Context preview" },
-          { label: "Operations", value: "Status and inspection placeholders" },
+          { label: "Current Mode", value: "Context workspace" },
+          { label: "Operations", value: "Status and inspection context" },
           { label: "Writes", value: "Disabled" },
         ]}
       />
@@ -120,15 +120,15 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
 
       <MeRecordSummary
         title="KCH"
-        subtitle="Branch detail preview"
+        subtitle="Branch detail"
         status="Active"
-        guardrail="Branch preview only"
+        guardrail="Current release scope"
         meta={[
           { label: "Scope", value: "Local operations" },
-          { label: "Manager", value: "Placeholder" },
+          { label: "Manager", value: "Branch manager" },
           { label: "Linked modules", value: "PSI / Reports / Roles" },
           { label: "Context", value: "KCH branch view" },
-          { label: "Issue watch", value: "2 open placeholders" },
+          { label: "Issue watch", value: "2 open follow-ups" },
           { label: "Inventory status", value: "Replenishment review active" },
           { label: "Reports status", value: "Weekly view ready" },
           { label: "Last updated", value: "Today 15:05" },
@@ -168,10 +168,10 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
                     ["Branch", "KCH"],
                     ["Status", "Active"],
                     ["Scope", "Local operations"],
-                    ["Manager", "Placeholder"],
+                    ["Manager", "Branch manager"],
                     ["Linked modules", "PSI / Reports / Roles"],
                     ["Inventory watch", "Replenishment review active"],
-                    ["Issue load", "2 open placeholders"],
+                    ["Issue load", "2 open follow-ups"],
                     ["Report cadence", "Weekly operating review"],
                   ].map(([label, value]) => (
                     <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
@@ -195,8 +195,8 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
                 columns={["Area", "Status", "Owner", "Notes"]}
                 rows={[
                   ["PSI operations", "Watch", "Purchasing", "Procurement review linked to replenishment queue"],
-                  ["Inventory readiness", "Active", "Warehouse", "Freezer and dry storage tracked in mock scope"],
-                  ["Staff alignment", "Placeholder", "Branch manager", "No live staffing model connected"],
+                  ["Inventory readiness", "Active", "Warehouse", "Freezer and dry storage tracked in current scope"],
+                  ["Staff alignment", "Review", "Branch manager", "Staff structure visible for branch coordination"],
                 ]}
               />
             </MeWorkspaceSection>
@@ -208,7 +208,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
                     embedded
                     columns={["Issue", "Module", "Status", "Action"]}
                     rows={[
-                      ["Low-stock review", "PSI", "Open", "Link procurement placeholder"],
+                      ["Low-stock review", "PSI", "Open", "Link procurement workspace"],
                       ["Weekly performance variance", "Reports", "Watch", "Review report workspace"],
                     ]}
                   />
@@ -269,7 +269,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         </div>
       </MeWorkspaceSection>
 
-      <DemoPresentationNote description="Branch pages now use the same SaaS shell while remaining mock/read-only. No tenant model, persistence, auth, access enforcement, or write behavior was added." />
+      <DemoPresentationNote description="Branch pages now use the same customer-facing shell with branch context, linked modules, and operational review. Tenant persistence, auth, access enforcement, and write behavior remain outside the current release." />
     </MeDashboardShell>
   );
 }

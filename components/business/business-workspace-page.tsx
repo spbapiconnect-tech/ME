@@ -28,7 +28,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
           items: [
             "Branch context: All Stores / KCH preview",
             "Routing source: shared navigation config",
-            "Guardrail: mock and read-only only",
+            "Current release: operational visibility and linked review",
           ],
         },
         {
@@ -57,7 +57,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
         notice={data.notice.en}
         badges={[
           { label: "CRM / ERP shell", variant: "secondary" },
-          { label: "Read-only", variant: "outline" },
+          { label: "Current release", variant: "outline" },
           { label: "Config-driven navigation", variant: "outline" },
         ]}
         actions={
@@ -123,7 +123,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             </div>
             <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Mode</p>
-              <p className="mt-1.5 text-sm font-semibold text-slate-900">Mock / read-only</p>
+              <p className="mt-1.5 text-sm font-semibold text-slate-900">Operational visibility</p>
             </div>
             <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Display</p>
@@ -155,7 +155,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                       </div>
                       <div>
                         <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Secondary</p>
-                        <p>{module.secondaryMetric?.en ?? "Read-only"}</p>
+                        <p>{module.secondaryMetric?.en ?? "Current scope"}</p>
                       </div>
                     </div>
                   </Link>
@@ -181,7 +181,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
         }
         summary={
           <>
-            <MeWorkspaceSection title="Action Panel" description="Visual actions only. No writes or workflow execution.">
+            <MeWorkspaceSection title="Action Panel" description="Current release actions for review, follow-up, and workspace navigation.">
               <div className="grid gap-2">
                 {data.actions.map((action) => (
                   <Link key={action.key} href={action.route} className="rounded-[20px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
@@ -205,7 +205,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
         }
       />
 
-      <DemoPresentationNote description="Screenshot-ready operational shell only. All routing and data remain mock/read-only with no API, auth, workflow, or write execution added." />
+      <DemoPresentationNote description="Customer-facing operational shell with visibility across PSI, reports, branches, and roles. Data connections, approvals, and automation remain in later release phases." />
     </MeDashboardShell>
   );
 }

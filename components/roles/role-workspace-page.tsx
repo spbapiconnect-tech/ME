@@ -27,12 +27,12 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
       sections={[
         {
           title: "Role Context",
-          badge: "Preview only",
-          items: ["Business roles visible", "System foundation kept accessible", "Staff and permissions remain placeholders"],
+          badge: "Current release",
+          items: ["Business roles visible", "System foundation kept accessible", "Staff and access structure remain visible"],
         },
         {
           title: "Workspace Focus",
-          items: ["Role profiles", "Access preview", "Training placeholder", "Staff context placeholder"],
+          items: ["Role profiles", "Access structure", "Training coverage", "Staff context"],
         },
         {
           title: "Guardrails",
@@ -48,11 +48,11 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
         eyebrow="Roles & Staff"
         title="Role profiles and staff workspace shell"
         description="Role-based workspace framing for leadership, operations, and platform administration."
-        notice="Role preview only. No auth, session, or permission enforcement is connected."
+        notice="Current release provides role profiles, access structure, and staff context visibility. Auth, session, and permission enforcement remain outside this release."
         badges={[
           { label: "Roles" },
-          { label: "Permissions placeholder", variant: "secondary" },
-          { label: "Read-only", variant: "outline" },
+          { label: "Access catalog", variant: "secondary" },
+          { label: "Current release", variant: "outline" },
         ]}
         actions={
           <>
@@ -102,7 +102,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
             ["Role profiles", String(roles.length)],
             ["Business users", String(businessRoles.length)],
             ["Platform admins", String(platformRoles.length)],
-            ["Permission mode", "Placeholder"],
+            ["Permission mode", "Structured"],
           ].map(([label, value]) => (
             <div key={label} className="rounded-[22px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] px-4 py-3.5 ring-1 ring-slate-200/75">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
@@ -126,9 +126,9 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
             embedded
             columns={["Staff", "Role", "Branch", "Access scope", "Status"]}
             rows={[
-              ["Store manager placeholder", "Branch manager", "KCH", "Operations and reports", "Preview only"],
-              ["Purchasing placeholder", "Procurement lead", "All Stores", "PSI and supplier detail", "Preview only"],
-              ["System admin placeholder", "System admin", "Global", "Foundation routes", "Preview only"],
+              ["KCH Store Manager", "Branch manager", "KCH", "Operations and reports", "Current scope"],
+              ["Purchasing Lead", "Procurement lead", "All Stores", "PSI and supplier detail", "Current scope"],
+              ["Platform Administrator", "System admin", "Global", "Foundation routes", "Current scope"],
             ]}
           />
         </MeWorkspaceSection>
@@ -138,9 +138,9 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
             embedded
             columns={["Group", "Surface", "Mode", "Guardrail"]}
             rows={[
-              ["Operations review", "PSI / Branches", "Read-only", "No approval execution"],
-              ["Reporting review", "Reports", "Read-only", "No export runtime"],
-              ["Foundation admin", "System routes", "Preview-only", "No auth/session enforced"],
+              ["Operations review", "PSI / Branches", "Visibility", "No approval execution"],
+              ["Reporting review", "Reports", "Visibility", "No export runtime"],
+              ["Foundation admin", "System routes", "Current release", "No auth/session enforced"],
             ]}
           />
         </MeWorkspaceSection>
@@ -154,12 +154,12 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
         </div>
       </MeWorkspaceSection>
 
-      <MeWorkspaceSection title="Placeholder Staff Surfaces" description="Reserved operational regions without implementing staff management or permission writes.">
+      <MeWorkspaceSection title="Staff Workspace Surfaces" description="Operational regions reserved for directory, access, and training coordination.">
         <div className="grid gap-3 md:grid-cols-3">
           {[
-            "Staff profile directory placeholder",
-            "Permission matrix placeholder",
-            "Training and certification placeholder",
+            "Staff profile directory",
+            "Permission matrix",
+            "Training and certification",
           ].map((item) => (
             <div key={item} className="rounded-[24px] bg-slate-50/88 p-4 text-sm text-slate-600 ring-1 ring-slate-200/75">
               {item}
@@ -168,7 +168,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
         </div>
       </MeWorkspaceSection>
 
-      <DemoPresentationNote description="Roles now sit inside the shared SaaS shell and remain visual-only. No auth, session, permission, or staff write behavior was added." />
+      <DemoPresentationNote description="Roles now sit inside the shared customer-facing shell with role profiles, access structure, and staff context. Auth, session, permission enforcement, and write behavior remain in later phases." />
     </MeDashboardShell>
   );
 }
