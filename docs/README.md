@@ -92,3 +92,7 @@ After this governance pass, future UI changes must follow:
   Imported reference appendix from the provided governance pack. Not the source of truth.
 - [archive/DESIGN_LINKS_PATCH.md](./archive/DESIGN_LINKS_PATCH.md)
   Imported patch note from the provided governance pack. Kept for traceability only.
+
+## UI System
+
+- [ME shadcn UI System](./ME_SHADCN_UI_SYSTEM.md)
