@@ -8,7 +8,7 @@ interface BranchNavigationPreviewProps {
 
 export function BranchNavigationPreview({ navigationPreview }: BranchNavigationPreviewProps) {
   return (
-    <Card size="sm" className="border border-border/70 bg-card/95">
+    <Card className="border border-border/70 bg-card/95">
       <CardHeader className="gap-1">
         <CardTitle className="text-sm">Visible Navigation Preview</CardTitle>
         <CardDescription>{navigationPreview.notice.en}</CardDescription>

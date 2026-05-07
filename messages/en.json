@@ -52,7 +52,44 @@
     "mockDataOnly": "Mock Data Only",
     "layoutEngine": "Layout Engine",
     "openTaskEngine": "Open Task Engine",
-    "openLayoutEngine": "Open Layout Engine"
+    "openLayoutEngine": "Open Layout Engine",
+    "search": "Search",
+    "add": "Add",
+    "export": "Export",
+    "viewReports": "View Reports",
+    "openTasks": "Open Tasks",
+    "openDetail": "Open Detail",
+    "createTask": "Create Task",
+    "manager": "Manager",
+    "region": "Region",
+    "lastUpdate": "Last Update",
+    "allBranches": "All Branches",
+    "allRegions": "All Regions",
+    "allStatus": "All Status"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "storeOperations": "Store Operations",
+    "psi": "PSI",
+    "workforce": "Workforce",
+    "business": "Business",
+    "system": "System",
+    "branches": "Branches",
+    "inspection": "Inspection",
+    "issues": "Issues",
+    "tasks": "Tasks",
+    "psiOverview": "PSI Overview",
+    "procurement": "Procurement",
+    "supplier": "Supplier",
+    "inventory": "Inventory",
+    "receiving": "Receiving",
+    "staff": "Staff",
+    "schedule": "Schedule",
+    "training": "Training",
+    "reports": "Reports",
+    "rolesPermission": "Roles & Permission",
+    "settings": "Settings",
+    "integration": "Integration"
   },
   "themes": {
     "bright": "Bright",
@@ -67,7 +104,14 @@
     "enabled": "Enabled",
     "disabled": "Disabled",
     "coming-soon": "Coming Soon",
-    "beta": "Beta"
+    "beta": "Beta",
+    "operating": "Operating",
+    "preparation": "Preparation",
+    "active": "Active",
+    "critical": "Critical",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
   },
   "plan": {
     "starter": "Starter",
@@ -113,66 +157,6 @@
     "task": {
       "name": "Task",
       "shortName": "Task"
-    },
-    "approval": {
-      "name": "Approval Center",
-      "shortName": "Approval"
-    },
-    "message": {
-      "name": "Message Center",
-      "shortName": "Messages"
-    },
-    "api-center": {
-      "name": "API Center",
-      "shortName": "API"
-    },
-    "automation-center": {
-      "name": "Automation Center",
-      "shortName": "Automation"
-    },
-    "rule-center": {
-      "name": "Rule Center",
-      "shortName": "Rules"
-    },
-    "formula-center": {
-      "name": "Formula Center",
-      "shortName": "Formula"
-    },
-    "report-builder": {
-      "name": "Report Builder",
-      "shortName": "Builder"
-    },
-    "ai-assistant": {
-      "name": "AI Assistant",
-      "shortName": "Assistant"
-    },
-    "branch-overview": {
-      "name": "Branch Overview",
-      "shortName": "Branch"
-    },
-    "inspection": {
-      "name": "Inspection",
-      "shortName": "Inspect"
-    },
-    "scheduling": {
-      "name": "Scheduling",
-      "shortName": "Schedule"
-    },
-    "staff": {
-      "name": "Staff",
-      "shortName": "Staff"
-    },
-    "crm": {
-      "name": "CRM",
-      "shortName": "CRM"
-    },
-    "erp-integration": {
-      "name": "ERP Integration",
-      "shortName": "ERP"
-    },
-    "advanced-wms": {
-      "name": "Advanced WMS",
-      "shortName": "WMS"
     }
   }
 }

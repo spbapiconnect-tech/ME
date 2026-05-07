@@ -3,77 +3,121 @@
     "name": "ME",
     "subtitle": "Modular Store Operations Platform",
     "subtitleZh": "模块化门店运营平台",
-    "description": "ME 当前已包含首个 Layout Engine 与 Skin System 基础，让未来 UI 重设计可以在不重写模块逻辑的前提下切换布局与皮肤。",
-    "milestone": "v0.5.2 Layout Engine / Skin System Foundation"
+    "description": "ME 现在包含了第一个布局引擎和皮肤系统基础，因此未来的 UI 重新设计可以在不重写模块逻辑的情况下更换布局和皮肤。",
+    "milestone": "v0.5.2 布局引擎 / 皮肤系统基础"
   },
   "common": {
     "theme": "主题",
     "language": "语言",
     "currentTheme": "当前主题",
     "moduleCenter": "模块中心",
-    "moduleRegistry": "模块注册中心",
-    "moduleCenterSummary": "按分类、计划与上线状态组织的 ME 模块注册基础层。",
-    "moduleCenterDescription": "模块中心直接读取 config/modules.ts，展示当前与未来的注册模块。",
-    "supportedThemes": "支持主题",
+    "moduleRegistry": "模块注册表",
+    "moduleCenterSummary": "ME 模块的结构化注册表基础，按类别、计划和推广状态分组。",
+    "moduleCenterDescription": "模块中心直接从 config/modules.ts 读取并公开当前和未来的注册表项。",
+    "supportedThemes": "支持的主题",
     "placeholderRoutes": "占位路由",
     "permissions": "权限",
     "category": "分类",
     "status": "状态",
     "plan": "计划",
     "foundationStatus": "基础状态",
-    "currentViewport": "当前视图",
+    "currentViewport": "当前视口",
     "activeLanguage": "当前语言",
-    "shellPlaceholder": "骨架占位",
-    "noBusinessLogic": "当前里程碑不包含真实业务逻辑、数据库或外部连接器。",
-    "dashboardReady": "Dashboard 骨架已为后续模块扩展做好准备。",
-    "responsiveReady": "三端响应式 Shell 模式已准备完成。",
-    "bilingualReady": "中文与 English 共用同一套稳定布局。",
-    "totalModules": "模块总数",
+    "shellPlaceholder": "Shell 占位符",
+    "noBusinessLogic": "此里程碑未实现实际业务逻辑、数据库或外部连接器。",
+    "dashboardReady": "仪表盘 shell 已为未来模块做好准备。",
+    "responsiveReady": "响应式 shell 模式已到位。",
+    "bilingualReady": "中英文标签共享相同的布局系统。",
+    "totalModules": "总模块数",
     "enabledModules": "已启用模块",
-    "comingSoonModules": "即将上线",
-    "betaModules": "Beta 模块",
-    "disabledModules": "停用模块",
+    "comingSoonModules": "即将推出",
+    "betaModules": "测试版模块",
+    "disabledModules": "已禁用模块",
     "openModuleCenter": "打开模块中心",
-    "backToDashboard": "返回 Dashboard",
-    "allModules": "全部模块",
-    "allRegisteredModules": "所有模块都从配置注册并展示。",
-    "enabledCoreModules": "Dashboard 仅展示已启用的核心与控制模块，模块中心展示完整注册表。",
-    "moduleCategoryGroups": "模块分类分组",
-    "routeCount": "路由数量",
-    "permissionCount": "权限数量",
-    "apiScopeCount": "API 范围数量",
-    "ownerRole": "负责角色",
-    "sourceMapping": "来源映射",
+    "backToDashboard": "返回工作台",
+    "allModules": "所有模块",
+    "allRegisteredModules": "所有模块均从配置中注册。",
+    "enabledCoreModules": "仪表盘仅显示已启用的核心和控制模块，而模块中心显示完整的注册表。",
+    "moduleCategoryGroups": "模块类别组",
+    "routeCount": "路由数",
+    "permissionCount": "权限数",
+    "apiScopeCount": "API 范围数",
+    "ownerRole": "所有者角色",
+    "sourceMapping": "源映射",
     "openTemplates": "打开页面模板",
     "openComponents": "打开核心组件",
-    "openActionContracts": "打开 Action Contracts",
-    "openDemo": "打开 Demo Workspace",
-    "prototypeDemo": "Prototype Demo",
-    "mockDataOnly": "仅使用 Mock Data",
+    "openActionContracts": "打开操作合约",
+    "openDemo": "打开演示工作区",
+    "prototypeDemo": "原型演示",
+    "mockDataOnly": "仅模拟数据",
     "layoutEngine": "布局引擎",
-    "openTaskEngine": "打开 Task Engine",
-    "openLayoutEngine": "打开 Layout Engine"
+    "openTaskEngine": "打开任务引擎",
+    "openLayoutEngine": "打开布局引擎",
+    "search": "搜索",
+    "add": "新增",
+    "export": "导出",
+    "viewReports": "查看报表",
+    "openTasks": "打开任务",
+    "openDetail": "查看详情",
+    "createTask": "创建任务",
+    "manager": "经理",
+    "region": "区域",
+    "lastUpdate": "最后更新",
+    "allBranches": "所有门店",
+    "allRegions": "所有区域",
+    "allStatus": "所有状态"
+  },
+  "sidebar": {
+    "dashboard": "工作台",
+    "storeOperations": "门店管理",
+    "psi": "采购库存",
+    "workforce": "人力资源",
+    "business": "业务管理",
+    "system": "系统设置",
+    "branches": "门店管理",
+    "inspection": "巡检管理",
+    "issues": "异常事件",
+    "tasks": "任务管理",
+    "psiOverview": "采购库存总览",
+    "procurement": "采购管理",
+    "supplier": "供应商管理",
+    "inventory": "库存管理",
+    "receiving": "收货管理",
+    "staff": "员工管理",
+    "schedule": "排班管理",
+    "training": "培训与 SOP",
+    "reports": "报表中心",
+    "rolesPermission": "权限管理",
+    "settings": "系统设置",
+    "integration": "集成管理"
   },
   "themes": {
-    "bright": "Bright",
-    "dark": "Dark",
-    "moon": "Moon"
+    "bright": "明亮",
+    "dark": "深色",
+    "moon": "月光"
   },
   "languages": {
     "en": "English",
     "zh": "中文"
   },
   "status": {
-    "enabled": "启用",
-    "disabled": "停用",
-    "coming-soon": "即将上线",
-    "beta": "Beta"
+    "enabled": "已启用",
+    "disabled": "已禁用",
+    "coming-soon": "即将推出",
+    "beta": "测试版",
+    "operating": "营业中",
+    "preparation": "筹备中",
+    "active": "活跃",
+    "critical": "紧急",
+    "high": "高",
+    "medium": "中",
+    "low": "低"
   },
   "plan": {
-    "starter": "Starter",
-    "ops": "Ops",
-    "pro": "Pro",
-    "enterprise": "Enterprise"
+    "starter": "入门版",
+    "ops": "运营版",
+    "pro": "专业版",
+    "enterprise": "企业版"
   },
   "category": {
     "core": "核心",
@@ -82,12 +126,12 @@
     "future": "未来"
   },
   "shells": {
-    "mobile": "Mobile Shell",
-    "tablet": "Tablet Shell",
-    "desktop": "Desktop Shell",
-    "mobileCopy": "包含顶栏、紧凑 KPI 区、模块流与底部导航占位。",
-    "tabletCopy": "包含侧栏、工作区分栏、工具栏与自适应内容区域占位。",
-    "desktopCopy": "包含全局侧栏、主工作台、分析信息栏与操作面板占位。"
+    "mobile": "移动端 Shell",
+    "tablet": "平板端 Shell",
+    "desktop": "桌面端 Shell",
+    "mobileCopy": "顶部栏、紧凑的 KPI 区域、模块流和底部导航占位符。",
+    "tabletCopy": "侧边栏、工作区拆分、实用工具栏和自适应内容区域占位符。",
+    "desktopCopy": "全局侧边栏、工作区画布、分析侧栏和操作面板占位符。"
   },
   "modules": {
     "procurement": {
@@ -96,7 +140,7 @@
     },
     "supplier": {
       "name": "供应商",
-      "shortName": "供方"
+      "shortName": "供应商"
     },
     "inventory": {
       "name": "库存",
@@ -104,7 +148,7 @@
     },
     "pos-report": {
       "name": "POS 报表",
-      "shortName": "报表"
+      "shortName": "POS"
     },
     "education": {
       "name": "培训",
@@ -113,66 +157,6 @@
     "task": {
       "name": "任务",
       "shortName": "任务"
-    },
-    "approval": {
-      "name": "审批中心",
-      "shortName": "审批"
-    },
-    "message": {
-      "name": "消息中心",
-      "shortName": "消息"
-    },
-    "api-center": {
-      "name": "API 中心",
-      "shortName": "API"
-    },
-    "automation-center": {
-      "name": "自动化中心",
-      "shortName": "自动化"
-    },
-    "rule-center": {
-      "name": "规则中心",
-      "shortName": "规则"
-    },
-    "formula-center": {
-      "name": "公式中心",
-      "shortName": "公式"
-    },
-    "report-builder": {
-      "name": "报表构建器",
-      "shortName": "构建器"
-    },
-    "ai-assistant": {
-      "name": "AI 助手",
-      "shortName": "助手"
-    },
-    "branch-overview": {
-      "name": "门店总览",
-      "shortName": "总览"
-    },
-    "inspection": {
-      "name": "巡检",
-      "shortName": "巡检"
-    },
-    "scheduling": {
-      "name": "排班",
-      "shortName": "排班"
-    },
-    "staff": {
-      "name": "员工",
-      "shortName": "员工"
-    },
-    "crm": {
-      "name": "客户关系",
-      "shortName": "客户"
-    },
-    "erp-integration": {
-      "name": "ERP 集成",
-      "shortName": "ERP"
-    },
-    "advanced-wms": {
-      "name": "高级仓储",
-      "shortName": "WMS"
     }
   }
 }

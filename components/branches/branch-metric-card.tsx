@@ -10,7 +10,7 @@ interface BranchMetricCardProps {
 
 export function BranchMetricCard({ metric }: BranchMetricCardProps) {
   const content = (
-    <Card size="sm" className="h-full border border-border/70 bg-card/95">
+    <Card className="h-full border border-border/70 bg-card/95">
       <CardHeader className="gap-1">
         <CardDescription>{metric.label.en}</CardDescription>
         <CardTitle className="text-2xl font-semibold">

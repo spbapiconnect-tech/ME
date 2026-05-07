@@ -3,9 +3,11 @@ import { Card } from "@/components/ui/card";
 
 export function ErpRightRail({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card className="rounded-xl border-border bg-card p-4 shadow-sm">
-      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-      <div className="mt-3 space-y-3 text-sm text-muted-foreground">{children}</div>
+    <Card className="rounded-md border-border bg-card shadow-sm">
+      <div className="border-b border-border/50 px-4 py-3">
+        <h3 className="text-sm font-bold text-foreground">{title}</h3>
+      </div>
+      <div className="space-y-4">{children}</div>
     </Card>
   );
 }

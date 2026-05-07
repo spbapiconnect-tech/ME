@@ -35,7 +35,7 @@ function getStatusLabel(branch: MeBranchProfile) {
 
 export function BranchProfileCard({ branch }: BranchProfileCardProps) {
   return (
-    <Card size="sm" className="h-full border-border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+    <Card className="h-full border-border bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
       <CardHeader className="gap-2">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
@@ -61,7 +61,7 @@ export function BranchProfileCard({ branch }: BranchProfileCardProps) {
             <BranchChip key={moduleKey} label={moduleKey} tone="muted" />
           ))}
         </div>
-        <Button asChild size="sm" variant="outline" className="justify-center">
+        <Button asChild  variant="outline" className="justify-center">
           <Link href={`/branches/${branch.key}`}>Open Branch Workspace</Link>
         </Button>
       </CardContent>

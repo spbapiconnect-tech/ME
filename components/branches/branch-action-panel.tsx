@@ -11,7 +11,7 @@ interface BranchActionPanelProps {
 
 export function BranchActionPanel({ actions }: BranchActionPanelProps) {
   return (
-    <Card size="sm" className="h-full border border-border/70 bg-card/95">
+    <Card className="h-full border border-border/70 bg-card/95">
       <CardHeader className="gap-1">
         <CardTitle className="text-sm">Branch Actions</CardTitle>
         <CardDescription>Read-only branch actions and placeholder next steps</CardDescription>
@@ -24,7 +24,7 @@ export function BranchActionPanel({ actions }: BranchActionPanelProps) {
               <BranchChip label={action.isPlaceholder ? "placeholder" : "active"} tone={action.tone} />
             </div>
             {action.description ? <p className="mb-3 text-xs text-muted-foreground">{action.description.en}</p> : null}
-            <Button asChild size="sm" variant="outline" className="w-full justify-center">
+            <Button asChild  variant="outline" className="w-full justify-center">
               <Link href={action.route}>Open</Link>
             </Button>
           </div>

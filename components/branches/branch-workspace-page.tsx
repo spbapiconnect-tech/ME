@@ -124,11 +124,11 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         ]}
         actions={
           <>
-            <Button size="sm">{locale === "zh" ? "新增门店" : "Add Branch"}</Button>
-            <Button size="sm" variant="outline" onClick={() => setToast(t.exportDone)}>
+            <Button >{locale === "zh" ? "新增门店" : "Add Branch"}</Button>
+            <Button  variant="outline" onClick={() => setToast(t.exportDone)}>
               {locale === "zh" ? "导出" : "Export"}
             </Button>
-            <Button asChild size="sm" variant="outline">
+            <Button asChild  variant="outline">
               <Link href={`/reports?branch=${selected.code}`}>{locale === "zh" ? "查看报表" : "View Reports"}</Link>
             </Button>
           </>
@@ -163,7 +163,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
           [locale === "zh" ? "巡检得分" : "Inspection Score", "92%"],
           [locale === "zh" ? "严重异常" : "Critical Issues", "3"],
         ].map(([label, value]) => (
-          <Card key={label} size="sm">
+          <Card key={label} >
             <CardContent className="pt-4">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{label}</p>
               <p className="mt-2 text-[1.55rem] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{value}</p>

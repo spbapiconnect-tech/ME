@@ -24,7 +24,7 @@ interface PreviewLinkSectionProps {
 
 function PreviewLinkSection({ title, description, links }: PreviewLinkSectionProps) {
   return (
-    <Card size="sm" className="border border-border/70 bg-card/95">
+    <Card className="border border-border/70 bg-card/95">
       <CardHeader className="gap-1">
         <CardTitle className="text-sm">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
@@ -40,7 +40,7 @@ function PreviewLinkSection({ title, description, links }: PreviewLinkSectionPro
               <BranchChip label={link.tone} tone={link.tone} />
             </div>
             {link.description ? <p className="mb-3 text-xs text-muted-foreground">{link.description.en}</p> : null}
-            <Button asChild size="sm" variant="outline">
+            <Button asChild  variant="outline">
               <Link href={link.route}>Open</Link>
             </Button>
           </div>
@@ -64,13 +64,13 @@ export function BranchWorkspaceDetailPage({ data, branchKey }: BranchWorkspaceDe
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Button asChild size="sm" variant="outline">
+            <Button asChild  variant="outline">
               <Link href="/branches">Back To Branches</Link>
             </Button>
-            <Button asChild size="sm" variant="outline">
+            <Button asChild  variant="outline">
               <Link href="/navigation">Open Navigation IA</Link>
             </Button>
-            <Button asChild size="sm" variant="outline">
+            <Button asChild  variant="outline">
               <Link href="/reports">Open Reports</Link>
             </Button>
           </CardContent>
@@ -105,16 +105,16 @@ export function BranchWorkspaceDetailPage({ data, branchKey }: BranchWorkspaceDe
               </div>
               <CardDescription>{data.notice.en}</CardDescription>
               <div className="flex flex-wrap gap-2">
-                <Button asChild size="sm" variant="outline">
+                <Button asChild  variant="outline">
                   <Link href="/branches">All Branches</Link>
                 </Button>
-                <Button asChild size="sm" variant="outline">
+                <Button asChild  variant="outline">
                   <Link href="/roles">Roles</Link>
                 </Button>
-                <Button asChild size="sm" variant="outline">
+                <Button asChild  variant="outline">
                   <Link href="/navigation">Navigation IA</Link>
                 </Button>
-                <Button asChild size="sm" variant="outline">
+                <Button asChild  variant="outline">
                   <Link href="/reports">Reports</Link>
                 </Button>
               </div>
@@ -130,7 +130,7 @@ export function BranchWorkspaceDetailPage({ data, branchKey }: BranchWorkspaceDe
           </section>
 
           <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-            <Card size="sm" className="border border-border/70 bg-card/95">
+            <Card className="border border-border/70 bg-card/95">
               <CardHeader className="gap-1">
                 <CardTitle className="text-sm">Branch Alerts</CardTitle>
                 <CardDescription>Read-only alerts that describe the selected branch preview context.</CardDescription>
@@ -146,7 +146,7 @@ export function BranchWorkspaceDetailPage({ data, branchKey }: BranchWorkspaceDe
                     <p className="text-xs text-muted-foreground">Source: {alert.sourceModule}</p>
                     {alert.timestampLabel ? <p className="mt-1 text-xs text-muted-foreground">{alert.timestampLabel.en}</p> : null}
                     {alert.route ? (
-                      <Button asChild size="sm" variant="outline" className="mt-3">
+                      <Button asChild  variant="outline" className="mt-3">
                         <Link href={alert.route}>Open</Link>
                       </Button>
                     ) : null}
@@ -178,7 +178,7 @@ export function BranchWorkspaceDetailPage({ data, branchKey }: BranchWorkspaceDe
 
           <BranchNavigationPreview navigationPreview={data.navigationPreview} />
 
-          <Card size="sm" className="border-dashed">
+          <Card className="border-dashed">
             <CardHeader className="gap-1">
               <CardTitle className="text-sm">Branch Notes</CardTitle>
               <CardDescription>Generated at: {data.generatedAt}</CardDescription>

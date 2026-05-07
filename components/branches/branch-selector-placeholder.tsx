@@ -14,7 +14,7 @@ interface BranchSelectorPlaceholderProps {
 
 export function BranchSelectorPlaceholder({ branches, selectedBranchKey, compact = false }: BranchSelectorPlaceholderProps) {
   return (
-    <Card size="sm" className="border border-border/70 bg-card/95">
+    <Card className="border border-border/70 bg-card/95">
       <CardHeader className="gap-1">
         <CardTitle className="text-sm">Branch Directory</CardTitle>
         <CardDescription>
@@ -42,7 +42,7 @@ export function BranchSelectorPlaceholder({ branches, selectedBranchKey, compact
                   <BranchChip label={branch.shortName} tone={branch.tone} status={branch.status} />
                 </div>
                 {!compact ? <p className="mb-3 text-xs text-muted-foreground">{branch.region?.en ?? "Branch operations workspace"}</p> : null}
-                <Button asChild size="sm" variant={isSelected ? "default" : "outline"} className="w-full justify-center">
+                <Button asChild  variant={isSelected ? "default" : "outline"} className="w-full justify-center">
                   <Link href={`/branches/${branch.key}`}>{isSelected ? "Current Branch" : "Open Branch"}</Link>
                 </Button>
               </div>
