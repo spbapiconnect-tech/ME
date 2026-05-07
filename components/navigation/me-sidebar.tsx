@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, Building2, ChevronDown, LayoutDashboard, ListTodo, PackageSearch, Presentation, ShieldEllipsis, Users2 } from "lucide-react";
+import { BarChart3, Building2, ChefHat, ChevronDown, LayoutDashboard, ListTodo, PackageSearch, Presentation, ShieldEllipsis, Users2, WalletCards } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -23,12 +23,14 @@ interface MeSidebarProps {
 const iconMap = {
   BarChart3,
   Building2,
+  ChefHat,
   LayoutDashboard,
   ListTodo,
   PackageSearch,
   Presentation,
   ShieldEllipsis,
   Users2,
+  WalletCards,
 } as const;
 
 function isExplicitlyActive(item: MeSidebarNavigationItem, activeKey?: string) {
