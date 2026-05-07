@@ -1,211 +1,239 @@
-import Link from "next/link";
+"use client";
 
-import { DemoPresentationNote } from "@/components/demo-mode";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
 import {
   MeActionBar,
   MeDashboardShell,
-  MeListWorkspace,
+  MeDataTable,
+  MeInlineToast,
   MePageHeader,
   MeRightRail,
   MeWorkspaceSection,
 } from "@/components/layout";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { BusinessWorkspacePageData } from "@/types/business-workspace";
 
 interface BusinessWorkspacePageProps {
   data: BusinessWorkspacePageData;
 }
 
+const dashboardCopy = {
+  en: {
+    eyebrow: "Dashboard",
+    title: "Operations Dashboard",
+    description: "Monitor branch performance, urgent tasks, stock alerts, staffing, and daily operations across all stores.",
+    branchPerformance: "Branch Performance",
+    branchPerformanceDesc: "Daily performance snapshot across current operating branches.",
+    workQueue: "Work Queue",
+    workQueueDesc: "Priority follow-up items requiring action during the current operating window.",
+    pendingActions: "Pending Actions",
+    recentActivity: "Recent Activity",
+    systemHealth: "System Health",
+    exportDone: "Report export completed successfully.",
+  },
+  zh: {
+    eyebrow: "工作台",
+    title: "营运工作台",
+    description: "集中查看门店表现、紧急任务、库存预警、人员配置与每日营运状态。",
+    branchPerformance: "门店表现",
+    branchPerformanceDesc: "当前营业门店的当日营运快照。",
+    workQueue: "待办队列",
+    workQueueDesc: "当前营运时段需要优先处理的事项。",
+    pendingActions: "待处理事项",
+    recentActivity: "最近动态",
+    systemHealth: "系统健康",
+    exportDone: "报表导出成功。",
+  },
+} as const;
+
+const kpis = {
+  en: [
+    ["Today Sales", "RM 28,750"],
+    ["Open Stores", "7 / 8"],
+    ["Open Tasks", "12"],
+    ["Critical Issues", "3"],
+    ["Stock Alerts", "4"],
+    ["Staff On Duty", "18"],
+    ["Inspection Score", "92%"],
+    ["POS Sync", "Healthy"],
+  ],
+  zh: [
+    ["今日销售额", "RM 28,750"],
+    ["营业门店", "7 / 8"],
+    ["待处理任务", "12"],
+    ["严重异常", "3"],
+    ["库存预警", "4"],
+    ["当班员工", "18"],
+    ["巡检得分", "92%"],
+    ["POS 同步", "正常"],
+  ],
+} as const;
+
+const branchTable = {
+  en: {
+    columns: ["Branch", "Status", "Today Sales", "Open Tasks", "Stock Alerts", "Staff On Duty", "Inspection", "Last Update"],
+    rows: [
+      ["KCH Central Kitchen", "Operating", "RM 28,750", "5", "2", "18", "94%", "10:15"],
+      ["BTU Outlet", "Operating", "RM 18,420", "4", "1", "12", "91%", "09:45"],
+      ["KCH Pickup Point", "Preparation", "RM 6,880", "2", "1", "6", "88%", "08:30"],
+    ],
+  },
+  zh: {
+    columns: ["门店", "状态", "今日销售额", "待处理任务", "库存预警", "当班员工", "巡检", "最后更新"],
+    rows: [
+      ["KCH Central Kitchen", "营业中", "RM 28,750", "5", "2", "18", "94%", "10:15"],
+      ["BTU Outlet", "营业中", "RM 18,420", "4", "1", "12", "91%", "09:45"],
+      ["KCH Pickup Point", "筹备中", "RM 6,880", "2", "1", "6", "88%", "08:30"],
+    ],
+  },
+} as const;
+
+const workQueue = {
+  en: [
+    "Verify opening checklist",
+    "Review low stock alert",
+    "Approve supplier delivery variance",
+    "Confirm staff shift change",
+  ],
+  zh: ["确认开店检查表", "处理低库存预警", "审批供应商收货差异", "确认员工换班"],
+} as const;
+
+const railContent = {
+  en: {
+    pending: [
+      "3 overdue tasks need review",
+      "2 inventory alerts below safety stock",
+      "1 inspection item awaiting verification",
+      "1 supplier delivery delay",
+    ],
+    activity: [
+      "10:15 Opening checklist submitted",
+      "09:40 Stock alert created for fries",
+      "09:10 Shift change approved",
+      "Yesterday POS report synced",
+    ],
+    health: [
+      "POS Sync: Healthy",
+      "Printer Bridge: Online",
+      "Inventory Update: Attention",
+      "Report Export: Normal",
+    ],
+  },
+  zh: {
+    pending: ["3 个逾期任务待复核", "2 条库存低于安全库存", "1 个巡检项目待确认", "1 条供应商送货延迟"],
+    activity: ["10:15 已提交开店检查表", "09:40 薯条库存预警已创建", "09:10 已批准换班", "昨天 POS 报表已同步"],
+    health: ["POS 同步：正常", "打印桥接：在线", "库存更新：需关注", "报表导出：正常"],
+  },
+} as const;
+
 export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
-  const rightRail = (
-    <MeRightRail
-      sections={[
-        {
-          title: "Workspace Status",
-          badge: "Live shell",
-          items: [
-            "Branch context: All Stores / KCH preview",
-            "Routing source: shared navigation config",
-            "Operational visibility and linked review",
-          ],
-        },
-        {
-          title: "Operational Alerts",
-          description: "Current watch items carried into the dashboard shell.",
-          items: data.alerts.slice(0, 3).map((alert) => alert.title.en),
-        },
-        {
-          title: "Recent Activity",
-          items: [
-            "Business workspace shell updated",
-            "PSI, reports, and branches remain linked",
-            `Snapshot generated ${data.generatedAt}`,
-          ],
-        },
-      ]}
-    />
-  );
+  const locale = useUiPreferencesStore((state) => state.locale);
+  const copy = dashboardCopy[locale];
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 2200);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
   return (
-    <MeDashboardShell activeKey="dashboard" rightRail={rightRail}>
+    <MeDashboardShell
+      activeKey="dashboard"
+      rightRail={
+        <MeRightRail
+          sections={[
+            { title: copy.pendingActions, items: [...railContent[locale].pending] },
+            { title: copy.recentActivity, items: [...railContent[locale].activity] },
+            { title: copy.systemHealth, items: [...railContent[locale].health] },
+          ]}
+        />
+      }
+    >
       <MePageHeader
-        eyebrow="Business Workspace"
-        title="Operations overview"
-        description={data.subtitle.en}
-        notice={data.notice.en}
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        description={copy.description}
         badges={[
-          { label: "CRM / ERP shell", variant: "secondary" },
-          { label: "Operations center", variant: "outline" },
-          { label: "Config-driven navigation", variant: "outline" },
+          { label: locale === "zh" ? "全部门店" : "All Stores", variant: "secondary" },
+          { label: locale === "zh" ? "今日营运" : "Today’s Operations", variant: "outline" },
         ]}
         actions={
           <>
             <Button asChild size="sm">
-              <Link href="/psi">Open PSI Workspace</Link>
+              <Link href="/branches">{locale === "zh" ? "查看门店" : "View Branches"}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/reports">Open Reports</Link>
+              <Link href="/tasks?status=open">{locale === "zh" ? "打开任务" : "Open Tasks"}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/branches">Open Branches</Link>
+              <Link href="/issues?severity=critical">{locale === "zh" ? "查看预警" : "Review Alerts"}</Link>
             </Button>
           </>
         }
         meta={[
-          { label: "Branch", value: "All Stores / KCH" },
-          { label: "Workspace Date", value: "Last 7 days" },
-          { label: "Module Focus", value: "PSI / Reports / Roles" },
-          { label: "Snapshot", value: data.generatedAt },
+          { label: locale === "zh" ? "门店范围" : "Branch Scope", value: locale === "zh" ? "全部门店" : "All Stores" },
+          { label: locale === "zh" ? "统计周期" : "Window", value: locale === "zh" ? "今天" : "Today" },
+          { label: locale === "zh" ? "值班经理" : "Duty Lead", value: "Chin Ling" },
+          { label: locale === "zh" ? "更新时间" : "Updated", value: data.generatedAt },
         ]}
       />
+
+      {toast ? <MeInlineToast message={toast} /> : null}
 
       <MeActionBar
         actions={[
-          { label: "Review alerts" },
-          { label: "Open queue", variant: "secondary" },
-          { label: "Assign follow-up", variant: "outline" },
-          { label: "Export summary", variant: "outline" },
-          { label: "View history", variant: "ghost" },
+          { label: locale === "zh" ? "查看门店" : "View Branches", href: "/branches", variant: "default" },
+          { label: locale === "zh" ? "打开任务" : "Open Tasks", href: "/tasks?status=open", variant: "secondary" },
+          { label: locale === "zh" ? "查看预警" : "Review Alerts", href: "/issues?severity=critical", variant: "outline" },
+          { label: locale === "zh" ? "导出报表" : "Export Report", variant: "outline", onClick: () => setToast(copy.exportDone) },
         ]}
       />
 
-      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-        {data.metrics.map((metric) => (
-          <Card key={metric.key} size="sm" className="border-border/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.95))] shadow-[0_16px_24px_-24px_rgba(15,23,42,0.14)]">
-            <CardContent className="grid gap-2 pt-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{metric.label.en}</p>
-                <span className="h-2.5 w-2.5 rounded-full bg-blue-400/80" />
-              </div>
-              <p className="text-[1.7rem] font-semibold tracking-[-0.02em] text-slate-950">{metric.value}</p>
-              <p className="text-sm leading-6 text-slate-500">{metric.description?.en}</p>
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-8">
+        {kpis[locale].map(([label, value]) => (
+          <Card key={label} size="sm" className="border-border bg-[var(--surface-strong)] shadow-[0_1px_2px_var(--shadow-color)]">
+            <CardContent className="pt-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{label}</p>
+              <p className="mt-2 text-[1.55rem] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">{value}</p>
             </CardContent>
           </Card>
         ))}
       </section>
 
-      <MeListWorkspace
-        filters={
-          <MeWorkspaceSection
-            title="Operational Controls"
-            description="Branch scope, density, and route shortcuts for the main workspace."
-            contentClassName="md:grid-cols-4"
-          >
-              <div className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Branch scope</p>
-              <p className="mt-1.5 text-sm font-semibold text-slate-900">All Stores / KCH</p>
-            </div>
-              <div className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Queues</p>
-              <p className="mt-1.5 text-sm font-semibold text-slate-900">Procurement, issues, reports</p>
-            </div>
-              <div className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Mode</p>
-              <p className="mt-1.5 text-sm font-semibold text-slate-900">Operational visibility</p>
-            </div>
-              <div className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Display</p>
-              <p className="mt-1.5 text-sm font-semibold text-slate-900">Desktop / Comfortable</p>
-            </div>
-          </MeWorkspaceSection>
-        }
-        list={
-          <>
-            <MeWorkspaceSection title="Operational Modules" description="Core modules arranged as a working B2B home instead of a gallery of cards.">
-              <div className="grid gap-3 xl:grid-cols-2">
-                {data.modules.map((module) => (
-                  <Link
-                    key={module.key}
-                    href={module.route}
-                    className="rounded-[12px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_24px_-20px_rgba(15,23,42,0.14)]"
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-base font-semibold text-slate-950">{module.title.en}</p>
-                        <p className="mt-1 text-sm text-slate-500">{module.description.en}</p>
-                      </div>
-                      <Badge variant="outline">{module.status}</Badge>
-                    </div>
-                    <div className="mt-4 grid gap-3 border-t border-slate-200/80 pt-3 text-sm text-slate-600 md:grid-cols-2">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Primary</p>
-                        <p>{module.primaryMetric?.en ?? "Operational review"}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Secondary</p>
-                        <p>{module.secondaryMetric?.en ?? "Current scope"}</p>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </MeWorkspaceSection>
+      <MeWorkspaceSection title={copy.branchPerformance} description={copy.branchPerformanceDesc}>
+        <MeDataTable embedded columns={[...branchTable[locale].columns]} rows={branchTable[locale].rows.map((row) => [...row])} />
+      </MeWorkspaceSection>
 
-            <MeWorkspaceSection title="Operational Alerts" description="Queue-style watch items for immediate review.">
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {data.alerts.map((alert) => (
-                    <div key={alert.key} className="rounded-[12px] bg-slate-50/88 p-4 ring-1 ring-slate-200/75">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="font-medium text-slate-950">{alert.title.en}</p>
-                      <Badge variant="outline">{alert.sourceModule}</Badge>
-                    </div>
-                    <p className="mt-2 text-sm text-slate-600">{alert.description.en}</p>
-                    <p className="mt-3 text-xs text-slate-500">{alert.timestampLabel?.en ?? "Pending review"}</p>
-                  </div>
-                ))}
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
+        <MeWorkspaceSection title={copy.workQueue} description={copy.workQueueDesc}>
+          <div className="grid gap-2">
+            {workQueue[locale].map((item) => (
+              <div key={item} className="rounded-[10px] border border-border bg-[var(--surface-soft)] px-4 py-3 text-sm text-[var(--text-secondary)]">
+                {item}
               </div>
-            </MeWorkspaceSection>
-          </>
-        }
-        summary={
-          <>
-            <MeWorkspaceSection title="Action Panel" description="Actions for review, follow-up, and workspace navigation.">
-              <div className="grid gap-2">
-                {data.actions.map((action) => (
-                  <Link key={action.key} href={action.route} className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
-                    <p className="font-medium text-slate-950">{action.label.en}</p>
-                    <p className="mt-1 text-xs text-slate-500">{action.description?.en ?? "Operational action"}</p>
-                  </Link>
-                ))}
-              </div>
-            </MeWorkspaceSection>
+            ))}
+          </div>
+        </MeWorkspaceSection>
 
-            <MeWorkspaceSection title="Foundation Links" description="Shared admin and structure routes stay available through the shell.">
-              <div className="grid gap-2">
-                {data.systemFoundationLinks.map((link) => (
-                  <Link key={link.key} href={link.route} className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 text-sm font-medium text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
-                    {link.label.en}
-                  </Link>
-                ))}
-              </div>
-            </MeWorkspaceSection>
-          </>
-        }
-      />
-
-      <DemoPresentationNote title="Workspace Note" description="This workspace consolidates branch operations, PSI review, reporting, and people coordination in one executive surface." />
+        <MeWorkspaceSection title={locale === "zh" ? "快捷操作" : "Quick Actions"} description={locale === "zh" ? "跨模块营运入口。" : "Cross-module operational entry points."}>
+          <div className="grid gap-2">
+            <Link href="/branches" className="rounded-[10px] border border-border bg-[var(--surface-soft)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface)]">
+              {locale === "zh" ? "门店管理" : "Branch Management"}
+            </Link>
+            <Link href="/psi/inventory?status=alert" className="rounded-[10px] border border-border bg-[var(--surface-soft)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface)]">
+              {locale === "zh" ? "库存预警" : "Inventory Alerts"}
+            </Link>
+            <Link href="/reports" className="rounded-[10px] border border-border bg-[var(--surface-soft)] px-4 py-3 text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface)]">
+              {locale === "zh" ? "报表中心" : "Report Center"}
+            </Link>
+          </div>
+        </MeWorkspaceSection>
+      </div>
     </MeDashboardShell>
   );
 }

@@ -284,8 +284,8 @@ export async function getBusinessWorkspacePageData(): Promise<BusinessWorkspaceP
   const healthScore = findMetricValue(healthWidget, "healthScore", "78");
 
   return {
-    title: { zh: "ME 业务工作台", en: "ME Business Workspace" },
-    subtitle: { zh: "模块化门店运营平台", en: "Modular Store Operations Platform" },
+    title: { zh: "营运工作台", en: "Operations Dashboard" },
+    subtitle: { zh: "跨门店营运总览", en: "Cross-store operations overview" },
     generatedAt: psiReport.meta.generatedAt,
     metrics: [
       {

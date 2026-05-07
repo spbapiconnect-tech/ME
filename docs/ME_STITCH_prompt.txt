@@ -1,0 +1,159 @@
+You are designing ME Branch ERP for Stitch AI.
+
+Use the attached design.md as the source of truth.
+
+Main instruction:
+Create a real, interactive B2B restaurant ERP application, not a static dashboard and not a marketing page.
+
+The app must support:
+
+1. Two languages:
+- English
+- Chinese
+
+2. Three themes:
+- Bright theme
+- Dark theme inspired by Trae Solo IDE dark mode
+- Moon theme, a premium soft night theme
+
+3. Real app navigation:
+- Sidebar subdirectory navigation
+- Topbar
+- Breadcrumbs
+- Module pages
+- Record detail pages
+- Drawers
+- Modals
+- Toasts
+- Loading states
+- Empty states
+- Error states
+
+Important:
+Every button must work. Do not create dead buttons.
+
+Every button must either:
+- navigate to another page
+- open a drawer
+- open a modal
+- apply a filter
+- select a table row
+- switch tabs
+- trigger loading and success/error toast
+- update visible status
+- show confirmation
+
+Design style:
+Use the Figma B2B ERP Branch Management direction as the visual DNA:
+- light professional SaaS
+- compact
+- realistic
+- dense but clean
+- white cards
+- subtle gray borders
+- blue accents
+- real data tables
+- selected record detail panels
+- right rail for actions/activity
+- no marketing dashboard
+- no concept board
+
+Do not show:
+- DEVELOP
+- Guardrail
+- Current release scope
+- Context workspace
+- Mock
+- Demo
+- Placeholder
+- Read-only
+- Dev
+- Internal only
+- Prototype
+- Sample
+- Fake data
+
+App shell:
+Left sidebar:
+ME Branch ERP
+Restaurant Operations
+
+Navigation:
+Dashboard
+Store Operations
+- Branches
+- Inspection
+- Issues
+- Tasks
+
+PSI
+- Overview
+- Procurement
+- Supplier
+- Inventory
+- Receiving
+
+Workforce
+- Staff
+- Schedule
+- Training
+
+Business
+- Reports
+- Roles & Permission
+
+System
+- Settings
+- Integration
+
+Topbar:
+- Search
+- Branch selector
+- Date range
+- Notification
+- Theme switch
+- Language switch
+- User menu
+
+Modules to create:
+1. Dashboard
+2. Branch Management
+3. Inspection
+4. Issues / Incidents
+5. Tasks
+6. Procurement
+7. Supplier
+8. Inventory
+9. Receiving
+10. Staff / HR
+11. Schedule
+12. Training / SOP
+13. Reports
+14. Roles & Permission
+15. Settings
+16. Integration
+
+For every module:
+- Create a realistic module landing/workspace page
+- Add KPI row
+- Add filters
+- Add table or board
+- Add selected record detail
+- Add action buttons
+- Add tabs
+- Add right rail
+- Add recent activity
+- Add pending actions
+- Add empty/loading/error states
+- Add English/Chinese copy support
+- Add Bright/Dark/Moon theme support
+
+Use the module specifications from design.md for:
+- page purpose
+- KPI
+- table columns
+- tabs
+- buttons
+- UX behavior
+
+The result must feel like an app that can be clicked and used, not a dead screenshot.

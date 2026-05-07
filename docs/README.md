@@ -24,6 +24,12 @@ After this governance pass, future UI changes must follow:
 
 ## 2. UI / Visual System
 
+- [ME_STITCH_design.md](./ME_STITCH_design.md)
+  Stitch interactive app design specification for the final ME shell and module UX.
+- [ME_STITCH_prompt.txt](./ME_STITCH_prompt.txt)
+  Stitch build prompt defining interactive behavior, theme, language, and module requirements.
+- [ME_module_shell_ux_link_map.md](./ME_module_shell_ux_link_map.md)
+  Shell route map, detail routes, and cross-module UX link contract.
 - [ME_UI_METRICS.md](./ME_UI_METRICS.md)
   Layout dimensions, density, table rules, action limits, and acceptance metrics.
 - [ME_VISUAL_SYSTEM.md](./ME_VISUAL_SYSTEM.md)
