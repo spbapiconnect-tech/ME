@@ -1,21 +1,43 @@
-"use client";
-
 import Link from "next/link";
-import { Layers3, LayoutDashboard, PanelTopClose, Workflow } from "lucide-react";
-import { useEffect } from "react";
 
-import { MockDataNotice } from "@/components/demo/mock-data-notice";
-import { EmptyState } from "@/components/data/empty-state";
-import { getLocalizedText } from "@/lib/localized";
-import { getTaskById } from "@/lib/tasks";
-import { useUiPreferencesStore } from "@/stores/ui-preferences";
-import type { SupportedLocale, ThemeMode } from "@/types/module";
+import {
+  MeActionBar,
+  MeDashboardShell,
+  MeDataTable,
+  MeDetailWorkspace,
+  MePageHeader,
+  MeRecordSummary,
+  MeRightRail,
+  MeStatusTimeline,
+  MeTabs,
+  MeWorkspaceSection,
+} from "@/components/layout";
 import type { TaskRecord } from "@/types/task";
 
-import { TaskActionBar } from "@/components/tasks/task-action-bar";
-import { TaskDetailPanel } from "@/components/tasks/task-detail-panel";
-import { TaskSourceCard } from "@/components/tasks/task-source-card";
-import { TaskTimeline } from "@/components/tasks/task-timeline";
+function mapModuleRoute(sourceModule: TaskRecord["sourceModule"]) {
+  switch (sourceModule) {
+    case "inventory":
+      return "/psi/inventory";
+    case "procurement":
+      return "/psi/procurement";
+    case "supplier":
+      return "/psi/supplier";
+    case "pos-report":
+      return "/reports/pos";
+    case "education":
+      return "/training";
+    case "task":
+    default:
+      return "/tasks";
+  }
+}
+
+function titleCaseStatus(value: string) {
+  return value
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
 
 interface TaskDetailPageProps {
   taskId: string;
@@ -23,143 +45,158 @@ interface TaskDetailPageProps {
   dataError?: string;
 }
 
-export function TaskDetailPage({ taskId, task: taskProp, dataError }: TaskDetailPageProps) {
-  const locale = useUiPreferencesStore((state) => state.locale);
-  const theme = useUiPreferencesStore((state) => state.theme);
-  const hydrated = useUiPreferencesStore((state) => state.hydrated);
-  const hydrate = useUiPreferencesStore((state) => state.hydrate);
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
-  }, [hydrated, locale, theme]);
-
-  const currentLocale: SupportedLocale = hydrated ? locale : "en";
-  const currentTheme: ThemeMode = hydrated ? theme : "bright";
-  const task = taskProp ?? getTaskById(taskId);
-
+export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps) {
   if (!task) {
     return (
-      <main className="main-frame module-center-page">
-        <section className="module-center-shell">
-          <div className="shell-backdrop" />
-          <div className="dashboard-content module-center-content">
-            <section className="hero-panel module-center-hero">
-              <div className="eyebrow-row">
-                <span className="brand-mark"><span className="brand-dot" />ME Task Engine</span>
-                <span className="locale-chip"><Workflow size={16} />{currentTheme}</span>
-              </div>
-              <div className="hero-metadata">
-                <div>
-                  <h1 className="hero-title">{currentLocale === "zh" ? "未找到任务" : "Task Not Found"}</h1>
-                  <p className="hero-subtitle">
-                    {dataError ? dataError : currentLocale === "zh" ? "当前任务 ID 不在本地 mock task data 中。" : "This task ID does not exist in the local mock task data set."}
-                  </p>
-                </div>
-                <div className="template-link-row">
-                  <Link className="shell-link-button" href="/tasks">ME Task Engine</Link>
-                  <Link className="shell-link-button" href="/demo">ME Demo Workspace</Link>
-                </div>
-              </div>
-            </section>
-            <section className="modules-panel">
-              <EmptyState
-                locale={currentLocale}
-                title={{ zh: "未找到任务", en: "Task Not Found" }}
-                description={{ zh: "请从任务列表中选择有效的任务记录。", en: "Choose a valid task record from the task list." }}
-                actionLabel={{ zh: "返回任务引擎", en: "Back To Task Engine" }}
-              />
-            </section>
-          </div>
-        </section>
-      </main>
+      <MeDashboardShell activeKey="tasks">
+        <MePageHeader
+          eyebrow="Task Management"
+          title="Task record not available"
+          description="The selected task could not be loaded into the current workspace."
+          notice={dataError ?? "Return to the task queue to continue reviewing operational work orders."}
+          badges={[{ label: "Task queue" }, { label: "Record check", variant: "outline" }]}
+          meta={[
+            { label: "Requested record", value: taskId },
+            { label: "Queue route", value: "/tasks" },
+          ]}
+        />
+      </MeDashboardShell>
     );
   }
 
+  const rightRail = (
+    <MeRightRail
+      sections={[
+        {
+          title: "Task Status",
+          badge: titleCaseStatus(task.status),
+          items: [`Priority: ${titleCaseStatus(task.priority)}`, `Owner: ${task.ownerRole}`, `Branch: ${task.store}`],
+        },
+        {
+          title: "Follow-up",
+          items: ["Comment trail", "Escalation review", "Related record coordination"],
+        },
+        {
+          title: "Related Modules",
+          items: task.linkedRecords.map((record) => `${titleCaseStatus(record.moduleCode)} · ${record.recordId}`),
+        },
+      ]}
+    />
+  );
+
   return (
-    <main className="main-frame module-center-page">
-      <section className="module-center-shell">
-        <div className="shell-backdrop" />
-        <div className="dashboard-content module-center-content">
-          <section className="hero-panel module-center-hero">
-            <div className="eyebrow-row">
-              <span className="brand-mark"><span className="brand-dot" />ME Task Engine</span>
-              <span className="locale-chip"><Workflow size={16} />{currentTheme}</span>
-            </div>
-            <div className="hero-metadata">
-              <div>
-                <h1 className="hero-title">{task.id}</h1>
-                <p className="hero-subtitle">{getLocalizedText(task.title, currentLocale)}</p>
-                <p className="hero-subtitle-zh">{getLocalizedText(task.description, currentLocale)}</p>
-              </div>
-              <div className="template-link-row">
-                <Link className="shell-link-button" href="/tasks">
-                  <Workflow size={16} />
-                  <span>{currentLocale === "zh" ? "返回任务引擎" : "Back To Task Engine"}</span>
-                </Link>
-                <Link className="shell-link-button" href="/">
-                  <LayoutDashboard size={16} />
-                  <span>{currentLocale === "zh" ? "返回 Dashboard" : "Back To Dashboard"}</span>
-                </Link>
-                <Link className="shell-link-button" href="/modules">
-                  <Layers3 size={16} />
-                  <span>{currentLocale === "zh" ? "打开模块中心" : "Open Module Center"}</span>
-                </Link>
-                <Link className="shell-link-button" href="/layout-engine">
-                  <PanelTopClose size={16} />
-                  <span>{currentLocale === "zh" ? "布局引擎" : "Layout Engine"}</span>
-                </Link>
-              </div>
-            </div>
-          </section>
+    <MeDashboardShell activeKey="tasks" rightRail={rightRail}>
+      <MePageHeader
+        eyebrow="Task Management"
+        title={task.id}
+        description={task.title.en}
+        notice={task.description.en}
+        badges={[
+          { label: titleCaseStatus(task.taskType) },
+          { label: titleCaseStatus(task.sourceModule), variant: "secondary" },
+          { label: titleCaseStatus(task.priority), variant: "outline" },
+        ]}
+        meta={[
+          { label: "Branch", value: task.store },
+          { label: "Owner", value: `${task.ownerName} · ${task.ownerRole}` },
+          { label: "Status", value: titleCaseStatus(task.status) },
+          { label: "Due", value: task.dueAt },
+        ]}
+      />
 
-          <MockDataNotice
-            locale={currentLocale}
-            compact
-            title={{ zh: "本地任务详情", en: "Local Task Detail" }}
-            message={{ zh: "当前任务详情、证据和时间线均为演示占位。", en: "The current task detail, evidence, and timeline are all demo placeholders." }}
-            detail={{ zh: "未连接真实工作流、通知或持久化。", en: "No real workflow, notification, or persistence is connected." }}
-          />
+      <MeRecordSummary
+        title={task.id}
+        subtitle={task.title.en}
+        status={titleCaseStatus(task.status)}
+        guardrail="Current service scope"
+        meta={[
+          { label: "Task type", value: titleCaseStatus(task.taskType) },
+          { label: "Source record", value: task.sourceRecordId },
+          { label: "Source module", value: titleCaseStatus(task.sourceModule) },
+          { label: "Assigned to", value: `${task.ownerName} · ${task.ownerRole}` },
+          { label: "Created", value: task.createdAt },
+          { label: "Updated", value: task.updatedAt },
+        ]}
+      />
 
-          <section className="modules-panel">
-            <TaskActionBar locale={currentLocale} task={task} />
-          </section>
+      <MeActionBar
+        actions={[
+          { label: "Complete", href: "#", variant: "default" },
+          { label: "Reassign", href: "#", variant: "secondary" },
+          { label: "Add Comment", href: "#", variant: "outline" },
+          { label: "Escalate", href: "#", variant: "outline" },
+          { label: "Back to Queue", href: "/tasks", variant: "ghost" },
+        ]}
+      />
 
-          <section className="demo-section-grid">
-            <section className="modules-panel">
-              <TaskDetailPanel task={task} locale={currentLocale} />
-            </section>
-            <section className="modules-panel">
-              <TaskSourceCard task={task} locale={currentLocale} />
-            </section>
-          </section>
+      <MeTabs
+        style="detail"
+        tabs={[
+          { label: "Overview", active: true },
+          { label: "Related Records", badge: String(task.linkedRecords.length) },
+          { label: "Activity", badge: String(task.timeline.length) },
+          { label: "Evidence", badge: String(task.evidence.length) },
+          { label: "Audit" },
+        ]}
+      />
 
-          <section className="demo-section-grid">
-            <section className="modules-panel">
-              <TaskTimeline task={task} locale={currentLocale} />
-            </section>
-            <section className="modules-panel">
-              <div className="me-panel-card">
-                <h3 className="me-panel-title">{currentLocale === "zh" ? "证据占位" : "Evidence Placeholder"}</h3>
-                <div className="task-evidence-list">
-                  {task.evidence.map((item) => (
-                    <article key={item.id} className="task-evidence-item">
-                      <strong>{getLocalizedText(item.label, currentLocale)}</strong>
-                      <span>{item.type}</span>
-                      <p>{item.value}</p>
-                    </article>
+      <MeDetailWorkspace
+        main={
+          <>
+            <MeWorkspaceSection title="Task Overview" description="Assignment context, branch impact, and linked operational summary for the selected work order.">
+              <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_18rem]">
+                <div className="grid gap-3 md:grid-cols-2">
+                  {[
+                    ["Task ID", task.id],
+                    ["Task title", task.title.en],
+                    ["Branch", task.store],
+                    ["Owner", `${task.ownerName} · ${task.ownerRole}`],
+                    ["Priority", titleCaseStatus(task.priority)],
+                    ["Status", titleCaseStatus(task.status)],
+                    ["Task type", titleCaseStatus(task.taskType)],
+                    ["Source record", task.sourceRecordId],
+                    ["Created", task.createdAt],
+                    ["Due date", task.dueAt],
+                  ].map(([label, value]) => (
+                    <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+                      <p className="mt-1.5 text-sm font-semibold text-slate-900">{value}</p>
+                    </div>
                   ))}
                 </div>
+                <div className="rounded-[12px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Business Summary</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{task.description.en}</p>
+                </div>
               </div>
-            </section>
-          </section>
-        </div>
-      </section>
-    </main>
+            </MeWorkspaceSection>
+
+            <MeWorkspaceSection title="Related Records" description="Business records referenced by this task across inventory, procurement, supplier, and reporting workspaces.">
+              <MeDataTable
+                embedded
+                columns={["Module", "Record", "Label", "Route"]}
+                rows={task.linkedRecords.map((record) => [
+                  titleCaseStatus(record.moduleCode),
+                  record.recordId,
+                  record.label.en,
+                  <Link key={`${record.recordId}-route`} href={mapModuleRoute(record.moduleCode)} className="text-blue-700 hover:underline">
+                    Open workspace
+                  </Link>,
+                ])}
+              />
+            </MeWorkspaceSection>
+
+            <MeWorkspaceSection title="Evidence and Notes" description="Supporting notes, documents, and operational evidence referenced during task follow-up.">
+              <MeDataTable
+                embedded
+                columns={["Evidence", "Type", "Detail"]}
+                rows={task.evidence.map((item) => [item.label.en, titleCaseStatus(item.type), item.value.replace(/placeholder/gi, "reference")])}
+              />
+            </MeWorkspaceSection>
+          </>
+        }
+        context={<MeStatusTimeline embedded title="Activity" items={task.timeline.map((entry) => ({ title: entry.title.en, description: entry.description.en, time: entry.timestamp }))} />}
+      />
+    </MeDashboardShell>
   );
 }

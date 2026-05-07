@@ -37,8 +37,8 @@ export function PsiHomePage() {
           items: ["PR-KCH-0001 pending review", "KCH replenishment watchlist updated", "Supplier ABC Food Supply remains linked"],
         },
         {
-          title: "Guardrail Notice",
-          items: ["No approvals", "No stock posting", "No supplier portal", "No write execution"],
+          title: "Service Scope",
+          items: ["Procurement coordination", "Supplier review", "Inventory watch", "Operational follow-up"],
         },
       ]}
     />
@@ -50,7 +50,7 @@ export function PsiHomePage() {
         eyebrow="PSI Workspace"
         title="Procurement, supplier, and inventory operations"
         description="Operational PSI shell with review queues, detail preview, and related context panels."
-        notice="Current release supports PSI visibility, review context, and linked navigation. Stock posting, approval workflow, supplier portal, and execution flows remain outside this release."
+        notice="Use the PSI workspace to coordinate procurement requests, supplier follow-up, inventory risks, and branch receiving readiness."
         badges={[
           { label: "Procurement" },
           { label: "Supplier", variant: "secondary" },
@@ -136,7 +136,7 @@ export function PsiHomePage() {
           { label: "Supplier" },
           { label: "Receiving" },
           { label: "Activity" },
-          { label: "Attachments", badge: "Planned" },
+          { label: "Attachments", badge: "2" },
         ]}
       />
 
@@ -301,7 +301,7 @@ export function PsiHomePage() {
         </CardContent>
       </Card>
 
-      <DemoPresentationNote description="PSI now uses the production detail-workspace pattern with object header, action toolbar, tabs, table, activity, and side context. Approval execution, write actions, tasks, and notifications remain scheduled for later phases." />
+      <DemoPresentationNote title="Workspace Note" description="PSI follows the shared ERP detail pattern with request header, action bar, line items, activity, and branch context." />
     </MeDashboardShell>
   );
 }

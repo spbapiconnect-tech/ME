@@ -81,7 +81,7 @@ function renderSidebarItem(item: MeSidebarNavigationItem, pathname: string, loca
               <p className="truncate font-medium">{label}</p>
             </div>
           </div>
-          <Badge variant="outline">{item.badge?.[locale] ?? "Soon"}</Badge>
+          <Badge variant="outline">{item.badge?.[locale] ?? "Planned"}</Badge>
         </div>
       )}
 
@@ -103,10 +103,10 @@ export function MeSidebar({ locale = "en", activeKey, className }: MeSidebarProp
           <div className="flex items-center justify-between gap-2">
             <div className="space-y-1">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">ME Platform</p>
-              <p className="text-sm font-semibold text-slate-950">Operational workspace</p>
-              <p className="text-xs text-slate-500">B-end navigation</p>
+              <p className="text-sm font-semibold text-slate-950">Restaurant operations</p>
+              <p className="text-xs text-slate-500">Enterprise navigation</p>
             </div>
-            <Badge variant="outline">{locale === "zh" ? "只读" : "Read-only"}</Badge>
+            <Badge variant="outline">{locale === "zh" ? "当前版本" : "Current release"}</Badge>
           </div>
         </div>
 

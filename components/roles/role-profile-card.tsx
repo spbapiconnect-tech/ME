@@ -3,7 +3,7 @@ import Link from "next/link";
 import { RoleChip } from "@/components/roles/role-chip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { resolveRoleDescription, resolveRoleName } from "@/lib/role-workspace";
+import { resolveRoleName } from "@/lib/role-workspace";
 import type { MeRoleProfile } from "@/types/role-workspace";
 
 interface RoleProfileCardProps {
@@ -11,9 +11,9 @@ interface RoleProfileCardProps {
 }
 
 const foundationAccessLabel: Record<MeRoleProfile["foundationAccessLevel"], string> = {
-  "hidden-preview": "Hidden Preview",
-  "limited-preview": "Limited Preview",
-  "full-preview": "Full Preview",
+  "hidden-preview": "Restricted",
+  "limited-preview": "Limited",
+  "full-preview": "Full",
 };
 
 export function RoleProfileCard({ role }: RoleProfileCardProps) {
@@ -27,13 +27,13 @@ export function RoleProfileCard({ role }: RoleProfileCardProps) {
           </div>
           <RoleChip label={role.status} tone={role.tone} status={role.status} />
         </div>
-        <CardDescription>{resolveRoleDescription(role)}</CardDescription>
+        <CardDescription>{`${role.suggestedModules.length} linked modules · ${foundationAccessLabel[role.foundationAccessLevel]} foundation access`}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 text-sm">
         <div className="grid gap-1 rounded-[10px] border border-border bg-slate-50 p-3">
-          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Primary Goal</p>
+          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Role Focus</p>
           <p className="font-medium">{role.primaryGoal.en}</p>
-          <p className="text-xs text-muted-foreground">{role.primaryGoal.zh}</p>
+          <p className="text-xs text-muted-foreground">{role.defaultRoute}</p>
         </div>
         <div className="grid gap-1 text-xs text-muted-foreground">
           <p>Default route: {role.defaultRoute}</p>
@@ -45,7 +45,7 @@ export function RoleProfileCard({ role }: RoleProfileCardProps) {
           ))}
         </div>
         <Button asChild size="sm" variant="outline" className="justify-center">
-          <Link href={`/roles/${role.key}`}>Open Role Preview</Link>
+          <Link href={`/roles/${role.key}`}>Open Role Workspace</Link>
         </Button>
       </CardContent>
     </Card>

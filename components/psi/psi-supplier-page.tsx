@@ -28,7 +28,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
         eyebrow="PSI Supplier"
         title="Supplier operations detail"
         description="Supplier profile, contact context, linked orders, and issue visibility inside the shared detail workspace pattern."
-        notice={`Source: ${source}. ${isMock ? "Current data is served through the product catalog layer." : "Current data is served through the connected source layer."} This release supports supplier visibility, contact context, and linked order review. Supplier portal, note submission, and execution flows remain outside this release.`}
+        notice={`Source: ${source}. ${isMock ? "This workspace is currently published through the shared catalog layer." : "This workspace is currently published through the connected service layer."} Use it to review supplier performance, contacts, linked orders, and open follow-up items.`}
         badges={[
           { label: "Supplier detail" },
           { label: "Operations workspace", variant: "secondary" },
@@ -200,7 +200,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
         }
       />
 
-      <DemoPresentationNote description="Supplier detail now uses the shared production detail-workspace pattern. Portal connectivity, note submission, and execution flows remain outside the current release." />
+      <DemoPresentationNote title="Workspace Note" description="Supplier detail centralizes profile health, contacts, order history, and issue review for purchasing teams." />
     </MeDashboardShell>
   );
 }

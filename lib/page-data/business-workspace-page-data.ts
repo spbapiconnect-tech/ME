@@ -50,7 +50,7 @@ function moduleCards(params: {
     {
       key: "procurement",
       title: { zh: "采购", en: "Procurement" },
-      description: { zh: "采购请求与收货状态聚合预览", en: "Aggregated preview for procurement requests and receiving status." },
+      description: { zh: "采购请求与收货状态聚合视图", en: "Aggregated view for procurement requests and receiving status." },
       status: params.pendingProcurement >= 8 ? "action-needed" : "watch",
       tone: params.pendingProcurement >= 8 ? "warning" : "info",
       route: "/psi/procurement",
@@ -70,7 +70,7 @@ function moduleCards(params: {
     {
       key: "inventory",
       title: { zh: "库存", en: "Inventory" },
-      description: { zh: "低库存风险与补货建议预览", en: "Low-stock risk and replenishment suggestion preview." },
+      description: { zh: "低库存风险与补货建议视图", en: "Low-stock risk and replenishment suggestion view." },
       status: params.inventoryRisk >= 8 ? "risk" : "watch",
       tone: riskToneByCount(params.inventoryRisk),
       route: "/psi/inventory",
@@ -80,11 +80,11 @@ function moduleCards(params: {
     {
       key: "reports",
       title: { zh: "报表", en: "Reports" },
-      description: { zh: "跨模块 PSI 报表预览入口", en: "Cross-module PSI reporting preview entry." },
+      description: { zh: "跨模块 PSI 报表入口", en: "Cross-module PSI reporting entry." },
       status: "healthy",
       tone: "success",
       route: "/reports",
-      primaryMetric: { zh: "已接入 PSI 预览", en: "PSI preview enabled" },
+      primaryMetric: { zh: "已接入 PSI 工作区", en: "PSI workspace linked" },
       actionLabel: { zh: "打开报表", en: "Open reports" },
     },
     {
@@ -95,13 +95,13 @@ function moduleCards(params: {
       tone: "success",
       route: "/branches",
       primaryMetric: { zh: "KCH / BTU / HQ", en: "KCH / BTU / HQ" },
-      secondaryMetric: { zh: "门店运营预览", en: "Store operations preview" },
+      secondaryMetric: { zh: "门店运营视图", en: "Store operations view" },
       actionLabel: { zh: "打开门店", en: "Open branches" },
     },
     {
       key: "staff",
       title: { zh: "员工 / HR", en: "Staff / HR" },
-      description: { zh: "员工名单、技能矩阵与门店分配预览", en: "Roster, skill matrix, and branch assignment preview." },
+      description: { zh: "员工名单、技能矩阵与门店分配视图", en: "Roster, skill matrix, and branch assignment view." },
       status: "watch",
       tone: "info",
       route: "/staff",
@@ -112,7 +112,7 @@ function moduleCards(params: {
     {
       key: "schedule",
       title: { zh: "排班", en: "Schedule" },
-      description: { zh: "周排班、站位覆盖与缺口预览", en: "Weekly roster, duty-station coverage, and gap preview." },
+      description: { zh: "周排班、站位覆盖与缺口视图", en: "Weekly roster, duty-station coverage, and gap view." },
       status: "watch",
       tone: "warning",
       route: "/schedule",
@@ -127,13 +127,13 @@ function moduleCards(params: {
       status: "watch",
       tone: "neutral",
       route: "/tasks",
-      primaryMetric: { zh: "闭环任务预览", en: "Close-loop task preview" },
+      primaryMetric: { zh: "闭环任务工作区", en: "Close-loop task workspace" },
       actionLabel: { zh: "查看任务", en: "Open tasks" },
     },
     {
       key: "training",
       title: { zh: "培训", en: "Training" },
-      description: { zh: "课程、技能差距与记录完成度预览", en: "Courses, skill gaps, and record completion preview." },
+      description: { zh: "课程、技能差距与记录完成度视图", en: "Courses, skill gaps, and record completion view." },
       status: "watch",
       tone: "info",
       route: "/training",
@@ -153,7 +153,7 @@ function moduleCards(params: {
     {
       key: "inspection",
       title: { zh: "巡检", en: "Inspection" },
-      description: { zh: "检查表、发现与门店分数预览", en: "Checklists, findings, and branch score preview." },
+      description: { zh: "检查表、发现与门店分数视图", en: "Checklists, findings, and branch score view." },
       status: "watch",
       tone: "warning",
       route: "/inspection",
@@ -163,11 +163,11 @@ function moduleCards(params: {
     {
       key: "finance",
       title: { zh: "财务 / 成本", en: "Finance / Costing" },
-      description: { zh: "产品成本、毛利与供应商成本预览", en: "Product cost, margin, and supplier cost preview." },
+      description: { zh: "产品成本、毛利与供应商成本视图", en: "Product cost, margin, and supplier cost view." },
       status: "watch",
       tone: "info",
       route: "/finance",
-      primaryMetric: { zh: "毛利预览", en: "Margin preview" },
+      primaryMetric: { zh: "毛利视图", en: "Margin view" },
       actionLabel: { zh: "打开财务", en: "Open finance" },
     },
   ];
@@ -223,7 +223,7 @@ function actionsList(): BusinessWorkspaceAction[] {
     },
     {
       key: "action-open-reports",
-      label: { zh: "查看报表预览", en: "Open Report Preview" },
+      label: { zh: "查看报表中心", en: "Open Report Center" },
       description: { zh: "进入 PSI 报表聚合看板。", en: "Open the PSI report aggregation workspace." },
       route: "/reports",
       tone: "success",
@@ -232,7 +232,7 @@ function actionsList(): BusinessWorkspaceAction[] {
     },
     {
       key: "action-open-tasks",
-      label: { zh: "查看任务占位", en: "View Task Placeholder" },
+      label: { zh: "查看任务工作区", en: "Open Task Workspace" },
       description: { zh: "查看任务队列、来源模块与状态看板。", en: "Review task queue, source modules, and status board." },
       route: "/tasks",
       tone: "muted",
@@ -242,7 +242,7 @@ function actionsList(): BusinessWorkspaceAction[] {
     {
       key: "action-open-staff",
       label: { zh: "打开员工 / HR", en: "Open Staff / HR" },
-      description: { zh: "查看员工名单、技能矩阵与门店分配。", en: "Review roster, skill matrix, and branch assignment previews." },
+      description: { zh: "查看员工名单、技能矩阵与门店分配。", en: "Review roster, skill matrix, and branch assignment." },
       route: "/staff",
       tone: "info",
       sourceModule: "staff",
@@ -251,7 +251,7 @@ function actionsList(): BusinessWorkspaceAction[] {
     {
       key: "action-open-schedule",
       label: { zh: "打开排班", en: "Open Schedule" },
-      description: { zh: "查看周排班、岗位覆盖与缺口预览。", en: "Open weekly roster, station coverage, and gap preview." },
+      description: { zh: "查看周排班、岗位覆盖与缺口。", en: "Open weekly roster, station coverage, and gap review." },
       route: "/schedule",
       tone: "warning",
       sourceModule: "schedule",

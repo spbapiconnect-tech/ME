@@ -52,7 +52,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
     <MeDashboardShell activeKey="dashboard" rightRail={rightRail}>
       <MePageHeader
         eyebrow="Business Workspace"
-        title="ME operational workspace"
+        title="Operations overview"
         description={data.subtitle.en}
         notice={data.notice.en}
         badges={[
@@ -113,19 +113,19 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             description="Branch scope, density, and route shortcuts for the main workspace."
             contentClassName="md:grid-cols-4"
           >
-            <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+              <div className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Branch scope</p>
               <p className="mt-1.5 text-sm font-semibold text-slate-900">All Stores / KCH</p>
             </div>
-            <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+              <div className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Queues</p>
               <p className="mt-1.5 text-sm font-semibold text-slate-900">Procurement, issues, reports</p>
             </div>
-            <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+              <div className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Mode</p>
               <p className="mt-1.5 text-sm font-semibold text-slate-900">Operational visibility</p>
             </div>
-            <div className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
+              <div className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 ring-1 ring-slate-200/70">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Display</p>
               <p className="mt-1.5 text-sm font-semibold text-slate-900">Desktop / Comfortable</p>
             </div>
@@ -139,7 +139,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                   <Link
                     key={module.key}
                     href={module.route}
-                    className="rounded-[22px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_24px_-20px_rgba(15,23,42,0.14)]"
+                    className="rounded-[12px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_18px_24px_-20px_rgba(15,23,42,0.14)]"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
@@ -151,7 +151,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
                     <div className="mt-4 grid gap-3 border-t border-slate-200/80 pt-3 text-sm text-slate-600 md:grid-cols-2">
                       <div>
                         <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Primary</p>
-                        <p>{module.primaryMetric?.en ?? "Placeholder"}</p>
+                        <p>{module.primaryMetric?.en ?? "Operational review"}</p>
                       </div>
                       <div>
                         <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Secondary</p>
@@ -166,7 +166,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Operational Alerts" description="Queue-style watch items for immediate review.">
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {data.alerts.map((alert) => (
-                  <div key={alert.key} className="rounded-[22px] bg-slate-50/88 p-4 ring-1 ring-slate-200/75">
+                    <div key={alert.key} className="rounded-[12px] bg-slate-50/88 p-4 ring-1 ring-slate-200/75">
                     <div className="flex items-center justify-between gap-3">
                       <p className="font-medium text-slate-950">{alert.title.en}</p>
                       <Badge variant="outline">{alert.sourceModule}</Badge>
@@ -184,9 +184,9 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Action Panel" description="Current release actions for review, follow-up, and workspace navigation.">
               <div className="grid gap-2">
                 {data.actions.map((action) => (
-                  <Link key={action.key} href={action.route} className="rounded-[20px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
+                  <Link key={action.key} href={action.route} className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
                     <p className="font-medium text-slate-950">{action.label.en}</p>
-                    <p className="mt-1 text-xs text-slate-500">{action.description?.en ?? "Placeholder action"}</p>
+                    <p className="mt-1 text-xs text-slate-500">{action.description?.en ?? "Operational action"}</p>
                   </Link>
                 ))}
               </div>
@@ -195,7 +195,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
             <MeWorkspaceSection title="Foundation Links" description="Shared admin and structure routes stay available through the shell.">
               <div className="grid gap-2">
                 {data.systemFoundationLinks.map((link) => (
-                  <Link key={link.key} href={link.route} className="rounded-[20px] bg-slate-50/88 px-4 py-3.5 text-sm font-medium text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
+                  <Link key={link.key} href={link.route} className="rounded-[12px] bg-slate-50/88 px-4 py-3.5 text-sm font-medium text-slate-700 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_14px_24px_-20px_rgba(15,23,42,0.14)]">
                     {link.label.en}
                   </Link>
                 ))}
@@ -205,7 +205,7 @@ export function BusinessWorkspacePage({ data }: BusinessWorkspacePageProps) {
         }
       />
 
-      <DemoPresentationNote description="Customer-facing operational shell with visibility across PSI, reports, branches, and roles. Data connections, approvals, and automation remain in later release phases." />
+      <DemoPresentationNote title="Workspace Note" description="This workspace consolidates branch operations, PSI review, reporting, and people coordination in one executive surface." />
     </MeDashboardShell>
   );
 }

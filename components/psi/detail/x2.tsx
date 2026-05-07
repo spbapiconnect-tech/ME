@@ -1,7 +1,17 @@
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  MeActionBar,
+  MeDashboardShell,
+  MeDataTable,
+  MeDetailWorkspace,
+  MePageHeader,
+  MeRecordSummary,
+  MeRightRail,
+  MeStatusTimeline,
+  MeTabs,
+  MeWorkspaceSection,
+} from "@/components/layout";
 import type { DisplayRecord } from "@/types/display-model";
 
 interface PsiWorkspaceLayoutV072Props {
@@ -17,98 +27,184 @@ interface PsiWorkspaceLayoutV072Props {
   actionShortcuts?: Array<{ label: string; actionKey: string }>;
 }
 
-function getMetaValue(record: DisplayRecord, key: string): string {
-  return record.meta.find((item) => item.label.en.toLowerCase().includes(key.toLowerCase()))?.value ?? "placeholder";
+function getMetaValue(record: DisplayRecord, key: string, fallback = "Operational review") {
+  return record.meta.find((item) => item.label.en.toLowerCase().includes(key.toLowerCase()))?.value ?? fallback;
 }
 
-export function PsiWorkspaceLayoutV072(props: PsiWorkspaceLayoutV072Props) {
-  const { title, subtitle, source, isMock, error, stats, records, issueRecords, detailBasePath, actionShortcuts = [] } = props;
+export function PsiWorkspaceLayoutV072({
+  title,
+  subtitle,
+  source,
+  isMock,
+  error,
+  stats,
+  records,
+  issueRecords,
+  detailBasePath,
+  actionShortcuts = [],
+}: PsiWorkspaceLayoutV072Props) {
+  const selectedRecord = records[0];
+
+  const activeKey = detailBasePath.includes("supplier")
+    ? "supplier"
+    : detailBasePath.includes("inventory")
+      ? "inventory"
+      : "procurement";
+
+  const rightRail = (
+    <MeRightRail
+      sections={[
+        {
+          title: "Workspace Context",
+          badge: activeKey === "procurement" ? "Procurement" : activeKey === "supplier" ? "Supplier" : "Inventory",
+          items: ["Queue review", "Linked issue context", "Branch coordination"],
+        },
+        {
+          title: "Service Layer",
+          items: [
+            isMock ? "Published through the shared catalog layer" : "Published through the connected service layer",
+            `Source: ${source}`,
+            `${records.length} active records in scope`,
+          ],
+        },
+        {
+          title: "Issue Watch",
+          items: [`${issueRecords.length} linked issue records`, "Escalation review", "Timeline follow-up"],
+        },
+      ]}
+    />
+  );
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{subtitle}</CardDescription>
-          <CardDescription>
-            Source: {source} · {isMock ? "Mock Repository" : "Unknown"}
-          </CardDescription>
-          {error ? <CardDescription className="text-destructive">{error}</CardDescription> : null}
-        </CardHeader>
-      </Card>
+    <MeDashboardShell activeKey={activeKey} rightRail={rightRail}>
+      <MePageHeader
+        eyebrow="PSI Workspace"
+        title={title}
+        description={subtitle}
+        notice={error ?? `Use this workspace to review queue records, issue watch items, and operating activity for ${title.toLowerCase()}.`}
+        badges={[
+          { label: activeKey === "procurement" ? "Procurement" : activeKey === "supplier" ? "Supplier" : "Inventory" },
+          { label: "Operational queue", variant: "secondary" },
+          { label: "Current service scope", variant: "outline" },
+        ]}
+        meta={[
+          { label: "Source", value: source },
+          { label: "Visible records", value: String(records.length) },
+          { label: "Issue watch", value: String(issueRecords.length) },
+          { label: "Delivery mode", value: isMock ? "Catalog layer" : "Connected service" },
+        ]}
+      />
 
-      <Card size="sm">
-        <CardHeader><CardTitle className="text-sm">KPI Preview</CardTitle></CardHeader>
-        <CardContent className="grid gap-2 md:grid-cols-4">
-          {stats.map((item) => (
-            <div key={item.label} className="rounded-xl border p-3">
-              <div className="text-xs text-muted-foreground">{item.label}</div>
-              <div className="text-lg font-semibold">{item.value}</div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <MeActionBar
+        actions={[
+          { label: "Open PSI Actions", href: "/psi/actions" },
+          { label: "Open Issues", href: "/psi/issues", variant: "secondary" },
+          { label: "Open Reports", href: "/reports", variant: "outline" },
+          ...actionShortcuts.slice(0, 2).map((item) => ({
+            label: item.label,
+            href: `/psi/actions/${item.actionKey}`,
+            variant: "outline" as const,
+          })),
+        ]}
+      />
 
-      <Card size="sm">
-        <CardHeader><CardTitle className="text-sm">Action Shortcuts</CardTitle></CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          <Link href="/psi/actions" className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">Open PSI Actions</Link>
-          <Link href="/psi/issues" className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">Open PSI Issues</Link>
-          <Link href="/reports" className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">PSI Report Preview</Link>
-          {actionShortcuts.map((item) => (
-            <Link key={item.actionKey} href={`/psi/actions/${item.actionKey}`} className="rounded-lg border px-3 py-2 text-xs hover:bg-muted/40">
-              {item.label}
-            </Link>
-          ))}
-        </CardContent>
-      </Card>
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {stats.map((item) => (
+          <MeWorkspaceSection key={item.label} title={item.label} className="shadow-[0_1px_2px_rgba(15,23,42,0.04)]" description={undefined}>
+            <p className="text-[1.55rem] font-semibold tracking-[-0.02em] text-slate-950">{item.value}</p>
+          </MeWorkspaceSection>
+        ))}
+      </section>
 
-      <Card size="sm">
-        <CardHeader><CardTitle className="text-sm">Main Records</CardTitle></CardHeader>
-        <CardContent className="grid gap-2">
-          {records.map((record) => (
-            <Link key={record.id} href={`${detailBasePath}/${record.id}`} className="rounded-lg border p-3 text-sm hover:bg-muted/40">
-              <div className="font-medium">{record.title}</div>
-              <div className="text-xs text-muted-foreground">{record.subtitle}</div>
-              <div className="text-xs text-muted-foreground">{record.description}</div>
-            </Link>
-          ))}
-          {records.length === 0 ? <div className="text-sm text-muted-foreground">No records</div> : null}
-        </CardContent>
-      </Card>
+      {selectedRecord ? (
+        <MeRecordSummary
+          title={selectedRecord.id}
+          subtitle={selectedRecord.title}
+          status={selectedRecord.status}
+          guardrail="Current service scope"
+          meta={[
+            { label: "Priority", value: selectedRecord.priority },
+            { label: "Owner", value: getMetaValue(selectedRecord, "owner") },
+            { label: "Supplier", value: getMetaValue(selectedRecord, "supplier") },
+            { label: "Branch", value: getMetaValue(selectedRecord, "branch") },
+            { label: "Lifecycle", value: getMetaValue(selectedRecord, "lifecycle", "Active") },
+            { label: "Action", value: getMetaValue(selectedRecord, "related action", "Operational follow-up") },
+          ]}
+        />
+      ) : null}
 
-      <Card size="sm">
-        <CardHeader>
-          <CardTitle className="text-sm">Issue Preview</CardTitle>
-          <CardDescription>Lifecycle and related action are placeholders only. No real issue updates are executed.</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-2">
-          {issueRecords.map((record) => {
-            const lifecycle = getMetaValue(record, "lifecycle");
-            const sourceRef = getMetaValue(record, "source");
-            const relatedAction = getMetaValue(record, "related action");
-            const actionHref = relatedAction.startsWith("psi.action.") ? `/psi/actions/${relatedAction}` : "/psi/actions";
+      <MeTabs
+        style="detail"
+        tabs={[
+          { label: "Overview", active: true },
+          { label: "Queue", badge: String(records.length) },
+          { label: "Issues", badge: String(issueRecords.length) },
+          { label: "Activity" },
+          { label: "Attachments" },
+        ]}
+      />
 
-            return (
-              <div key={record.id} className="rounded-lg border p-3 text-sm">
-                <div className="font-medium">{record.title}</div>
-                <div className="text-xs text-muted-foreground">{record.description}</div>
-                <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                  <Badge variant="secondary">status: {record.status}</Badge>
-                  <Badge variant="outline">priority: {record.priority}</Badge>
-                  <Badge variant="outline">lifecycle: {lifecycle}</Badge>
-                  <Badge variant="outline">source: {sourceRef}</Badge>
+      <MeDetailWorkspace
+        main={
+          <>
+            <MeWorkspaceSection title="Main Records" description="Primary queue records currently visible for operational review.">
+              <MeDataTable
+                embedded
+                columns={["Record", "Title", "Status", "Priority", "Open"]}
+                rows={records.map((record) => [
+                  record.id,
+                  <div key={`${record.id}-title`}>
+                    <p className="font-medium text-slate-900">{record.title}</p>
+                    <p className="mt-1 text-xs text-slate-500">{record.subtitle}</p>
+                  </div>,
+                  record.status,
+                  record.priority,
+                  <Link key={`${record.id}-open`} href={`${detailBasePath}/${record.id}`} className="text-blue-700 hover:underline">
+                    Open record
+                  </Link>,
+                ])}
+              />
+            </MeWorkspaceSection>
+
+            {selectedRecord ? (
+              <MeWorkspaceSection title="Selected Record" description="Structured metadata for the currently highlighted queue record.">
+                <div className="grid gap-3 md:grid-cols-2">
+                  {selectedRecord.meta.map((item) => (
+                    <div key={item.label.en} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label.en}</p>
+                      <p className="mt-1.5 text-sm font-semibold text-slate-900">{item.value}</p>
+                    </div>
+                  ))}
                 </div>
-                <div className="mt-2 flex flex-wrap gap-3 text-xs">
-                  <Link href={actionHref} className="text-primary hover:underline">Related action placeholder</Link>
-                  <Link href="/psi/issues" className="text-primary hover:underline">Open issue hub</Link>
-                </div>
-              </div>
-            );
-          })}
-          {issueRecords.length === 0 ? <div className="text-sm text-muted-foreground">No issues</div> : null}
-        </CardContent>
-      </Card>
-    </main>
+              </MeWorkspaceSection>
+            ) : null}
+
+            <MeWorkspaceSection title="Issue Queue" description="Issue and follow-up records linked to the current PSI workspace.">
+              <MeDataTable
+                embedded
+                columns={["Issue", "Status", "Priority", "Lifecycle"]}
+                rows={issueRecords.map((record) => [
+                  record.title,
+                  record.status,
+                  record.priority,
+                  getMetaValue(record, "lifecycle"),
+                ])}
+              />
+            </MeWorkspaceSection>
+          </>
+        }
+        context={
+          <MeStatusTimeline
+            embedded
+            title="Activity"
+            items={issueRecords.slice(0, 4).map((record, index) => ({
+              title: record.title,
+              description: record.description,
+              time: getMetaValue(record, "source", `Update ${index + 1}`),
+            }))}
+          />
+        }
+      />
+    </MeDashboardShell>
   );
 }

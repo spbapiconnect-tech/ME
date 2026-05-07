@@ -44,7 +44,7 @@ export async function getPsiIssuesPageData(): Promise<PsiIssuesPageData> {
         priority: item.priority,
         status: item.status,
         sourceRef: item.sourceRef.recordId,
-        lifecycleStage: getCurrentPsiLifecycleStage(getPsiLifecycleStagesByModule("procurement"))?.label.en ?? "Placeholder",
+        lifecycleStage: getCurrentPsiLifecycleStage(getPsiLifecycleStagesByModule("procurement"))?.label.en ?? "Review",
         detailHref: item.sourceRef.route,
         actionHref: "/psi/actions/psi.action.reportPurchaseIssue",
       }))
@@ -58,7 +58,7 @@ export async function getPsiIssuesPageData(): Promise<PsiIssuesPageData> {
         priority: item.priority,
         status: item.status,
         sourceRef: item.sourceRef.recordId,
-        lifecycleStage: getCurrentPsiLifecycleStage(getPsiLifecycleStagesByModule("supplier"))?.label.en ?? "Placeholder",
+        lifecycleStage: getCurrentPsiLifecycleStage(getPsiLifecycleStagesByModule("supplier"))?.label.en ?? "Review",
         detailHref: item.sourceRef.route,
         actionHref: "/psi/actions/psi.action.reportSupplierIssue",
       }))
@@ -72,7 +72,7 @@ export async function getPsiIssuesPageData(): Promise<PsiIssuesPageData> {
         priority: item.priority,
         status: item.status,
         sourceRef: item.sourceRef.recordId,
-        lifecycleStage: getCurrentPsiLifecycleStage(getPsiLifecycleStagesByModule("inventory"))?.label.en ?? "Placeholder",
+        lifecycleStage: getCurrentPsiLifecycleStage(getPsiLifecycleStagesByModule("inventory"))?.label.en ?? "Review",
         detailHref: item.sourceRef.route,
         actionHref: "/psi/actions/psi.action.reportInventoryIssue",
       }))

@@ -1,15 +1,18 @@
 import Link from "next/link";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  MeActionBar,
+  MeDashboardShell,
+  MeDataTable,
+  MeDetailWorkspace,
+  MePageHeader,
+  MeRecordSummary,
+  MeRightRail,
+  MeStatusTimeline,
+  MeTabs,
+  MeWorkspaceSection,
+} from "@/components/layout";
 import type { PsiDetailPanelData } from "@/types/psi";
-
-import { PsiDetailNotice } from "./psi-detail-notice";
-import { PsiInsightsCard } from "./psi-insights-card";
-import { PsiLifecycleStrip } from "./psi-lifecycle-strip";
-import { PsiLinkedRecordsCard } from "./psi-linked-records-card";
-import { PsiRelatedActionsCard } from "./psi-related-actions-card";
-import { PsiRelatedTasksCard } from "./psi-related-tasks-card";
-import { PsiTimeline } from "./psi-timeline";
 
 interface PsiDetailLayoutV072Props {
   title: string;
@@ -22,6 +25,12 @@ interface PsiDetailLayoutV072Props {
   relatedActions?: Array<{ label: string; actionKey: string }>;
 }
 
+function resolveActiveKey(backHref: string) {
+  if (backHref.includes("supplier")) return "supplier";
+  if (backHref.includes("inventory")) return "inventory";
+  return "procurement";
+}
+
 export function PsiDetailLayoutV072({
   title,
   source,
@@ -32,70 +41,144 @@ export function PsiDetailLayoutV072({
   detailPanelData = null,
   relatedActions = [],
 }: PsiDetailLayoutV072Props) {
+  const activeKey = resolveActiveKey(backHref);
   const summaryTitle = detailPanelData?.title.en ?? title;
-  const summarySubtitle = detailPanelData?.subtitle?.en;
-  const relatedActionKeys = detailPanelData?.relatedActionDraftKeys ?? relatedActions.map((item) => item.actionKey);
-  const panel = detailPanelData;
+  const summarySubtitle = detailPanelData?.subtitle?.en ?? "Operational record";
+
+  const rightRail = (
+    <MeRightRail
+      sections={[
+        {
+          title: "Record Context",
+          badge: activeKey === "procurement" ? "Procurement" : activeKey === "supplier" ? "Supplier" : "Inventory",
+          items: [
+            isMock ? "Published through the shared catalog layer" : "Published through the connected service layer",
+            `Source: ${source}`,
+            `Related actions: ${relatedActions.length}`,
+          ],
+        },
+        {
+          title: "Linked Records",
+          items: detailPanelData?.linkedRecords.map((record) => `${record.moduleCode} · ${record.recordId}`) ?? ["No linked records in scope"],
+        },
+        {
+          title: "Operational Watch",
+          items: detailPanelData?.insights.slice(0, 3).map((item) => `${item.label.en}: ${item.value.en}`) ?? ["Queue review", "Related activity", "Cross-module follow-up"],
+        },
+      ]}
+    />
+  );
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>{summaryTitle}</CardTitle>
-          {summarySubtitle ? <CardDescription>{summarySubtitle}</CardDescription> : null}
-          <CardDescription>
-            Source: {source} · {isMock ? "Mock" : "Unknown"}
-          </CardDescription>
-          <CardDescription>Summary header placeholder only. No real status transition or persistence is performed.</CardDescription>
-          {error ? <CardDescription className="text-destructive">{error}</CardDescription> : null}
-        </CardHeader>
-      </Card>
+    <MeDashboardShell activeKey={activeKey} rightRail={rightRail}>
+      <MePageHeader
+        eyebrow="PSI Record"
+        title={summaryTitle}
+        description={summarySubtitle}
+        notice={error ?? "Review the record summary, linked business records, operating timeline, and related actions from one detail workspace."}
+        badges={[
+          { label: activeKey === "procurement" ? "Procurement" : activeKey === "supplier" ? "Supplier" : "Inventory" },
+          { label: "Record detail", variant: "secondary" },
+          { label: "Current service scope", variant: "outline" },
+        ]}
+        meta={[
+          { label: "Source", value: source },
+          { label: "Timeline", value: String(detailPanelData?.timeline.length ?? 0) },
+          { label: "Related actions", value: String(relatedActions.length) },
+          { label: "Related records", value: String(detailPanelData?.linkedRecords.length ?? 0) },
+        ]}
+      />
 
-      <Card size="sm">
-        <CardHeader>
-          <CardTitle className="text-sm">Key Fields</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-2">
-          {rows.map((row) => (
-            <div key={row.key} className="flex items-center justify-between rounded-lg border p-2 text-sm">
-              <span className="text-muted-foreground">{row.key}</span>
-              <span>{row.value}</span>
-            </div>
-          ))}
-          {rows.length === 0 ? <div className="text-sm text-muted-foreground">No detail available</div> : null}
-        </CardContent>
-      </Card>
+      <MeRecordSummary
+        title={summaryTitle}
+        subtitle={summarySubtitle}
+        status={rows[0]?.value ?? "Monitoring"}
+        guardrail="Current service scope"
+        meta={rows.slice(0, 8).map((row) => ({ label: row.key, value: row.value }))}
+      />
 
-      {panel ? <PsiLifecycleStrip stages={panel.lifecycle} /> : null}
-      {panel ? <PsiTimeline events={panel.timeline} /> : null}
-      {panel ? <PsiLinkedRecordsCard records={panel.linkedRecords} /> : null}
-      {panel ? <PsiInsightsCard insights={panel.insights} /> : null}
-      <PsiRelatedActionsCard actionKeys={relatedActionKeys} />
-      {panel ? <PsiRelatedTasksCard tasks={panel.relatedTaskPlaceholders} /> : null}
-      <PsiDetailNotice notice={panel?.notice} />
+      <MeActionBar
+        actions={[
+          { label: "Back to Workspace", href: backHref },
+          ...relatedActions.slice(0, 4).map((action, index) => ({
+            label: action.label,
+            href: `/psi/actions/${action.actionKey}`,
+            variant: (index === 0 ? "secondary" : "outline") as "secondary" | "outline",
+          })),
+        ]}
+      />
 
-      <Card size="sm">
-        <CardHeader>
-          <CardTitle className="text-sm">Source / Mock Notice</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-xs text-muted-foreground">
-          <div>Current detail page is read-only placeholder content.</div>
-          <div>No database/API write, status change, timeline persistence, or task creation is executed.</div>
-          <div>
-            Source path: {source} · {isMock ? "mock repository" : "unknown"}
-          </div>
-          <Link href="/psi/actions" className="text-primary hover:underline">
-            Open PSI Actions
-          </Link>
-          <Link href="/reports" className="text-primary hover:underline">
-            Open PSI Report Preview
-          </Link>
-        </CardContent>
-      </Card>
+      <MeTabs
+        style="detail"
+        tabs={[
+          { label: "Overview", active: true },
+          { label: "Related Records", badge: String(detailPanelData?.linkedRecords.length ?? 0) },
+          { label: "Activity", badge: String(detailPanelData?.timeline.length ?? 0) },
+          { label: "Insights" },
+          { label: "Attachments" },
+        ]}
+      />
 
-      <Link href={backHref} className="text-sm text-primary hover:underline">
-        Back to workspace
-      </Link>
-    </main>
+      <MeDetailWorkspace
+        main={
+          <>
+            <MeWorkspaceSection title="Key Information" description="Core record fields for day-to-day operational review.">
+              <div className="grid gap-3 md:grid-cols-2">
+                {rows.map((row) => (
+                  <div key={row.key} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{row.key}</p>
+                    <p className="mt-1.5 text-sm font-semibold text-slate-900">{row.value}</p>
+                  </div>
+                ))}
+              </div>
+            </MeWorkspaceSection>
+
+            {detailPanelData?.linkedRecords?.length ? (
+              <MeWorkspaceSection title="Related Records" description="Connected PSI records used during review, coordination, and follow-up.">
+                <MeDataTable
+                  embedded
+                  columns={["Module", "Record", "Status", "Route"]}
+                  rows={detailPanelData.linkedRecords.map((record) => [
+                    record.moduleCode,
+                    record.recordId,
+                    record.status ?? "Active",
+                    record.route ? (
+                      <Link key={`${record.key}-route`} href={record.route} className="text-blue-700 hover:underline">
+                        Open record
+                      </Link>
+                    ) : (
+                      "Linked in current workspace"
+                    ),
+                  ])}
+                />
+              </MeWorkspaceSection>
+            ) : null}
+
+            {detailPanelData?.insights?.length ? (
+              <MeWorkspaceSection title="Insights" description="Operational indicators linked to the current record.">
+                <MeDataTable
+                  embedded
+                  columns={["Indicator", "Value", "Description"]}
+                  rows={detailPanelData.insights.map((item) => [item.label.en, item.value.en, item.description?.en ?? "Operational review context"])}
+                />
+              </MeWorkspaceSection>
+            ) : null}
+          </>
+        }
+        context={
+          <MeStatusTimeline
+            embedded
+            title="Activity"
+            items={
+              detailPanelData?.timeline.map((event) => ({
+                title: event.title.en,
+                description: `${event.description?.en ?? "Operational update"} · ${event.actor.name.en}`,
+                time: event.occurredAt,
+              })) ?? []
+            }
+          />
+        }
+      />
+    </MeDashboardShell>
   );
 }

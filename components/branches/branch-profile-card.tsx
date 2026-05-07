@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BranchChip } from "@/components/branches/branch-chip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { resolveBranchDescription, resolveBranchName } from "@/lib/branch-context";
+import { resolveBranchName } from "@/lib/branch-context";
 import type { MeBranchProfile } from "@/types/branch-context";
 
 interface BranchProfileCardProps {
@@ -12,14 +12,25 @@ interface BranchProfileCardProps {
 
 function getContextKindLabel(branch: MeBranchProfile) {
   if (branch.isAggregate) {
-    return "Aggregate Context";
+    return "Group Overview";
   }
 
   if (branch.status === "coming-soon") {
-    return "Future Branch";
+    return "Expansion Branch";
   }
 
-  return "Local Branch";
+  return "Operating Branch";
+}
+
+function getStatusLabel(branch: MeBranchProfile) {
+  if (branch.status === "coming-soon") {
+    return "Expansion";
+  }
+
+  return branch.status
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 export function BranchProfileCard({ branch }: BranchProfileCardProps) {
@@ -31,15 +42,15 @@ export function BranchProfileCard({ branch }: BranchProfileCardProps) {
             <CardTitle className="text-base">{resolveBranchName(branch)}</CardTitle>
             <CardDescription>{branch.name.zh}</CardDescription>
           </div>
-          <BranchChip label={branch.status} tone={branch.tone} status={branch.status} />
+          <BranchChip label={getStatusLabel(branch)} tone={branch.tone} status={branch.status} />
         </div>
-        <CardDescription>{resolveBranchDescription(branch)}</CardDescription>
+        <CardDescription>{branch.region?.en ?? "Branch operations workspace"}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 text-sm">
         <div className="grid gap-1 rounded-[10px] border border-border bg-slate-50 p-3">
           <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Context</p>
           <p className="font-medium">{getContextKindLabel(branch)}</p>
-          <p className="text-xs text-muted-foreground">{branch.region?.en ?? "Branch preview only"}</p>
+          <p className="text-xs text-muted-foreground">{branch.region?.en ?? "Branch operations context"}</p>
         </div>
         <div className="grid gap-1 text-xs text-muted-foreground">
           <p>Short name: {branch.shortName}</p>
@@ -51,7 +62,7 @@ export function BranchProfileCard({ branch }: BranchProfileCardProps) {
           ))}
         </div>
         <Button asChild size="sm" variant="outline" className="justify-center">
-          <Link href={`/branches/${branch.key}`}>Open Branch Preview</Link>
+          <Link href={`/branches/${branch.key}`}>Open Branch Workspace</Link>
         </Button>
       </CardContent>
     </Card>

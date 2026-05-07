@@ -65,7 +65,7 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
         <div className="grid gap-2 xl:grid-cols-[minmax(0,1.6fr)_repeat(4,minmax(0,0.85fr))]">
           <div className="flex min-w-0 items-center gap-2 rounded-[8px] border border-border bg-slate-50 px-3 py-2 text-sm text-slate-500">
             <Search className="size-4 text-slate-400" />
-            <span className="truncate">{locale === "zh" ? "搜索记录、模块或状态（占位）" : "Search records, modules, or status"}</span>
+            <span className="truncate">{locale === "zh" ? "搜索记录、模块或状态" : "Search records, modules, or status"}</span>
           </div>
           <div className="rounded-[8px] border border-border bg-slate-50 px-3 py-2 text-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Branch</p>
@@ -80,7 +80,7 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
               <ShieldCheck className="size-3.5" />
               Guardrail
             </p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">{locale === "zh" ? "Mock / 只读" : "Mock / Read-only"}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-900">{locale === "zh" ? "当前版本范围" : "Current release scope"}</p>
           </div>
           <div className="rounded-[8px] border border-border bg-slate-50 px-3 py-2 text-sm">
             <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">

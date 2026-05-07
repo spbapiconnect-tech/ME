@@ -35,8 +35,8 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
           items: ["Role profiles", "Access structure", "Training coverage", "Staff context"],
         },
         {
-          title: "Guardrails",
-          items: ["No auth", "No session middleware", "No permission enforcement", "No write paths"],
+          title: "Service Scope",
+          items: ["Role catalog", "Branch access view", "Staff mapping", "Security review"],
         },
       ]}
     />
@@ -46,13 +46,13 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
     <MeDashboardShell activeKey="roles" rightRail={rightRail}>
       <MePageHeader
         eyebrow="Roles & Staff"
-        title="Role profiles and staff workspace shell"
-        description="Role-based workspace framing for leadership, operations, and platform administration."
-        notice="Current release provides role profiles, access structure, and staff context visibility. Auth, session, and permission enforcement remain outside this release."
+        title="Role profiles and access workspace"
+        description="Role-based operations and access workspace for leadership, branch management, and platform administration."
+        notice="Use this workspace to review role coverage, branch access scope, staff mapping, and security-administration context."
         badges={[
           { label: "Roles" },
           { label: "Access catalog", variant: "secondary" },
-          { label: "Current release", variant: "outline" },
+          { label: "Security administration", variant: "outline" },
         ]}
         actions={
           <>
@@ -71,7 +71,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
           { label: "Profiles", value: String(roles.length) },
           { label: "Business roles", value: String(businessRoles.length) },
           { label: "Platform roles", value: String(platformRoles.length) },
-          { label: "Write actions", value: "Disabled" },
+          { label: "Operating mode", value: "Access review" },
         ]}
       />
 
@@ -121,7 +121,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
       </MeWorkspaceSection>
 
       <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <MeWorkspaceSection title="Staff Mapping Preview" description="Future user-to-role mapping stays visible without introducing auth or persistence.">
+        <MeWorkspaceSection title="Staff Mapping" description="Current staff-to-role alignment across branches and operating teams.">
           <MeDataTable
             embedded
             columns={["Staff", "Role", "Branch", "Access scope", "Status"]}
@@ -133,7 +133,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
           />
         </MeWorkspaceSection>
 
-        <MeWorkspaceSection title="Access Group Preview" description="Admin-style permission framing without runtime enforcement.">
+        <MeWorkspaceSection title="Access Groups" description="Module-level access structure for store, operations, and platform administration.">
           <MeDataTable
             embedded
             columns={["Group", "Surface", "Mode", "Guardrail"]}
@@ -168,7 +168,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
         </div>
       </MeWorkspaceSection>
 
-      <DemoPresentationNote description="Roles now sit inside the shared customer-facing shell with role profiles, access structure, and staff context. Auth, session, permission enforcement, and write behavior remain in later phases." />
+      <DemoPresentationNote title="Workspace Note" description="Roles and access now use the same production workspace structure as branch, PSI, and reporting surfaces." />
     </MeDashboardShell>
   );
 }

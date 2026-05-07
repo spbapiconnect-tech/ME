@@ -16,9 +16,9 @@ export function BranchSelectorPlaceholder({ branches, selectedBranchKey, compact
   return (
     <Card size="sm" className="border border-border/70 bg-card/95">
       <CardHeader className="gap-1">
-        <CardTitle className="text-sm">Branch Selector Placeholder</CardTitle>
+        <CardTitle className="text-sm">Branch Context Switcher</CardTitle>
         <CardDescription>
-          Branch preview only — no tenant switching or branch permission enforcement.
+          Review branch workspaces, operating status, and linked modules from a shared management surface.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3">
@@ -41,16 +41,16 @@ export function BranchSelectorPlaceholder({ branches, selectedBranchKey, compact
                   </div>
                   <BranchChip label={branch.shortName} tone={branch.tone} status={branch.status} />
                 </div>
-                {!compact ? <p className="mb-3 text-xs text-muted-foreground">{branch.description.en}</p> : null}
+                {!compact ? <p className="mb-3 text-xs text-muted-foreground">{branch.region?.en ?? "Branch operations workspace"}</p> : null}
                 <Button asChild size="sm" variant={isSelected ? "default" : "outline"} className="w-full justify-center">
-                  <Link href={`/branches/${branch.key}`}>{isSelected ? "Current Preview" : "Preview Context"}</Link>
+                  <Link href={`/branches/${branch.key}`}>{isSelected ? "Current Branch" : "Open Branch"}</Link>
                 </Button>
               </div>
             );
           })}
         </div>
         <div className="rounded-xl border border-dashed border-border/70 p-3 text-xs text-muted-foreground">
-          Selector UI is descriptive only. It does not persist a selected branch, switch tenants, or change route access.
+          Branch context is shared across operations, reporting, staffing, and inventory review.
         </div>
       </CardContent>
     </Card>

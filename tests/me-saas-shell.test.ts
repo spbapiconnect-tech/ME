@@ -32,11 +32,13 @@ test("main workspace routes import without crashing", async () => {
   const routes = await Promise.all([
     import("../app/page"),
     import("../app/psi/page"),
+    import("../app/psi/procurement/page"),
     import("../app/psi/supplier/page"),
     import("../app/psi/inventory/page"),
     import("../app/reports/page"),
     import("../app/branches/page"),
     import("../app/roles/page"),
+    import("../app/tasks/page"),
     import("../app/display-settings/page"),
     import("../app/demo-mode/page"),
     import("../app/demo-readiness/page"),
@@ -99,4 +101,32 @@ test(".write_test is not referenced in shell files", async () => {
   ];
   const text = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
   assert.equal(text.includes(".write_test"), false);
+});
+
+test("primary customer-facing pages do not expose legacy demo wording", async () => {
+  const files = [
+    "components/business/business-workspace-page.tsx",
+    "components/branches/branch-workspace-page.tsx",
+    "components/psi/psi-home-page.tsx",
+    "components/psi/psi-supplier-page.tsx",
+    "components/psi/psi-inventory-page.tsx",
+    "components/psi/psi-issues-page.tsx",
+    "components/reports/report-widgets-page.tsx",
+    "components/roles/role-workspace-page.tsx",
+    "components/tasks/task-engine-page.tsx",
+    "components/tasks/task-detail-page.tsx",
+    "app/psi/procurement/page.tsx",
+  ];
+  const text = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
+
+  for (const forbidden of [
+    "Mock / Read-only",
+    "Read-only mock procurement workspace",
+    "View Task Placeholder",
+    "Open action placeholder",
+    "No issue placeholders available",
+    "Issue Placeholders",
+  ]) {
+    assert.equal(text.includes(forbidden), false);
+  }
 });

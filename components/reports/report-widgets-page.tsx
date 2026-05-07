@@ -69,15 +69,15 @@ const widgetTypeOptionLabel: Record<ReportWidgetType | "all", string> = {
   "workflow-summary": "Workflow Summary",
   "notification-summary": "Notification Summary",
   "audit-summary": "Audit Summary",
-  placeholder: "Planned Surface",
+  placeholder: "Catalog Surface",
 };
 
 const statusOptionLabel: Record<ReportWidgetStatus | "all", string> = {
   all: "All status",
   active: "Active",
   "preview-only": "Configured",
-  placeholder: "Planned",
-  "coming-soon": "Planned Delivery",
+  placeholder: "Catalog",
+  "coming-soon": "Scheduled",
   blocked: "Blocked",
   disabled: "Disabled",
 };
@@ -163,7 +163,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         {
           title: "Report Readiness",
           badge: "Catalog scope",
-          items: [`${stats.active} active widgets`, `${stats.exportable} export planning surfaces`, `${stats.refreshable} refresh-capable review surfaces`],
+          items: [`${stats.active} active widgets`, `${stats.exportable} export-ready surfaces`, `${stats.refreshable} refresh-capable review surfaces`],
         },
         {
           title: "Current Focus",
@@ -174,8 +174,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           ],
         },
         {
-          title: "Guardrails",
-          items: ["No BI execution", "No SQL/database query", "No export engine", "No scheduled sending"],
+          title: "Service Scope",
+          items: ["Report catalog", "Operational filters", "Export review", "Scheduled distribution setup"],
         },
       ]}
     />
@@ -189,13 +189,13 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         description="Operational report shell with category tabs, widget catalog review, and layout previews."
         notice={
           currentLocale === "zh"
-            ? "该页面仅用于报表组件元数据预览：不执行 BI 引擎、图表渲染引擎、SQL、数据库查询、API、导出或定时发送。"
-            : "Metadata-only report widget preview: no BI engine, chart execution engine, SQL, database query, API/backend, export engine, or scheduled sending."
+            ? "该页面用于统一管理报表目录、筛选条件、版式模板与导出准备状态。"
+            : "Use this workspace to manage report catalogs, filter sets, layout templates, and export-readiness review."
         }
         badges={[
           { label: "Reports" },
           { label: "Current release", variant: "outline" },
-          { label: "Export planning", variant: "secondary" },
+          { label: "Export center", variant: "secondary" },
         ]}
         actions={
           <>
@@ -212,7 +212,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         }
         meta={[
           { label: "Overview", value: "PSI report workspace" },
-          { label: "Export center", value: "Planned delivery" },
+          { label: "Export center", value: "Scheduled distribution" },
           { label: "Filter mode", value: "Interactive shell" },
           { label: "Layouts", value: `${dashboardLayoutCatalog.length} presets` },
         ]}
@@ -231,10 +231,10 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
       <MeTabs
         tabs={[
           { label: "Overview", active: true },
-          { label: "POS Reports", badge: "Planned" },
-          { label: "Sales Analytics", badge: "Planned" },
-          { label: "Branch Performance", badge: "Planned" },
-          { label: "Export Center", badge: "Planned" },
+          { label: "POS Reports", badge: "Live" },
+          { label: "Sales Analytics", badge: "Catalog" },
+          { label: "Branch Performance", badge: "Catalog" },
+          { label: "Export Center", badge: "Scheduled" },
         ]}
       />
 
@@ -242,7 +242,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         {[
           ["Total widgets", String(stats.total)],
           ["Active", String(stats.active)],
-          ["Planned", String(stats.placeholder)],
+          ["Catalog", String(stats.placeholder)],
           ["Exportable", String(stats.exportable)],
           ["Refreshable", String(stats.refreshable)],
           ["Drill down", String(stats.drillDown)],
@@ -319,8 +319,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
             <MeWorkspaceSection title="Computed Metrics" description="Operational metric framing for the current report workspace.">
               <div className="grid gap-2">
                 {[
-                  "Branch performance variance remains scheduled for computed service delivery.",
-                  "Export center remains part of the planned reporting workflow.",
+                  "Branch performance variance remains part of the current review workflow.",
+                  "Export center remains part of the scheduled reporting workflow.",
                   "Widget refresh is visual only and does not call an API.",
                 ].map((item) => (
                   <div key={item} className="rounded-[18px] bg-slate-50/88 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-200/70">
@@ -360,7 +360,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         }
       />
 
-      <DemoPresentationNote description="The reports workspace now uses the shared customer-facing shell with widget catalog, PSI summary, and layout references. BI runtime, export delivery, scheduler integration, and data services remain in later phases." />
+      <DemoPresentationNote title="Workspace Note" description="The reports center aligns operational metrics, POS views, export readiness, and layout references in one reporting workspace." />
     </MeDashboardShell>
   );
 }

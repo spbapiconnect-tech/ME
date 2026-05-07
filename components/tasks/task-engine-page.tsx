@@ -1,82 +1,57 @@
-"use client";
-
 import Link from "next/link";
-import { Layers3, LayoutDashboard, PanelTopClose, Workflow } from "lucide-react";
-import { useEffect } from "react";
 
-import { moduleRegistry } from "@/config/modules";
-import { EmptyState } from "@/components/data/empty-state";
-import { MockDataNotice } from "@/components/demo/mock-data-notice";
-import { FilterBar } from "@/components/data/filter-bar";
-import { StatusChip } from "@/components/data/status-chip";
-import { useUiPreferencesStore } from "@/stores/ui-preferences";
-import type { SupportedLocale, ThemeMode } from "@/types/module";
-import type { TaskRecord, TaskSourceSummaryItem, TaskStats } from "@/types/task";
+import {
+  MeActionBar,
+  MeDashboardShell,
+  MeDataTable,
+  MeDetailWorkspace,
+  MePageHeader,
+  MeRecordSummary,
+  MeRightRail,
+  MeStatusTimeline,
+  MeTabs,
+  MeWorkspaceSection,
+} from "@/components/layout";
+import { Card, CardContent } from "@/components/ui/card";
+import type { TaskRecord } from "@/types/task";
 
-import { TaskActionBar } from "@/components/tasks/task-action-bar";
-import { TaskBoard } from "@/components/tasks/task-board";
-import { TaskList } from "@/components/tasks/task-list";
-import { TaskStatsRow } from "@/components/tasks/task-stats-row";
-
-const copy = {
-  en: {
-    modules: "Open Module Center",
-    dashboard: "Back To Dashboard",
-    demo: "Open Demo Workspace",
-    layoutEngine: "Layout Engine",
-    summary: "Close-loop layer between data and action",
-  },
-  zh: {
-    modules: "打开模块中心",
-    dashboard: "返回 Dashboard",
-    demo: "打开 Demo Workspace",
-    layoutEngine: "布局引擎",
-    summary: "连接数据与动作的闭环层",
-  },
-} as const;
-
-function buildTaskStats(tasks: TaskRecord[]): TaskStats {
-  const stats: TaskStats = {
-    total: tasks.length,
-    overdue: 0,
-    inProgress: 0,
-    review: 0,
-    blocked: 0,
-    done: 0,
-    byPriority: { low: 0, medium: 0, high: 0, critical: 0 },
-    byStatus: { todo: 0, "in-progress": 0, review: 0, blocked: 0, done: 0, rejected: 0, overdue: 0 },
-  };
-
-  for (const task of tasks) {
-    stats.byPriority[task.priority] += 1;
-    stats.byStatus[task.status] += 1;
-
-    if (task.status === "overdue") stats.overdue += 1;
-    if (task.status === "in-progress") stats.inProgress += 1;
-    if (task.status === "review") stats.review += 1;
-    if (task.status === "blocked") stats.blocked += 1;
-    if (task.status === "done") stats.done += 1;
+function mapModuleRoute(sourceModule: TaskRecord["sourceModule"]) {
+  switch (sourceModule) {
+    case "inventory":
+      return "/psi/inventory";
+    case "procurement":
+      return "/psi/procurement";
+    case "supplier":
+      return "/psi/supplier";
+    case "pos-report":
+      return "/reports/pos";
+    case "education":
+      return "/training";
+    case "task":
+    default:
+      return "/tasks";
   }
-
-  return stats;
 }
 
-function buildTaskSourceSummary(tasks: TaskRecord[]): TaskSourceSummaryItem[] {
-  return moduleRegistry
-    .filter((moduleItem) => ["procurement", "supplier", "inventory", "pos-report", "education", "task"].includes(moduleItem.code))
-    .map((moduleItem) => {
-      const sourceTasks = tasks.filter((task) => task.sourceModule === moduleItem.code);
+function titleCaseStatus(value: string) {
+  return value
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
 
-      return {
-        moduleCode: moduleItem.code as TaskRecord["sourceModule"],
-        total: sourceTasks.length,
-        overdue: sourceTasks.filter((task) => task.status === "overdue").length,
-        review: sourceTasks.filter((task) => task.status === "review").length,
-        route: moduleItem.code === "task" ? "/tasks" : `/demo/${moduleItem.code}`,
-      };
-    })
-    .filter((item) => item.total > 0)
-    .sort((left, right) => right.total - left.total);
+function summarizeTasks(tasks: TaskRecord[]) {
+  return tasks.reduce(
+    (acc, task) => {
+      acc.total += 1;
+      if (task.status === "overdue") acc.overdue += 1;
+      if (task.status === "review") acc.review += 1;
+      if (task.status === "in-progress") acc.inProgress += 1;
+      if (task.priority === "critical") acc.critical += 1;
+      return acc;
+    },
+    { total: 0, overdue: 0, review: 0, inProgress: 0, critical: 0 },
+  );
 }
 
 interface TaskEnginePageProps {
@@ -85,179 +60,186 @@ interface TaskEnginePageProps {
 }
 
 export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
-  const locale = useUiPreferencesStore((state) => state.locale);
-  const theme = useUiPreferencesStore((state) => state.theme);
-  const hydrated = useUiPreferencesStore((state) => state.hydrated);
-  const hydrate = useUiPreferencesStore((state) => state.hydrate);
+  const stats = summarizeTasks(tasks);
+  const selectedTask = tasks[0];
 
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
-  }, [hydrated, locale, theme]);
-
-  const currentLocale: SupportedLocale = hydrated ? locale : "en";
-  const currentTheme: ThemeMode = hydrated ? theme : "bright";
-  const currentCopy = copy[currentLocale];
-  const stats = buildTaskStats(tasks);
-  const sourceSummary = buildTaskSourceSummary(tasks);
+  const rightRail = (
+    <MeRightRail
+      sections={[
+        {
+          title: "Task Context",
+          badge: "Operations",
+          items: ["Branch follow-up", "Issue coordination", "Inventory and procurement linkage"],
+        },
+        {
+          title: "Current Focus",
+          items: [`${stats.review} records waiting for review`, `${stats.overdue} overdue items`, `${stats.critical} critical-priority tasks`],
+        },
+        {
+          title: "Today’s Priorities",
+          items: ["Replenishment review", "Delivery-delay escalation", "Schedule and training follow-up"],
+        },
+      ]}
+    />
+  );
 
   return (
-    <main className="main-frame module-center-page">
-      <section className="module-center-shell">
-        <div className="shell-backdrop" />
-        <div className="dashboard-content module-center-content">
-          <section className="hero-panel module-center-hero">
-            <div className="eyebrow-row">
-              <span className="brand-mark">
-                <span className="brand-dot" />
-                ME Task Engine
-              </span>
-              <span className="locale-chip">
-                <Workflow size={16} />
-                {currentTheme}
-              </span>
-            </div>
-            <div className="hero-metadata">
-              <div>
-                <h1 className="hero-title">ME Task Engine</h1>
-                <p className="hero-subtitle">{currentCopy.summary}</p>
-                <p className="hero-subtitle-zh">
-                  {currentLocale === "zh"
-                    ? "当前为本地 mock task data，不连接真实 workflow、notification API、数据库或持久化服务。"
-                    : "Current data is local mock task data only, with no real workflow, notification API, database, or persistence service connected."}
-                </p>
-              </div>
-              <div className="template-link-row">
-                <Link className="shell-link-button" href="/">
-                  <LayoutDashboard size={16} />
-                  <span>{currentCopy.dashboard}</span>
-                </Link>
-                <Link className="shell-link-button" href="/modules">
-                  <Layers3 size={16} />
-                  <span>{currentCopy.modules}</span>
-                </Link>
-                <Link className="shell-link-button shell-link-button--primary" href="/demo">
-                  <Workflow size={16} />
-                  <span>{currentCopy.demo}</span>
-                </Link>
-                <Link className="shell-link-button" href="/layout-engine">
-                  <PanelTopClose size={16} />
-                  <span>{currentCopy.layoutEngine}</span>
-                </Link>
-              </div>
-            </div>
-          </section>
+    <MeDashboardShell activeKey="tasks" rightRail={rightRail}>
+      <MePageHeader
+        eyebrow="Task Management"
+        title="Task operations workspace"
+        description="Daily execution queue for branch follow-up, issue handling, procurement coordination, and cross-module work orders."
+        notice={dataError ? `Task service notice: ${dataError}` : "Use this workspace to review assigned work, branch-linked tasks, comments, and operating timelines."}
+        badges={[
+          { label: "Task queue" },
+          { label: "Branch follow-up", variant: "secondary" },
+          { label: "Operational review", variant: "outline" },
+        ]}
+        meta={[
+          { label: "Queue size", value: String(stats.total) },
+          { label: "Branch scope", value: "All Stores / KCH / Central DC" },
+          { label: "Priority watch", value: `${stats.critical} critical` },
+          { label: "Workstream", value: "Daily operations" },
+        ]}
+      />
 
-          <MockDataNotice
-            locale={currentLocale}
-            title={{ zh: "Task Engine MVP", en: "Task Engine MVP" }}
-            message={{ zh: "当前任务数据来自本地 TypeScript mock data。", en: "Current task records come from local TypeScript mock data." }}
-            detail={{ zh: "未连接真实工作流、通知服务、API 或数据库。", en: "No real workflow, notification service, API, or database is connected." }}
-            tags={[{ zh: "本地任务数据", en: "Local Task Data" }, { zh: "无工作流引擎", en: "No Workflow Engine" }, { zh: "无通知服务", en: "No Notification Service" }]}
-          />
+      <MeActionBar
+        actions={[
+          { label: "Review Queue" },
+          { label: "Open Branches", href: "/branches", variant: "secondary" },
+          { label: "Open Inspection", href: "/inspection", variant: "outline" },
+          { label: "Open PSI", href: "/psi", variant: "outline" },
+          { label: "Export Queue", href: "#", variant: "ghost" },
+        ]}
+      />
 
-          {dataError ? (
-            <section className="modules-panel">
-              <EmptyState
-                locale={currentLocale}
-                title={{ zh: "数据读取失败", en: "Data Load Failed" }}
-                description={{ zh: dataError, en: dataError }}
-                actionLabel={{ zh: "返回 Demo Workspace", en: "Back To Demo Workspace" }}
-              />
-            </section>
-          ) : null}
-
-          <section className="modules-panel">
-            <TaskActionBar locale={currentLocale} />
-          </section>
-
-          <section className="modules-panel">
-            <TaskStatsRow locale={currentLocale} stats={stats} />
-          </section>
-
-          <section className="modules-panel">
-            <div className="panel-header">
-              <div>
-                <h2 className="shell-title">{currentLocale === "zh" ? "筛选与搜索占位" : "Filter And Search Placeholder"}</h2>
-                <p className="shell-copy">
-                  {currentLocale === "zh"
-                    ? "展示未来任务筛选、搜索和视图切换的基础入口。"
-                    : "Shows the foundation for future task filters, search, and view switching."}
-                </p>
-              </div>
-            </div>
-            <FilterBar
-              locale={currentLocale}
-              searchPlaceholder={{ zh: "搜索任务、来源记录、负责人", en: "Search tasks, source records, or owners" }}
-              filters={[
-                { key: "status", label: { zh: "状态", en: "Status" }, type: "status" },
-                { key: "source", label: { zh: "来源模块", en: "Source Module" }, type: "tag" },
-                { key: "owner", label: { zh: "负责人角色", en: "Owner Role" }, type: "owner" },
-              ]}
-              actionSlot={<StatusChip label={{ zh: "本地筛选占位", en: "Local Filter Placeholder" }} locale={currentLocale} tone="brand" size="sm" />}
-            />
-          </section>
-
-          <section className="modules-panel">
-            <div className="panel-header">
-              <div>
-                <h2 className="shell-title">{currentLocale === "zh" ? "任务看板" : "Task Board"}</h2>
-                <p className="shell-copy">
-                  {currentLocale === "zh"
-                    ? "按状态聚合展示 todo、in-progress、review、blocked、done。"
-                    : "Groups tasks by todo, in-progress, review, blocked, and done statuses."}
-                </p>
-              </div>
-            </div>
-            <TaskBoard tasks={tasks} locale={currentLocale} />
-          </section>
-
-          <section className="demo-section-grid">
-            <section className="modules-panel">
-              <div className="panel-header">
-                <div>
-                  <h2 className="shell-title">{currentLocale === "zh" ? "任务列表" : "Task List"}</h2>
-                  <p className="shell-copy">
-                    {currentLocale === "zh"
-                      ? "按优先级与到期时间排序的任务列表。"
-                      : "Task list sorted by priority and due date."}
-                  </p>
-                </div>
-              </div>
-              <TaskList tasks={tasks} locale={currentLocale} />
-            </section>
-
-            <section className="modules-panel">
-              <div className="panel-header">
-                <div>
-                  <h2 className="shell-title">{currentLocale === "zh" ? "来源摘要" : "Source Summary"}</h2>
-                  <p className="shell-copy">
-                    {currentLocale === "zh"
-                      ? "展示任务如何从不同模块进入 Task Engine。"
-                      : "Shows how tasks enter the Task Engine from different modules."}
-                  </p>
-                </div>
-              </div>
-              <div className="task-source-summary-grid">
-                {sourceSummary.map((item) => (
-                  <Link key={item.moduleCode} className="task-source-summary-card" href={item.route}>
-                    <span>{item.moduleCode}</span>
-                    <strong>{item.total}</strong>
-                    <p>
-                      {currentLocale === "zh" ? "待复核" : "Review"}: {item.review} · {currentLocale === "zh" ? "逾期" : "Overdue"}: {item.overdue}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          </section>
-        </div>
+      <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        {[
+          ["Open tasks", String(stats.total)],
+          ["In progress", String(stats.inProgress)],
+          ["Waiting review", String(stats.review)],
+          ["Overdue", String(stats.overdue)],
+          ["Critical", String(stats.critical)],
+        ].map(([label, value]) => (
+          <Card key={label} size="sm" className="border-border/60 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
+            <CardContent className="pt-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+              <p className="mt-2 text-[1.55rem] font-semibold tracking-[-0.02em] text-slate-950">{value}</p>
+            </CardContent>
+          </Card>
+        ))}
       </section>
-    </main>
+
+      {selectedTask ? (
+        <MeRecordSummary
+          title={selectedTask.id}
+          subtitle={selectedTask.title.en}
+          status={titleCaseStatus(selectedTask.status)}
+          guardrail="Current service scope"
+          meta={[
+            { label: "Branch", value: selectedTask.store },
+            { label: "Owner", value: `${selectedTask.ownerName} · ${selectedTask.ownerRole}` },
+            { label: "Priority", value: titleCaseStatus(selectedTask.priority) },
+            { label: "Module", value: titleCaseStatus(selectedTask.sourceModule) },
+            { label: "Due", value: selectedTask.dueAt },
+            { label: "Updated", value: selectedTask.updatedAt },
+          ]}
+        />
+      ) : null}
+
+      <MeTabs
+        style="detail"
+        tabs={[
+          { label: "Overview", active: true },
+          { label: "Queue", badge: String(stats.total) },
+          { label: "Comments" },
+          { label: "Activity" },
+          { label: "Attachments" },
+        ]}
+      />
+
+      <MeDetailWorkspace
+        main={
+          <>
+            <MeWorkspaceSection title="Work Queue" description="Prioritized task records linked to branch operations, procurement, inventory, and incident handling.">
+              <MeDataTable
+                embedded
+                columns={["Task", "Branch", "Owner", "Priority", "Status", "Due"]}
+                rows={tasks.map((task) => [
+                  <Link key={`${task.id}-link`} href={`/tasks/${task.id}`} className="font-medium text-slate-900 hover:text-blue-700">
+                    {task.id}
+                  </Link>,
+                  task.store,
+                  task.ownerRole,
+                  titleCaseStatus(task.priority),
+                  titleCaseStatus(task.status),
+                  task.dueAt,
+                ])}
+              />
+            </MeWorkspaceSection>
+
+            {selectedTask ? (
+              <>
+                <MeWorkspaceSection title="Selected Task" description="Primary work order detail, assignment context, and linked business records.">
+                  <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_18rem]">
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {[
+                        ["Task ID", selectedTask.id],
+                        ["Title", selectedTask.title.en],
+                        ["Task type", titleCaseStatus(selectedTask.taskType)],
+                        ["Source module", titleCaseStatus(selectedTask.sourceModule)],
+                        ["Owner", `${selectedTask.ownerName} · ${selectedTask.ownerRole}`],
+                        ["Current branch", selectedTask.store],
+                        ["Priority", titleCaseStatus(selectedTask.priority)],
+                        ["Current status", titleCaseStatus(selectedTask.status)],
+                        ["Created", selectedTask.createdAt],
+                        ["Due", selectedTask.dueAt],
+                      ].map(([label, value]) => (
+                        <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+                          <p className="mt-1.5 text-sm font-semibold text-slate-900">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="rounded-[12px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Task Note</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">{selectedTask.description.en}</p>
+                    </div>
+                  </div>
+                </MeWorkspaceSection>
+
+                <MeWorkspaceSection title="Related Records" description="Connected procurement, supplier, inventory, and issue records used during task review.">
+                  <MeDataTable
+                    embedded
+                    columns={["Module", "Record", "Description", "Route"]}
+                    rows={selectedTask.linkedRecords.map((record) => [
+                      titleCaseStatus(record.moduleCode),
+                      record.recordId,
+                      record.label.en,
+                      <Link key={`${record.recordId}-route`} href={mapModuleRoute(record.moduleCode)} className="text-blue-700 hover:underline">
+                        Open workspace
+                      </Link>,
+                    ])}
+                  />
+                </MeWorkspaceSection>
+              </>
+            ) : null}
+          </>
+        }
+        context={
+          selectedTask ? (
+            <MeStatusTimeline
+              embedded
+              title="Activity"
+              items={selectedTask.timeline.map((entry) => ({
+                title: entry.title.en,
+                description: `${entry.description.en} · ${selectedTask.ownerRole}`,
+                time: entry.timestamp,
+              }))}
+            />
+          ) : undefined
+        }
+      />
+    </MeDashboardShell>
   );
 }

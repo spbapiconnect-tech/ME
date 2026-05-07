@@ -80,6 +80,15 @@ export function getTaskStats(): TaskStats {
 }
 
 export function getTaskSourceSummary(): TaskSourceSummaryItem[] {
+  const routeByModule: Partial<Record<TaskRecord["sourceModule"], string>> = {
+    inventory: "/psi/inventory",
+    procurement: "/psi/procurement",
+    supplier: "/psi/supplier",
+    "pos-report": "/reports/pos",
+    education: "/training",
+    task: "/tasks",
+  };
+
   return moduleRegistry
     .filter((moduleItem) => ["procurement", "supplier", "inventory", "pos-report", "education", "task"].includes(moduleItem.code))
     .map((moduleItem) => {
@@ -89,7 +98,7 @@ export function getTaskSourceSummary(): TaskSourceSummaryItem[] {
         total: tasks.length,
         overdue: tasks.filter((task) => task.status === "overdue").length,
         review: tasks.filter((task) => task.status === "review").length,
-        route: moduleItem.code === "task" ? "/tasks" : `/demo/${moduleItem.code}`,
+        route: routeByModule[moduleItem.code as TaskRecord["sourceModule"]] ?? "/tasks",
       };
     })
     .filter((item) => item.total > 0)

@@ -7,7 +7,7 @@ export default async function PsiProcurementPage() {
   return (
     <PsiWorkspacePage
       title="ME PSI Procurement"
-      subtitle="Read-only mock procurement workspace"
+      subtitle="Procurement requests, purchase activity, and issue review workspace"
       source={data.meta.source}
       isMock={data.isMock}
       error={data.error}

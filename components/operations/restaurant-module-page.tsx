@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { DemoPresentationNote } from "@/components/demo-mode";
 import {
   MeActionBar,
   MeDashboardShell,
@@ -31,7 +30,7 @@ export function RestaurantModulePage({ module }: { module: RestaurantModuleDefin
         eyebrow={preview.eyebrow}
         title={preview.title}
         description={preview.description}
-        notice={preview.notice}
+        notice={undefined}
         badges={preview.badges}
         actions={
           <>
@@ -76,7 +75,7 @@ export function RestaurantModulePage({ module }: { module: RestaurantModuleDefin
         title={preview.recordSummary.title}
         subtitle={preview.recordSummary.subtitle}
         status={preview.recordSummary.status}
-        guardrail={preview.recordSummary.guardrail}
+        guardrail="Current service scope"
         meta={preview.recordSummary.meta}
       />
 
@@ -94,8 +93,6 @@ export function RestaurantModulePage({ module }: { module: RestaurantModuleDefin
         }
         context={<RestaurantModuleRightRail sections={preview.rightRail} />}
       />
-
-      <DemoPresentationNote description={preview.footerNote} />
     </MeDashboardShell>
   );
 }

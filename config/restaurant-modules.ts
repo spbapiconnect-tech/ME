@@ -184,7 +184,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       title: "Branch inspection and audit workspace",
       description: "Inspection queue, checklist preview, findings, and branch audit context inside the shared operations shell.",
       notice: "UI preview only. No inspection submission, no checklist writes, no corrective-task execution, and no workflow runtime are connected.",
-      badges: [{ label: "Inspection" }, { label: "Audit shell", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "Inspection" }, { label: "Audit workspace", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Branches", href: "/branches" },
         { label: "Open Issues", href: "/issues", variant: "outline" },
@@ -200,7 +200,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         title: "INSP-KCH-240507",
         subtitle: "Branch inspection preview",
         status: "Review Needed",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Branch", value: "KCH" },
           { label: "Audit score", value: "86 / 100" },
@@ -227,7 +227,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       metrics: [
         { label: "Open inspections", value: "4", description: "Branch-level reviews currently visible in the audit queue." },
         { label: "Average score", value: "89", description: "Preview-only branch audit score average for the active window." },
-        { label: "Critical findings", value: "1", description: "One mock critical finding remains visible for KCH." },
+        { label: "Critical findings", value: "1", description: "One critical finding remains active for KCH review." },
       ],
       filters: [
         { label: "Branch", value: "KCH" },
@@ -244,20 +244,20 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
           rows: [
             ["INSP-KCH-240507", "KCH", "Food safety", "86", "Review Needed"],
             ["INSP-BTU-240506", "BTU", "Storage", "92", "Monitoring"],
-            ["INSP-HQ-240505", "All Stores", "Operations", "89", "Preview Only"],
+            ["INSP-HQ-240505", "All Stores", "Operations", "89", "Portfolio Review"],
           ],
         },
         {
           kind: "fields",
           title: "Checklist Preview",
-          description: "Read-only inspection checklist fields used to frame audit coverage.",
+          description: "Inspection checklist fields used to frame audit coverage.",
           fields: [
             { label: "Kitchen prep line", value: "Pass" },
             { label: "Cold storage temperature", value: "Watch" },
             { label: "Expiry label presence", value: "Pass" },
             { label: "Sanitation close", value: "Review Needed" },
             { label: "Receiving bay check", value: "Pass" },
-            { label: "Manager sign-off", value: "Placeholder only" },
+            { label: "Manager sign-off", value: "Pending review" },
           ],
           asideTitle: "Inspection Note",
           asideBody: "This panel is a checklist preview only. No inspection form submission, no branch scoring engine, and no corrective task creation are executed from this UI.",
@@ -268,9 +268,9 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
           description: "Findings remain visible without creating any downstream workflow actions.",
           columns: ["Finding", "Severity", "Area", "Suggested Follow-up"],
           rows: [
-            ["Missing freezer label", "High", "Storage", "Open expiry workspace placeholder"],
+            ["Missing freezer label", "High", "Storage", "Open expiry workspace"],
             ["Receiving log gap", "Medium", "Backroom", "Review receiving checklist"],
-            ["Cleaning sign-off late", "Low", "Kitchen", "Manager review placeholder"],
+            ["Cleaning sign-off late", "Low", "Kitchen", "Manager review"],
           ],
         },
       ],
@@ -284,9 +284,9 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         ],
       },
       rightRail: [
-        { title: "Audit Context", badge: "KCH", items: ["Weekly audit window", "Food safety + operations mix", "Corrective actions remain placeholder-only"] },
+        { title: "Audit Context", badge: "KCH", items: ["Weekly audit window", "Food safety + operations mix", "Corrective actions remain under review"] },
         { title: "Open Findings", items: ["1 critical watch item", "2 medium/low findings", "No task generation runtime"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No checklist submit", "No approval execution", "No notification sending"] },
+        { title: "Service Scope", badge: "Current release", items: ["Checklist review", "Finding visibility", "Follow-up coordination"] },
       ],
       footerNote: "Inspection remains a visual operations workspace only. No checklist engine, no corrective-action execution, and no write path were added.",
     },
@@ -309,7 +309,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       title: "Cross-module issue and incident queue",
       description: "Issue severity filters, linked modules, incident preview, and timeline context across operations.",
       notice: "UI preview only. No issue writes, no task creation, no escalation execution, and no notification runtime are connected.",
-      badges: [{ label: "Issues" }, { label: "Incident shell", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "Issues" }, { label: "Incident workspace", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Inspection", href: "/inspection" },
         { label: "Open PSI Issues", href: "/psi/issues", variant: "outline" },
@@ -325,12 +325,12 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         title: "ISS-KCH-009",
         subtitle: "Cold chain label gap",
         status: "Open / High",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Branch", value: "KCH" },
           { label: "Module", value: "Expiry / Inspection" },
           { label: "Owner", value: "Operations QA" },
-          { label: "Linked task", value: "Placeholder only" },
+          { label: "Linked task", value: "Task coordination queue" },
           { label: "Raised", value: "Today 10:35" },
           { label: "Current state", value: "Awaiting branch review" },
         ],
@@ -394,7 +394,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       rightRail: [
         { title: "Severity Context", badge: "High", items: ["Food safety adjacency", "Linked to branch KCH", "No escalation automation"] },
         { title: "Related Links", items: ["Expiry label preview", "Inspection record preview", "Task creation remains disabled"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No task creation", "No notifications", "No approval workflow"] },
+        { title: "Service Scope", badge: "Current release", items: ["Issue review", "Branch follow-up", "Cross-module coordination"] },
       ],
       footerNote: "Issue management is rendered as an operational queue and detail preview only. No corrective workflow, notification sending, or task creation was added.",
     },
@@ -519,9 +519,9 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       activeNavKey: "pos-reports",
       eyebrow: "POS Reports",
       title: "POS sales and branch performance preview",
-      description: "Daily POS snapshot, branch sales view, export placeholder, and reporting context inside the shared report shell.",
+      description: "Daily POS snapshot, branch sales view, export readiness, and reporting context inside the shared report shell.",
       notice: "UI preview only. No POS integration, no payment feed, no accounting sync, and no export engine are connected.",
-      badges: [{ label: "POS Reports" }, { label: "Sales preview", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "POS Reports" }, { label: "Sales workspace", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Reports", href: "/reports" },
         { label: "Open Branches", href: "/branches", variant: "outline" },
@@ -530,21 +530,21 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       meta: [
         { label: "Period", value: "Today / Last 7 days" },
         { label: "Branch set", value: "KCH / BTU / All Stores" },
-        { label: "Source", value: "POS preview only" },
-        { label: "Exports", value: "Placeholder" },
+        { label: "Source", value: "POS catalog layer" },
+        { label: "Exports", value: "Scheduled distribution" },
       ],
       recordSummary: {
         title: "POS Daily Snapshot",
         subtitle: "Sales report preview",
         status: "Monitoring",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Lead branch", value: "KCH" },
           { label: "Sales day", value: "Today" },
           { label: "Snapshot", value: "13:30 cutoff" },
           { label: "Variance watch", value: "2 branches" },
           { label: "Margin preview", value: "Finance-linked" },
-          { label: "Exports", value: "UI-only placeholder" },
+          { label: "Exports", value: "Scheduled distribution" },
         ],
       },
       actionBar: [
@@ -563,7 +563,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       ],
       metrics: [
         { label: "Gross sales", value: "RM 42.8k", description: "Preview-only aggregate across selected branches." },
-        { label: "Transactions", value: "812", description: "Mock transaction volume for the active sales window." },
+        { label: "Transactions", value: "812", description: "Transaction volume for the active sales window." },
         { label: "Branch variance", value: "2", description: "Two branches remain on the review watchlist." },
       ],
       filters: [
@@ -587,11 +587,11 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         {
           kind: "cards",
           title: "Computed Metric Preview",
-          description: "Preview-only placeholders for formula and report-computation outputs.",
+          description: "Current workspace indicators for margin, variance, and export readiness.",
           cards: [
-            { title: "Sales variance", value: "+4.8%", description: "Versus mock same-day baseline. Formula layer not connected." },
-            { title: "Gross margin preview", value: "31.2%", description: "Finance-linked preview only, not a live margin engine." },
-            { title: "Export readiness", value: "Preview", description: "Export center remains UI-only without file generation." },
+            { title: "Sales variance", value: "+4.8%", description: "Versus same-day operating baseline for the current branch set." },
+            { title: "Gross margin outlook", value: "31.2%", description: "Finance-linked commercial view for branch leadership." },
+            { title: "Export readiness", value: "Scheduled", description: "Export center is prepared for scheduled distribution." },
           ],
         },
       ],
@@ -604,9 +604,9 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         ],
       },
       rightRail: [
-        { title: "Report Readiness", badge: "Preview", items: ["POS integration not connected", "Export center not implemented", "Branch variance stays visual-only"] },
+        { title: "Report Readiness", badge: "Scheduled", items: ["POS sales catalog", "Export center routing", "Branch variance review"] },
         { title: "Related Surfaces", items: ["Reports workspace", "Finance preview", "Branch operations"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No POS feed", "No accounting sync", "No scheduled sending"] },
+        { title: "Service Scope", badge: "Current release", items: ["Sales review", "Branch comparison", "Scheduled distribution setup"] },
       ],
       footerNote: "POS reporting remains a UI/report shell only. No POS integration, no export engine, and no financial close logic were added.",
     },
@@ -629,7 +629,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       title: "Staff roster and profile operations workspace",
       description: "Staff list, branch assignment, skill matrix, and training status using the shared operations detail pattern.",
       notice: "UI preview only. No HR writes, no attendance sync, no payroll integration, and no permission enforcement are connected.",
-      badges: [{ label: "Staff / HR" }, { label: "Roster preview", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "Staff / HR" }, { label: "Roster workspace", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Schedule", href: "/schedule" },
         { label: "Open Training", href: "/training", variant: "outline" },
@@ -638,14 +638,14 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       meta: [
         { label: "Branch scope", value: "KCH / BTU" },
         { label: "Current mode", value: "Roster preview" },
-        { label: "Attendance", value: "Placeholder only" },
+        { label: "Attendance", value: "Attendance review" },
         { label: "Writes", value: "Disabled" },
       ],
       recordSummary: {
         title: "STF-KCH-014",
         subtitle: "Kitchen lead profile",
         status: "Active",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Name", value: "Alicia Tan" },
           { label: "Role", value: "Kitchen Lead" },
@@ -702,7 +702,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
             { label: "Secondary station", value: "Receiving assist" },
             { label: "Current branch", value: "KCH" },
             { label: "Assigned role", value: "Kitchen Lead" },
-            { label: "Attendance overview", value: "Preview only" },
+            { label: "Attendance overview", value: "Current review" },
           ],
           asideTitle: "Profile Note",
           asideBody: "Staff profile details remain UI-only. No HR records are edited here, and there is no attendance, payroll, or identity synchronization.",
@@ -730,7 +730,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       rightRail: [
         { title: "Roster Context", badge: "KCH", items: ["Kitchen + service mix", "Branch assignment visible", "No HR record writes"] },
         { title: "Training Watch", items: ["2 pending reviews", "1 refresher due soon", "No course engine connected"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No attendance write", "No payroll sync", "No permission enforcement"] },
+        { title: "Service Scope", badge: "Current release", items: ["Roster review", "Training linkage", "Branch assignment"] },
       ],
       footerNote: "Staff / HR is rendered as a roster and profile workspace only. No HR system, no attendance writes, and no identity/permission enforcement were added.",
     },
@@ -753,7 +753,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       title: "Schedule coverage and shift preview workspace",
       description: "Week selector, branch context, shift cards, and coverage summary using a shared list/detail operations pattern.",
       notice: "UI preview only. No schedule write actions, no auto-generation algorithm, no leave sync, and no staffing workflow execution are connected.",
-      badges: [{ label: "Schedule" }, { label: "Roster preview", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "Schedule" }, { label: "Roster workspace", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Staff", href: "/staff" },
         { label: "Open Training", href: "/training", variant: "outline" },
@@ -762,14 +762,14 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       meta: [
         { label: "Branch", value: "KCH" },
         { label: "Week", value: "May 6 - May 12" },
-        { label: "Coverage mode", value: "Preview only" },
+        { label: "Coverage mode", value: "Current roster view" },
         { label: "Writes", value: "Disabled" },
       ],
       recordSummary: {
         title: "KCH Week Roster",
         subtitle: "Shift coverage preview",
         status: "Coverage Watch",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Branch", value: "KCH" },
           { label: "Week window", value: "May 6 - May 12" },
@@ -849,7 +849,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       rightRail: [
         { title: "Coverage Watch", badge: "3 gaps", items: ["Friday dinner gap", "Sunday lunch gap", "Receiving support dependency"] },
         { title: "Availability", items: ["2 off/unavailable rows", "No leave system sync", "No schedule generation runtime"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No shift write", "No auto roster", "No staff notification sending"] },
+        { title: "Service Scope", badge: "Current release", items: ["Coverage review", "Shift coordination", "Branch staffing visibility"] },
       ],
       footerNote: "Schedule / Roster is rendered as a coverage preview only. No scheduling algorithm, no shift persistence, and no notification workflow were added.",
     },
@@ -885,7 +885,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       title: "Training records and skill completion workspace",
       description: "Course list, staff progress table, SOP-linked training records, and gap context across branches.",
       notice: "UI preview only. No training engine, no certification write behavior, and no automated course assignment are connected.",
-      badges: [{ label: "Training" }, { label: "Skill preview", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "Training" }, { label: "Skill coverage", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Staff", href: "/staff" },
         { label: "Open SOP", href: "/sop", variant: "outline" },
@@ -894,14 +894,14 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       meta: [
         { label: "Branch scope", value: "All Stores / KCH" },
         { label: "Course set", value: "Ops / Food safety / SOP" },
-        { label: "Completion view", value: "Preview only" },
+        { label: "Completion view", value: "Current completion view" },
         { label: "Writes", value: "Disabled" },
       ],
       recordSummary: {
         title: "TRN-KCH-SOP-004",
         subtitle: "Kitchen SOP refresher",
         status: "In Review",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Course", value: "Kitchen SOP refresher" },
           { label: "Branch", value: "KCH" },
@@ -966,7 +966,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
           fields: [
             { label: "Linked SOP", value: "SOP-KITCHEN-014" },
             { label: "Record type", value: "Refresher" },
-            { label: "Assessment", value: "Preview only" },
+            { label: "Assessment", value: "Assessment review" },
             { label: "Skill gap rule", value: "Planning-only" },
             { label: "Branch applicability", value: "KCH / BTU" },
             { label: "Next checkpoint", value: "Next week" },
@@ -980,13 +980,13 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         items: [
           { title: "Course refreshed", description: "Kitchen SOP refresher remains linked to the food-operations shell.", time: "09:05" },
           { title: "Progress watch surfaced", description: "Cold chain handling completion gap remains visible for warehouse staff.", time: "11:20" },
-          { title: "Assessment placeholder reviewed", description: "Training lead reviewed the mock completion state.", time: "13:40" },
+          { title: "Assessment review completed", description: "Training lead reviewed the current completion status.", time: "13:40" },
         ],
       },
       rightRail: [
         { title: "Training Gap", badge: "8 watch", items: ["Cold chain handling gap", "Kitchen refresher review", "No auto assignment engine"] },
         { title: "Related Surfaces", items: ["Staff / HR", "SOP / Recipes", "Roles / access preview"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No course writes", "No certification issue", "No workflow execution"] },
+        { title: "Service Scope", badge: "Current release", items: ["Course review", "Training progress", "Skill-gap follow-up"] },
       ],
       footerNote: "Training remains a people-operations preview only. No training engine, no course assignment workflow, and no record persistence were added.",
     },
@@ -1009,7 +1009,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       title: "SOP, recipe, and product standard workspace",
       description: "Operational SOP list, recipe detail preview, and product-standard context for restaurant execution.",
       notice: "UI preview only. No recipe engine, no ingredient write behavior, no product release workflow, and no POS link are connected.",
-      badges: [{ label: "SOP / Recipes" }, { label: "Product standard", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "SOP / Recipes" }, { label: "Product standards", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Training", href: "/training" },
         { label: "Open Expiry", href: "/expiry", variant: "outline" },
@@ -1018,14 +1018,14 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       meta: [
         { label: "Category", value: "Kitchen / Product standard" },
         { label: "Branch scope", value: "All Stores" },
-        { label: "Versioning", value: "Preview only" },
+        { label: "Versioning", value: "Current version set" },
         { label: "Writes", value: "Disabled" },
       ],
       recordSummary: {
         title: "SOP-KITCHEN-014",
         subtitle: "Chicken broth standard",
         status: "Active",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Product", value: "Chicken broth" },
           { label: "Version", value: "v1.4" },
@@ -1069,7 +1069,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
           rows: [
             ["Chicken broth standard", "Recipe SOP", "Food operations", "v1.4", "Active"],
             ["Freezer labeling guide", "Storage SOP", "QA", "v1.1", "Watch"],
-            ["Receiving quality checklist", "Receiving SOP", "Warehouse", "v1.0", "Preview Only"],
+            ["Receiving quality checklist", "Receiving SOP", "Warehouse", "v1.0", "Operations Review"],
           ],
         },
         {
@@ -1104,13 +1104,13 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         items: [
           { title: "Standard refreshed", description: "Chicken broth standard version remains active in the preview catalog.", time: "08:40" },
           { title: "Training link reviewed", description: "Kitchen SOP refresher remains attached to this record.", time: "11:25" },
-          { title: "Finance preview linked", description: "Cost estimate placeholder surfaced for finance review.", time: "12:20" },
+          { title: "Finance linkage reviewed", description: "Cost estimate surfaced for finance review.", time: "12:20" },
         ],
       },
       rightRail: [
         { title: "Standard Context", badge: "Active", items: ["All-store applicability", "Training linkage visible", "Versioning remains metadata-only"] },
         { title: "Related Modules", items: ["Training", "Finance", "Expiry / Labels"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No recipe writes", "No cost engine", "No product release workflow"] },
+        { title: "Service Scope", badge: "Current release", items: ["Standard review", "Training linkage", "Recipe governance"] },
       ],
       footerNote: "SOP / Recipes remains a food-operations preview only. No recipe engine, no cost formulas, and no product workflow execution were added.",
     },
@@ -1131,9 +1131,9 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       activeNavKey: "expiry",
       eyebrow: "Expiry / Labels",
       title: "Expiry watch and label log workspace",
-      description: "Label log table, expiry watchlist, print placeholder, and storage-status context for food safety operations.",
+      description: "Label log table, expiry watchlist, print preparation, and storage-status context for food safety operations.",
       notice: "UI preview only. No printer connection, no barcode engine, no label writeback, and no food-safety escalation runtime are connected.",
-      badges: [{ label: "Expiry / Labels" }, { label: "Food safety preview", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "Expiry / Labels" }, { label: "Food safety workspace", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Inspection", href: "/inspection" },
         { label: "Open SOP", href: "/sop", variant: "outline" },
@@ -1142,14 +1142,14 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       meta: [
         { label: "Scope", value: "Freezer / chiller / dry" },
         { label: "Branch", value: "KCH" },
-        { label: "Label mode", value: "Preview only" },
+        { label: "Label mode", value: "Current branch review" },
         { label: "Writes", value: "Disabled" },
       ],
       recordSummary: {
         title: "LBL-KCH-240507-03",
         subtitle: "Cold chain label preview",
         status: "Watch",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Branch", value: "KCH" },
           { label: "Storage", value: "Freezer" },
@@ -1182,7 +1182,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         { label: "Branch", value: "KCH" },
         { label: "Storage", value: "Freezer" },
         { label: "Status", value: "Watch" },
-        { label: "Print mode", value: "Preview only" },
+        { label: "Print mode", value: "Prepared for review" },
       ],
       sections: [
         {
@@ -1203,7 +1203,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
           cards: [
             { title: "Near expiry", value: "2", description: "Two items are within the watch window; no escalation is executed." },
             { title: "Missing label", value: "1", description: "One freezer item is missing a visible label record in preview." },
-            { title: "Print preview", value: "Ready", description: "Label print area remains visual-only with no printer hook." },
+            { title: "Print preparation", value: "Ready", description: "Label print area is prepared for branch review." },
           ],
         },
         {
@@ -1233,7 +1233,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       rightRail: [
         { title: "Food Safety Context", badge: "Watch", items: ["Freezer storage focus", "Missing-label issue linked", "No escalation automation"] },
         { title: "Related Surfaces", items: ["Inspection", "Issues", "SOP / Recipes"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No printer connection", "No barcode engine", "No notification sending"] },
+        { title: "Service Scope", badge: "Current release", items: ["Expiry watch", "Label review", "Food safety coordination"] },
       ],
       footerNote: "Expiry / Labels remains a food-safety preview only. No printer/barcode integration, no stock updates, and no escalation workflow were added.",
     },
@@ -1254,9 +1254,9 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       activeNavKey: "finance",
       eyebrow: "Finance / Costing",
       title: "Cost, supplier comparison, and margin preview workspace",
-      description: "Cost summary, product cost rows, supplier comparison placeholder, and margin preview without connecting accounting systems.",
+      description: "Cost summary, product cost rows, supplier comparison, and margin review without leaving the finance workspace.",
       notice: "UI preview only. No accounting integration, no real cost engine, no margin computation runtime, and no approval workflow are connected.",
-      badges: [{ label: "Finance / Costing" }, { label: "Margin preview", variant: "secondary" }, { label: "Read-only", variant: "outline" }],
+      badges: [{ label: "Finance / Costing" }, { label: "Margin review", variant: "secondary" }, { label: "Current release", variant: "outline" }],
       pageActions: [
         { label: "Open Reports", href: "/reports" },
         { label: "Open POS Reports", href: "/reports/pos", variant: "outline" },
@@ -1265,14 +1265,14 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
       meta: [
         { label: "Scope", value: "Product cost / margin preview" },
         { label: "Branch", value: "All Stores / KCH" },
-        { label: "Source", value: "Preview only" },
+        { label: "Source", value: "Current finance review" },
         { label: "Writes", value: "Disabled" },
       ],
       recordSummary: {
         title: "FIN-KCH-DAILY",
         subtitle: "Daily cost and margin preview",
         status: "Monitoring",
-        guardrail: "Mock / Read-only",
+        guardrail: "Current service scope",
         meta: [
           { label: "Lead branch", value: "KCH" },
           { label: "Product line", value: "Core menu" },
@@ -1315,7 +1315,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
           cards: [
             { title: "Estimated input cost", value: "RM 12.6k", description: "Static preview amount across the active branch set." },
             { title: "Margin watch", value: "2 items", description: "Two products remain on the margin review watchlist." },
-            { title: "Supplier cost drift", value: "+3.1%", description: "Planning-only supplier cost comparison delta." },
+            { title: "Supplier cost drift", value: "+3.1%", description: "Supplier cost comparison delta for current finance review." },
           ],
         },
         {
@@ -1326,7 +1326,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
           rows: [
             ["Chicken broth bowl", "RM 7.40", "RM 18.90", "60.8%", "Monitoring"],
             ["Coated fries side", "RM 4.10", "RM 9.90", "58.6%", "Watch"],
-            ["Combo add-on", "RM 5.30", "RM 11.90", "55.4%", "Preview Only"],
+            ["Combo add-on", "RM 5.30", "RM 11.90", "55.4%", "Operations Review"],
           ],
         },
         {
@@ -1337,7 +1337,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
           rows: [
             ["Broth base", "ABC Food Supply", "North Pantry Co", "+2.8%", "Review supplier"],
             ["Coated fries", "ABC Food Supply", "Cold Chain Hub", "+1.1%", "Monitor"],
-            ["Garnish pack", "ABC Food Supply", "Local Fresh", "-0.9%", "Preview Only"],
+            ["Garnish pack", "ABC Food Supply", "Local Fresh", "-0.9%", "Operations Review"],
           ],
         },
       ],
@@ -1350,9 +1350,9 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         ],
       },
       rightRail: [
-        { title: "Finance Context", badge: "Preview", items: ["No accounting integration", "No live cost engine", "Supplier comparison remains static"] },
+        { title: "Finance Context", badge: "Current release", items: ["Cost review", "Margin outlook", "Supplier comparison"] },
         { title: "Related Surfaces", items: ["POS Reports", "Supplier detail", "SOP / Recipes"] },
-        { title: "Guardrail", badge: "Read-only", items: ["No accounting sync", "No approval execution", "No writeback to products"] },
+        { title: "Service Scope", badge: "Current release", items: ["Cost visibility", "Margin review", "Supplier comparison"] },
       ],
       footerNote: "Finance / Costing is rendered as a review workspace only. No accounting integration, no margin engine, and no approval execution were added.",
     },

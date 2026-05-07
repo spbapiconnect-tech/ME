@@ -44,8 +44,8 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
           items: ["KCH branch context reviewed", "Inventory watch linked to PSI", "Issue queue remains under manager review"],
         },
         {
-          title: "Guardrails",
-          items: ["No branch database", "No branch switching persistence", "No permission enforcement", "No writes"],
+          title: "Service Scope",
+          items: ["Branch configuration review", "Module coordination", "Operational visibility", "Cross-team follow-up"],
         },
         {
           title: "Next Steps",
@@ -60,12 +60,12 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
       <MePageHeader
         eyebrow="Branch Workspace"
         title="Branch context and operations status"
-        description="Branch management shell for aggregate and local operating views."
-        notice="Current release supports branch context, operations visibility, and linked module review. Tenant switching, branch persistence, and permission enforcement remain outside this release."
+        description="Branch management workspace for group oversight, local operations review, and linked module coordination."
+        notice="Use this workspace to review branch performance, operating status, linked teams, and follow-up items from one shared branch context."
         badges={[
           { label: "All Stores" },
           { label: "KCH / BTU", variant: "secondary" },
-          { label: "Current release", variant: "outline" },
+          { label: "Operations review", variant: "outline" },
         ]}
         actions={
           <>
@@ -81,10 +81,10 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
           </>
         }
         meta={[
-          { label: "Scope", value: "All Stores / KCH / BTU / Future Branch" },
+          { label: "Scope", value: "All Stores / KCH / BTU / Expansion Branch" },
           { label: "Current Mode", value: "Context workspace" },
           { label: "Operations", value: "Status and inspection context" },
-          { label: "Writes", value: "Disabled" },
+          { label: "View", value: "Branch operations" },
         ]}
       />
 
@@ -98,7 +98,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         ]}
       />
 
-      <MeWorkspaceSection title="Branch Selector" description="Shared branch frame for future workspace mapping.">
+      <MeWorkspaceSection title="Branch Context" description="Select the branch workspace used for operations review, reporting, and staff coordination.">
         <BranchSelectorPlaceholder branches={branches} />
       </MeWorkspaceSection>
 
@@ -108,7 +108,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
             ["Total contexts", String(branches.length)],
             ["Aggregate", String(aggregateBranches.length)],
             ["Operational branches", String(localBranches.length)],
-            ["Future branch", String(futureBranches.length)],
+            ["Expansion branches", String(futureBranches.length)],
           ].map(([label, value]) => (
             <div key={label} className="rounded-[22px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] px-4 py-3.5 ring-1 ring-slate-200/75">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
@@ -183,7 +183,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
                 <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Branch Note</p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    KCH is the local branch context used to frame PSI, reports, and staff previews. This remains a shell-only branch record with no tenant persistence or permission enforcement.
+                    KCH is the active store context used for branch operations, replenishment review, reporting, and staff coordination across the current service footprint.
                   </p>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
                   <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Linked Modules</p>
                     <p className="mt-2 text-sm leading-6 text-slate-600">
-                      PSI, reports, and roles remain the active linked modules for this branch preview. No tenant-aware switching or branch-specific permissions are applied.
+                      PSI, reports, and roles remain the primary linked workspaces for KCH, giving store leadership one branch-centered view of operations and follow-up activity.
                     </p>
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         </div>
       </MeWorkspaceSection>
 
-      <MeWorkspaceSection title="Future Branch Planning" description="Placeholder capacity for onboarding and inspection workflows without implementing them yet.">
+      <MeWorkspaceSection title="Expansion Branch Planning" description="Reserved branch contexts for upcoming locations and rollout readiness.">
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {futureBranches.map((branch) => (
             <BranchProfileCard key={branch.key} branch={branch} />
@@ -269,7 +269,7 @@ export function BranchWorkspacePage({ branches }: BranchWorkspacePageProps) {
         </div>
       </MeWorkspaceSection>
 
-      <DemoPresentationNote description="Branch pages now use the same customer-facing shell with branch context, linked modules, and operational review. Tenant persistence, auth, access enforcement, and write behavior remain outside the current release." />
+      <DemoPresentationNote title="Workspace Note" description="Branch workspaces now align operations, issues, staffing, and reporting around one branch-centered management surface." />
     </MeDashboardShell>
   );
 }

@@ -28,7 +28,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         eyebrow="PSI Inventory"
         title="Inventory stock detail"
         description="Stock profile, movement context, expiry visibility, and linked procurement records using the shared detail pattern."
-        notice={`Source: ${source}. ${isMock ? "Current data is served through the product catalog layer." : "Current data is served through the connected source layer."} This release supports stock visibility, risk tracking, and procurement linkage. Posting, stock updates, and execution flows remain outside this release.`}
+        notice={`Source: ${source}. ${isMock ? "This workspace is currently published through the shared catalog layer." : "This workspace is currently published through the connected service layer."} Use it to review stock position, movement history, expiry watch, and replenishment linkage.`}
         badges={[
           { label: "Inventory detail" },
           { label: "Warehouse workspace", variant: "secondary" },
@@ -203,7 +203,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         }
       />
 
-      <DemoPresentationNote description="Inventory detail now uses the shared production detail-workspace pattern. Stock posting, movement execution, and write behavior remain scheduled for later phases." />
+      <DemoPresentationNote title="Workspace Note" description="Inventory detail brings stock position, movement review, supplier linkage, and replenishment context into one operational record page." />
     </MeDashboardShell>
   );
 }
