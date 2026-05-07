@@ -38,4 +38,17 @@ export const erpBranchRows = [
     inspection: "88%",
     lastUpdate: "08:30",
   },
+  {
+    id: "HQ-001",
+    branchCode: "HQ-001",
+    branchName: "Head Office",
+    region: "HQ",
+    manager: "Admin",
+    status: "Active",
+    todaySales: "-",
+    openTasks: 1,
+    stockAlerts: 0,
+    inspection: "-",
+    lastUpdate: "Yesterday",
+  },
 ];

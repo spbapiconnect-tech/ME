@@ -37,40 +37,42 @@ export function ErpTopbar() {
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-border bg-card/80 backdrop-blur-md px-6">
-      <div className="relative flex-1 max-w-[400px] group">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-        <Input
-          type="search"
-          placeholder={dict.common.search + "..."}
-          className="h-9 w-full rounded-md bg-muted/40 border-transparent hover:bg-muted/60 focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-all pl-10"
-        />
+      <div className="flex items-center gap-4 flex-1">
+        <div className="relative w-full max-w-[320px] group">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input
+            type="search"
+            placeholder={dict.common.search + "..."}
+            className="h-9 w-full rounded-md bg-muted/40 border-transparent hover:bg-muted/60 focus-visible:bg-background focus-visible:ring-1 focus-visible:ring-primary/30 focus-visible:border-primary/30 transition-all pl-10"
+          />
+        </div>
+
+        <div className="hidden md:flex items-center gap-2">
+          <Select defaultValue="all">
+            <SelectTrigger className="h-8 w-[140px] text-xs border-transparent bg-muted/40 hover:bg-muted/60 transition-colors">
+              <SelectValue placeholder={dict.common.allBranches} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{dict.common.allBranches}</SelectItem>
+              <SelectItem value="kuching">Kuching</SelectItem>
+              <SelectItem value="bintulu">Bintulu</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select defaultValue="7d">
+            <SelectTrigger className="h-8 w-[120px] text-xs border-transparent bg-muted/40 hover:bg-muted/60 transition-colors">
+              <SelectValue placeholder="Date Range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="7d">Last 7 days</SelectItem>
+              <SelectItem value="30d">Last 30 days</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Select defaultValue="all">
-          <SelectTrigger className="h-8 w-[140px] text-xs border-transparent bg-muted/40 hover:bg-muted/60 transition-colors">
-            <SelectValue placeholder={dict.common.allBranches} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{dict.common.allBranches}</SelectItem>
-            <SelectItem value="kuching">Kuching</SelectItem>
-            <SelectItem value="bintulu">Bintulu</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select defaultValue="7d">
-          <SelectTrigger className="h-8 w-[120px] text-xs border-transparent bg-muted/40 hover:bg-muted/60 transition-colors">
-            <SelectValue placeholder="Date Range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="7d">Last 7 days</SelectItem>
-            <SelectItem value="30d">Last 30 days</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="ml-auto flex items-center gap-1">
+      <div className="flex items-center gap-1">
         <div className="flex items-center gap-1 mr-2 pr-2 border-r">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

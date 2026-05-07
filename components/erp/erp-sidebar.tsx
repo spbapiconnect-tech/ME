@@ -1,13 +1,77 @@
 "use client";
 
 import Link from "next/link";
-import { erpNavigation } from "@/lib/erp/erp-module-schema";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { useDictionary } from "@/lib/i18n";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  LayoutDashboard, 
+  Store, 
+  ClipboardList, 
+  AlertCircle, 
+  ListTodo, 
+  BarChart3, 
+  Truck, 
+  Users, 
+  Warehouse, 
+  History, 
+  CalendarDays, 
+  GraduationCap, 
+  ShieldCheck, 
+  Settings, 
+  LayoutGrid 
+} from "lucide-react";
 
-const groupKeys = ["dashboard", "storeOperations", "psi", "workforce", "business", "system"] as const;
+const navigationGroups = [
+  {
+    key: "dashboard",
+    items: [
+      { key: "dashboard", href: "/", icon: LayoutDashboard },
+    ]
+  },
+  {
+    key: "storeOperations",
+    items: [
+      { key: "branches", href: "/branches", icon: Store },
+      { key: "inspection", href: "/inspection", icon: ClipboardList },
+      { key: "issues", href: "/issues", icon: AlertCircle },
+      { key: "tasks", href: "/tasks", icon: ListTodo },
+    ]
+  },
+  {
+    key: "psi",
+    items: [
+      { key: "psiOverview", href: "/psi", icon: BarChart3 },
+      { key: "procurement", href: "/psi/procurement", icon: Truck },
+      { key: "supplier", href: "/psi/supplier", icon: Users },
+      { key: "inventory", href: "/psi/inventory", icon: Warehouse },
+      { key: "receiving", href: "/psi/receiving", icon: History },
+    ]
+  },
+  {
+    key: "workforce",
+    items: [
+      { key: "staff", href: "/staff", icon: Users },
+      { key: "schedule", href: "/schedule", icon: CalendarDays },
+      { key: "training", href: "/training", icon: GraduationCap },
+    ]
+  },
+  {
+    key: "business",
+    items: [
+      { key: "reports", href: "/reports", icon: BarChart3 },
+      { key: "rolesPermission", href: "/roles", icon: ShieldCheck },
+    ]
+  },
+  {
+    key: "system",
+    items: [
+      { key: "settings", href: "/settings", icon: Settings },
+      { key: "integration", href: "/integration", icon: LayoutGrid },
+    ]
+  }
+] as const;
 
 export function ErpSidebar({ activeHref }: { activeHref?: string }) {
   const pathname = usePathname();
@@ -15,7 +79,7 @@ export function ErpSidebar({ activeHref }: { activeHref?: string }) {
   const dict = useDictionary();
 
   return (
-    <aside className="fixed left-0 top-0 bottom-0 z-40 w-[240px] border-r border-border bg-card flex flex-col">
+    <aside className="h-screen sticky top-0 border-r border-border bg-card flex flex-col">
       <div className="flex h-14 items-center gap-3 px-6 border-b border-border/50 shrink-0">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground shadow-lg shadow-primary/20">
           ME
@@ -28,33 +92,26 @@ export function ErpSidebar({ activeHref }: { activeHref?: string }) {
 
       <ScrollArea className="flex-1 py-6">
         <nav className="flex flex-col gap-6 px-3">
-          {groupKeys.map((groupKey) => {
-            const groupName = dict.sidebar[groupKey as keyof typeof dict.sidebar];
-            // Map group names back to erpNavigation groups which might be English
-            // This is a bit tricky, I'll assume erpNavigation groups are stable
-            const navGroup = groupKey === "dashboard" ? "Dashboard" : 
-                            groupKey === "storeOperations" ? "Store Operations" :
-                            groupKey === "psi" ? "PSI" :
-                            groupKey === "workforce" ? "Workforce" :
-                            groupKey === "business" ? "Business" : "System";
+          {navigationGroups.map((group) => {
+            const groupName = dict.sidebar[group.key as keyof typeof dict.sidebar];
             
-            const items = erpNavigation.filter((item) => item.group === navGroup);
-            if (!items.length) return null;
-
             return (
-              <div key={groupKey} className="px-1">
+              <div key={group.key} className="px-1">
                 <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60">
                   {groupName}
                 </div>
                 <div className="space-y-0.5">
-                  {items.map((item) => {
+                  {group.items.map((item) => {
                     const active = currentHref === item.href || (item.href !== "/" && currentHref.startsWith(item.href));
+                    const Icon = item.icon;
+                    const label = dict.sidebar[item.key as keyof typeof dict.sidebar];
+
                     return (
                       <Link
                         key={item.href}
                         href={item.href}
                         className={cn(
-                          "relative flex h-9 items-center rounded-md px-3 text-sm transition-all group",
+                          "relative flex h-9 items-center rounded-md px-3 text-sm transition-all group gap-3",
                           active 
                             ? "bg-primary/5 text-primary font-medium" 
                             : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
@@ -63,7 +120,8 @@ export function ErpSidebar({ activeHref }: { activeHref?: string }) {
                         {active && (
                           <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full bg-primary" />
                         )}
-                        {item.label}
+                        <Icon className={cn("h-4 w-4", active ? "text-primary" : "text-muted-foreground group-hover:text-foreground")} />
+                        {label}
                       </Link>
                     );
                   })}
