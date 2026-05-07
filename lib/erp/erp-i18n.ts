@@ -25,14 +25,10 @@ export const erpDictionary = {
   viewReports: { en: "View Reports", zh: "查看报表" },
   openTasks: { en: "Open Tasks", zh: "打开任务" },
   openDetail: { en: "Open Detail", zh: "查看详情" },
-  createTask: { en: "Create Task", zh: "创建任务" },
   save: { en: "Save", zh: "保存" },
   cancel: { en: "Cancel", zh: "取消" },
   search: { en: "Search", zh: "搜索" },
   status: { en: "Status", zh: "状态" },
-  manager: { en: "Manager", zh: "经理" },
-  region: { en: "Region", zh: "区域" },
-  lastUpdate: { en: "Last Update", zh: "最后更新" },
 } as const;
 
 export type ErpDictionaryKey = keyof typeof erpDictionary;

@@ -1,6 +1,4 @@
 export { BranchActionPanel } from "./branch-action-panel";
-export { BranchErpDetailPage } from "./branch-erp-detail-page";
-export { BranchErpPage } from "./branch-erp-page";
 export { BranchManagementFigmaPage } from "./branch-management-figma-page";
 export { BranchChip } from "./branch-chip";
 export { BranchMetricCard } from "./branch-metric-card";

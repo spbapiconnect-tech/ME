@@ -81,7 +81,6 @@ export type ErpColumnType =
   | "number"
   | "count"
   | "quantity"
-  | "percent"
   | "percentage"
   | "score"
   | "status"
@@ -91,17 +90,12 @@ export type ErpColumnType =
   | "time"
   | "action";
 
-export type ErpColumnAlign = "left" | "center" | "right";
-
-export interface ErpDataTableColumn<TRecord> {
+export interface ErpDataTableColumn<TRecord extends { id: string }> {
   key: keyof TRecord & string;
   label: string;
   type?: ErpColumnType;
-  align?: ErpColumnAlign;
   width?: string;
   render?: (record: TRecord) => ReactNode;
-  sortable?: boolean;
-  visible?: boolean;
 }
 
 export interface ErpKpiItem {

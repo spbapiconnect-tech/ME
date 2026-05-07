@@ -1,5 +1,5 @@
-import { BranchErpPage } from "@/components/branches/branch-erp-page";
+import { BranchManagementFigmaPage } from "@/components/branches/branch-management-figma-page";
 
 export default function BranchesPage() {
-  return <BranchErpPage />;
+  return <BranchManagementFigmaPage />;
 }

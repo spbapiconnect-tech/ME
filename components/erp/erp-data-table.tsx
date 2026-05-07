@@ -13,7 +13,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ErpEmptyState } from "@/components/erp/erp-empty-state";
 import { ErpErrorState } from "@/components/erp/erp-error-state";
 import { ErpLoadingState } from "@/components/erp/erp-loading-state";
@@ -29,7 +28,6 @@ const rightAlignedTypes: ErpColumnType[] = [
   "number",
   "count",
   "quantity",
-  "percent",
   "percentage",
   "score",
   "date",
@@ -38,10 +36,7 @@ const rightAlignedTypes: ErpColumnType[] = [
 
 const centerAlignedTypes: ErpColumnType[] = ["status", "priority", "badge", "action"];
 
-function alignClassName(type: ErpColumnType = "text", align?: "left" | "center" | "right") {
-  if (align === "right") return "text-right tabular-nums";
-  if (align === "center") return "text-center";
-  if (align === "left") return "text-left";
+function alignClassName(type: ErpColumnType = "text") {
   if (rightAlignedTypes.includes(type)) return "text-right tabular-nums";
   if (centerAlignedTypes.includes(type)) return "text-center";
   return "text-left";
@@ -64,91 +59,78 @@ function defaultStatusTone(value: ReactNode) {
 
 export function ErpDataTable<TRecord extends ErpRecord>({
   columns,
-  data,
   records,
   selectedId,
   selectable = false,
   loading = false,
   error,
-  emptyMessage = "No records",
+  emptyTitle = "No records",
+  emptyDescription,
   onRowSelect,
   onOpenDetail,
-  rowActions,
-  density = "default",
-  className,
-  getRowId = (record) => record.id,
 }: {
   columns: Array<ErpDataTableColumn<TRecord>>;
-  data?: TRecord[];
-  records?: TRecord[];
+  records: TRecord[];
   selectedId?: string;
   selectable?: boolean;
   loading?: boolean;
   error?: string;
-  emptyMessage?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
   onRowSelect?: (record: TRecord) => void;
   onOpenDetail?: (record: TRecord) => void;
-  rowActions?: (record: TRecord) => ReactNode;
-  density?: "compact" | "default" | "comfortable";
-  className?: string;
-  getRowId?: (record: TRecord) => string;
 }) {
-  const rows = data ?? records ?? [];
-  const visibleColumns = columns.filter((column) => column.visible !== false);
-  const rowHeight = density === "compact" ? "h-11" : density === "comfortable" ? "h-14" : "h-12";
-
   if (loading) return <ErpLoadingState />;
   if (error) return <ErpErrorState title="Unable to load records" description={error} />;
-  if (!rows.length) return <ErpEmptyState title={emptyMessage} />;
+  if (!records.length) return <ErpEmptyState title={emptyTitle} description={emptyDescription} />;
 
   return (
-    <div className={cn("rounded-xl border bg-card shadow-sm", className)}>
+    <div className="rounded-lg border bg-card shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow className="h-11 bg-muted/50 hover:bg-muted/50">
+          <TableRow className="h-11 bg-muted/45 hover:bg-muted/45">
             {selectable ? (
               <TableHead className="w-10 px-4 text-center">
                 <span className="sr-only">Select</span>
               </TableHead>
             ) : null}
-            {visibleColumns.map((column) => (
+            {columns.map((column) => (
               <TableHead
                 key={column.key}
                 style={column.width ? { width: column.width } : undefined}
-                className={cn("h-11 px-4 text-xs font-semibold uppercase text-muted-foreground", alignClassName(column.type, column.align))}
+                className={cn("h-11 px-4 text-xs font-semibold uppercase text-muted-foreground", alignClassName(column.type))}
               >
                 {column.label}
               </TableHead>
             ))}
-            {onOpenDetail || rowActions ? <TableHead className="h-11 px-4 text-right text-xs font-semibold uppercase text-muted-foreground">Action</TableHead> : null}
+            {onOpenDetail ? <TableHead className="h-11 px-4 text-right text-xs font-semibold uppercase text-muted-foreground">Action</TableHead> : null}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rows.map((record) => {
-            const rowId = getRowId(record);
-
-            return (
+          {records.map((record) => (
             <TableRow
-              key={rowId}
-              data-state={selectedId === rowId ? "selected" : undefined}
+              key={record.id}
+              data-state={selectedId === record.id ? "selected" : undefined}
               onClick={() => onRowSelect?.(record)}
-              className={cn(rowHeight, "cursor-pointer hover:bg-primary/5", selectedId === rowId && "bg-primary/10")}
+              className={cn("h-12 cursor-pointer hover:bg-primary/5", selectedId === record.id && "bg-primary/5")}
             >
               {selectable ? (
                 <TableCell className="px-4 text-center">
-                  <Checkbox
+                  <input
                     aria-label={`Select ${record.id}`}
-                    checked={selectedId === rowId}
-                    onCheckedChange={() => onRowSelect?.(record)}
+                    type="checkbox"
+                    checked={selectedId === record.id}
+                    onChange={() => onRowSelect?.(record)}
+                    className="size-4 rounded border-input"
                   />
                 </TableCell>
               ) : null}
-              {visibleColumns.map((column) => {
+              {columns.map((column) => {
                 const value = column.render ? column.render(record) : formatCellValue(record[column.key]);
                 const type = column.type ?? "text";
 
                 return (
-                  <TableCell key={`${rowId}-${column.key}`} className={cn("px-4 py-3 text-[13px]", alignClassName(type, column.align))}>
+                  <TableCell key={`${record.id}-${column.key}`} className={cn("px-4 py-3 text-[13px]", alignClassName(type))}>
                     {type === "id" || type === "code" ? (
                       record.detailHref ? (
                         <Link href={record.detailHref} className="font-semibold text-primary hover:underline">
@@ -169,27 +151,22 @@ export function ErpDataTable<TRecord extends ErpRecord>({
                   </TableCell>
                 );
               })}
-              {onOpenDetail || rowActions ? (
+              {onOpenDetail ? (
                 <TableCell className="px-4 text-right">
-                  {rowActions ? (
-                    rowActions(record)
-                  ) : (
-                    <Button
-                      size="xs"
-                      variant="outline"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        onOpenDetail?.(record);
-                      }}
-                    >
-                      Open Detail
-                    </Button>
-                  )}
+                  <Button
+                    size="xs"
+                    variant="outline"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onOpenDetail(record);
+                    }}
+                  >
+                    Open Detail
+                  </Button>
                 </TableCell>
               ) : null}
             </TableRow>
-            );
-          })}
+          ))}
         </TableBody>
       </Table>
     </div>
