@@ -1,5 +1,5 @@
-import { BranchManagementFigmaPage } from "@/components/branches/branch-management-figma-page";
+import { BranchManagement } from "@/components/branches/branch-management-figma-source";
 
 export default function BranchesPage() {
-  return <BranchManagementFigmaPage />;
+  return <BranchManagement />;
 }
