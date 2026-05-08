@@ -172,12 +172,12 @@ const [selectedId, setSelectedId] = useState("KCH-001");
           zhTitle="门店管理"
           subtitle="Manage branch operating status, performance, staffing, tasks, and alerts across all stores."
           actions={
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-end gap-2">
               <Sheet>
                 <SheetTrigger asChild>
                   <Button size="sm" className="gap-2">
                     <Plus className="h-4 w-4" />
-                    <span>Add Branch</span>
+                    <span className="hidden sm:inline">Add Branch</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent>
@@ -214,17 +214,17 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 </SheetContent>
               </Sheet>
 
-              <Button variant="outline" size="sm" onClick={handleExport} className="gap-2">
+              <Button variant="outline" size="sm" onClick={handleExport} className="hidden gap-2 md:inline-flex">
                 <Download className="h-4 w-4" />
                 <span>Export</span>
               </Button>
               
-              <Button variant="outline" size="sm" onClick={() => router.push("/reports?module=branches")} className="gap-2">
+              <Button variant="outline" size="sm" onClick={() => router.push("/reports?module=branches")} className="hidden gap-2 md:inline-flex">
                 <FileText className="h-4 w-4" />
                 <span>View Reports</span>
               </Button>
 
-              <Button variant="outline" size="sm" onClick={() => router.push("/tasks?module=branches")} className="gap-2">
+              <Button variant="outline" size="sm" onClick={() => router.push("/tasks?module=branches")} className="hidden gap-2 md:inline-flex">
                 <CheckSquare className="h-4 w-4" />
                 <span>Open Tasks</span>
               </Button>
@@ -236,6 +236,15 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="md:hidden" onClick={handleExport}>
+                    Export
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="md:hidden" onClick={() => router.push("/reports?module=branches")}>
+                    View Reports
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="md:hidden" onClick={() => router.push("/tasks?module=branches")}>
+                    Open Tasks
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Import Branches</DropdownMenuItem>
                   <DropdownMenuItem>Batch Edit</DropdownMenuItem>
                   <DropdownMenuItem className="text-destructive">Delete Archive</DropdownMenuItem>
