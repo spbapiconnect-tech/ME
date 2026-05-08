@@ -292,24 +292,24 @@ export function BranchErpPage() {
           }
         />
 
-        {/* Main Content Layout */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* Table Area */}
-          <div className="lg:col-span-8 space-y-6">
-            <ErpDataTable
-              columns={branchColumns}
-              data={erpBranchRows}
-              getRowId={(row) => row.id}
-              selectedId={selectedId}
-              onRowSelect={(row) => setSelectedId(row.id)}
-              onOpenDetail={(row) => router.push(`/branches/${row.id}`)}
-              rowActions={(row) => (
-                <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              )}
-            />
+        {/* Branch Directory */}
+        <ErpDataTable
+          columns={branchColumns}
+          data={erpBranchRows}
+          getRowId={(row) => row.id}
+          selectedId={selectedId}
+          onRowSelect={(row) => setSelectedId(row.id)}
+          onOpenDetail={(row) => router.push(`/branches/${row.id}`)}
+          rowActions={() => (
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          )}
+        />
 
+        {/* Detail + Right Rail */}
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="min-w-0 space-y-6">
             {/* Detail Panel */}
             <ErpDetailPanel
               title={selected.branchName}
@@ -493,7 +493,7 @@ export function BranchErpPage() {
           </div>
 
           {/* Right Rail */}
-          <div className="lg:col-span-4 space-y-6">
+          <div className="min-w-0 space-y-6">
             <ErpRightRail title="Branch Insights">
               <div className="p-4 space-y-4">
                 <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
