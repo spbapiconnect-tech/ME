@@ -195,3 +195,142 @@
   overflow-y: auto;
   padding: 20px 24px;
 }
+
+/* =========================================================
+   ME THEME PALETTE
+   Color-only patch. Do not put layout/component styles here.
+   Bright = clean SaaS
+   Dark   = Trae IDE inspired
+   Moon   = premium blue night
+   ========================================================= */
+
+:root,
+[data-theme="bright"] {
+  --background: #f6f8fb;
+  --foreground: #0f172a;
+
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #93c5fd;
+
+  --erp-app: #f6f8fb;
+  --erp-sidebar: #ffffff;
+  --erp-topbar: #ffffff;
+  --erp-surface: #ffffff;
+  --erp-surface-soft: #f8fafc;
+  --erp-control: #ffffff;
+  --erp-control-hover: #f1f5f9;
+  --erp-control-border: #e2e8f0;
+  --erp-elevated: #ffffff;
+  --erp-text: #0f172a;
+  --erp-muted: #64748b;
+  --erp-primary: #2563eb;
+}
+
+.dark,
+[data-theme="dark"] {
+  --background: #161719;
+  --foreground: #d9dbe0;
+
+  --card: #1a1b1d;
+  --card-foreground: #d9dbe0;
+
+  --popover: #1a1b1d;
+  --popover-foreground: #d9dbe0;
+
+  --primary: #22c55e;
+  --primary-foreground: #07110b;
+
+  --secondary: #202224;
+  --secondary-foreground: #d9dbe0;
+
+  --muted: #202224;
+  --muted-foreground: #8f949e;
+
+  --accent: #202224;
+  --accent-foreground: #d9dbe0;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #2b2d31;
+  --input: #2b2d31;
+  --ring: #22c55e;
+
+  --erp-app: #161719;
+  --erp-sidebar: #1a1b1d;
+  --erp-topbar: #222427;
+  --erp-surface: #1a1b1d;
+  --erp-surface-soft: #202224;
+  --erp-control: #202224;
+  --erp-control-hover: #26282c;
+  --erp-control-border: #2b2d31;
+  --erp-elevated: #1d1f22;
+  --erp-text: #d9dbe0;
+  --erp-muted: #8f949e;
+  --erp-primary: #22c55e;
+}
+
+[data-theme="moon"] {
+  --background: #0d1426;
+  --foreground: #eef2ff;
+
+  --card: #151d33;
+  --card-foreground: #eef2ff;
+
+  --popover: #151d33;
+  --popover-foreground: #eef2ff;
+
+  --primary: #8ea7ff;
+  --primary-foreground: #0d1426;
+
+  --secondary: #1d2740;
+  --secondary-foreground: #eef2ff;
+
+  --muted: #1d2740;
+  --muted-foreground: #a7b4cc;
+
+  --accent: #202b45;
+  --accent-foreground: #eef2ff;
+
+  --destructive: #fb7185;
+  --destructive-foreground: #ffffff;
+
+  --border: #3a4663;
+  --input: #3a4663;
+  --ring: #8ea7ff;
+
+  --erp-app: #0d1426;
+  --erp-sidebar: #111a30;
+  --erp-topbar: #151f38;
+  --erp-surface: #151d33;
+  --erp-surface-soft: #1d2740;
+  --erp-control: #202b45;
+  --erp-control-hover: #273452;
+  --erp-control-border: #3a4663;
+  --erp-elevated: #151d33;
+  --erp-text: #eef2ff;
+  --erp-muted: #a7b4cc;
+  --erp-primary: #8ea7ff;
+}
