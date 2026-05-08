@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 export function ErpDetailPanel({
   title,
   subtitle,
+  status,
   badge,
   actions,
   tabs,
@@ -16,6 +17,7 @@ export function ErpDetailPanel({
 }: {
   title: string;
   subtitle?: string;
+  status?: string;
   badge?: ReactNode;
   actions?: ReactNode;
   tabs?: string[];
@@ -30,6 +32,11 @@ export function ErpDetailPanel({
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="truncate text-base font-semibold text-foreground sm:text-lg">{title}</h2>
             {badge}
+            {!badge && status ? (
+              <span className="rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-primary">
+                {status}
+              </span>
+            ) : null}
           </div>
           {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
         </div>
