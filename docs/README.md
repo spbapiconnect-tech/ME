@@ -96,3 +96,7 @@ After this governance pass, future UI changes must follow:
 ## UI System
 
 - [ME shadcn UI System](./ME_SHADCN_UI_SYSTEM.md)
+
+## UI Standards
+
+- [ME Responsive UI Standard](./ME_RESPONSIVE_UI_STANDARD.md)
