@@ -2,14 +2,25 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+type CardProps = React.HTMLAttributes<HTMLDivElement> & {
+  size?: "sm" | "default" | "lg";
+}
+
+const cardSizeClass: Record<NonNullable<CardProps["size"]>, string> = {
+  sm: "rounded-md",
+  default: "rounded-lg",
+  lg: "rounded-xl",
+}
+
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  CardProps
+>(({ className, size = "default", ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "border bg-card text-card-foreground shadow-sm",
+      cardSizeClass[size],
       className
     )}
     {...props}

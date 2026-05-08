@@ -14,7 +14,6 @@ import { ErpEmptyState } from "./erp-empty-state";
 import { ErpErrorState } from "./erp-error-state";
 import { ErpLoadingState } from "./erp-loading-state";
 import { ErpStatusBadge } from "./erp-status-badge";
-import { cn } from "@/lib/utils";
 
 export type ErpColumnType =
   | "id"
@@ -60,43 +59,72 @@ export type ErpDataTableProps<T> = {
 function alignmentFor(type?: ErpColumnType, align?: "left" | "center" | "right") {
   if (align) return align;
 
-  switch (type) {
-    case "amount":
-    case "number":
-    case "percent":
-    case "score":
-    case "date":
-    case "time":
-      return "right";
-    case "status":
-    case "priority":
-    case "badge":
-      return "center";
-    case "action":
-      return "right";
-    default:
-      return "left";
+  if (
+    type === "amount" ||
+    type === "number" ||
+    type === "percent" ||
+    type === "score" ||
+    type === "date" ||
+    type === "time"
+  ) {
+    return "right";
   }
+
+  if (type === "status" || type === "priority" || type === "badge" || type === "action") {
+    return "center";
+  }
+
+  return "left";
+}
+
+function alignmentClass(align: "left" | "center" | "right") {
+  if (align === "right") return "text-right";
+  if (align === "center") return "text-center";
+  return "text-left";
 }
 
 function cellClass(type?: ErpColumnType) {
-  switch (type) {
-    case "amount":
-    case "number":
-    case "percent":
-    case "score":
-      return "font-medium tabular-nums text-foreground";
-    case "date":
-    case "time":
-      return "tabular-nums text-muted-foreground";
-    case "id":
-    case "code":
-      return "font-medium text-primary hover:underline cursor-pointer";
-    case "name":
-      return "font-medium text-foreground";
-    default:
-      return "text-muted-foreground";
+  if (type === "amount" || type === "number" || type === "percent" || type === "score") {
+    return "font-medium tabular-nums text-foreground whitespace-nowrap";
   }
+
+  if (type === "date" || type === "time") {
+    return "tabular-nums text-muted-foreground whitespace-nowrap";
+  }
+
+  if (type === "id" || type === "code") {
+    return "font-medium text-primary whitespace-nowrap";
+  }
+
+  if (type === "name") {
+    return "font-medium text-foreground whitespace-nowrap";
+  }
+
+  if (type === "status" || type === "priority" || type === "badge") {
+    return "whitespace-nowrap";
+  }
+
+  return "text-muted-foreground whitespace-nowrap";
+}
+
+function widthClass(type?: ErpColumnType) {
+  if (type === "code" || type === "id") return "min-w-[92px]";
+  if (type === "name") return "min-w-[170px]";
+  if (type === "amount") return "min-w-[120px]";
+  if (type === "status") return "min-w-[120px]";
+  if (type === "number" || type === "badge") return "min-w-[86px]";
+  if (type === "percent" || type === "score") return "min-w-[96px]";
+  if (type === "date" || type === "time") return "min-w-[108px]";
+  if (type === "action") return "min-w-[88px]";
+  return "min-w-[110px]";
+}
+
+function CountBadge({ value }: { value: ReactNode }) {
+  return (
+    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-md border bg-muted px-1.5 text-xs font-medium text-muted-foreground">
+      {value}
+    </span>
+  );
 }
 
 export function ErpDataTable<T extends Record<string, unknown>>({
@@ -119,106 +147,91 @@ export function ErpDataTable<T extends Record<string, unknown>>({
   if (!data.length) return <ErpEmptyState description={emptyMessage} />;
 
   return (
-    <div className={cn("overflow-hidden rounded-md border bg-card shadow-sm", className)}>
-      <div className="overflow-x-auto">
-        <Table className="min-w-full">
-          <TableHeader>
-            <TableRow className="h-10 hover:bg-transparent border-b">
-              {visibleColumns.map((column) => {
-                const align = alignmentFor(column.type, column.align);
-
-                return (
-                  <TableHead
-                    key={String(column.key)}
-                    style={column.width ? { width: column.width } : undefined}
-                    className={cn(
-                      "h-10 px-3 text-xs font-bold uppercase tracking-wider text-muted-foreground/80",
-                      align === "right" && "text-right",
-                      align === "center" && "text-center",
-                      align === "left" && "text-left"
-                    )}
-                  >
-                    {column.label}
-                  </TableHead>
-                );
-              })}
-
-              {rowActions || onOpenDetail ? (
-                <TableHead className="h-10 px-3 text-right text-xs font-bold uppercase tracking-wider text-muted-foreground/80">
-                  Action
-                </TableHead>
-              ) : null}
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {data.map((row) => {
-              const rowId = getRowId(row);
-              const selected = rowId === selectedId;
+    <div className={`overflow-hidden rounded-xl border bg-card shadow-xs ${className}`}>
+      <Table className="min-w-[1180px] table-fixed">
+        <TableHeader>
+          <TableRow className="h-10 bg-muted/35 hover:bg-muted/35">
+            {visibleColumns.map((column) => {
+              const align = alignmentFor(column.type, column.align);
 
               return (
-                <TableRow
-                  key={rowId}
-                  data-state={selected ? "selected" : undefined}
-                  onClick={() => onRowSelect?.(row)}
-                  className={cn(
-                    "group transition-colors border-b last:border-0",
-                    onRowSelect && "cursor-pointer",
-                    selected ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-muted/30"
-                  )}
+                <TableHead
+                  key={String(column.key)}
+                  style={column.width ? { width: column.width } : undefined}
+                  className={`h-10 px-3 align-middle text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground ${alignmentClass(align)} ${widthClass(column.type)}`}
                 >
-                  {visibleColumns.map((column) => {
-                    const type = column.type ?? "text";
-                    const align = alignmentFor(type, column.align);
-                    const value = column.render ? column.render(row) : row[column.key as keyof T];
-
-                    return (
-                      <TableCell
-                        key={String(column.key)}
-                        className={cn(
-                          "py-2.5 px-3 text-sm transition-colors",
-                          align === "right" && "text-right",
-                          align === "center" && "text-center",
-                          align === "left" && "text-left",
-                          cellClass(type)
-                        )}
-                      >
-                        {type === "status" || type === "priority" || type === "badge" ? (
-                          <ErpStatusBadge status={String(value ?? "")} />
-                        ) : (
-                          (value as ReactNode)
-                        )}
-                      </TableCell>
-                    );
-                  })}
-
-                  {rowActions || onOpenDetail ? (
-                    <TableCell className="py-2.5 px-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        {rowActions ? rowActions(row) : null}
-                        {onOpenDetail ? (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              onOpenDetail(row);
-                            }}
-                            className="h-8 px-2 text-xs font-medium text-primary hover:text-primary hover:bg-primary/10"
-                          >
-                            Open
-                          </Button>
-                        ) : null}
-                      </div>
-                    </TableCell>
-                  ) : null}
-                </TableRow>
+                  <span className="block truncate">{column.label}</span>
+                </TableHead>
               );
             })}
-          </TableBody>
-        </Table>
-      </div>
+
+            {rowActions || onOpenDetail ? (
+              <TableHead className="h-10 min-w-[88px] px-3 text-right align-middle text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                Action
+              </TableHead>
+            ) : null}
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {data.map((row) => {
+            const rowId = getRowId(row);
+            const selected = rowId === selectedId;
+
+            return (
+              <TableRow
+                key={rowId}
+                data-state={selected ? "selected" : undefined}
+                onClick={() => onRowSelect?.(row)}
+                className={`h-12 ${onRowSelect ? "cursor-pointer" : ""}`}
+              >
+                {visibleColumns.map((column) => {
+                  const type = column.type ?? "text";
+                  const align = alignmentFor(type, column.align);
+                  const value = column.render ? column.render(row) : row[column.key as keyof T];
+
+                  return (
+                    <TableCell
+                      key={String(column.key)}
+                      className={`h-12 px-3 py-2 align-middle text-sm leading-5 ${alignmentClass(align)} ${cellClass(type)} ${widthClass(type)}`}
+                    >
+                      {type === "status" || type === "priority" ? (
+                        <ErpStatusBadge status={String(value ?? "")} />
+                      ) : type === "badge" ? (
+                        <CountBadge value={value as ReactNode} />
+                      ) : (
+                        <span className="block truncate">{value as ReactNode}</span>
+                      )}
+                    </TableCell>
+                  );
+                })}
+
+                {rowActions || onOpenDetail ? (
+                  <TableCell className="h-12 min-w-[88px] px-3 py-2 text-right align-middle">
+                    <div className="flex items-center justify-end gap-2">
+                      {rowActions ? rowActions(row) : null}
+                      {onOpenDetail ? (
+                        <Button
+                          type="button"
+                          variant="link"
+                          size="sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            onOpenDetail(row);
+                          }}
+                          className="h-auto px-0 text-primary"
+                        >
+                          Open
+                        </Button>
+                      ) : null}
+                    </div>
+                  </TableCell>
+                ) : null}
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 }

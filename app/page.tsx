@@ -1,7 +1,5 @@
-import { BusinessWorkspacePage } from "@/components/business";
-import { getBusinessWorkspacePageData } from "@/lib/page-data/business-workspace-page-data";
+import { WorkbenchErpPage } from "@/components/business/workbench-erp-page";
 
-export default async function HomePage() {
-  const data = await getBusinessWorkspacePageData();
-  return <BusinessWorkspacePage data={data} />;
+export default function HomePage() {
+  return <WorkbenchErpPage />;
 }

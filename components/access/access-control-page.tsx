@@ -205,39 +205,39 @@ export function AccessControlPage() {
         <CardHeader className="gap-1"><CardTitle className="text-sm">Filters</CardTitle></CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.role} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.role} /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t.all}</SelectItem>
               {roleRegistry.map((role) => <SelectItem key={role.code} value={role.code}>{currentLocale === "zh" ? role.name.zh : role.name.en}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={planFilter} onValueChange={setPlanFilter}>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.plan} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.plan} /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">{t.all}</SelectItem>
               {planRegistry.map((plan) => <SelectItem key={plan.code} value={plan.code}>{currentLocale === "zh" ? plan.name.zh : plan.name.en}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={scopeFilter} onValueChange={(value) => setScopeFilter(value as AccessScope | "all") }>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.scope} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.scope} /></SelectTrigger>
             <SelectContent>
               {scopeOptions.map((scope) => <SelectItem key={scope} value={scope}>{scope === "all" ? t.all : scope}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AccessStatus | "all") }>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.status} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.status} /></SelectTrigger>
             <SelectContent>
               {statusOptions.map((status) => <SelectItem key={status} value={status}>{status === "all" ? t.all : status}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={moduleFilter} onValueChange={setModuleFilter}>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.module} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.module} /></SelectTrigger>
             <SelectContent>
               {moduleOptions.map((module) => <SelectItem key={module} value={module}>{module === "all" ? t.all : module}</SelectItem>)}
             </SelectContent>
           </Select>
           <Select value={selectedActionKey} onValueChange={setSelectedActionKey}>
-            <SelectTrigger size="sm" className="min-w-[14rem]"><SelectValue placeholder={t.action} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs" className="min-w-[14rem]"><SelectValue placeholder={t.action} /></SelectTrigger>
             <SelectContent>
               {actionRegistry.map((action) => <SelectItem key={action.key} value={action.key}>{currentLocale === "zh" ? action.label.zh : action.label.en}</SelectItem>)}
             </SelectContent>
