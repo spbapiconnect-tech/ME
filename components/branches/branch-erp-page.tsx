@@ -58,6 +58,7 @@ import {
   ErpShell,
 } from "@/components/erp";
 import { erpBranchRows } from "@/lib/erp/erp-sample-data";
+import { branchDetails, branchKpiItems } from "@/config/branch-demo-data";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 
@@ -76,67 +77,6 @@ const branchColumns: ErpDataTableColumn<BranchRow>[] = [
   { key: "lastUpdate", label: "Last Update", type: "time" },
 ];
 
-const kpiItems = [
-  { key: "totalBranches", value: "8" },
-  { key: "openStores", value: "7 / 8" },
-  { key: "todaySales", value: "RM 28,750" },
-  { key: "openTasks", value: "12" },
-  { key: "stockAlerts", value: "4" },
-  { key: "staffOnDuty", value: "18" },
-  { key: "inspectionScore", value: "92%" },
-  { key: "criticalIssues", value: "3" },
-] as const;
-
-const branchDetails: Record<string, Record<string, string>> = {
-  "KCH-001": {
-    "Branch Code": "KCH-001",
-    Region: "Kuching",
-    Manager: "Chin Ling",
-    "Business Hours": "10:00–00:00",
-    Phone: "082-000 123",
-    Address: "Kuching Central, Sarawak",
-    "Staff Today": "18",
-    "Current Shift": "Day / Night transition",
-    "Last Inspection": "2026-05-06",
-    "Inventory Review": "4 alerts",
-  },
-  "BTU-001": {
-    "Branch Code": "BTU-001",
-    Region: "Bintulu",
-    Manager: "Morexson",
-    "Business Hours": "10:00–22:00",
-    Phone: "086-000 228",
-    Address: "Bintulu Town, Sarawak",
-    "Staff Today": "12",
-    "Current Shift": "Day shift active",
-    "Last Inspection": "2026-05-05",
-    "Inventory Review": "1 alert",
-  },
-  "KCH-002": {
-    "Branch Code": "KCH-002",
-    Region: "Kuching",
-    Manager: "Lydia",
-    "Business Hours": "10:00–20:00",
-    Phone: "082-000 778",
-    Address: "Kuching Pickup Zone",
-    "Staff Today": "6",
-    "Current Shift": "Opening preparation",
-    "Last Inspection": "2026-05-04",
-    "Inventory Review": "1 alert",
-  },
-  "HQ-001": {
-    "Branch Code": "HQ-001",
-    Region: "HQ",
-    Manager: "Admin",
-    "Business Hours": "09:00–18:00",
-    Phone: "082-999 000",
-    Address: "ME HQ Tower, Kuching",
-    "Staff Today": "45",
-    "Current Shift": "Full support active",
-    "Last Inspection": "N/A",
-    "Inventory Review": "0 alerts",
-  },
-};
 
 const tabKeys = ["overview", "branchHealth", "todayOperations", "relatedRecords", "tasks", "activity"] as const;
 type BranchTabKey = (typeof tabKeys)[number];
@@ -151,7 +91,7 @@ export function BranchErpPage() {
     label: branchCopy.tabs[key],
   }));
 
-  const localizedKpis = kpiItems.map((item) => ({
+  const localizedKpis = branchKpiItems.map((item) => ({
     label: branchCopy.kpis[item.key],
     value: item.value,
   }));
