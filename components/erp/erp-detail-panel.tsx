@@ -1,62 +1,68 @@
+"use client";
+
 import { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
-import { ErpStatusBadge } from "./erp-status-badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 export function ErpDetailPanel({
   title,
-  status,
   subtitle,
+  badge,
   actions,
-  children,
   tabs,
   activeTab,
   onTabChange,
-  className,
+  children,
 }: {
   title: string;
-  status?: string;
   subtitle?: string;
+  badge?: ReactNode;
   actions?: ReactNode;
-  children: ReactNode;
   tabs?: string[];
   activeTab?: string;
   onTabChange?: (tab: string) => void;
-  className?: string;
+  children: ReactNode;
 }) {
   return (
-    <Card className={cn("rounded-md border-border bg-card shadow-sm", className)}>
-      <div className="flex items-start justify-between gap-4 border-b border-border/50 p-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold tracking-tight text-foreground">{title}</h2>
-            {status ? <ErpStatusBadge status={status} /> : null}
+    <Card className="overflow-hidden border-border bg-card">
+      <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="truncate text-base font-semibold text-foreground sm:text-lg">{title}</h2>
+            {badge}
           </div>
           {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
         </div>
-        {actions ? <div className="flex shrink-0 gap-2">{actions}</div> : null}
+
+        {actions ? <div className="shrink-0">{actions}</div> : null}
       </div>
 
-      {tabs && tabs.length > 0 && (
-        <div className="border-b border-border/50 px-4">
-          <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-            <TabsList className="h-10 w-full justify-start rounded-none bg-transparent p-0">
-              {tabs.map((tab) => (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className="relative h-10 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 text-sm font-medium text-muted-foreground transition-none data-[state=active]:border-b-primary data-[state=active]:text-primary data-[state=active]:shadow-none"
-                >
-                  {tab}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-        </div>
-      )}
+      {tabs?.length ? (
+        <div
+          className="flex max-w-full items-center overflow-x-auto border-b border-border bg-card/30 px-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          data-me-mobile-tabs="true"
+        >
+          {tabs.map((tab) => {
+            const active = activeTab === tab;
 
-      <div className="min-h-[200px]">{children}</div>
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => onTabChange?.(tab)}
+                className={cn(
+                  "shrink-0 whitespace-nowrap border-b-2 border-transparent px-3 py-3 text-xs font-medium text-muted-foreground outline-none ring-0 transition-colors hover:text-foreground focus:outline-none focus:ring-0 focus-visible:ring-0 sm:px-4 sm:text-sm",
+                  active && "border-primary text-primary"
+                )}
+              >
+                {tab}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
+      <div className="min-h-[200px] p-4">{children}</div>
     </Card>
   );
 }

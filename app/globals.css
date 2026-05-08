@@ -413,3 +413,21 @@ textarea:focus:not(:focus-visible) {
   box-shadow: none !important;
   --tw-ring-shadow: 0 0 #0000 !important;
 }
+
+/* =========================================================
+   ME MOBILE TAB OVERFLOW CONTROL
+   Prevent detail tabs from stretching mobile cards.
+   ========================================================= */
+
+.branch-mobile-tabs,
+[data-me-mobile-tabs="true"] {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.branch-mobile-tabs::-webkit-scrollbar,
+[data-me-mobile-tabs="true"]::-webkit-scrollbar {
+  display: none;
+}
