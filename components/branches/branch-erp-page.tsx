@@ -24,7 +24,6 @@ import {
   Phone,
   Clock,
   User,
-  Search,
   Filter
 } from "lucide-react";
 import {

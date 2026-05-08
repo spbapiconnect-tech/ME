@@ -18,8 +18,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { useDictionary } from "@/lib/i18n";
 
 export function Topbar() {
