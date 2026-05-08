@@ -188,7 +188,9 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   <SheetHeader>
                     <SheetTitle>{branchCopy.actions.addBranch}</SheetTitle>
                     <SheetDescription>
-                      {currentLocale === "zh" ? "填写资料以新增门店到系统。" : "{currentLocale === "zh" ? "填写资料以新增门店到系统。" : "Fill in the details to register a new branch in the system."}"}
+                      {currentLocale === "zh"
+                        ? "填写资料以新增门店到系统。"
+                        : "Fill in the details to register a new branch in the system."}
                     </SheetDescription>
                   </SheetHeader>
                   <div className="space-y-4 py-6">
@@ -268,7 +270,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
             <div className="flex items-center gap-2">
               <Select defaultValue="all">
                 <SelectTrigger className="h-9 w-[160px]">
-                  <SelectValue placeholder=branchCopy.filters.allBranches />
+                  <SelectValue placeholder={branchCopy.filters.allBranches} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Branches</SelectItem>
@@ -278,7 +280,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
               </Select>
               <Select defaultValue="all">
                 <SelectTrigger className="h-9 w-[140px]">
-                  <SelectValue placeholder=branchCopy.filters.allRegions />
+                  <SelectValue placeholder={branchCopy.filters.allRegions} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Regions</SelectItem>
@@ -288,7 +290,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
               </Select>
               <Select defaultValue="all">
                 <SelectTrigger className="h-9 w-[140px]">
-                  <SelectValue placeholder=branchCopy.filters.allStatus />
+                  <SelectValue placeholder={branchCopy.filters.allStatus} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
