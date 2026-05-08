@@ -62,10 +62,6 @@ export function Topbar() {
       </div>
 
       <div className="flex items-center gap-1">
-        <div className="flex items-center gap-1 mr-2 pr-2 border-r">
-          <LanguageSwitcher />
-          <ThemeSwitcher />
-        </div>
 
         <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground relative">
           <Bell className="h-4 w-4" />
