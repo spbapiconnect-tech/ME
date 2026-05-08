@@ -169,7 +169,6 @@ const [selectedId, setSelectedId] = useState("KCH-001");
         <ErpPageHeader
           breadcrumbs={["ME", "Store Operations", "Branch Management"]}
           title="Branch Management"
-          zhTitle="门店管理"
           subtitle="Manage branch operating status, performance, staffing, tasks, and alerts across all stores."
           actions={
             <div className="flex items-center justify-end gap-2">
