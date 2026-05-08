@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { Menu } from "lucide-react";
 import { ErpSidebar } from "./erp-sidebar";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ErpTopbar } from "./erp-topbar";
 
 export function ErpShell({ activeHref, children }: { activeHref?: string; children: ReactNode }) {
@@ -31,6 +31,10 @@ export function ErpShell({ activeHref, children }: { activeHref?: string; childr
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[280px] p-0">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>ERP Navigation</SheetTitle>
+                  <SheetDescription>Mobile navigation for ME Branch ERP modules.</SheetDescription>
+                </SheetHeader>
                 <ErpSidebar activeHref={activeHref} />
               </SheetContent>
             </Sheet>
