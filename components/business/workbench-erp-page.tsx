@@ -8,14 +8,12 @@ import {
   ClipboardList,
   FileText,
   PackageSearch,
-  Plus,
   Store,
   Users,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   ErpDataTable,
   ErpDataTableColumn,
@@ -142,7 +140,7 @@ export function WorkbenchErpPage() {
           }
         />
 
-        <ErpKpiGrid items={kpis} />
+        <ErpKpiGrid kpis={kpis} />
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="min-w-0 space-y-6">
