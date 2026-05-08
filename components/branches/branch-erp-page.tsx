@@ -138,13 +138,19 @@ const branchDetails: Record<string, Record<string, string>> = {
   },
 };
 
-const tabs = ["Overview", "Branch Health", "Today Operations", "Related Records", "Tasks", "Activity"];
+const tabKeys = ["overview", "branchHealth", "todayOperations", "relatedRecords", "tasks", "activity"] as const;
+type BranchTabKey = (typeof tabKeys)[number];
 
 export function BranchErpPage() {
   const router = useRouter();
   const rawLocale = useUiPreferencesStore((state) => state.locale);
   const currentLocale: BranchLocale = rawLocale === "zh" ? "zh" : "en";
   const branchCopy = getBranchCopy(currentLocale);
+  const localizedTabs = tabKeys.map((key) => ({
+    key,
+    label: branchCopy.tabs[key],
+  }));
+
   const localizedBranchColumns: ErpDataTableColumn<BranchRow>[] = branchColumns.map((column) => {
     const key = String(column.key);
     const labelMap: Record<string, string> = {
@@ -161,7 +167,7 @@ export function BranchErpPage() {
   });
 
 const [selectedId, setSelectedId] = useState("KCH-001");
-  const [activeTab, setActiveTab] = useState("Overview");
+  const [activeTab, setActiveTab] = useState<BranchTabKey>("overview");
 
   const selected = useMemo(
     () => erpBranchRows.find((row) => row.id === selectedId) ?? erpBranchRows[0],
@@ -397,9 +403,12 @@ const [selectedId, setSelectedId] = useState("KCH-001");
               title={selected.branchName}
               status={selected.status}
               subtitle={`${selected.branchCode} • ${selected.region} ${branchCopy.detail.regionSuffix}`}
-              tabs={tabs}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
+              tabs={localizedTabs.map((tab) => tab.label)}
+              activeTab={localizedTabs.find((tab) => tab.key === activeTab)?.label ?? branchCopy.tabs.overview}
+              onTabChange={(label) => {
+                const nextTab = localizedTabs.find((tab) => tab.label === label)?.key;
+                if (nextTab) setActiveTab(nextTab);
+              }}
               actions={
                 <Button size="sm" variant="outline" onClick={handleCreateTask} className="gap-2">
                   <Plus className="h-4 w-4" />
@@ -408,7 +417,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
               }
             >
               <div className="p-6">
-                {activeTab === "Overview" && (
+                {activeTab === "overview" && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-6">
                       <div className="grid grid-cols-2 gap-4">
@@ -458,7 +467,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   </div>
                 )}
 
-                {activeTab === "Branch Health" && (
+                {activeTab === "branchHealth" && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
                       { label: "Inspection", value: selected.inspection, status: "Good" },
@@ -476,7 +485,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   </div>
                 )}
 
-                {activeTab === "Tasks" && (
+                {activeTab === "tasks" && (
                   <div className="space-y-1">
                     {[
                       { title: "Review morning inventory", status: "Open", priority: "High" },
@@ -497,7 +506,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   </div>
                 )}
 
-                {activeTab === "Activity" && (
+                {activeTab === "activity" && (
                   <div className="space-y-6 py-2">
                     {[
                       { user: "Chin Ling", action: "Completed opening checklist", time: "08:15 AM", icon: ClipboardList },
@@ -519,7 +528,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 )}
                 
                 {/* Fallback for other tabs */}
-                {["Today Operations", "Related Records"].includes(activeTab) && (
+                {["todayOperations", "relatedRecords"].includes(activeTab) && (
                   <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                     <History className="h-8 w-8 mb-2 opacity-20" />
                     <p className="text-sm italic">{branchCopy.detail.upcoming}</p>
