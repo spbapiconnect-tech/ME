@@ -11,8 +11,7 @@ import {
   FileText, 
   BarChart3,
   ListTodo, 
-  Truck, 
-  Warehouse,
+Warehouse,
   CheckSquare, 
   MoreHorizontal, 
   ClipboardList, 
@@ -24,7 +23,6 @@ import {
   Phone,
   Clock,
   User,
-  Filter
 } from "lucide-react";
 import {
   Select,
@@ -143,8 +141,7 @@ const tabs = ["Overview", "Branch Health", "Today Operations", "Related Records"
 
 export function BranchErpPage() {
   const router = useRouter();
-  const dict = useDictionary();
-  const [selectedId, setSelectedId] = useState("KCH-001");
+const [selectedId, setSelectedId] = useState("KCH-001");
   const [activeTab, setActiveTab] = useState("Overview");
 
   const selected = useMemo(
