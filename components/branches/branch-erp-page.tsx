@@ -76,16 +76,16 @@ const branchColumns: ErpDataTableColumn<BranchRow>[] = [
   { key: "lastUpdate", label: "Last Update", type: "time" },
 ];
 
-const kpis = [
-  { label: "Total Branches", value: "8" },
-  { label: "Open Stores", value: "7 / 8" },
-  { label: "Today Sales", value: "RM 28,750" },
-  { label: "Open Tasks", value: "12" },
-  { label: "Stock Alerts", value: "4" },
-  { label: "Staff On Duty", value: "18" },
-  { label: "Inspection Score", value: "92%" },
-  { label: "Critical Issues", value: "3" },
-];
+const kpiItems = [
+  { key: "totalBranches", value: "8" },
+  { key: "openStores", value: "7 / 8" },
+  { key: "todaySales", value: "RM 28,750" },
+  { key: "openTasks", value: "12" },
+  { key: "stockAlerts", value: "4" },
+  { key: "staffOnDuty", value: "18" },
+  { key: "inspectionScore", value: "92%" },
+  { key: "criticalIssues", value: "3" },
+] as const;
 
 const branchDetails: Record<string, Record<string, string>> = {
   "KCH-001": {
@@ -149,6 +149,11 @@ export function BranchErpPage() {
   const localizedTabs = tabKeys.map((key) => ({
     key,
     label: branchCopy.tabs[key],
+  }));
+
+  const localizedKpis = kpiItems.map((item) => ({
+    label: branchCopy.kpis[item.key],
+    value: item.value,
   }));
 
   const localizedBranchColumns: ErpDataTableColumn<BranchRow>[] = branchColumns.map((column) => {
@@ -282,7 +287,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
         />
 
         {/* KPI Grid */}
-        <ErpKpiGrid kpis={kpis} />
+        <ErpKpiGrid kpis={localizedKpis} />
 
         {/* Filter Bar */}
         <ErpFilterBar
@@ -295,8 +300,8 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{branchCopy.filters.allBranches}</SelectItem>
-                  <SelectItem value="kch">Kuching Stores</SelectItem>
-                  <SelectItem value="btu">Bintulu Stores</SelectItem>
+                  <SelectItem value="kch">Kuching</SelectItem>
+                  <SelectItem value="btu">Bintulu</SelectItem>
                 </SelectContent>
               </Select>
               <Select defaultValue="all">
@@ -306,7 +311,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 <SelectContent>
                   <SelectItem value="all">{branchCopy.filters.allRegions}</SelectItem>
                   <SelectItem value="central">Central</SelectItem>
-                  <SelectItem value="north">North</SelectItem>
+                  <SelectItem value="north">{currentLocale === "zh" ? "北区" : "North"}</SelectItem>
                 </SelectContent>
               </Select>
               <Select defaultValue="all">
@@ -316,7 +321,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 <SelectContent>
                   <SelectItem value="all">{branchCopy.filters.allStatus}</SelectItem>
                   <SelectItem value="operating">{branchCopy.status.operating}</SelectItem>
-                  <SelectItem value="preparation">Preparation</SelectItem>
+                  <SelectItem value="preparation">{branchCopy.status.preparation}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -356,7 +361,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                     <div className="font-medium text-foreground">{row.todaySales}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-muted-foreground">Last Update</div>
+                    <div className="text-xs text-muted-foreground">{branchCopy.detail.lastUpdate}</div>
                     <div className="font-medium text-foreground">{row.lastUpdate}</div>
                   </div>
                   <div>
@@ -459,7 +464,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                           </div>
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">{branchCopy.detail.salesProgress}</span>
-                            <span className="font-medium text-success">84% of target</span>
+                            <span className="font-medium text-success">84% {branchCopy.detail.targetSuffix}</span>
                           </div>
                         </div>
                       </div>
@@ -470,14 +475,14 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 {activeTab === "branchHealth" && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
-                      { label: "Inspection", value: selected.inspection, status: "Good" },
-                      { label: branchCopy.detail.stockHealth, value: detailData["Inventory Review"], status: "Warning" },
-                      { label: branchCopy.detail.staffCoverage, value: "100%", status: "Good" },
+                      { label: branchCopy.detail.inspection, value: selected.inspection, status: branchCopy.detail.good },
+                      { label: branchCopy.detail.stockHealth, value: detailData["Inventory Review"], status: branchCopy.detail.warning },
+                      { label: branchCopy.detail.staffCoverage, value: "100%", status: branchCopy.detail.good },
                     ].map((item) => (
                       <div key={item.label} className="border rounded-md p-4 space-y-2">
                         <div className="text-xs text-muted-foreground">{item.label}</div>
                         <div className="text-xl font-bold">{item.value}</div>
-                        <Badge variant={item.status === "Good" ? "outline" : "secondary"} className={item.status === "Good" ? "text-success border-success/30 bg-success/5" : ""}>
+                        <Badge variant={item.status === branchCopy.detail.good ? "outline" : "secondary"} className={item.status === branchCopy.detail.good ? "text-success border-success/30 bg-success/5" : ""}>
                           {item.status}
                         </Badge>
                       </div>
@@ -488,9 +493,9 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 {activeTab === "tasks" && (
                   <div className="space-y-1">
                     {[
-                      { title: "Review morning inventory", status: "Open", priority: "High" },
-                      { title: "Submit daily sales report", status: "In Progress", priority: "Medium" },
-                      { title: "Clean storage area", status: "Open", priority: "Low" },
+                      { title: "Review morning inventory", status: branchCopy.detail.open, priority: branchCopy.detail.high },
+                      { title: "Submit daily sales report", status: branchCopy.detail.inProgress, priority: branchCopy.detail.medium },
+                      { title: "Clean storage area", status: branchCopy.detail.open, priority: branchCopy.detail.low },
                     ].map((task, i) => (
                       <div key={i} className="flex items-center justify-between p-3 border-b last:border-0 hover:bg-muted/30 transition-colors">
                         <div className="flex items-center gap-3">
@@ -552,7 +557,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                     <div key={i} className="flex items-center justify-between p-2 text-sm border-b last:border-0">
                       <span>{row.item}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs">{row.stock} left</span>
+                        <span className="text-muted-foreground text-xs">{row.stock} {branchCopy.detail.left}</span>
                         <Badge variant="destructive" className="text-[10px] h-4 px-1">{row.alert}</Badge>
                       </div>
                     </div>
@@ -563,7 +568,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
               <div className="border rounded-md bg-card overflow-hidden shadow-sm">
                 <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
                   <h3 className="text-xs font-bold uppercase tracking-wider">{branchCopy.detail.staffOnDutyTitle}</h3>
-                  <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px]">Manage</Button>
+                  <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px]">{branchCopy.actions.manage}</Button>
                 </div>
                 <div className="p-1">
                   {[
@@ -590,7 +595,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
                   <div className="flex items-center gap-2 text-primary">
                     <ArrowUpRight className="h-4 w-4" />
-                    <span className="text-sm font-bold">Performance Up</span>
+                    <span className="text-sm font-bold">{branchCopy.detail.performanceUp}</span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {currentLocale === "zh" ? `${selected.branchName} ${branchCopy.detail.salesInsightSuffix}` : `${branchCopy.detail.salesInsightPrefix} ${selected.branchName} ${branchCopy.detail.salesInsightSuffix}`}
@@ -604,13 +609,13 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                       <div className="h-2 w-2 rounded-full bg-destructive mt-1.5 shrink-0" />
                       <div className="space-y-0.5">
                         <div className="text-xs font-medium">{branchCopy.detail.inventoryCritical}</div>
-                        <div className="text-[10px] text-muted-foreground">2 items below threshold</div>
+                        <div className="text-[10px] text-muted-foreground">2 {branchCopy.detail.itemsBelowThreshold}</div>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
                       <div className="h-2 w-2 rounded-full bg-warning mt-1.5 shrink-0" />
                       <div className="space-y-0.5">
-                        <div className="text-xs font-medium">Inspection Due</div>
+                        <div className="text-xs font-medium">{branchCopy.detail.inspectionDue}</div>
                         <div className="text-[10px] text-muted-foreground">{branchCopy.detail.scheduledTomorrow}</div>
                       </div>
                     </div>
