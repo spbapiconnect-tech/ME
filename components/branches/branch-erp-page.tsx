@@ -145,6 +145,21 @@ export function BranchErpPage() {
   const rawLocale = useUiPreferencesStore((state) => state.locale);
   const currentLocale: BranchLocale = rawLocale === "zh" ? "zh" : "en";
   const branchCopy = getBranchCopy(currentLocale);
+  const localizedBranchColumns: ErpDataTableColumn<BranchRow>[] = branchColumns.map((column) => {
+    const key = String(column.key);
+    const labelMap: Record<string, string> = {
+      branchCode: branchCopy.fields.branchCode,
+      branchName: branchCopy.fields.branchName,
+      region: branchCopy.fields.region,
+      status: branchCopy.fields.status,
+    };
+
+    return {
+      ...column,
+      label: labelMap[key] ?? column.label,
+    };
+  });
+
 const [selectedId, setSelectedId] = useState("KCH-001");
   const [activeTab, setActiveTab] = useState("Overview");
 
@@ -360,7 +375,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
         {/* Desktop / Tablet Branch Table */}
         <div className="hidden md:block">
         <ErpDataTable
-          columns={branchColumns}
+          columns={localizedBranchColumns}
           data={erpBranchRows}
           getRowId={(row) => row.id}
           selectedId={selectedId}
@@ -381,7 +396,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
             <ErpDetailPanel
               title={selected.branchName}
               status={selected.status}
-              subtitle={`${selected.branchCode} • ${selected.region} Region`}
+              subtitle={`${selected.branchCode} • ${selected.region} ${branchCopy.detail.regionSuffix}`}
               tabs={tabs}
               activeTab={activeTab}
               onTabChange={setActiveTab}
@@ -430,7 +445,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                             <span className="font-medium">{detailData["Staff Today"]} Persons</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Current Shift</span>
+                            <span className="text-muted-foreground">{branchCopy.detail.currentShift}</span>
                             <span className="font-medium text-primary">{detailData["Current Shift"]}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
@@ -507,7 +522,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 {["Today Operations", "Related Records"].includes(activeTab) && (
                   <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                     <History className="h-8 w-8 mb-2 opacity-20" />
-                    <p className="text-sm italic">Content for {activeTab} will be available soon.</p>
+                    <p className="text-sm italic">{branchCopy.detail.upcoming}</p>
                   </div>
                 )}
               </div>
@@ -569,7 +584,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                     <span className="text-sm font-bold">Performance Up</span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Sales for {selected.branchName} are up by 12% compared to last week. Productivity is high.
+                    {currentLocale === "zh" ? `${selected.branchName} ${branchCopy.detail.salesInsightSuffix}` : `${branchCopy.detail.salesInsightPrefix} ${selected.branchName} ${branchCopy.detail.salesInsightSuffix}`}
                   </p>
                 </div>
 
@@ -622,7 +637,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
             </ErpRightRail>
 
             <div className="border rounded-md bg-card p-4 shadow-sm space-y-4">
-              <h3 className="text-sm font-bold">Recent Activity</h3>
+              <h3 className="text-sm font-bold">{branchCopy.detail.recentActivity}</h3>
               <div className="space-y-4">
                 {[
                   { user: "Chin Ling", action: "Updated inventory", time: "2h ago" },

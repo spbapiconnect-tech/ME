@@ -35,6 +35,14 @@ export const branchLanguageCopy = {
       address: "Address",
       status: "Status",
     },
+    detail: {
+      currentShift: "Current Shift",
+      recentActivity: "Recent Activity",
+      regionSuffix: "Region",
+      upcoming: "Content will be available soon.",
+      salesInsightPrefix: "Sales for",
+      salesInsightSuffix: "are up by 12% compared to last week. Productivity is high.",
+    },
     tabs: {
       overview: "Overview",
       branchHealth: "Branch Health",
@@ -83,6 +91,14 @@ export const branchLanguageCopy = {
       phone: "电话",
       address: "地址",
       status: "状态",
+    },
+    detail: {
+      currentShift: "当前班次",
+      recentActivity: "最近动态",
+      regionSuffix: "区域",
+      upcoming: "内容即将开放。",
+      salesInsightPrefix: "",
+      salesInsightSuffix: "较上周提升 12%。当前生产效率良好。",
     },
     tabs: {
       overview: "概览",
