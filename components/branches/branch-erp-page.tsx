@@ -288,6 +288,60 @@ const [selectedId, setSelectedId] = useState("KCH-001");
         />
 
         {/* Branch Directory */}
+        {/* Mobile Branch Card List */}
+        <div className="grid gap-3 md:hidden">
+          {erpBranchRows.map((row) => {
+            const selected = row.id === selectedId;
+
+            return (
+              <button
+                key={row.id}
+                type="button"
+                onClick={() => setSelectedId(row.id)}
+                className={`w-full rounded-xl border bg-card p-4 text-left shadow-sm transition hover:bg-muted/40 ${selected ? "border-primary ring-1 ring-primary/30" : "border-border"}`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-foreground">
+                      {row.branchName}
+                    </div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">
+                      {row.branchCode} · {row.region}
+                    </div>
+                  </div>
+                  <ErpStatusBadge status={row.status} />
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Today Sales</div>
+                    <div className="font-medium text-foreground">{row.todaySales}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-muted-foreground">Last Update</div>
+                    <div className="font-medium text-foreground">{row.lastUpdate}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Open Tasks</div>
+                    <div className="font-medium text-foreground">{row.openTasks}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-muted-foreground">Stock Alerts</div>
+                    <div className="font-medium text-foreground">{row.stockAlerts}</div>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
+                  <span>{row.manager}</span>
+                  <span>Inspection {row.inspection}</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Desktop / Tablet Branch Table */}
+        <div className="hidden md:block">
         <ErpDataTable
           columns={branchColumns}
           data={erpBranchRows}
@@ -301,6 +355,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
             </Button>
           )}
         />
+        </div>
 
         {/* Detail + Right Rail */}
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
