@@ -159,19 +159,19 @@ export function RulesPage() {
         <CardHeader className="gap-1"><CardTitle className="text-sm">Filters</CardTitle></CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as RuleType | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Rule Type" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Rule Type" /></SelectTrigger>
             <SelectContent>{typeOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Source Module" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Source Module" /></SelectTrigger>
             <SelectContent>{sourceModules.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as RuleStatus | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={severityFilter} onValueChange={(value) => setSeverityFilter(value as RuleSeverity | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Severity" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Severity" /></SelectTrigger>
             <SelectContent>{severityOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
         </CardContent>

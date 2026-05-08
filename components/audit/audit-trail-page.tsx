@@ -269,7 +269,7 @@ export function AuditTrailPage() {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Select value={eventTypeFilter} onValueChange={(value) => setEventTypeFilter(value as AuditEventType | "all")}>
-            <SelectTrigger size="sm">
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder={t.eventType} />
             </SelectTrigger>
             <SelectContent>
@@ -281,7 +281,7 @@ export function AuditTrailPage() {
             </SelectContent>
           </Select>
           <Select value={severityFilter} onValueChange={(value) => setSeverityFilter(value as AuditSeverity | "all")}>
-            <SelectTrigger size="sm">
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder={t.severity} />
             </SelectTrigger>
             <SelectContent>
@@ -293,7 +293,7 @@ export function AuditTrailPage() {
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AuditStatus | "all")}>
-            <SelectTrigger size="sm">
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder={t.status} />
             </SelectTrigger>
             <SelectContent>
@@ -305,7 +305,7 @@ export function AuditTrailPage() {
             </SelectContent>
           </Select>
           <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
-            <SelectTrigger size="sm">
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder={t.sourceModule} />
             </SelectTrigger>
             <SelectContent>

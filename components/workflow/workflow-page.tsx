@@ -184,24 +184,24 @@ export function WorkflowPage() {
         <CardHeader className="gap-1"><CardTitle className="text-sm">Filters</CardTitle></CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Select value={triggerTypeFilter} onValueChange={(value) => setTriggerTypeFilter(value as WorkflowTriggerType | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.triggerType} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.triggerType} /></SelectTrigger>
             <SelectContent>{triggerTypeOptions.map((value) => <SelectItem key={value} value={value}>{value === "all" ? t.all : value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={targetTypeFilter} onValueChange={(value) => setTargetTypeFilter(value as WorkflowTargetType | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.targetType} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.targetType} /></SelectTrigger>
             <SelectContent>{targetTypeOptions.map((value) => <SelectItem key={value} value={value}>{value === "all" ? t.all : value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as WorkflowStatus | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.status} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.status} /></SelectTrigger>
             <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{value === "all" ? t.all : value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
-            <SelectTrigger size="sm"><SelectValue placeholder={t.sourceModule} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={t.sourceModule} /></SelectTrigger>
             <SelectContent>{sourceModules.map((value) => <SelectItem key={value} value={value}>{value === "all" ? t.all : value}</SelectItem>)}</SelectContent>
           </Select>
           {filteredWorkflows.length > 0 ? (
             <Select value={effectiveWorkflowKey} onValueChange={setSelectedWorkflowKey}>
-              <SelectTrigger size="sm" className="min-w-[16rem]"><SelectValue placeholder="Workflow" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs min-w-[16rem]"><SelectValue placeholder="Workflow" /></SelectTrigger>
               <SelectContent>
                 {filteredWorkflows.map((workflow) => (
                   <SelectItem key={workflow.key} value={workflow.key}>{currentLocale === "zh" ? workflow.label.zh : workflow.label.en}</SelectItem>

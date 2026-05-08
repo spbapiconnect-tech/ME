@@ -267,19 +267,19 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         filters={
           <MeWorkspaceSection title="Report Filters" description="Operational filtering shell for the widget registry." contentClassName="xl:grid-cols-4">
             <Select value={widgetTypeFilter} onValueChange={(value) => setWidgetTypeFilter(value as ReportWidgetType | "all")}>
-              <SelectTrigger size="sm"><SelectValue placeholder="Widget Type" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Widget Type" /></SelectTrigger>
               <SelectContent>{widgetTypeOptions.map((value) => <SelectItem key={value} value={value}>{widgetTypeOptionLabel[value]}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
-              <SelectTrigger size="sm"><SelectValue placeholder="Source Module" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Source Module" /></SelectTrigger>
               <SelectContent>{sourceModules.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ReportWidgetStatus | "all")}>
-              <SelectTrigger size="sm"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{statusOptionLabel[value]}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={severityFilter} onValueChange={(value) => setSeverityFilter(value as ReportWidgetSeverity | "all")}>
-              <SelectTrigger size="sm"><SelectValue placeholder="Severity" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Severity" /></SelectTrigger>
               <SelectContent>{severityOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
             </Select>
           </MeWorkspaceSection>
@@ -299,7 +299,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
             <MeWorkspaceSection title="Dashboard Layout Templates" description="Reusable report layout references for future mapping.">
               <div className="flex flex-wrap gap-2">
                 <Select value={selectedLayoutKey} onValueChange={setSelectedLayoutKey}>
-                  <SelectTrigger size="sm" className="min-w-[16rem]"><SelectValue placeholder="Dashboard Layout" /></SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs min-w-[16rem]"><SelectValue placeholder="Dashboard Layout" /></SelectTrigger>
                   <SelectContent>{dashboardLayoutCatalog.map((item) => <SelectItem key={item.key} value={item.key}>{currentLocale === "zh" ? item.name.zh : item.name.en}</SelectItem>)}</SelectContent>
                 </Select>
               </div>

@@ -136,19 +136,19 @@ export function PackagesPage() {
         <CardHeader className="gap-1"><CardTitle className="text-sm">Filters</CardTitle></CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as PackageCategory | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Category" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
             <SelectContent>{categoryOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={tierFilter} onValueChange={(value) => setTierFilter(value as PackageTier | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Tier" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Tier" /></SelectTrigger>
             <SelectContent>{tierOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as PackageStatus | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={moduleFilter} onValueChange={setModuleFilter}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Module" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Module" /></SelectTrigger>
             <SelectContent>{modules.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
         </CardContent>

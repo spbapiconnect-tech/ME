@@ -158,19 +158,19 @@ export function NotificationsPage() {
         <CardHeader className="gap-1"><CardTitle className="text-sm">Filters</CardTitle></CardHeader>
         <CardContent className="flex flex-wrap gap-3">
           <Select value={channelFilter} onValueChange={(value) => setChannelFilter(value as NotificationChannel | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Channel" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Channel" /></SelectTrigger>
             <SelectContent>{channelOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={categoryFilter} onValueChange={(value) => setCategoryFilter(value as NotificationCategory | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Category" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Category" /></SelectTrigger>
             <SelectContent>{categoryOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as NotificationStatus | "all")}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Status" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
           <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
-            <SelectTrigger size="sm"><SelectValue placeholder="Source Module" /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Source Module" /></SelectTrigger>
             <SelectContent>{sourceModules.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
           </Select>
         </CardContent>

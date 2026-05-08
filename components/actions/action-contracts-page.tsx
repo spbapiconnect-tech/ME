@@ -253,7 +253,7 @@ export function ActionContractsPage() {
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
             <Select value={intentFilter} onValueChange={(value) => setIntentFilter(value as ActionIntent | "all")}>
-              <SelectTrigger size="sm">
+              <SelectTrigger className="h-8 text-xs">
                 <SelectValue placeholder={t.intent} />
               </SelectTrigger>
               <SelectContent>
@@ -266,7 +266,7 @@ export function ActionContractsPage() {
             </Select>
 
             <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
-              <SelectTrigger size="sm">
+              <SelectTrigger className="h-8 text-xs">
                 <SelectValue placeholder={t.sourceModule} />
               </SelectTrigger>
               <SelectContent>
@@ -279,7 +279,7 @@ export function ActionContractsPage() {
             </Select>
 
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ActionStatus | "all")}>
-              <SelectTrigger size="sm">
+              <SelectTrigger className="h-8 text-xs">
                 <SelectValue placeholder={t.status} />
               </SelectTrigger>
               <SelectContent>
@@ -293,7 +293,7 @@ export function ActionContractsPage() {
 
             {filteredActions.length > 0 ? (
               <Select value={effectiveSelectedKey} onValueChange={setSelectedKey}>
-                <SelectTrigger size="sm" className="min-w-[14rem]">
+                <SelectTrigger className="h-8 text-xs min-w-[14rem]">
                   <SelectValue placeholder={t.selectAction} />
                 </SelectTrigger>
                 <SelectContent>

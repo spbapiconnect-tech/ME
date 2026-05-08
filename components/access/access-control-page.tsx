@@ -237,7 +237,7 @@ export function AccessControlPage() {
             </SelectContent>
           </Select>
           <Select value={selectedActionKey} onValueChange={setSelectedActionKey}>
-            <SelectTrigger className="h-8 text-xs" className="min-w-[14rem]"><SelectValue placeholder={t.action} /></SelectTrigger>
+            <SelectTrigger className="h-8 text-xs min-w-[14rem]"><SelectValue placeholder={t.action} /></SelectTrigger>
             <SelectContent>
               {actionRegistry.map((action) => <SelectItem key={action.key} value={action.key}>{currentLocale === "zh" ? action.label.zh : action.label.en}</SelectItem>)}
             </SelectContent>

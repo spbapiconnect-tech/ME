@@ -136,7 +136,7 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           <Select value={category} onValueChange={(value) => setCategory(value as PsiActionDraftCategory | "all")}>
-            <SelectTrigger size="sm">
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -149,7 +149,7 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
           </Select>
 
           <Select value={intent} onValueChange={(value) => setIntent(value as PsiActionDraftIntent | "all")}>
-            <SelectTrigger size="sm">
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder="Intent" />
             </SelectTrigger>
             <SelectContent>
@@ -162,7 +162,7 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
           </Select>
 
           <Select value={status} onValueChange={(value) => setStatus(value as PsiActionDraftStatus | "all")}>
-            <SelectTrigger size="sm">
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
@@ -175,7 +175,7 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
           </Select>
 
           <Select value={moduleCode} onValueChange={setModuleCode}>
-            <SelectTrigger size="sm">
+            <SelectTrigger className="h-8 text-xs">
               <SelectValue placeholder="Module" />
             </SelectTrigger>
             <SelectContent>
