@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
+import { getBranchCopy, type BranchLocale } from "@/config/branch-language-copy";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -140,6 +142,9 @@ const tabs = ["Overview", "Branch Health", "Today Operations", "Related Records"
 
 export function BranchErpPage() {
   const router = useRouter();
+  const rawLocale = useUiPreferencesStore((state) => state.locale);
+  const currentLocale: BranchLocale = rawLocale === "zh" ? "zh" : "en";
+  const branchCopy = getBranchCopy(currentLocale);
 const [selectedId, setSelectedId] = useState("KCH-001");
   const [activeTab, setActiveTab] = useState("Overview");
 
@@ -167,39 +172,39 @@ const [selectedId, setSelectedId] = useState("KCH-001");
       <div className="space-y-6">
         {/* Page Header */}
         <ErpPageHeader
-          breadcrumbs={["ME", "Store Operations", "Branch Management"]}
-          title="Branch Management"
-          subtitle="Manage branch operating status, performance, staffing, tasks, and alerts across all stores."
+          breadcrumbs={[...branchCopy.page.breadcrumbs]}
+          title={branchCopy.page.title}
+          subtitle={branchCopy.page.subtitle}
           actions={
             <div className="flex items-center justify-end gap-2">
               <Sheet>
                 <SheetTrigger asChild>
                   <Button size="sm" className="gap-2">
                     <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Add Branch</span>
+                    <span className="hidden sm:inline">{branchCopy.actions.addBranch}</span>
                   </Button>
                 </SheetTrigger>
                 <SheetContent>
                   <SheetHeader>
-                    <SheetTitle>Add New Branch</SheetTitle>
+                    <SheetTitle>{branchCopy.actions.addBranch}</SheetTitle>
                     <SheetDescription>
-                      Fill in the details to register a new branch in the system.
+                      {currentLocale === "zh" ? "填写资料以新增门店到系统。" : "{currentLocale === "zh" ? "填写资料以新增门店到系统。" : "Fill in the details to register a new branch in the system."}"}
                     </SheetDescription>
                   </SheetHeader>
                   <div className="space-y-4 py-6">
                     <div className="space-y-1">
-                      <label className="text-sm font-medium">Branch Name</label>
-                      <Input placeholder="Enter branch name" />
+                      <label className="text-sm font-medium">{branchCopy.fields.branchName}</label>
+                      <Input placeholder={currentLocale === "zh" ? "输入门店名称" : "Enter branch name"} />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-sm font-medium">Branch Code</label>
+                      <label className="text-sm font-medium">{branchCopy.fields.branchCode}</label>
                       <Input placeholder="e.g. KCH-003" />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-sm font-medium">Region</label>
+                      <label className="text-sm font-medium">{branchCopy.fields.region}</label>
                       <Select>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select region" />
+                          <SelectValue placeholder={branchCopy.fields.region} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="kuching">Kuching</SelectItem>
@@ -209,23 +214,23 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                       </Select>
                     </div>
                   </div>
-                  <Button className="w-full">Create Branch</Button>
+                  <Button className="w-full">{branchCopy.actions.createBranch}</Button>
                 </SheetContent>
               </Sheet>
 
               <Button variant="outline" size="sm" onClick={handleExport} className="hidden gap-2 md:inline-flex">
                 <Download className="h-4 w-4" />
-                <span>Export</span>
+                <span>{branchCopy.actions.export}</span>
               </Button>
               
               <Button variant="outline" size="sm" onClick={() => router.push("/reports?module=branches")} className="hidden gap-2 md:inline-flex">
                 <FileText className="h-4 w-4" />
-                <span>View Reports</span>
+                <span>{branchCopy.actions.viewReports}</span>
               </Button>
 
               <Button variant="outline" size="sm" onClick={() => router.push("/tasks?module=branches")} className="hidden gap-2 md:inline-flex">
                 <CheckSquare className="h-4 w-4" />
-                <span>Open Tasks</span>
+                <span>{branchCopy.actions.openTasks}</span>
               </Button>
 
               <DropdownMenu>
@@ -236,17 +241,17 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem className="md:hidden" onClick={handleExport}>
-                    Export
+                    {branchCopy.actions.export}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="md:hidden" onClick={() => router.push("/reports?module=branches")}>
-                    View Reports
+                    {branchCopy.actions.viewReports}
                   </DropdownMenuItem>
                   <DropdownMenuItem className="md:hidden" onClick={() => router.push("/tasks?module=branches")}>
-                    Open Tasks
+                    {branchCopy.actions.openTasks}
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Import Branches</DropdownMenuItem>
-                  <DropdownMenuItem>Batch Edit</DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive">Delete Archive</DropdownMenuItem>
+                  <DropdownMenuItem>{branchCopy.actions.importBranches}</DropdownMenuItem>
+                  <DropdownMenuItem>{branchCopy.actions.batchEdit}</DropdownMenuItem>
+                  <DropdownMenuItem className="text-destructive">{branchCopy.actions.deleteArchive}</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -263,7 +268,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
             <div className="flex items-center gap-2">
               <Select defaultValue="all">
                 <SelectTrigger className="h-9 w-[160px]">
-                  <SelectValue placeholder="All Branches" />
+                  <SelectValue placeholder=branchCopy.filters.allBranches />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Branches</SelectItem>
@@ -273,7 +278,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
               </Select>
               <Select defaultValue="all">
                 <SelectTrigger className="h-9 w-[140px]">
-                  <SelectValue placeholder="All Regions" />
+                  <SelectValue placeholder=branchCopy.filters.allRegions />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Regions</SelectItem>
@@ -283,7 +288,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
               </Select>
               <Select defaultValue="all">
                 <SelectTrigger className="h-9 w-[140px]">
-                  <SelectValue placeholder="All Status" />
+                  <SelectValue placeholder=branchCopy.filters.allStatus />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
@@ -381,7 +386,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
               actions={
                 <Button size="sm" variant="outline" onClick={handleCreateTask} className="gap-2">
                   <Plus className="h-4 w-4" />
-                  <span>Create Task</span>
+                  <span>{branchCopy.actions.createTask}</span>
                 </Button>
               }
             >
