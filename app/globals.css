@@ -364,3 +364,18 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+/* =========================================================
+   ME SCROLL BEHAVIOR
+   Stop page-level rubber-band bounce without blocking inner scrolling.
+   Do not apply overscroll rules to *.
+   ========================================================= */
+
+html,
+body {
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+}
+
+body {
+  min-height: 100dvh;
+}
