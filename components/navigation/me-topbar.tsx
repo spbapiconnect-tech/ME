@@ -83,7 +83,7 @@ export function MeTopbar({ locale = "en" }: MeTopbarProps) {
             </div>
             <div className="flex items-center gap-2">
               <MeMobileNav locale={resolvedLocale} />
-              <Button size="icon-sm" variant="outline" className="lg:hidden" onClick={() => setNotificationOpen(true)}>
+              <Button size="icon" className="h-8 w-8 lg:hidden" variant="outline" onClick={() => setNotificationOpen(true)}>
                 <Bell className="size-4" />
               </Button>
               <Badge variant="outline" className="hidden sm:inline-flex">
