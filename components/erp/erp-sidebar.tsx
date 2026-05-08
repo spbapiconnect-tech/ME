@@ -79,7 +79,7 @@ export function ErpSidebar({ activeHref }: { activeHref?: string }) {
   const dict = useDictionary();
 
   return (
-    <aside className="hidden h-screen w-[280px] shrink-0 sticky top-0 border-r border-border bg-card md:flex flex-col">
+    <aside className="h-screen sticky top-0 border-r border-border bg-card flex flex-col">
       <div className="flex h-14 items-center gap-3 px-6 border-b border-border/50 shrink-0">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground shadow-lg shadow-primary/20">
           ME
