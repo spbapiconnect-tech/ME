@@ -9,7 +9,7 @@ export type ErpKpi = {
 
 export function ErpKpiGrid({ kpis }: { kpis: ErpKpi[] }) {
   return (
-    <div className="grid gap-4 md:grid-cols-4 xl:grid-cols-8">
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-8">
       {kpis.map((item) => (
         <Card key={item.label} className="flex flex-col justify-center min-h-[72px] rounded-md border-border bg-card p-3 shadow-sm">
           <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">{item.label}</div>
