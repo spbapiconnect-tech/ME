@@ -364,20 +364,3 @@ body::-webkit-scrollbar {
   display: none;
 }
 
-/* =========================================================
-   ME SCROLL BEHAVIOR
-   Prevent page rubber-band / bounce while keeping scrolling usable.
-   ========================================================= */
-
-html,
-body {
-  overscroll-behavior: none;
-}
-
-body {
-  min-height: 100dvh;
-}
-
-* {
-  overscroll-behavior: contain;
-}
