@@ -334,3 +334,32 @@
   --erp-muted: #a7b4cc;
   --erp-primary: #8ea7ff;
 }
+
+/* =========================================================
+   ME SCROLLBAR POLICY
+   Hide visual scrollbars while keeping scroll behavior.
+   ========================================================= */
+
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
