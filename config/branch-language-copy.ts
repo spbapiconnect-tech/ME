@@ -93,6 +93,7 @@ export const branchLanguageCopy = {
       openTasks: "Open tasks",
       inventoryAlerts: "Inventory alerts",
       openInspection: "Open inspection",
+      procurementRequest: "Procurement request",
     },
     tabs: {
       overview: "Overview",
@@ -201,6 +202,7 @@ export const branchLanguageCopy = {
       openTasks: "打开任务",
       inventoryAlerts: "库存警报",
       openInspection: "打开巡检",
+      procurementRequest: "采购申请",
     },
     tabs: {
       overview: "概览",

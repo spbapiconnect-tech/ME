@@ -59,3 +59,20 @@ export const branchDetails: Record<string, Record<string, string>> = {
     "Inventory Review": "0 alerts",
   },
 };
+
+export const branchInventoryAlerts = [
+  { item: "Fresh Milk", stock: "2L", alert: "Critical" },
+  { item: "Coffee Beans", stock: "5kg", alert: "Low" },
+] as const;
+
+export const branchStaffOnDuty = [
+  { name: "Alex Wong", role: "Barista", shift: "Morning" },
+  { name: "Siti Aminah", role: "Supervisor", shift: "Morning" },
+] as const;
+
+export const branchRecentActivity = [
+  { user: "Chin Ling", action: "Updated inventory", time: "2h ago" },
+  { user: "System", action: "Daily report generated", time: "5h ago" },
+  { user: "Sarah Lee", action: "Completed 4 tasks", time: "1d ago" },
+] as const;
+

@@ -58,7 +58,7 @@ import {
   ErpShell,
 } from "@/components/erp";
 import { erpBranchRows } from "@/lib/erp/erp-sample-data";
-import { branchDetails, branchKpiItems } from "@/config/branch-demo-data";
+import { branchDetails, branchInventoryAlerts, branchKpiItems, branchRecentActivity, branchStaffOnDuty } from "@/config/branch-demo-data";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 
@@ -490,10 +490,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px]">{branchCopy.detail.viewAll}</Button>
                 </div>
                 <div className="p-1">
-                  {[
-                    { item: "Fresh Milk", stock: "2L", alert: "Critical" },
-                    { item: "Coffee Beans", stock: "5kg", alert: "Low" },
-                  ].map((row, i) => (
+                  {branchInventoryAlerts.map((row, i) => (
                     <div key={i} className="flex items-center justify-between p-2 text-sm border-b last:border-0">
                       <span>{row.item}</span>
                       <div className="flex items-center gap-2">
@@ -511,10 +508,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px]">{branchCopy.actions.manage}</Button>
                 </div>
                 <div className="p-1">
-                  {[
-                    { name: "Alex Wong", role: "Barista", shift: "Morning" },
-                    { name: "Siti Aminah", role: "Supervisor", shift: "Morning" },
-                  ].map((row, i) => (
+                  {branchStaffOnDuty.map((row, i) => (
                     <div key={i} className="flex items-center justify-between p-2 text-sm border-b last:border-0">
                       <div className="flex items-center gap-2">
                         <User className="h-3 w-3 text-muted-foreground" />
@@ -572,7 +566,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                       { label: branchCopy.quickLinks.openTasks, href: `/tasks?branch=${selectedId}`, icon: ListTodo },
                       { label: branchCopy.quickLinks.inventoryAlerts, href: `/psi/inventory?branch=${selectedId}`, icon: Warehouse },
                       { label: branchCopy.quickLinks.openInspection, href: `/inspection?branch=${selectedId}`, icon: ClipboardList },
-                      { label: "Procurement request", href: `/psi/procurement?action=new&branch=${selectedId}`, icon: Plus },
+                      { label: branchCopy.quickLinks.procurementRequest, href: `/psi/procurement?action=new&branch=${selectedId}`, icon: Plus },
                     ].map((link) => (
                       <Button 
                         key={link.label} 
@@ -593,11 +587,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
             <div className="border rounded-md bg-card p-4 shadow-sm space-y-4">
               <h3 className="text-sm font-bold">{branchCopy.detail.recentActivity}</h3>
               <div className="space-y-4">
-                {[
-                  { user: "Chin Ling", action: "Updated inventory", time: "2h ago" },
-                  { user: "System", action: "Daily report generated", time: "5h ago" },
-                  { user: "Sarah Lee", action: "Completed 4 tasks", time: "1d ago" },
-                ].map((activity, i) => (
+                {branchRecentActivity.map((activity, i) => (
                   <div key={i} className="flex items-start gap-3 text-sm">
                     <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0 uppercase">
                       {activity.user[0]}
