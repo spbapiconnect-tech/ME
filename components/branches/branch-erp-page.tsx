@@ -57,7 +57,6 @@ import {
 } from "@/components/erp";
 import { erpBranchRows } from "@/lib/erp/erp-sample-data";
 import { toast } from "sonner";
-import { useDictionary } from "@/lib/i18n";
 import { Separator } from "@/components/ui/separator";
 
 type BranchRow = (typeof erpBranchRows)[number];
