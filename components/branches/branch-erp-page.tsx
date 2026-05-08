@@ -294,7 +294,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   <SelectValue placeholder={branchCopy.filters.allBranches} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Branches</SelectItem>
+                  <SelectItem value="all">{branchCopy.filters.allBranches}</SelectItem>
                   <SelectItem value="kch">Kuching Stores</SelectItem>
                   <SelectItem value="btu">Bintulu Stores</SelectItem>
                 </SelectContent>
@@ -304,7 +304,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   <SelectValue placeholder={branchCopy.filters.allRegions} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Regions</SelectItem>
+                  <SelectItem value="all">{branchCopy.filters.allRegions}</SelectItem>
                   <SelectItem value="central">Central</SelectItem>
                   <SelectItem value="north">North</SelectItem>
                 </SelectContent>
@@ -314,8 +314,8 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   <SelectValue placeholder={branchCopy.filters.allStatus} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="operating">Operating</SelectItem>
+                  <SelectItem value="all">{branchCopy.filters.allStatus}</SelectItem>
+                  <SelectItem value="operating">{branchCopy.status.operating}</SelectItem>
                   <SelectItem value="preparation">Preparation</SelectItem>
                 </SelectContent>
               </Select>
@@ -352,7 +352,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
 
                 <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <div className="text-xs text-muted-foreground">Today Sales</div>
+                    <div className="text-xs text-muted-foreground">{branchCopy.mobileCards.todaySales}</div>
                     <div className="font-medium text-foreground">{row.todaySales}</div>
                   </div>
                   <div className="text-right">
@@ -360,11 +360,11 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                     <div className="font-medium text-foreground">{row.lastUpdate}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">Open Tasks</div>
+                    <div className="text-xs text-muted-foreground">{branchCopy.mobileCards.openTasks}</div>
                     <div className="font-medium text-foreground">{row.openTasks}</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-muted-foreground">Stock Alerts</div>
+                    <div className="text-xs text-muted-foreground">{branchCopy.mobileCards.stockAlerts}</div>
                     <div className="font-medium text-foreground">{row.stockAlerts}</div>
                   </div>
                 </div>
@@ -447,18 +447,18 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                     
                     <div className="space-y-6">
                       <div className="rounded-lg bg-muted/30 p-4 space-y-4">
-                        <h4 className="text-sm font-bold">Today Operation Summary</h4>
+                        <h4 className="text-sm font-bold">{branchCopy.detail.todayOperationSummary}</h4>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Staff on Duty</span>
-                            <span className="font-medium">{detailData["Staff Today"]} Persons</span>
+                            <span className="text-muted-foreground">{branchCopy.detail.staffOnDuty}</span>
+                            <span className="font-medium">{detailData["Staff Today"]} {branchCopy.detail.persons}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">{branchCopy.detail.currentShift}</span>
                             <span className="font-medium text-primary">{detailData["Current Shift"]}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Sales Progress</span>
+                            <span className="text-muted-foreground">{branchCopy.detail.salesProgress}</span>
                             <span className="font-medium text-success">84% of target</span>
                           </div>
                         </div>
@@ -471,8 +471,8 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[
                       { label: "Inspection", value: selected.inspection, status: "Good" },
-                      { label: "Stock Health", value: detailData["Inventory Review"], status: "Warning" },
-                      { label: "Staff Coverage", value: "100%", status: "Good" },
+                      { label: branchCopy.detail.stockHealth, value: detailData["Inventory Review"], status: "Warning" },
+                      { label: branchCopy.detail.staffCoverage, value: "100%", status: "Good" },
                     ].map((item) => (
                       <div key={item.label} className="border rounded-md p-4 space-y-2">
                         <div className="text-xs text-muted-foreground">{item.label}</div>
@@ -541,8 +541,8 @@ const [selectedId, setSelectedId] = useState("KCH-001");
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="border rounded-md bg-card overflow-hidden shadow-sm">
                 <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-wider">Inventory Alerts</h3>
-                  <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px]">View All</Button>
+                  <h3 className="text-xs font-bold uppercase tracking-wider">{branchCopy.detail.inventoryAlerts}</h3>
+                  <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px]">{branchCopy.detail.viewAll}</Button>
                 </div>
                 <div className="p-1">
                   {[
@@ -562,7 +562,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
 
               <div className="border rounded-md bg-card overflow-hidden shadow-sm">
                 <div className="p-3 border-b bg-muted/30 flex items-center justify-between">
-                  <h3 className="text-xs font-bold uppercase tracking-wider">Staff On Duty</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-wider">{branchCopy.detail.staffOnDutyTitle}</h3>
                   <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px]">Manage</Button>
                 </div>
                 <div className="p-1">
@@ -585,7 +585,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
 
           {/* Right Rail */}
           <div className="min-w-0 space-y-6">
-            <ErpRightRail title="Branch Insights">
+            <ErpRightRail title={branchCopy.detail.branchInsights}>
               <div className="p-4 space-y-4">
                 <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
                   <div className="flex items-center gap-2 text-primary">
@@ -598,12 +598,12 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 </div>
 
                 <div className="space-y-3">
-                  <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Top Alerts</h4>
+                  <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{branchCopy.detail.topAlerts}</h4>
                   <div className="space-y-2">
                     <div className="flex items-start gap-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
                       <div className="h-2 w-2 rounded-full bg-destructive mt-1.5 shrink-0" />
                       <div className="space-y-0.5">
-                        <div className="text-xs font-medium">Inventory Critical</div>
+                        <div className="text-xs font-medium">{branchCopy.detail.inventoryCritical}</div>
                         <div className="text-[10px] text-muted-foreground">2 items below threshold</div>
                       </div>
                     </div>
@@ -611,7 +611,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                       <div className="h-2 w-2 rounded-full bg-warning mt-1.5 shrink-0" />
                       <div className="space-y-0.5">
                         <div className="text-xs font-medium">Inspection Due</div>
-                        <div className="text-[10px] text-muted-foreground">Scheduled for tomorrow</div>
+                        <div className="text-[10px] text-muted-foreground">{branchCopy.detail.scheduledTomorrow}</div>
                       </div>
                     </div>
                   </div>
@@ -620,13 +620,13 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                 <Separator />
 
                 <div className="space-y-3">
-                  <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Quick Links</h4>
+                  <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{branchCopy.detail.quickLinks}</h4>
                   <div className="grid grid-cols-1 gap-1">
                     {[
-                      { label: "View branch report", href: `/reports?branch=${selectedId}`, icon: BarChart3 },
-                      { label: "Open tasks", href: `/tasks?branch=${selectedId}`, icon: ListTodo },
-                      { label: "Inventory alerts", href: `/psi/inventory?branch=${selectedId}`, icon: Warehouse },
-                      { label: "Open inspection", href: `/inspection?branch=${selectedId}`, icon: ClipboardList },
+                      { label: branchCopy.quickLinks.viewBranchReport, href: `/reports?branch=${selectedId}`, icon: BarChart3 },
+                      { label: branchCopy.quickLinks.openTasks, href: `/tasks?branch=${selectedId}`, icon: ListTodo },
+                      { label: branchCopy.quickLinks.inventoryAlerts, href: `/psi/inventory?branch=${selectedId}`, icon: Warehouse },
+                      { label: branchCopy.quickLinks.openInspection, href: `/inspection?branch=${selectedId}`, icon: ClipboardList },
                       { label: "Procurement request", href: `/psi/procurement?action=new&branch=${selectedId}`, icon: Plus },
                     ].map((link) => (
                       <Button 
@@ -665,7 +665,7 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                   </div>
                 ))}
               </div>
-              <Button variant="ghost" className="w-full text-xs h-8 text-muted-foreground">View Full Timeline</Button>
+              <Button variant="ghost" className="w-full text-xs h-8 text-muted-foreground">{branchCopy.detail.viewFullTimeline}</Button>
             </div>
           </div>
         </div>
