@@ -309,7 +309,9 @@ const [selectedId, setSelectedId] = useState("KCH-001");
                       {row.branchCode} · {row.region}
                     </div>
                   </div>
-                  <ErpStatusBadge status={row.status} />
+                  <Badge variant="outline" className="shrink-0 text-[10px] uppercase tracking-[0.14em]">
+                    {row.status}
+                  </Badge>
                 </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
