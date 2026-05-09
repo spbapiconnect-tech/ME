@@ -4,7 +4,7 @@ import Link from "next/link"
 import * as React from "react"
 
 import { AccessPreviewCard } from "@/components/access/access-preview-card"
-import { MeDashboardShell, MePageHeader } from "@/components/layout"
+import { ErpPageHeader, ErpShell } from "@/components/erp"
 import { AccessRuleCard } from "@/components/access/access-rule-card"
 import { PlanCard } from "@/components/access/plan-card"
 import { RoleCard } from "@/components/access/role-card"
@@ -157,32 +157,31 @@ export function AccessControlPage() {
   }, [])
 
   return (
-    <MeDashboardShell activeKey="access-control">
-      <MePageHeader
-        eyebrow={currentLocale === "zh" ? "权限 / 治理" : "Access / Governance"}
-        title={t.title}
-        description={t.subtitle}
-        notice={t.desc}
-        badges={[
-          { label: t.metadata, variant: "secondary" },
-          { label: t.noAuth, variant: "outline" },
-          { label: t.noApi, variant: "outline" },
-          { label: t.noHide, variant: "outline" },
-        ]}
-        actions={
-          <>
-            <Button asChild variant="outline" size="sm"><Link href="/">{t.back}</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/action-contracts">{t.openActionContracts}</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/layout-engine">{t.openLayoutEngine}</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/workflow">ME Workflow</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/reports">ME Reports</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/notifications">ME Notifications</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/rules">ME Rules</Link></Button>
-            <Button asChild variant="outline" size="sm"><Link href="/packages">ME Packages</Link></Button>
-          </>
-        }
-      />
+    <ErpShell activeHref="/access-control">
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "Access Control", "Governance Contract"]}
+          title={t.title}
+          zhTitle="权限与访问控制"
+          subtitle={
+            currentLocale === "zh"
+              ? `${t.subtitle}。${t.desc}`
+              : `${t.subtitle}. ${t.desc}`
+          }
+          actions={
+            <>
+              <Button asChild variant="outline" size="sm"><Link href="/">{t.back}</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href="/action-contracts">{t.openActionContracts}</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href="/layout-engine">{t.openLayoutEngine}</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href="/audit-trail">ME Audit Trail</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href="/workflow">ME Workflow</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href="/reports">ME Reports</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href="/notifications">ME Notifications</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href="/rules">ME Rules</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link href="/packages">ME Packages</Link></Button>
+            </>
+          }
+        />
 
       <Card size="sm">
         <CardHeader className="gap-1">
@@ -284,6 +283,7 @@ export function AccessControlPage() {
           {actionPreview ? <AccessPreviewCard preview={actionPreview} locale={currentLocale} auditPreview={actionAuditPreview} workflowPreview={actionWorkflowPreview} notificationPreview={actionNotificationPreview} /> : null}
         </div>
       </section>
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   )
 }
