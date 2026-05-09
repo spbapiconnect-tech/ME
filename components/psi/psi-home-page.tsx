@@ -3,10 +3,9 @@
 import Link from "next/link";
 
 import { ErpPageHeader, ErpShell } from "@/components/erp";
-import { MeWorkspaceSection } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
-import { PsiModuleCard, PsiSoftCard, psiVisual } from "@/components/psi/psi-visual";
+import { PsiModuleCard, PsiSection, PsiSoftCard, psiVisual } from "@/components/psi/psi-visual";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 
 export function PsiHomePage() {
@@ -72,6 +71,12 @@ export function PsiHomePage() {
     },
   ];
 
+  const activity = [
+    ["09:26", currentLocale === "zh" ? "供应商报价已关联" : "Supplier quote attached", "ABC Food Supply quotation linked for procurement reference."],
+    ["09:35", currentLocale === "zh" ? "库存风险已关联" : "Inventory risk linked", "KCH broth coverage risk attached to procurement request."],
+    ["14:22", currentLocale === "zh" ? "等待经理复核" : "Awaiting manager review", "Procurement request is queued for branch review."],
+  ];
+
   return (
     <ErpShell activeHref="/psi">
       <div className={psiVisual.pageStack}>
@@ -95,8 +100,7 @@ export function PsiHomePage() {
           }
         />
 
-        <MeWorkspaceSection
-          className={psiVisual.section}
+        <PsiSection
           title={psiCopy.overview.operationModules}
           description={psiCopy.overview.operationModulesDescription}
         >
@@ -111,7 +115,7 @@ export function PsiHomePage() {
               />
             ))}
           </div>
-        </MeWorkspaceSection>
+        </PsiSection>
 
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {kpis.map(([label, value, hint]) => (
@@ -124,8 +128,7 @@ export function PsiHomePage() {
         </section>
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-          <MeWorkspaceSection
-            className={psiVisual.section}
+          <PsiSection
             title={currentLocale === "zh" ? "当前 PSI 队列" : "Current PSI Queue"}
             description={
               currentLocale === "zh"
@@ -146,10 +149,9 @@ export function PsiHomePage() {
                 </Link>
               ))}
             </div>
-          </MeWorkspaceSection>
+          </PsiSection>
 
-          <MeWorkspaceSection
-            className={psiVisual.section}
+          <PsiSection
             title={currentLocale === "zh" ? "PSI 健康检查" : "PSI Health Check"}
             description={
               currentLocale === "zh"
@@ -169,7 +171,50 @@ export function PsiHomePage() {
                 </PsiSoftCard>
               ))}
             </div>
-          </MeWorkspaceSection>
+          </PsiSection>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+          <PsiSection
+            title={currentLocale === "zh" ? "今日活动" : "Today Activity"}
+            description={
+              currentLocale === "zh"
+                ? "显示 PSI dashboard 层面的最新联动，不进入单据明细。"
+                : "Latest PSI coordination signals without turning this dashboard into a record detail page."
+            }
+          >
+            <div className="grid gap-3">
+              {activity.map(([time, title, description]) => (
+                <PsiSoftCard key={`${time}-${title}`}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className={psiVisual.title}>{title}</p>
+                      <p className={`mt-1 ${psiVisual.body}`}>{description}</p>
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground">{time}</span>
+                  </div>
+                </PsiSoftCard>
+              ))}
+            </div>
+          </PsiSection>
+
+          <PsiSection
+            title={currentLocale === "zh" ? "工作区说明" : "Workspace Note"}
+            description={
+              currentLocale === "zh"
+                ? "PSI 总览只负责跨模块判断，详细单据保留在 Procurement / Supplier / Inventory / Receiving 页面。"
+                : "PSI overview is for cross-module triage. Record-level work stays inside Procurement, Supplier, Inventory, and Receiving."
+            }
+          >
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm">
+                <Link href="/system-foundation">Open System Center</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/psi/procurement">Open Procurement Detail</Link>
+              </Button>
+            </div>
+          </PsiSection>
         </div>
       </div>
     </ErpShell>
