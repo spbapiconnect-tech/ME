@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import {
@@ -13,6 +15,8 @@ import {
   MeWorkspaceSection,
 } from "@/components/layout";
 import type { TaskRecord } from "@/types/task";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
+import { getTaskCopy, type TaskLocale } from "@/config/task-language-copy";
 
 function mapModuleRoute(sourceModule: TaskRecord["sourceModule"]) {
   switch (sourceModule) {
@@ -39,6 +43,10 @@ function titleCaseStatus(value: string) {
     .join(" ");
 }
 
+function getLocalizedTaskText(text: { en: string; zh: string }, locale: TaskLocale) {
+  return locale === "zh" ? text.zh : text.en;
+}
+
 interface TaskDetailPageProps {
   taskId: string;
   task?: TaskRecord | null;
@@ -46,18 +54,22 @@ interface TaskDetailPageProps {
 }
 
 export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps) {
+  const rawLocale = useUiPreferencesStore((state) => state.locale);
+  const currentLocale: TaskLocale = rawLocale === "zh" ? "zh" : "en";
+  const taskCopy = getTaskCopy(currentLocale);
+
   if (!task) {
     return (
       <MeDashboardShell activeKey="tasks">
         <MePageHeader
-          eyebrow="Task Management"
-          title="Task record not available"
-          description="The selected task could not be loaded into the current workspace."
-          notice={dataError ?? "Return to the task queue to continue reviewing operational work orders."}
-          badges={[{ label: "Task queue" }, { label: "Record check", variant: "outline" }]}
+          eyebrow={taskCopy.page.eyebrow}
+          title={taskCopy.page.emptyTitle}
+          description={taskCopy.page.emptyDescription}
+          notice={dataError ?? taskCopy.page.emptyNotice}
+          badges={[{ label: taskCopy.badges.taskQueue }, { label: taskCopy.badges.recordCheck, variant: "outline" }]}
           meta={[
-            { label: "Requested record", value: taskId },
-            { label: "Queue route", value: "/tasks" },
+            { label: taskCopy.fields.record, value: taskId },
+            { label: taskCopy.fields.route, value: "/tasks" },
           ]}
         />
       </MeDashboardShell>
@@ -68,16 +80,16 @@ export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps)
     <MeRightRail
       sections={[
         {
-          title: "Task Status",
+          title: taskCopy.rightRail.taskStatus,
           badge: titleCaseStatus(task.status),
-          items: [`Priority: ${titleCaseStatus(task.priority)}`, `Owner: ${task.ownerRole}`, `Branch: ${task.store}`],
+          items: [`${taskCopy.fields.priority}: ${titleCaseStatus(task.priority)}`, `${taskCopy.fields.owner}: ${task.ownerRole}`, `${taskCopy.fields.branch}: ${task.store}`],
         },
         {
-          title: "Follow-up",
-          items: ["Comment trail", "Escalation review", "Related record coordination"],
+          title: taskCopy.rightRail.followUp,
+          items: [taskCopy.rightRail.commentTrail, taskCopy.rightRail.escalationReview, taskCopy.rightRail.relatedRecordCoordination],
         },
         {
-          title: "Related Modules",
+          title: taskCopy.rightRail.relatedModules,
           items: task.linkedRecords.map((record) => `${titleCaseStatus(record.moduleCode)} · ${record.recordId}`),
         },
       ]}
@@ -87,76 +99,76 @@ export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps)
   return (
     <MeDashboardShell activeKey="tasks" rightRail={rightRail}>
       <MePageHeader
-        eyebrow="Task Management"
+        eyebrow={taskCopy.page.eyebrow}
         title={task.id}
-        description={task.title.en}
-        notice={task.description.en}
+        description={getLocalizedTaskText(task.title, currentLocale)}
+        notice={getLocalizedTaskText(task.description, currentLocale)}
         badges={[
           { label: titleCaseStatus(task.taskType) },
           { label: titleCaseStatus(task.sourceModule), variant: "secondary" },
           { label: titleCaseStatus(task.priority), variant: "outline" },
         ]}
         meta={[
-          { label: "Branch", value: task.store },
-          { label: "Owner", value: `${task.ownerName} · ${task.ownerRole}` },
-          { label: "Status", value: titleCaseStatus(task.status) },
-          { label: "Due", value: task.dueAt },
+          { label: taskCopy.fields.branch, value: task.store },
+          { label: taskCopy.fields.owner, value: `${task.ownerName} · ${task.ownerRole}` },
+          { label: taskCopy.fields.status, value: titleCaseStatus(task.status) },
+          { label: taskCopy.fields.due, value: task.dueAt },
         ]}
       />
 
       <MeRecordSummary
         title={task.id}
-        subtitle={task.title.en}
+        subtitle={getLocalizedTaskText(task.title, currentLocale)}
         status={titleCaseStatus(task.status)}
-        guardrail="Current service scope"
+        guardrail={taskCopy.fields.currentServiceScope}
         meta={[
-          { label: "Task type", value: titleCaseStatus(task.taskType) },
-          { label: "Source record", value: task.sourceRecordId },
-          { label: "Source module", value: titleCaseStatus(task.sourceModule) },
-          { label: "Assigned to", value: `${task.ownerName} · ${task.ownerRole}` },
-          { label: "Created", value: task.createdAt },
-          { label: "Updated", value: task.updatedAt },
+          { label: taskCopy.fields.taskType, value: titleCaseStatus(task.taskType) },
+          { label: taskCopy.fields.sourceRecord, value: task.sourceRecordId },
+          { label: taskCopy.fields.sourceModule, value: titleCaseStatus(task.sourceModule) },
+          { label: taskCopy.fields.assignedTo, value: `${task.ownerName} · ${task.ownerRole}` },
+          { label: taskCopy.fields.created, value: task.createdAt },
+          { label: taskCopy.fields.updated, value: task.updatedAt },
         ]}
       />
 
       <MeActionBar
         actions={[
-          { label: "Complete", href: "#", variant: "default" },
-          { label: "Reassign", href: "#", variant: "secondary" },
-          { label: "Add Comment", href: "#", variant: "outline" },
-          { label: "Escalate", href: "#", variant: "outline" },
-          { label: "Back to Queue", href: "/tasks", variant: "ghost" },
+          { label: taskCopy.actions.complete, href: "#", variant: "default" },
+          { label: taskCopy.actions.reassign, href: "#", variant: "secondary" },
+          { label: taskCopy.actions.addComment, href: "#", variant: "outline" },
+          { label: taskCopy.actions.escalate, href: "#", variant: "outline" },
+          { label: taskCopy.actions.backToQueue, href: "/tasks", variant: "ghost" },
         ]}
       />
 
       <MeTabs
         style="detail"
         tabs={[
-          { label: "Overview", active: true },
-          { label: "Related Records", badge: String(task.linkedRecords.length) },
-          { label: "Activity", badge: String(task.timeline.length) },
-          { label: "Evidence", badge: String(task.evidence.length) },
-          { label: "Audit" },
+          { label: taskCopy.tabs.overview, active: true },
+          { label: taskCopy.tabs.relatedRecords, badge: String(task.linkedRecords.length) },
+          { label: taskCopy.tabs.activity, badge: String(task.timeline.length) },
+          { label: taskCopy.tabs.evidence, badge: String(task.evidence.length) },
+          { label: taskCopy.tabs.audit },
         ]}
       />
 
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title="Task Overview" description="Assignment context, branch impact, and linked operational summary for the selected work order.">
+            <MeWorkspaceSection title={taskCopy.sections.taskOverview} description={taskCopy.sections.taskOverviewDescription}>
               <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_18rem]">
                 <div className="grid gap-3 md:grid-cols-2">
                   {[
-                    ["Task ID", task.id],
-                    ["Task title", task.title.en],
-                    ["Branch", task.store],
-                    ["Owner", `${task.ownerName} · ${task.ownerRole}`],
-                    ["Priority", titleCaseStatus(task.priority)],
-                    ["Status", titleCaseStatus(task.status)],
-                    ["Task type", titleCaseStatus(task.taskType)],
-                    ["Source record", task.sourceRecordId],
-                    ["Created", task.createdAt],
-                    ["Due date", task.dueAt],
+                    [taskCopy.fields.taskId, task.id],
+                    [taskCopy.fields.taskTitle, getLocalizedTaskText(task.title, currentLocale)],
+                    [taskCopy.fields.branch, task.store],
+                    [taskCopy.fields.owner, `${task.ownerName} · ${task.ownerRole}`],
+                    [taskCopy.fields.priority, titleCaseStatus(task.priority)],
+                    [taskCopy.fields.status, titleCaseStatus(task.status)],
+                    [taskCopy.fields.taskType, titleCaseStatus(task.taskType)],
+                    [taskCopy.fields.sourceRecord, task.sourceRecordId],
+                    [taskCopy.fields.created, task.createdAt],
+                    [taskCopy.fields.dueDate, task.dueAt],
                   ].map(([label, value]) => (
                     <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
@@ -165,37 +177,37 @@ export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps)
                   ))}
                 </div>
                 <div className="rounded-[12px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Business Summary</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">{task.description.en}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{taskCopy.fields.businessSummary}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{getLocalizedTaskText(task.description, currentLocale)}</p>
                 </div>
               </div>
             </MeWorkspaceSection>
 
-            <MeWorkspaceSection title="Related Records" description="Business records referenced by this task across inventory, procurement, supplier, and reporting workspaces.">
+            <MeWorkspaceSection title={taskCopy.sections.relatedRecords} description={taskCopy.sections.relatedRecordsDescription}>
               <MeDataTable
                 embedded
-                columns={["Module", "Record", "Label", "Route"]}
+                columns={[taskCopy.fields.module, taskCopy.fields.record, taskCopy.fields.label, taskCopy.fields.route]}
                 rows={task.linkedRecords.map((record) => [
                   titleCaseStatus(record.moduleCode),
                   record.recordId,
-                  record.label.en,
+                  getLocalizedTaskText(record.label, currentLocale),
                   <Link key={`${record.recordId}-route`} href={mapModuleRoute(record.moduleCode)} className="text-blue-700 hover:underline">
-                    Open workspace
+                    {taskCopy.actions.openWorkspace}
                   </Link>,
                 ])}
               />
             </MeWorkspaceSection>
 
-            <MeWorkspaceSection title="Evidence and Notes" description="Supporting notes, documents, and operational evidence referenced during task follow-up.">
+            <MeWorkspaceSection title={taskCopy.sections.evidenceAndNotes} description={taskCopy.sections.evidenceAndNotesDescription}>
               <MeDataTable
                 embedded
-                columns={["Evidence", "Type", "Detail"]}
-                rows={task.evidence.map((item) => [item.label.en, titleCaseStatus(item.type), item.value.replace(/placeholder/gi, "reference")])}
+                columns={[taskCopy.fields.evidence, taskCopy.fields.type, taskCopy.fields.detail]}
+                rows={task.evidence.map((item) => [getLocalizedTaskText(item.label, currentLocale), titleCaseStatus(item.type), item.value.replace(/placeholder/gi, "reference")])}
               />
             </MeWorkspaceSection>
           </>
         }
-        context={<MeStatusTimeline embedded title="Activity" items={task.timeline.map((entry) => ({ title: entry.title.en, description: entry.description.en, time: entry.timestamp }))} />}
+        context={<MeStatusTimeline embedded title={taskCopy.sections.activity} items={task.timeline.map((entry) => ({ title: getLocalizedTaskText(entry.title, currentLocale), description: getLocalizedTaskText(entry.description, currentLocale), time: entry.timestamp }))} />}
       />
     </MeDashboardShell>
   );
