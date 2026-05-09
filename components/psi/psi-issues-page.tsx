@@ -4,15 +4,14 @@ import Link from "next/link";
 
 import {
   MeActionBar,
-  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MePageHeader,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { PsiIssuePlaceholderRow } from "@/lib/page-data/psi/issues-page-data";
@@ -60,24 +59,14 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
   );
 
   return (
-    <MeDashboardShell activeKey="psi-issues" rightRail={rightRail}>
-      <MePageHeader
-        eyebrow={psiCopy.issues.eyebrow}
-        title={psiCopy.issues.title}
-        description={psiCopy.issues.description}
-        notice={error ?? psiCopy.issues.notice}
-        badges={[
-          { label: psiCopy.issues.issues },
-          { label: psiCopy.issues.psiCoordination, variant: "secondary" },
-          { label: psiCopy.rightRail.currentRelease, variant: "outline" },
-        ]}
-        meta={[
-          { label: psiCopy.shared.source, value: source },
-          { label: psiCopy.rightRail.queueSize, value: String(rows.length) },
-          { label: psiCopy.issues.coverage, value: psiCopy.issues.coverageValue },
-          { label: psiCopy.rightRail.deliveryMode, value: isMock ? psiCopy.rightRail.catalogLayerShort : psiCopy.rightRail.connectedServiceShort },
-        ]}
-      />
+    <ErpShell activeHref="/psi/issues">
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "PSI", "Issues"]}
+          title={psiCopy.issues.title}
+          zhTitle="PSI 问题队列"
+          subtitle={error ?? psiCopy.issues.description}
+        />
 
       <MeActionBar
         actions={[
@@ -142,6 +131,7 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
           />
         }
       />
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   );
 }
