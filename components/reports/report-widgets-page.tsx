@@ -56,32 +56,40 @@ const widgetTypeOptions: Array<ReportWidgetType | "all"> = [
 const statusOptions: Array<ReportWidgetStatus | "all"> = ["all", "active", "preview-only", "placeholder", "coming-soon", "blocked", "disabled"];
 const severityOptions: Array<ReportWidgetSeverity | "all"> = ["all", "neutral", "low", "medium", "high", "critical"];
 
-const widgetTypeOptionLabel: Record<ReportWidgetType | "all", string> = {
-  all: "All types",
-  kpi: "KPI",
-  chart: "Chart",
-  table: "Table",
-  list: "List",
-  "status-summary": "Status Summary",
-  trend: "Trend",
-  distribution: "Distribution",
-  alert: "Alert",
-  "task-summary": "Task Summary",
-  "workflow-summary": "Workflow Summary",
-  "notification-summary": "Notification Summary",
-  "audit-summary": "Audit Summary",
-  placeholder: "Catalog Surface",
-};
+function widgetTypeOptionLabel(value: ReportWidgetType | "all", copy: ReturnType<typeof getReportCopy>) {
+  const map: Record<ReportWidgetType | "all", string> = {
+    all: copy.filters.widgetTypeOptions.all,
+    kpi: copy.filters.widgetTypeOptions.kpi,
+    chart: copy.filters.widgetTypeOptions.chart,
+    table: copy.filters.widgetTypeOptions.table,
+    list: copy.filters.widgetTypeOptions.list,
+    "status-summary": copy.filters.widgetTypeOptions.statusSummary,
+    trend: copy.filters.widgetTypeOptions.trend,
+    distribution: copy.filters.widgetTypeOptions.distribution,
+    alert: copy.filters.widgetTypeOptions.alert,
+    "task-summary": copy.filters.widgetTypeOptions.taskSummary,
+    "workflow-summary": copy.filters.widgetTypeOptions.workflowSummary,
+    "notification-summary": copy.filters.widgetTypeOptions.notificationSummary,
+    "audit-summary": copy.filters.widgetTypeOptions.auditSummary,
+    placeholder: copy.filters.widgetTypeOptions.placeholder,
+  };
 
-const statusOptionLabel: Record<ReportWidgetStatus | "all", string> = {
-  all: "All status",
-  active: "Active",
-  "preview-only": "Configured",
-  placeholder: "Catalog",
-  "coming-soon": "Scheduled",
-  blocked: "Blocked",
-  disabled: "Disabled",
-};
+  return map[value];
+}
+
+function statusOptionLabel(value: ReportWidgetStatus | "all", copy: ReturnType<typeof getReportCopy>) {
+  const map: Record<ReportWidgetStatus | "all", string> = {
+    all: copy.filters.statusOptions.all,
+    active: copy.filters.statusOptions.active,
+    "preview-only": copy.filters.statusOptions.previewOnly,
+    placeholder: copy.filters.statusOptions.placeholder,
+    "coming-soon": copy.filters.statusOptions.comingSoon,
+    blocked: copy.filters.statusOptions.blocked,
+    disabled: copy.filters.statusOptions.disabled,
+  };
+
+  return map[value];
+}
 
 function groupBy(values: string[]) {
   return values.reduce<Record<string, number>>((acc, value) => {
@@ -222,8 +230,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           { label: reportCopy.actions.refreshPreview },
           { label: reportCopy.filters.reportFilters, variant: "secondary" },
           { label: reportCopy.actions.exportReview, variant: "outline" },
-          { label: "Share deck", variant: "outline" },
-          { label: "History", variant: "ghost" },
+          { label: reportCopy.actions.shareDeck, variant: "outline" },
+          { label: reportCopy.actions.history, variant: "ghost" },
         ]}
       />
 
@@ -232,8 +240,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           { label: reportCopy.tabs.reportOverview, active: true },
           { label: reportCopy.tabs.posReports, badge: reportCopy.badges.live },
           { label: reportCopy.tabs.salesAnalytics, badge: reportCopy.badges.catalog },
-          { label: "Branch Performance", badge: reportCopy.badges.catalog },
-          { label: reportCopy.actions.exportReview, badge: reportCopy.rightRail.scheduledDistributionSetup },
+          { label: reportCopy.tabs.branchPerformance, badge: reportCopy.badges.catalog },
+          { label: reportCopy.tabs.exportCenter, badge: reportCopy.rightRail.scheduledDistributionSetup },
         ]}
       />
 
@@ -267,7 +275,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           <MeWorkspaceSection title={reportCopy.sections.reportFilters} description={reportCopy.sections.reportFiltersDescription} contentClassName="xl:grid-cols-4">
             <Select value={widgetTypeFilter} onValueChange={(value) => setWidgetTypeFilter(value as ReportWidgetType | "all")}>
               <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={reportCopy.filters.widgetType} /></SelectTrigger>
-              <SelectContent>{widgetTypeOptions.map((value) => <SelectItem key={value} value={value}>{widgetTypeOptionLabel[value]}</SelectItem>)}</SelectContent>
+              <SelectContent>{widgetTypeOptions.map((value) => <SelectItem key={value} value={value}>{widgetTypeOptionLabel(value, reportCopy)}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
               <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={reportCopy.filters.sourceModule} /></SelectTrigger>
@@ -275,7 +283,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
             </Select>
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ReportWidgetStatus | "all")}>
               <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={reportCopy.filters.status} /></SelectTrigger>
-              <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{statusOptionLabel[value]}</SelectItem>)}</SelectContent>
+              <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{statusOptionLabel(value, reportCopy)}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={severityFilter} onValueChange={(value) => setSeverityFilter(value as ReportWidgetSeverity | "all")}>
               <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={reportCopy.filters.severity} /></SelectTrigger>
