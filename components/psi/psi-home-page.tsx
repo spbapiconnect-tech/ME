@@ -1,27 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { DemoPresentationNote } from "@/components/demo-mode/demo-presentation-note";
-import { useUiPreferencesStore } from "@/stores/ui-preferences";
-import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
-import {
-  MeActionBar,
-  MeDataTable,
-  MeDetailWorkspace,
-  MeRightRail,
-  MeStatusTimeline,
-  MeTabs,
-  MeWorkspaceSection,
-} from "@/components/layout";
-import { ErpPageHeader, ErpShell } from "@/components/erp";
-import { Button } from "@/components/ui/button";
-import { PsiModuleCard, PsiSoftCard, psiVisual } from "@/components/psi/psi-visual";
 
-const lineItems = [
-  ["Chicken broth base", "12 carton", "High", "Supplier confirmed"],
-  ["Burger sauce cup", "600 pcs", "Medium", "Pending manager review"],
-  ["Fried chicken patty", "8 carton", "High", "Receiving slot pending"],
-];
+import { ErpPageHeader, ErpShell } from "@/components/erp";
+import { MeWorkspaceSection } from "@/components/layout";
+import { Button } from "@/components/ui/button";
+import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
+import { PsiModuleCard, PsiSoftCard, psiVisual } from "@/components/psi/psi-visual";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 
 export function PsiHomePage() {
   const rawLocale = useUiPreferencesStore((state) => state.locale);
@@ -58,6 +44,33 @@ export function PsiHomePage() {
     },
   ];
 
+  const kpis = [
+    [psiCopy.shared.procurement, "12", currentLocale === "zh" ? "待处理采购事项" : "Open procurement work"],
+    [psiCopy.shared.supplier, "4", currentLocale === "zh" ? "供应商关注事项" : "Supplier watch items"],
+    [psiCopy.shared.inventory, "8", currentLocale === "zh" ? "库存风险项目" : "Inventory watch items"],
+    [psiCopy.shared.issues, "6", currentLocale === "zh" ? "跨模块问题" : "Cross-module issues"],
+  ];
+
+  const operatingQueue = [
+    {
+      title: "PR-KCH-0001",
+      label: psiCopy.overview.procurementRequest,
+      meta: "ABC Food Supply · KCH · High",
+      href: "/psi/procurement/PR-1001",
+    },
+    {
+      title: "SKU-KCH-0007",
+      label: currentLocale === "zh" ? "库存低于安全线" : "Low-stock watch",
+      meta: "Coated Fries · Freezer · 2.1 days",
+      href: "/psi/inventory/SKU-KCH-0007",
+    },
+    {
+      title: "RCV-KCH-240507",
+      label: currentLocale === "zh" ? "收货待验证" : "Receiving verification",
+      meta: "PO-KCH-0098 · ABC Food Supply · Today",
+      href: "/psi/receiving",
+    },
+  ];
 
   return (
     <ErpShell activeHref="/psi">
@@ -82,163 +95,82 @@ export function PsiHomePage() {
           }
         />
 
-      <MeWorkspaceSection className={psiVisual.section} title={psiCopy.overview.operationModules} description={psiCopy.overview.operationModulesDescription}>
-        <div className={psiVisual.moduleGrid}>
-          {psiModules.map((item) => (
-            <PsiModuleCard
-              key={item.href}
-              href={item.href}
-              title={item.title}
-              description={item.description}
-              metric={item.metric}
-            />
-          ))}
-        </div>
-      </MeWorkspaceSection>
+        <MeWorkspaceSection
+          className={psiVisual.section}
+          title={psiCopy.overview.operationModules}
+          description={psiCopy.overview.operationModulesDescription}
+        >
+          <div className={psiVisual.moduleGrid}>
+            {psiModules.map((item) => (
+              <PsiModuleCard
+                key={item.href}
+                href={item.href}
+                title={item.title}
+                description={item.description}
+                metric={item.metric}
+              />
+            ))}
+          </div>
+        </MeWorkspaceSection>
 
-      <MeWorkspaceSection className={psiVisual.section} title="PR-KCH-0001" description={psiCopy.overview.procurementRequest}>
-        <div className="grid gap-3 md:grid-cols-4">
-          {[
-            [psiCopy.shared.supplier, "ABC Food Supply"],
-            [psiCopy.shared.branch, "KCH"],
-            [psiCopy.overview.requestType, psiCopy.overview.procurementRequest],
-            [psiCopy.shared.priority, "High"],
-          ].map(([label, value]) => (
+        <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {kpis.map(([label, value, hint]) => (
             <PsiSoftCard key={label}>
-              <div className={psiVisual.eyebrow}>{label}</div>
-              <div className={psiVisual.value}>{value}</div>
+              <p className={psiVisual.eyebrow}>{label}</p>
+              <p className={psiVisual.metric}>{value}</p>
+              <p className={`mt-1 ${psiVisual.muted}`}>{hint}</p>
             </PsiSoftCard>
           ))}
+        </section>
+
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+          <MeWorkspaceSection
+            className={psiVisual.section}
+            title={currentLocale === "zh" ? "当前 PSI 队列" : "Current PSI Queue"}
+            description={
+              currentLocale === "zh"
+                ? "只显示需要跨采购、供应商、库存、收货协调的事项。"
+                : "Only cross-module work that needs procurement, supplier, inventory, or receiving coordination."
+            }
+          >
+            <div className="grid gap-3">
+              {operatingQueue.map((item) => (
+                <Link key={item.title} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className={psiVisual.title}>{item.title}</p>
+                      <p className={`mt-1 ${psiVisual.body}`}>{item.label}</p>
+                    </div>
+                    <span className={psiVisual.pill}>{item.meta}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </MeWorkspaceSection>
+
+          <MeWorkspaceSection
+            className={psiVisual.section}
+            title={currentLocale === "zh" ? "PSI 健康检查" : "PSI Health Check"}
+            description={
+              currentLocale === "zh"
+                ? "用于经理快速判断今天要先处理什么。"
+                : "Manager-facing snapshot for what needs attention first today."
+            }
+          >
+            <div className="grid gap-3">
+              {[
+                currentLocale === "zh" ? "采购请求仍有 12 条待处理" : "12 procurement requests still open",
+                currentLocale === "zh" ? "4 个供应商需要跟进" : "4 suppliers need follow-up",
+                currentLocale === "zh" ? "8 个库存项目低于关注线" : "8 inventory items are under watch",
+                currentLocale === "zh" ? "3 条收货记录等待验证" : "3 receiving records awaiting verification",
+              ].map((item) => (
+                <PsiSoftCard key={item}>
+                  <p className={psiVisual.value}>{item}</p>
+                </PsiSoftCard>
+              ))}
+            </div>
+          </MeWorkspaceSection>
         </div>
-      </MeWorkspaceSection>
-
-      <MeActionBar
-        actions={[
-          { label: psiCopy.overview.createRequest, href: "#" },
-          { label: psiCopy.overview.reviewSupplier, variant: "secondary", href: "#" },
-          { label: psiCopy.overview.linkInventory, variant: "outline", href: "#" },
-        ]}
-      />
-
-      <MeWorkspaceSection className={psiVisual.section} title={psiCopy.overview.currentFocus} description={psiCopy.rightRail.workCoverage}>
-        <div className="grid gap-3 md:grid-cols-4">
-          {[
-            [psiCopy.shared.procurement, "12"],
-            [psiCopy.shared.supplier, "4"],
-            [psiCopy.shared.inventory, "8"],
-            [psiCopy.shared.issues, "6"],
-          ].map(([label, value]) => (
-            <PsiSoftCard key={label}>
-              <div className={psiVisual.eyebrow}>{label}</div>
-              <div className={psiVisual.metric}>{value}</div>
-            </PsiSoftCard>
-          ))}
-        </div>
-      </MeWorkspaceSection>
-
-      <MeTabs
-        tabs={[
-          { label: psiCopy.shared.overview, active: true },
-          { label: psiCopy.overview.items, badge: "3" },
-          { label: psiCopy.shared.supplier },
-          { label: psiCopy.shared.receiving },
-          { label: psiCopy.shared.activity },
-          { label: psiCopy.shared.attachments },
-        ]}
-      />
-
-      <MeDetailWorkspace
-        main={
-          <>
-            <MeWorkspaceSection className={psiVisual.section} title={psiCopy.shared.overview} description="Structured request information for procurement review.">
-              <div className="grid gap-3 md:grid-cols-2">
-                {[
-                  [psiCopy.shared.supplier, "ABC Food Supply"],
-                  [psiCopy.shared.branch, "KCH"],
-                  [psiCopy.overview.requestType, psiCopy.overview.procurementRequest],
-                  [psiCopy.shared.priority, "High"],
-                  [psiCopy.shared.status, "Review"],
-                  [psiCopy.shared.receivingSite, "KCH backroom"],
-                ].map(([label, value]) => (
-                  <PsiSoftCard key={label}>
-                    <p className={psiVisual.eyebrow}>{label}</p>
-                    <p className={psiVisual.value}>{value}</p>
-                  </PsiSoftCard>
-                ))}
-              </div>
-
-              <div className={`mt-4 ${psiVisual.noteCard}`}>
-                <p className={psiVisual.eyebrow}>{psiCopy.overview.procurementNote}</p>
-                <p className={`mt-2 ${psiVisual.body}`}>
-                  This request was raised from the KCH inventory risk watchlist after broth-input coverage dropped below target. Supplier terms are known, but the branch receiving slot is still pending review.
-                </p>
-              </div>
-            </MeWorkspaceSection>
-
-            <MeWorkspaceSection className={psiVisual.section} title={psiCopy.overview.items} description={psiCopy.overview.itemsDescription}>
-              <MeDataTable columns={[psiCopy.shared.item, psiCopy.shared.quantity, psiCopy.shared.priority, psiCopy.shared.status]} rows={lineItems} />
-            </MeWorkspaceSection>
-
-            <MeWorkspaceSection className={psiVisual.section} title={psiCopy.overview.supplierAndReceiving} description={psiCopy.overview.supplierAndReceivingDescription}>
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className={psiVisual.softCard}>
-                  <p className={psiVisual.eyebrow}>{psiCopy.shared.supplier}</p>
-                  <p className={psiVisual.value}>ABC Food Supply</p>
-                  <p className={`mt-1 ${psiVisual.body}`}>Known supplier, current status requires purchasing review.</p>
-                </div>
-                <div className={psiVisual.softCard}>
-                  <p className={psiVisual.eyebrow}>{psiCopy.shared.receiving}</p>
-                  <p className={psiVisual.value}>KCH backroom</p>
-                  <p className={`mt-1 ${psiVisual.body}`}>Receiving team is available tomorrow morning after review release.</p>
-                </div>
-              </div>
-
-              <div className={`mt-3 ${psiVisual.warningCard}`}>
-                <p className={psiVisual.eyebrow}>{psiCopy.overview.linkedInventoryStatus}</p>
-                <p className={`mt-2 ${psiVisual.body}`}>
-                  Inventory coverage for the KCH broth line is below target and this request is linked to the active replenishment watchlist. No posting or stock movement occurs from this UI.
-                </p>
-              </div>
-            </MeWorkspaceSection>
-          </>
-        }
-        context={
-          <>
-            <MeStatusTimeline
-              embedded
-              title={psiCopy.shared.activity}
-              items={[
-                { title: "Supplier quote attached", description: "ABC Food Supply quotation linked for reference.", time: "09:26" },
-                { title: "Inventory risk linked", description: "KCH broth coverage risk attached to this request.", time: "09:35" },
-                { title: "Awaiting manager review", description: "Procurement request is queued for branch review.", time: "14:22" },
-              ]}
-            />
-
-            <MeRightRail
-              sections={[
-                {
-                  title: psiCopy.overview.inventoryImpact,
-                  items: ["KCH broth coverage below target", "Linked watchlist remains open", "Receiving slot still required"],
-                },
-                {
-                  title: psiCopy.overview.relatedContext,
-                  items: ["Inventory risk: Low stock replenishment", "Task coordination: Store manager review", "Attachments: 2 files linked"],
-                },
-                {
-                  title: psiCopy.overview.serviceScope,
-                  badge: psiCopy.rightRail.currentRelease,
-                  items: ["PSI preview only", "No stock posting", "No supplier write-back"],
-                },
-              ]}
-            />
-          </>
-        }
-      />
-
-      <DemoPresentationNote
-        title={psiCopy.overview.workspaceNote}
-        description={psiCopy.overview.workspaceNoteDescription}
-      />
       </div>
     </ErpShell>
   );
