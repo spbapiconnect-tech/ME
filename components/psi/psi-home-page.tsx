@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
+import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 
 import { DemoPresentationNote } from "@/components/demo-mode";
 import {
@@ -17,28 +21,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-const psiModules = [
-  { title: "Procurement", description: "Request queues, supplier handoff, and receiving checkpoints.", href: "/psi/procurement", metric: "12 pending review" },
-  { title: "Supplier", description: "Supplier readiness, issue context, and communication status.", href: "/psi/supplier", metric: "4 vendor issues" },
-  { title: "Inventory", description: "Low stock, coverage visibility, and replenishment context.", href: "/psi/inventory", metric: "8 watch items" },
-];
+const psiModuleKeys = ["procurement", "supplier", "inventory"] as const;
 
 export function PsiHomePage() {
   const rightRail = (
     <MeRightRail
       sections={[
         {
-          title: "PSI Status",
+          title: psiCopy.rightRail.psiStatus,
           badge: "Live view",
-          items: ["Procurement queue visible", "Supplier risks surfaced", "Inventory follow-up remains coordinated through the workspace"],
+          items: [psiCopy.rightRail.procurementQueueVisible, psiCopy.rightRail.supplierRisksSurfaced, psiCopy.rightRail.inventoryFollowUpCoordinated],
         },
         {
           title: "Recent Activity",
-          items: ["PR-KCH-0001 pending review", "KCH replenishment watchlist updated", "Supplier ABC Food Supply remains linked"],
+          items: ["PR-KCH-0001", "KCH replenishment watchlist", "ABC Food Supply"],
         },
         {
-          title: "Service Scope",
-          items: ["Procurement coordination", "Supplier review", "Inventory watch", "Operational follow-up"],
+          title: psiCopy.overview.serviceScope,
+          items: [psiCopy.rightRail.procurementCoordination, psiCopy.rightRail.supplierReview, psiCopy.rightRail.inventoryWatch, psiCopy.rightRail.operationalFollowUp],
         },
       ]}
     />
@@ -47,25 +47,25 @@ export function PsiHomePage() {
   return (
     <MeDashboardShell activeKey="psi-workspace" rightRail={rightRail}>
       <MePageHeader
-        eyebrow="PSI Workspace"
-        title="Procurement, supplier, and inventory operations"
-        description="Operational PSI shell with review queues, detail preview, and related context panels."
-        notice="Use the PSI workspace to coordinate procurement requests, supplier follow-up, inventory risks, and branch receiving readiness."
+        eyebrow={psiCopy.overview.eyebrow}
+        title={psiCopy.overview.title}
+        description={psiCopy.overview.description}
+        notice={psiCopy.overview.notice}
         badges={[
-          { label: "Procurement" },
-          { label: "Supplier", variant: "secondary" },
-          { label: "Inventory", variant: "secondary" },
+          { label: psiCopy.shared.procurement },
+          { label: psiCopy.shared.supplier, variant: "secondary" },
+          { label: psiCopy.shared.inventory, variant: "secondary" },
         ]}
         actions={
           <>
             <Button asChild size="sm">
-              <Link href="/psi/procurement">Open Procurement</Link>
+              <Link href="/psi/procurement">{psiCopy.overview.openProcurement}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/reports">Open PSI Reports</Link>
+              <Link href="/reports">{psiCopy.overview.openPsiReports}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/psi/issues">Open Issues</Link>
+              <Link href="/psi/issues">{psiCopy.overview.openIssues}</Link>
             </Button>
           </>
         }
@@ -77,7 +77,7 @@ export function PsiHomePage() {
         ]}
       />
 
-      <MeWorkspaceSection title="PSI Operation Modules" description="Primary entry points for daily PSI work.">
+      <MeWorkspaceSection title={psiCopy.overview.operationModules} description={psiCopy.overview.operationModulesDescription}>
         <div className="grid gap-3 xl:grid-cols-3">
           {psiModules.map((module) => (
             <Link
@@ -100,14 +100,14 @@ export function PsiHomePage() {
 
       <MeRecordSummary
         title="PR-KCH-0001"
-        subtitle="Procurement request"
+        subtitle={psiCopy.overview.procurementRequest}
         status="Pending Review"
         meta={[
           { label: "Branch", value: "KCH" },
-          { label: "Supplier", value: "ABC Food Supply" },
+          { label: psiCopy.shared.supplier, value: "ABC Food Supply" },
           { label: "Owner", value: "Purchasing" },
           { label: "Last updated", value: "Today 14:22" },
-          { label: "Request type", value: "Procurement request" },
+          { label: psiCopy.overview.requestType, value: psiCopy.overview.procurementRequest },
           { label: "Requested by", value: "Operations planning" },
           { label: "Expected delivery", value: "Tomorrow 09:00" },
           { label: "Current stage", value: "Awaiting manager review" },
@@ -122,7 +122,7 @@ export function PsiHomePage() {
           { label: "Export", variant: "outline", href: "#" },
           { label: "Add Note", variant: "outline", href: "#" },
           { label: "View History", variant: "ghost", href: "#" },
-          { label: "Link Inventory", variant: "outline", href: "#" },
+          { label: psiCopy.overview.linkInventory, variant: "outline", href: "#" },
           { label: "Attach Document", variant: "outline", href: "#" },
         ]}
       />
@@ -130,11 +130,11 @@ export function PsiHomePage() {
       <MeTabs
         style="detail"
         tabs={[
-          { label: "Overview", active: true },
+          { label: psiCopy.shared.overview, active: true },
           { label: "Items", badge: "12" },
-          { label: "Supplier" },
-          { label: "Receiving" },
-          { label: "Activity" },
+          { label: psiCopy.shared.supplier },
+          { label: psiCopy.shared.receiving },
+          { label: psiCopy.shared.activity },
           { label: "Attachments", badge: "2" },
         ]}
       />
@@ -142,7 +142,7 @@ export function PsiHomePage() {
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title="Overview" description="Structured request information for procurement review.">
+            <MeWorkspaceSection title={psiCopy.shared.overview} description="Structured request information for procurement review.">
               <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_17rem]">
                 <div className="grid gap-3 md:grid-cols-2">
                   {[
@@ -164,7 +164,7 @@ export function PsiHomePage() {
                   ))}
                 </div>
                 <div className="rounded-[20px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Procurement Note</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.overview.procurementNote}</p>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
                     This request was raised from the KCH inventory risk watchlist after broth-input coverage dropped below target. Supplier terms are known, but the branch receiving slot still needs review.
                   </p>
@@ -172,7 +172,7 @@ export function PsiHomePage() {
               </div>
             </MeWorkspaceSection>
 
-            <MeWorkspaceSection title="Items" description="Line items under the current procurement request.">
+            <MeWorkspaceSection title={psiCopy.overview.items} description={psiCopy.overview.itemsDescription}>
               <MeDataTable
                 embedded
                 columns={["SKU", "Item", "Qty", "Unit", "Est. cost", "Status", "Linked inventory"]}
@@ -218,22 +218,22 @@ export function PsiHomePage() {
             </MeWorkspaceSection>
 
             <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_20rem]">
-              <MeWorkspaceSection title="Supplier and Receiving" description="Operational context tied to vendor and branch receiving readiness.">
+              <MeWorkspaceSection title={psiCopy.overview.supplierAndReceiving} description={psiCopy.overview.supplierAndReceivingDescription}>
                 <div className="grid gap-3">
                   <div className="grid gap-3 md:grid-cols-2">
                     <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Supplier</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.shared.supplier}</p>
                       <p className="mt-1.5 text-sm font-semibold text-slate-900">ABC Food Supply</p>
                       <p className="mt-1 text-sm text-slate-600">Preferred supplier with known lead times and current quote attached.</p>
                     </div>
                     <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Receiving</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.shared.receiving}</p>
                       <p className="mt-1.5 text-sm font-semibold text-slate-900">KCH backroom slot pending</p>
                       <p className="mt-1 text-sm text-slate-600">Receiving team is available tomorrow morning after review release.</p>
                     </div>
                   </div>
                   <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Linked Inventory Status</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.overview.linkedInventoryStatus}</p>
                     <p className="mt-1.5 text-sm text-slate-600">
                       Inventory coverage for the KCH broth line is below target and this request is linked to the active replenishment watchlist. No posting or stock movement occurs from this screen.
                     </p>
@@ -263,7 +263,7 @@ export function PsiHomePage() {
                 items: ["Current approver: Branch manager", "Current stage: Awaiting review", "Escalation: None"],
               },
               {
-                title: "Inventory Impact",
+                title: psiCopy.overview.inventoryImpact,
                 items: ["KCH broth coverage below target", "Linked watchlist remains open", "Receiving slot still required"],
               },
               {
@@ -287,9 +287,9 @@ export function PsiHomePage() {
       <Card size="sm" className="border-border/60 bg-white/90 shadow-[0_16px_24px_-26px_rgba(15,23,42,0.12)]">
         <CardContent className="grid gap-3 pt-4 md:grid-cols-2 xl:grid-cols-4">
           {[
-            ["Object", "Procurement request"],
+            [psiCopy.values.object, psiCopy.overview.procurementRequest],
             ["Side panel", "Approval, inventory, related records"],
-            ["Tabs", "Overview, Items, Supplier, Receiving, Activity, Attachments"],
+            [psiCopy.values.tabs, `${psiCopy.shared.overview}, ${psiCopy.overview.items}, ${psiCopy.shared.supplier}, ${psiCopy.shared.receiving}, ${psiCopy.shared.activity}, ${psiCopy.shared.attachments}`],
             ["Behavior", "Operational visibility"],
           ].map(([label, value]) => (
             <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b xl:border-b-0 xl:pb-0">
@@ -300,7 +300,7 @@ export function PsiHomePage() {
         </CardContent>
       </Card>
 
-      <DemoPresentationNote title="Workspace Note" description="PSI follows the shared ERP detail pattern with request header, action bar, line items, activity, and branch context." />
+      <DemoPresentationNote title={psiCopy.overview.workspaceNote} description={psiCopy.overview.workspaceNoteDescription} />
     </MeDashboardShell>
   );
 }
