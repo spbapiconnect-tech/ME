@@ -1287,7 +1287,7 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         { label: "Confirm Received", variant: "secondary" },
         { label: "Report Variance", variant: "outline" },
         { label: "Upload Photo", variant: "outline" },
-        { label: "Post to Inventory", variant: "ghost" },
+        { label: "Preview Inventory Posting", variant: "ghost" },
       ],
       tabs: [{ label: "Overview", active: true }, { label: "Items" }, { label: "Variance" }, { label: "Quality Check" }, { label: "Documents" }, { label: "Activity" }],
       metrics: [
@@ -1390,11 +1390,11 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         ],
       },
       actionBar: [
-        { label: "Save Changes" },
+        { label: "Preview Changes" },
         { label: "Preview Settings", variant: "secondary" },
-        { label: "Test Setting", variant: "outline" },
-        { label: "Add Rule", variant: "outline" },
-        { label: "Reset", variant: "ghost" },
+        { label: "Preview Setting Test", variant: "outline" },
+        { label: "Preview Rule Draft", variant: "outline" },
+        { label: "Reset Preview", variant: "ghost" },
       ],
       tabs: [{ label: "Overview", active: true }, { label: "Display & Theme" }, { label: "Language" }, { label: "Approval Rules" }, { label: "Security" }, { label: "Activity" }],
       metrics: [
@@ -1495,11 +1495,11 @@ export const restaurantModules: RestaurantModuleDefinition[] = [
         ],
       },
       actionBar: [
-        { label: "Add Connector" },
-        { label: "Test Connection", variant: "secondary" },
-        { label: "Sync Now", variant: "outline" },
+        { label: "Preview Connector Draft" },
+        { label: "Preview Connection Test", variant: "secondary" },
+        { label: "Preview Sync", variant: "outline" },
         { label: "View Logs", variant: "outline" },
-        { label: "Disable", variant: "ghost" },
+        { label: "Preview Disable", variant: "ghost" },
       ],
       tabs: [{ label: "Overview", active: true }, { label: "Settings" }, { label: "Logs" }, { label: "Mapping" }, { label: "Alerts" }],
       metrics: [
