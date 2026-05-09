@@ -4,6 +4,7 @@ import Link from "next/link"
 import * as React from "react"
 
 import { AccessPreviewCard } from "@/components/access/access-preview-card"
+import { MeDashboardShell, MePageHeader } from "@/components/layout"
 import { AccessRuleCard } from "@/components/access/access-rule-card"
 import { PlanCard } from "@/components/access/plan-card"
 import { RoleCard } from "@/components/access/role-card"
@@ -156,13 +157,20 @@ export function AccessControlPage() {
   }, [])
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
-      <Card>
-        <CardHeader className="gap-2">
-          <CardTitle className="text-xl">{t.title}</CardTitle>
-          <CardDescription>{t.subtitle}</CardDescription>
-          <CardDescription>{t.desc}</CardDescription>
-          <div className="flex flex-wrap gap-2">
+    <MeDashboardShell activeKey="access-control">
+      <MePageHeader
+        eyebrow={currentLocale === "zh" ? "权限 / 治理" : "Access / Governance"}
+        title={t.title}
+        description={t.subtitle}
+        notice={t.desc}
+        badges={[
+          { label: t.metadata, variant: "secondary" },
+          { label: t.noAuth, variant: "outline" },
+          { label: t.noApi, variant: "outline" },
+          { label: t.noHide, variant: "outline" },
+        ]}
+        actions={
+          <>
             <Button asChild variant="outline" size="sm"><Link href="/">{t.back}</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/action-contracts">{t.openActionContracts}</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/layout-engine">{t.openLayoutEngine}</Link></Button>
@@ -172,9 +180,9 @@ export function AccessControlPage() {
             <Button asChild variant="outline" size="sm"><Link href="/notifications">ME Notifications</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/rules">ME Rules</Link></Button>
             <Button asChild variant="outline" size="sm"><Link href="/packages">ME Packages</Link></Button>
-          </div>
-        </CardHeader>
-      </Card>
+          </>
+        }
+      />
 
       <Card size="sm">
         <CardHeader className="gap-1">
@@ -276,6 +284,6 @@ export function AccessControlPage() {
           {actionPreview ? <AccessPreviewCard preview={actionPreview} locale={currentLocale} auditPreview={actionAuditPreview} workflowPreview={actionWorkflowPreview} notificationPreview={actionNotificationPreview} /> : null}
         </div>
       </section>
-    </main>
+    </MeDashboardShell>
   )
 }
