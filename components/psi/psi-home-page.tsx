@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
-
-import { DemoPresentationNote } from "@/components/demo-mode";
 import {
+  DemoPresentationNote,
   MeActionBar,
   MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
+  MeKpiStrip,
   MePageHeader,
   MeRecordSummary,
   MeRightRail,
@@ -17,35 +17,66 @@ import {
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
-const psiModuleKeys = ["procurement", "supplier", "inventory"] as const;
+const lineItems = [
+  ["Chicken broth base", "12 carton", "High", "Supplier confirmed"],
+  ["Burger sauce cup", "600 pcs", "Medium", "Pending manager review"],
+  ["Fried chicken patty", "8 carton", "High", "Receiving slot pending"],
+];
 
 export function PsiHomePage() {
-  const rightRail = (
-    <MeRightRail
-      sections={[
-        {
-          title: psiCopy.rightRail.psiStatus,
-          badge: "Live view",
-          items: [psiCopy.rightRail.procurementQueueVisible, psiCopy.rightRail.supplierRisksSurfaced, psiCopy.rightRail.inventoryFollowUpCoordinated],
-        },
-        {
-          title: "Recent Activity",
-          items: ["PR-KCH-0001", "KCH replenishment watchlist", "ABC Food Supply"],
-        },
-        {
-          title: psiCopy.overview.serviceScope,
-          items: [psiCopy.rightRail.procurementCoordination, psiCopy.rightRail.supplierReview, psiCopy.rightRail.inventoryWatch, psiCopy.rightRail.operationalFollowUp],
-        },
-      ]}
-    />
-  );
+  const rawLocale = useUiPreferencesStore((state) => state.locale);
+  const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
+  const psiCopy = getPsiCopy(currentLocale);
+
+  const psiModules = [
+    {
+      title: psiCopy.shared.procurement,
+      description: psiCopy.overview.procurementDescription,
+      href: "/psi/procurement",
+      metric: psiCopy.overview.procurementMetric,
+    },
+    {
+      title: psiCopy.shared.supplier,
+      description: psiCopy.overview.supplierDescription,
+      href: "/psi/supplier",
+      metric: psiCopy.overview.supplierMetric,
+    },
+    {
+      title: psiCopy.shared.inventory,
+      description: psiCopy.overview.inventoryDescription,
+      href: "/psi/inventory",
+      metric: psiCopy.overview.inventoryMetric,
+    },
+  ];
+
+  const rightRail = [
+    {
+      title: psiCopy.rightRail.psiStatus,
+      badge: "Live view",
+      items: [
+        psiCopy.rightRail.procurementQueueVisible,
+        psiCopy.rightRail.supplierRisksSurfaced,
+        psiCopy.rightRail.inventoryFollowUpCoordinated,
+      ],
+    },
+    {
+      title: psiCopy.rightRail.todayFocus,
+      items: ["PR-KCH-0001", "KCH replenishment watchlist", "ABC Food Supply"],
+    },
+    {
+      title: psiCopy.rightRail.workCoverage,
+      items: [
+        psiCopy.rightRail.procurementCoordination,
+        psiCopy.rightRail.supplierReview,
+        psiCopy.rightRail.inventoryWatch,
+        psiCopy.rightRail.operationalFollowUp,
+      ],
+    },
+  ];
 
   return (
-    <MeDashboardShell activeKey="psi-workspace" rightRail={rightRail}>
+    <MeDashboardShell activeKey="psi-workspace" rightRail={<MeRightRail sections={rightRail} />}>
       <MePageHeader
         eyebrow={psiCopy.overview.eyebrow}
         title={psiCopy.overview.title}
@@ -58,41 +89,24 @@ export function PsiHomePage() {
         ]}
         actions={
           <>
-            <Button asChild size="sm">
-              <Link href="/psi/procurement">{psiCopy.overview.openProcurement}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/reports">{psiCopy.overview.openPsiReports}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/psi/issues">{psiCopy.overview.openIssues}</Link>
-            </Button>
+            <Link href="/psi/procurement">{psiCopy.overview.openProcurement}</Link>
+            <Link href="/reports">{psiCopy.overview.openPsiReports}</Link>
+            <Link href="/psi/issues">{psiCopy.overview.openIssues}</Link>
           </>
         }
-        meta={[
-          { label: "Branch", value: "KCH" },
-          { label: "Owner", value: "Purchasing" },
-          { label: "Queue State", value: "Pending review" },
-          { label: "Refresh Window", value: "Today" },
-        ]}
       />
 
       <MeWorkspaceSection title={psiCopy.overview.operationModules} description={psiCopy.overview.operationModulesDescription}>
-        <div className="grid gap-3 xl:grid-cols-3">
-          {psiModules.map((module) => (
+        <div className="grid gap-3 md:grid-cols-3">
+          {psiModules.map((item) => (
             <Link
-              key={module.title}
-              href={module.href}
-              className="rounded-[22px] bg-[linear-gradient(180deg,rgba(248,250,252,0.98),rgba(241,245,249,0.9))] p-4 ring-1 ring-slate-200/75 transition hover:bg-white hover:shadow-[0_18px_24px_-20px_rgba(15,23,42,0.14)]"
+              key={item.href}
+              href={item.href}
+              className="rounded-[24px] bg-white/95 p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/80 transition hover:-translate-y-0.5 hover:shadow-[0_22px_45px_-28px_rgba(15,23,42,0.32)]"
             >
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-base font-semibold text-slate-950">{module.title}</p>
-                <Badge variant="outline">Open</Badge>
-              </div>
-              <p className="mt-2 text-sm text-slate-600">{module.description}</p>
-              <div className="mt-4 border-t border-slate-200/80 pt-3">
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">{module.metric}</p>
-              </div>
+              <div className="text-sm font-semibold text-slate-950">{item.title}</div>
+              <p className="mt-1 text-xs leading-5 text-slate-500">{item.description}</p>
+              <div className="mt-3 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">{item.metric}</div>
             </Link>
           ))}
         </div>
@@ -101,41 +115,40 @@ export function PsiHomePage() {
       <MeRecordSummary
         title="PR-KCH-0001"
         subtitle={psiCopy.overview.procurementRequest}
-        status="Pending Review"
-        meta={[
-          { label: "Branch", value: "KCH" },
+        status="Review"
+        metrics={[
           { label: psiCopy.shared.supplier, value: "ABC Food Supply" },
-          { label: "Owner", value: "Purchasing" },
-          { label: "Last updated", value: "Today 14:22" },
+          { label: "Branch", value: "KCH" },
           { label: psiCopy.overview.requestType, value: psiCopy.overview.procurementRequest },
-          { label: "Requested by", value: "Operations planning" },
-          { label: "Expected delivery", value: "Tomorrow 09:00" },
-          { label: "Current stage", value: "Awaiting manager review" },
+          { label: psiCopy.shared.priority, value: "High" },
         ]}
       />
 
       <MeActionBar
         actions={[
-          { label: "Review", href: "#" },
-          { label: "Open queue", variant: "secondary", href: "#" },
-          { label: "Assign", variant: "outline", href: "#" },
-          { label: "Export", variant: "outline", href: "#" },
-          { label: "Add Note", variant: "outline", href: "#" },
-          { label: "View History", variant: "ghost", href: "#" },
+          { label: psiCopy.overview.createRequest, href: "#" },
+          { label: psiCopy.overview.reviewSupplier, variant: "secondary", href: "#" },
           { label: psiCopy.overview.linkInventory, variant: "outline", href: "#" },
-          { label: "Attach Document", variant: "outline", href: "#" },
+        ]}
+      />
+
+      <MeKpiStrip
+        items={[
+          [psiCopy.shared.procurement, "12"],
+          [psiCopy.shared.supplier, "4"],
+          [psiCopy.shared.inventory, "8"],
+          [psiCopy.shared.issues, "6"],
         ]}
       />
 
       <MeTabs
-        style="detail"
         tabs={[
           { label: psiCopy.shared.overview, active: true },
-          { label: "Items", badge: "12" },
+          { label: psiCopy.overview.items, badge: "3" },
           { label: psiCopy.shared.supplier },
           { label: psiCopy.shared.receiving },
           { label: psiCopy.shared.activity },
-          { label: "Attachments", badge: "2" },
+          { label: psiCopy.shared.attachments },
         ]}
       />
 
@@ -143,164 +156,98 @@ export function PsiHomePage() {
         main={
           <>
             <MeWorkspaceSection title={psiCopy.shared.overview} description="Structured request information for procurement review.">
-              <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_17rem]">
-                <div className="grid gap-3 md:grid-cols-2">
-                  {[
-                    ["Request ID", "PR-KCH-0001"],
-                    ["Branch", "KCH"],
-                    ["Supplier", "ABC Food Supply"],
-                    ["Requested by", "Operations planning"],
-                    ["Request date", "Today 09:10"],
-                    ["Expected delivery", "Tomorrow 09:00"],
-                    ["Total estimated amount", "RM 3,480.00"],
-                    ["Priority", "Medium"],
-                    ["Current stage", "Awaiting manager review"],
-                    ["Receiving site", "KCH backroom"],
-                  ].map(([label, value]) => (
-                    <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
-                      <p className="mt-1.5 text-sm font-semibold text-slate-900">{value}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="rounded-[20px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.overview.procurementNote}</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    This request was raised from the KCH inventory risk watchlist after broth-input coverage dropped below target. Supplier terms are known, but the branch receiving slot still needs review.
-                  </p>
-                </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                {[
+                  [psiCopy.shared.supplier, "ABC Food Supply"],
+                  ["Branch", "KCH"],
+                  [psiCopy.overview.requestType, psiCopy.overview.procurementRequest],
+                  [psiCopy.shared.priority, "High"],
+                  [psiCopy.shared.status, "Review"],
+                  ["Receiving site", "KCH backroom"],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-[18px] bg-slate-50/90 px-4 py-3 ring-1 ring-slate-200/75">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
+                    <p className="mt-1 text-sm font-medium text-slate-900">{value}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 rounded-[20px] bg-blue-50/70 p-4 ring-1 ring-blue-100">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.overview.procurementNote}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  This request was raised from the KCH inventory risk watchlist after broth-input coverage dropped below target. Supplier terms are known, but the branch receiving slot is still pending review.
+                </p>
               </div>
             </MeWorkspaceSection>
 
             <MeWorkspaceSection title={psiCopy.overview.items} description={psiCopy.overview.itemsDescription}>
-              <MeDataTable
-                embedded
-                columns={["SKU", "Item", "Qty", "Unit", "Est. cost", "Status", "Linked inventory"]}
-                rows={[
-                  [
-                    "SKU-BTH-001",
-                    <div key="item-1">
-                      <p className="font-medium text-slate-900">Chicken stock base</p>
-                      <p className="mt-1 text-xs text-slate-500">Core broth input</p>
-                    </div>,
-                    "24",
-                    "ctn",
-                    "RM 1,320",
-                    "Pending review",
-                    "Low stock risk linked",
-                  ],
-                  [
-                    "SKU-NDL-008",
-                    <div key="item-2">
-                      <p className="font-medium text-slate-900">Rice noodle pack</p>
-                      <p className="mt-1 text-xs text-slate-500">High-turn branch item</p>
-                    </div>,
-                    "18",
-                    "ctn",
-                    "RM 1,080",
-                    "Supplier confirmed",
-                    "Coverage watch",
-                  ],
-                  [
-                    "SKU-GRN-014",
-                    <div key="item-3">
-                      <p className="font-medium text-slate-900">Soup garnish set</p>
-                      <p className="mt-1 text-xs text-slate-500">Receiving slot pending</p>
-                    </div>,
-                    "12",
-                    "ctn",
-                    "RM 1,080",
-                    "Awaiting slot",
-                    "Replenishment linked",
-                  ],
-                ]}
-              />
+              <MeDataTable columns={["Item", "Qty", psiCopy.shared.priority, psiCopy.shared.status]} rows={lineItems} />
             </MeWorkspaceSection>
 
-            <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_20rem]">
-              <MeWorkspaceSection title={psiCopy.overview.supplierAndReceiving} description={psiCopy.overview.supplierAndReceivingDescription}>
-                <div className="grid gap-3">
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.shared.supplier}</p>
-                      <p className="mt-1.5 text-sm font-semibold text-slate-900">ABC Food Supply</p>
-                      <p className="mt-1 text-sm text-slate-600">Preferred supplier with known lead times and current quote attached.</p>
-                    </div>
-                    <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.shared.receiving}</p>
-                      <p className="mt-1.5 text-sm font-semibold text-slate-900">KCH backroom slot pending</p>
-                      <p className="mt-1 text-sm text-slate-600">Receiving team is available tomorrow morning after review release.</p>
-                    </div>
-                  </div>
-                  <div className="rounded-[20px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.overview.linkedInventoryStatus}</p>
-                    <p className="mt-1.5 text-sm text-slate-600">
-                      Inventory coverage for the KCH broth line is below target and this request is linked to the active replenishment watchlist. No posting or stock movement occurs from this screen.
-                    </p>
-                  </div>
+            <MeWorkspaceSection title={psiCopy.overview.supplierAndReceiving} description={psiCopy.overview.supplierAndReceivingDescription}>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="rounded-[20px] bg-slate-50/90 p-4 ring-1 ring-slate-200/75">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.shared.supplier}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900">ABC Food Supply</p>
+                  <p className="mt-1 text-sm text-slate-600">Known supplier, current status requires purchasing review.</p>
                 </div>
-              </MeWorkspaceSection>
+                <div className="rounded-[20px] bg-slate-50/90 p-4 ring-1 ring-slate-200/75">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.shared.receiving}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900">KCH backroom</p>
+                  <p className="mt-1 text-sm text-slate-600">Receiving team is available tomorrow morning after review release.</p>
+                </div>
+              </div>
 
-              <MeStatusTimeline
-                embedded
-                title="Activity"
-                items={[
-                  { title: "Created request", description: "PR-KCH-0001 created from low stock watchlist.", time: "09:10" },
-                  { title: "Supplier quote attached", description: "ABC Food Supply quotation linked for reference.", time: "09:26" },
-                  { title: "Inventory risk linked", description: "KCH broth coverage risk attached to this request.", time: "09:35" },
-                  { title: "Awaiting manager review", description: "Procurement request is queued for branch review.", time: "14:22" },
-                ]}
-              />
-            </div>
+              <div className="mt-3 rounded-[20px] bg-amber-50/75 p-4 ring-1 ring-amber-100">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.overview.linkedInventoryStatus}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  Inventory coverage for the KCH broth line is below target and this request is linked to the active replenishment watchlist. No posting or stock movement occurs from this UI.
+                </p>
+              </div>
+            </MeWorkspaceSection>
           </>
         }
         context={
-          <MeRightRail
-            sections={[
-              {
-                title: "Approval Status",
-                badge: "Pending",
-                items: ["Current approver: Branch manager", "Current stage: Awaiting review", "Escalation: None"],
-              },
-              {
-                title: psiCopy.overview.inventoryImpact,
-                items: ["KCH broth coverage below target", "Linked watchlist remains open", "Receiving slot still required"],
-              },
-              {
-                title: "Related Records",
-                items: ["Inventory risk: Low stock replenishment", "Task coordination: Store manager review", "Attachments: 2 files linked"],
-              },
-              {
-                title: "Next Steps",
-                items: ["Review request amount", "Confirm receiving window", "Export or attach document if needed"],
-              },
-              {
-                title: "Operating Notes",
-                badge: "Live view",
-                items: ["No approval execution", "No task creation", "No notification sending", "No write behavior"],
-              },
-            ]}
-          />
+          <>
+            <MeStatusTimeline
+              embedded
+              title={psiCopy.shared.activity}
+              items={[
+                { title: "Supplier quote attached", description: "ABC Food Supply quotation linked for reference.", time: "09:26" },
+                { title: "Inventory risk linked", description: "KCH broth coverage risk attached to this request.", time: "09:35" },
+                { title: "Awaiting manager review", description: "Procurement request is queued for branch review.", time: "14:22" },
+              ]}
+            />
+
+            <MeRightRail
+              sections={[
+                {
+                  title: psiCopy.overview.inventoryImpact,
+                  items: ["KCH broth coverage below target", "Linked watchlist remains open", "Receiving slot still required"],
+                },
+                {
+                  title: psiCopy.overview.relatedContext,
+                  items: ["Inventory risk: Low stock replenishment", "Task coordination: Store manager review", "Attachments: 2 files linked"],
+                },
+                {
+                  title: psiCopy.overview.serviceScope,
+                  badge: "Current release",
+                  items: ["PSI preview only", "No stock posting", "No supplier write-back"],
+                },
+              ]}
+            />
+          </>
         }
       />
 
-      <Card size="sm" className="border-border/60 bg-white/90 shadow-[0_16px_24px_-26px_rgba(15,23,42,0.12)]">
-        <CardContent className="grid gap-3 pt-4 md:grid-cols-2 xl:grid-cols-4">
-          {[
-            [psiCopy.values.object, psiCopy.overview.procurementRequest],
-            ["Side panel", "Approval, inventory, related records"],
-            [psiCopy.values.tabs, `${psiCopy.shared.overview}, ${psiCopy.overview.items}, ${psiCopy.shared.supplier}, ${psiCopy.shared.receiving}, ${psiCopy.shared.activity}, ${psiCopy.shared.attachments}`],
-            ["Behavior", "Operational visibility"],
-          ].map(([label, value]) => (
-            <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b xl:border-b-0 xl:pb-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
-              <p className="mt-1.5 text-sm font-semibold text-slate-900">{value}</p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <DemoPresentationNote title={psiCopy.overview.workspaceNote} description={psiCopy.overview.workspaceNoteDescription} />
+      <DemoPresentationNote
+        title={psiCopy.overview.workspaceNote}
+        description={psiCopy.overview.workspaceNoteDescription}
+        bullets={[
+          [psiCopy.values.object, psiCopy.overview.procurementRequest],
+          [psiCopy.values.tabs, `${psiCopy.shared.overview}, ${psiCopy.overview.items}, ${psiCopy.shared.supplier}, ${psiCopy.shared.receiving}, ${psiCopy.shared.activity}, ${psiCopy.shared.attachments}`],
+        ]}
+      />
     </MeDashboardShell>
   );
 }
