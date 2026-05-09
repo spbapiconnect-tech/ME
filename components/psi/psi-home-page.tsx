@@ -8,6 +8,7 @@ import {
   MeActionBar,
   MeDataTable,
   MeDetailWorkspace,
+  MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
