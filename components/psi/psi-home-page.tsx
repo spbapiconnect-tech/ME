@@ -14,6 +14,7 @@ import {
   MeWorkspaceSection,
 } from "@/components/layout";
 import { ErpPageHeader, ErpShell } from "@/components/erp";
+import { Button } from "@/components/ui/button";
 
 const lineItems = [
   ["Chicken broth base", "12 carton", "High", "Supplier confirmed"],
@@ -45,6 +46,15 @@ export function PsiHomePage() {
       href: "/psi/inventory",
       metric: psiCopy.overview.inventoryMetric,
     },
+    {
+      title: currentLocale === "zh" ? "收货" : "Receiving",
+      description:
+        currentLocale === "zh"
+          ? "供应商到货、数量差异、入库交接与收货检查。"
+          : "Supplier receiving, variance review, inventory handoff, and delivery checks.",
+      href: "/psi/receiving",
+      metric: currentLocale === "zh" ? "3 条待验证" : "3 awaiting verification",
+    },
   ];
 
 
@@ -58,15 +68,21 @@ export function PsiHomePage() {
           subtitle={psiCopy.overview.description}
           actions={
             <>
-              <Link href="/psi/procurement">{psiCopy.overview.openProcurement}</Link>
-              <Link href="/reports">{psiCopy.overview.openPsiReports}</Link>
-              <Link href="/psi/issues">{psiCopy.overview.openIssues}</Link>
+              <Button asChild size="sm">
+                <Link href="/psi/procurement">{psiCopy.overview.openProcurement}</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/reports">{psiCopy.overview.openPsiReports}</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/psi/issues">{psiCopy.overview.openIssues}</Link>
+              </Button>
             </>
           }
         />
 
       <MeWorkspaceSection title={psiCopy.overview.operationModules} description={psiCopy.overview.operationModulesDescription}>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           {psiModules.map((item) => (
             <Link
               key={item.href}
