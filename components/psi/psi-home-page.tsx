@@ -6,15 +6,14 @@ import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import {
   MeActionBar,
-  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MePageHeader,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { ErpPageHeader, ErpShell } from "@/components/erp";
 
 const lineItems = [
   ["Chicken broth base", "12 carton", "High", "Supplier confirmed"],
@@ -74,25 +73,21 @@ export function PsiHomePage() {
   ];
 
   return (
-    <MeDashboardShell activeKey="psi-workspace" rightRail={<MeRightRail sections={rightRail} />}>
-      <MePageHeader
-        eyebrow={psiCopy.overview.eyebrow}
-        title={psiCopy.overview.title}
-        description={psiCopy.overview.description}
-        notice={psiCopy.overview.notice}
-        badges={[
-          { label: psiCopy.shared.procurement },
-          { label: psiCopy.shared.supplier, variant: "secondary" },
-          { label: psiCopy.shared.inventory, variant: "secondary" },
-        ]}
-        actions={
-          <>
-            <Link href="/psi/procurement">{psiCopy.overview.openProcurement}</Link>
-            <Link href="/reports">{psiCopy.overview.openPsiReports}</Link>
-            <Link href="/psi/issues">{psiCopy.overview.openIssues}</Link>
-          </>
-        }
-      />
+    <ErpShell activeHref="/psi">
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "PSI", psiCopy.overview.eyebrow]}
+          title={psiCopy.overview.title}
+          zhTitle="PSI 工作台"
+          subtitle={psiCopy.overview.description}
+          actions={
+            <>
+              <Link href="/psi/procurement">{psiCopy.overview.openProcurement}</Link>
+              <Link href="/reports">{psiCopy.overview.openPsiReports}</Link>
+              <Link href="/psi/issues">{psiCopy.overview.openIssues}</Link>
+            </>
+          }
+        />
 
       <MeWorkspaceSection title={psiCopy.overview.operationModules} description={psiCopy.overview.operationModulesDescription}>
         <div className="grid gap-3 md:grid-cols-3">
@@ -253,6 +248,7 @@ export function PsiHomePage() {
         title={psiCopy.overview.workspaceNote}
         description={psiCopy.overview.workspaceNoteDescription}
       />
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   );
 }
