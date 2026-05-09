@@ -15,6 +15,7 @@ import {
 } from "@/components/layout";
 import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { Button } from "@/components/ui/button";
+import { PsiModuleCard, PsiSoftCard, psiVisual } from "@/components/psi/psi-visual";
 
 const lineItems = [
   ["Chicken broth base", "12 carton", "High", "Supplier confirmed"],
@@ -60,7 +61,7 @@ export function PsiHomePage() {
 
   return (
     <ErpShell activeHref="/psi">
-      <div className="space-y-6">
+      <div className={psiVisual.pageStack}>
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", psiCopy.overview.eyebrow]}
           title={psiCopy.overview.title}
@@ -82,17 +83,15 @@ export function PsiHomePage() {
         />
 
       <MeWorkspaceSection title={psiCopy.overview.operationModules} description={psiCopy.overview.operationModulesDescription}>
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className={psiVisual.moduleGrid}>
           {psiModules.map((item) => (
-            <Link
+            <PsiModuleCard
               key={item.href}
               href={item.href}
-              className="rounded-[24px] bg-white/95 p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.25)] ring-1 ring-slate-200/80 transition hover:-translate-y-0.5 hover:shadow-[0_22px_45px_-28px_rgba(15,23,42,0.32)]"
-            >
-              <div className="text-sm font-semibold text-slate-950">{item.title}</div>
-              <p className="mt-1 text-xs leading-5 text-slate-500">{item.description}</p>
-              <div className="mt-3 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">{item.metric}</div>
-            </Link>
+              title={item.title}
+              description={item.description}
+              metric={item.metric}
+            />
           ))}
         </div>
       </MeWorkspaceSection>
@@ -105,10 +104,10 @@ export function PsiHomePage() {
             [psiCopy.overview.requestType, psiCopy.overview.procurementRequest],
             [psiCopy.shared.priority, "High"],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-[20px] bg-white/95 px-4 py-3 shadow-[0_14px_32px_-28px_rgba(15,23,42,0.35)] ring-1 ring-slate-200/80">
-              <div className="text-xs font-medium text-slate-500">{label}</div>
-              <div className="mt-1 text-sm font-semibold text-slate-950">{value}</div>
-            </div>
+            <PsiSoftCard key={label}>
+              <div className={psiVisual.eyebrow}>{label}</div>
+              <div className={psiVisual.value}>{value}</div>
+            </PsiSoftCard>
           ))}
         </div>
       </MeWorkspaceSection>
@@ -129,10 +128,10 @@ export function PsiHomePage() {
             [psiCopy.shared.inventory, "8"],
             [psiCopy.shared.issues, "6"],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-[20px] bg-white/95 px-4 py-3 shadow-[0_14px_32px_-28px_rgba(15,23,42,0.35)] ring-1 ring-slate-200/80">
-              <div className="text-xs font-medium text-slate-500">{label}</div>
-              <div className="mt-1 text-xl font-semibold text-slate-950">{value}</div>
-            </div>
+            <PsiSoftCard key={label}>
+              <div className={psiVisual.eyebrow}>{label}</div>
+              <div className={psiVisual.metric}>{value}</div>
+            </PsiSoftCard>
           ))}
         </div>
       </MeWorkspaceSection>
@@ -161,16 +160,16 @@ export function PsiHomePage() {
                   [psiCopy.shared.status, "Review"],
                   [psiCopy.shared.receivingSite, "KCH backroom"],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-[18px] bg-slate-50/90 px-4 py-3 ring-1 ring-slate-200/75">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
-                    <p className="mt-1 text-sm font-medium text-slate-900">{value}</p>
-                  </div>
+                  <PsiSoftCard key={label}>
+                    <p className={psiVisual.eyebrow}>{label}</p>
+                    <p className={psiVisual.value}>{value}</p>
+                  </PsiSoftCard>
                 ))}
               </div>
 
-              <div className="mt-4 rounded-[20px] bg-blue-50/70 p-4 ring-1 ring-blue-100">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.overview.procurementNote}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+              <div className={`mt-4 ${psiVisual.noteCard}`}>
+                <p className={psiVisual.eyebrow}>{psiCopy.overview.procurementNote}</p>
+                <p className={`mt-2 ${psiVisual.body}`}>
                   This request was raised from the KCH inventory risk watchlist after broth-input coverage dropped below target. Supplier terms are known, but the branch receiving slot is still pending review.
                 </p>
               </div>
@@ -182,21 +181,21 @@ export function PsiHomePage() {
 
             <MeWorkspaceSection title={psiCopy.overview.supplierAndReceiving} description={psiCopy.overview.supplierAndReceivingDescription}>
               <div className="grid gap-3 md:grid-cols-2">
-                <div className="rounded-[20px] bg-slate-50/90 p-4 ring-1 ring-slate-200/75">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.shared.supplier}</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-900">ABC Food Supply</p>
-                  <p className="mt-1 text-sm text-slate-600">Known supplier, current status requires purchasing review.</p>
+                <div className={psiVisual.softCard}>
+                  <p className={psiVisual.eyebrow}>{psiCopy.shared.supplier}</p>
+                  <p className={psiVisual.value}>ABC Food Supply</p>
+                  <p className={`mt-1 ${psiVisual.body}`}>Known supplier, current status requires purchasing review.</p>
                 </div>
-                <div className="rounded-[20px] bg-slate-50/90 p-4 ring-1 ring-slate-200/75">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.shared.receiving}</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-900">KCH backroom</p>
-                  <p className="mt-1 text-sm text-slate-600">Receiving team is available tomorrow morning after review release.</p>
+                <div className={psiVisual.softCard}>
+                  <p className={psiVisual.eyebrow}>{psiCopy.shared.receiving}</p>
+                  <p className={psiVisual.value}>KCH backroom</p>
+                  <p className={`mt-1 ${psiVisual.body}`}>Receiving team is available tomorrow morning after review release.</p>
                 </div>
               </div>
 
-              <div className="mt-3 rounded-[20px] bg-amber-50/75 p-4 ring-1 ring-amber-100">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{psiCopy.overview.linkedInventoryStatus}</p>
-                <p className="mt-2 text-sm leading-6 text-slate-600">
+              <div className={`mt-3 ${psiVisual.warningCard}`}>
+                <p className={psiVisual.eyebrow}>{psiCopy.overview.linkedInventoryStatus}</p>
+                <p className={`mt-2 ${psiVisual.body}`}>
                   Inventory coverage for the KCH broth line is below target and this request is linked to the active replenishment watchlist. No posting or stock movement occurs from this UI.
                 </p>
               </div>

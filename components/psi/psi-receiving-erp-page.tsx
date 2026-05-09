@@ -12,6 +12,7 @@ import {
   MeWorkspaceSection,
 } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { PsiSoftCard, psiVisual } from "@/components/psi/psi-visual";
 import type { RestaurantModuleDefinition } from "@/config/restaurant-modules";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 
@@ -43,7 +44,7 @@ export function PsiReceivingErpPage({ module }: { module: RestaurantModuleDefini
 
   return (
     <ErpShell activeHref="/psi/receiving">
-      <div className="space-y-6">
+      <div className={psiVisual.pageStack}>
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", module.label[locale]]}
           title={preview.title}
@@ -69,7 +70,7 @@ export function PsiReceivingErpPage({ module }: { module: RestaurantModuleDefini
           <section className="grid gap-3 md:grid-cols-3">
             {preview.metrics.map((metric) => (
               <MeWorkspaceSection key={metric.label} title={metric.label} description={metric.description}>
-                <p className="text-[1.55rem] font-semibold tracking-[-0.02em] text-slate-950">{metric.value}</p>
+                <p className={psiVisual.metric}>{metric.value}</p>
               </MeWorkspaceSection>
             ))}
           </section>
@@ -79,10 +80,10 @@ export function PsiReceivingErpPage({ module }: { module: RestaurantModuleDefini
           <MeWorkspaceSection title={locale === "zh" ? "工作区筛选" : "Workspace Filters"} description={locale === "zh" ? "当前收货页面的运营筛选范围。" : "Operating filters for the receiving workspace."}>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {preview.filters.map((filterItem) => (
-                <div key={filterItem.label} className="rounded-[10px] border border-border bg-slate-50 px-4 py-3.5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{filterItem.label}</p>
-                  <p className="mt-1.5 text-sm font-semibold text-slate-900">{filterItem.value}</p>
-                </div>
+                <PsiSoftCard key={filterItem.label}>
+                  <p className={psiVisual.eyebrow}>{filterItem.label}</p>
+                  <p className={psiVisual.value}>{filterItem.value}</p>
+                </PsiSoftCard>
               ))}
             </div>
           </MeWorkspaceSection>
@@ -108,10 +109,10 @@ export function PsiReceivingErpPage({ module }: { module: RestaurantModuleDefini
                   <div className="grid gap-4 md:grid-cols-3">
                     {firstTableSection?.kind === "table"
                       ? firstTableSection.columns.slice(0, selectedRow.length).map((column, index) => (
-                          <div key={column} className="rounded-[10px] border border-border bg-slate-50 px-4 py-3">
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{column}</p>
-                            <p className="mt-1.5 text-sm font-semibold text-slate-900">{selectedRow[index]}</p>
-                          </div>
+                          <PsiSoftCard key={column}>
+                            <p className={psiVisual.eyebrow}>{column}</p>
+                            <p className={psiVisual.value}>{selectedRow[index]}</p>
+                          </PsiSoftCard>
                         ))
                       : null}
                     <Button asChild variant="outline" size="sm" className="self-end">
