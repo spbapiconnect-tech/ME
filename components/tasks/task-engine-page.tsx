@@ -14,6 +14,8 @@ import {
 } from "@/components/layout";
 import { Card, CardContent } from "@/components/ui/card";
 import type { TaskRecord } from "@/types/task";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
+import { getTaskCopy, type TaskLocale } from "@/config/task-language-copy";
 
 function mapModuleRoute(sourceModule: TaskRecord["sourceModule"]) {
   switch (sourceModule) {
@@ -54,12 +56,19 @@ function summarizeTasks(tasks: TaskRecord[]) {
   );
 }
 
+function getLocalizedTaskText(text: { en: string; zh: string }, locale: TaskLocale) {
+  return locale === "zh" ? text.zh : text.en;
+}
+
 interface TaskEnginePageProps {
   tasks: TaskRecord[];
   dataError?: string;
 }
 
 export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
+  const rawLocale = useUiPreferencesStore((state) => state.locale);
+  const currentLocale: TaskLocale = rawLocale === "zh" ? "zh" : "en";
+  const taskCopy = getTaskCopy(currentLocale);
   const stats = summarizeTasks(tasks);
   const selectedTask = tasks[0];
 
@@ -67,17 +76,17 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
     <MeRightRail
       sections={[
         {
-          title: "Task Context",
-          badge: "Operations",
-          items: ["Branch follow-up", "Issue coordination", "Inventory and procurement linkage"],
+          title: taskCopy.rightRail.taskContext,
+          badge: taskCopy.rightRail.operations,
+          items: [taskCopy.rightRail.branchFollowUp, taskCopy.rightRail.issueCoordination, taskCopy.rightRail.inventoryProcurementLinkage],
         },
         {
-          title: "Current Focus",
-          items: [`${stats.review} records waiting for review`, `${stats.overdue} overdue items`, `${stats.critical} critical-priority tasks`],
+          title: taskCopy.rightRail.currentFocus,
+          items: [`${stats.review} ${taskCopy.rightRail.recordsWaitingForReview}`, `${stats.overdue} ${taskCopy.rightRail.overdueItems}`, `${stats.critical} ${taskCopy.rightRail.criticalPriorityTasks}`],
         },
         {
-          title: "Today’s Priorities",
-          items: ["Replenishment review", "Delivery-delay escalation", "Schedule and training follow-up"],
+          title: taskCopy.rightRail.todaysPriorities,
+          items: [taskCopy.rightRail.replenishmentReview, taskCopy.rightRail.deliveryDelayEscalation, taskCopy.rightRail.scheduleTrainingFollowUp],
         },
       ]}
     />
@@ -86,40 +95,40 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
   return (
     <MeDashboardShell activeKey="tasks" rightRail={rightRail}>
       <MePageHeader
-        eyebrow="Task Management"
-        title="Task operations workspace"
-        description="Daily execution queue for branch follow-up, issue handling, procurement coordination, and cross-module work orders."
-        notice={dataError ? `Task service notice: ${dataError}` : "Use this workspace to review assigned work, branch-linked tasks, comments, and operating timelines."}
+        eyebrow={taskCopy.page.eyebrow}
+        title={taskCopy.page.title}
+        description={taskCopy.page.description}
+        notice={dataError ? `${taskCopy.page.serviceNoticePrefix} ${dataError}` : taskCopy.page.notice}
         badges={[
-          { label: "Task queue" },
-          { label: "Branch follow-up", variant: "secondary" },
-          { label: "Operational review", variant: "outline" },
+          { label: taskCopy.badges.taskQueue },
+          { label: taskCopy.badges.branchFollowUp, variant: "secondary" },
+          { label: taskCopy.badges.operationalReview, variant: "outline" },
         ]}
         meta={[
-          { label: "Queue size", value: String(stats.total) },
-          { label: "Branch scope", value: "All Stores / KCH / Central DC" },
-          { label: "Priority watch", value: `${stats.critical} critical` },
-          { label: "Workstream", value: "Daily operations" },
+          { label: taskCopy.fields.queueSize, value: String(stats.total) },
+          { label: taskCopy.fields.branchScope, value: taskCopy.values.allStoresScope },
+          { label: taskCopy.fields.priorityWatch, value: `${stats.critical} ${taskCopy.kpis.critical}` },
+          { label: taskCopy.fields.workstream, value: taskCopy.values.dailyOperations },
         ]}
       />
 
       <MeActionBar
         actions={[
-          { label: "Review Queue" },
-          { label: "Open Branches", href: "/branches", variant: "secondary" },
-          { label: "Open Inspection", href: "/inspection", variant: "outline" },
-          { label: "Open PSI", href: "/psi", variant: "outline" },
-          { label: "Export Queue", href: "#", variant: "ghost" },
+          { label: taskCopy.actions.reviewQueue },
+          { label: taskCopy.actions.openBranches, href: "/branches", variant: "secondary" },
+          { label: taskCopy.actions.openInspection, href: "/inspection", variant: "outline" },
+          { label: taskCopy.actions.openPsi, href: "/psi", variant: "outline" },
+          { label: taskCopy.actions.exportQueue, href: "#", variant: "ghost" },
         ]}
       />
 
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
         {[
-          ["Open tasks", String(stats.total)],
-          ["In progress", String(stats.inProgress)],
-          ["Waiting review", String(stats.review)],
-          ["Overdue", String(stats.overdue)],
-          ["Critical", String(stats.critical)],
+          [taskCopy.kpis.openTasks, String(stats.total)],
+          [taskCopy.kpis.inProgress, String(stats.inProgress)],
+          [taskCopy.kpis.waitingReview, String(stats.review)],
+          [taskCopy.kpis.overdue, String(stats.overdue)],
+          [taskCopy.kpis.critical, String(stats.critical)],
         ].map(([label, value]) => (
           <Card key={label} size="sm" className="border-border/60 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
             <CardContent className="pt-4">
@@ -133,16 +142,16 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
       {selectedTask ? (
         <MeRecordSummary
           title={selectedTask.id}
-          subtitle={selectedTask.title.en}
+          subtitle={getLocalizedTaskText(selectedTask.title, currentLocale)}
           status={titleCaseStatus(selectedTask.status)}
-          guardrail="Current service scope"
+          guardrail={taskCopy.fields.currentServiceScope}
           meta={[
-            { label: "Branch", value: selectedTask.store },
-            { label: "Owner", value: `${selectedTask.ownerName} · ${selectedTask.ownerRole}` },
-            { label: "Priority", value: titleCaseStatus(selectedTask.priority) },
-            { label: "Module", value: titleCaseStatus(selectedTask.sourceModule) },
-            { label: "Due", value: selectedTask.dueAt },
-            { label: "Updated", value: selectedTask.updatedAt },
+            { label: taskCopy.fields.branch, value: selectedTask.store },
+            { label: taskCopy.fields.owner, value: `${selectedTask.ownerName} · ${selectedTask.ownerRole}` },
+            { label: taskCopy.fields.priority, value: titleCaseStatus(selectedTask.priority) },
+            { label: taskCopy.fields.module, value: titleCaseStatus(selectedTask.sourceModule) },
+            { label: taskCopy.fields.due, value: selectedTask.dueAt },
+            { label: taskCopy.fields.updated, value: selectedTask.updatedAt },
           ]}
         />
       ) : null}
@@ -150,21 +159,21 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
       <MeTabs
         style="detail"
         tabs={[
-          { label: "Overview", active: true },
-          { label: "Queue", badge: String(stats.total) },
-          { label: "Comments" },
-          { label: "Activity" },
-          { label: "Attachments" },
+          { label: taskCopy.tabs.overview, active: true },
+          { label: taskCopy.tabs.queue, badge: String(stats.total) },
+          { label: taskCopy.tabs.comments },
+          { label: taskCopy.tabs.activity },
+          { label: taskCopy.tabs.attachments },
         ]}
       />
 
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title="Work Queue" description="Prioritized task records linked to branch operations, procurement, inventory, and incident handling.">
+            <MeWorkspaceSection title={taskCopy.sections.workQueue} description={taskCopy.sections.workQueueDescription}>
               <MeDataTable
                 embedded
-                columns={["Task", "Branch", "Owner", "Priority", "Status", "Due"]}
+                columns={[taskCopy.fields.task, taskCopy.fields.branch, taskCopy.fields.owner, taskCopy.fields.priority, taskCopy.fields.status, taskCopy.fields.due]}
                 rows={tasks.map((task) => [
                   <Link key={`${task.id}-link`} href={`/tasks/${task.id}`} className="font-medium text-slate-900 hover:text-blue-700">
                     {task.id}
@@ -180,20 +189,20 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
 
             {selectedTask ? (
               <>
-                <MeWorkspaceSection title="Selected Task" description="Primary work order detail, assignment context, and linked business records.">
+                <MeWorkspaceSection title={taskCopy.sections.selectedTask} description={taskCopy.sections.selectedTaskDescription}>
                   <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_18rem]">
                     <div className="grid gap-3 md:grid-cols-2">
                       {[
-                        ["Task ID", selectedTask.id],
-                        ["Title", selectedTask.title.en],
-                        ["Task type", titleCaseStatus(selectedTask.taskType)],
-                        ["Source module", titleCaseStatus(selectedTask.sourceModule)],
-                        ["Owner", `${selectedTask.ownerName} · ${selectedTask.ownerRole}`],
-                        ["Current branch", selectedTask.store],
-                        ["Priority", titleCaseStatus(selectedTask.priority)],
-                        ["Current status", titleCaseStatus(selectedTask.status)],
-                        ["Created", selectedTask.createdAt],
-                        ["Due", selectedTask.dueAt],
+                        [taskCopy.fields.taskId, selectedTask.id],
+                        [taskCopy.fields.title, getLocalizedTaskText(selectedTask.title, currentLocale)],
+                        [taskCopy.fields.taskType, titleCaseStatus(selectedTask.taskType)],
+                        [taskCopy.fields.sourceModule, titleCaseStatus(selectedTask.sourceModule)],
+                        [taskCopy.fields.owner, `${selectedTask.ownerName} · ${selectedTask.ownerRole}`],
+                        [taskCopy.fields.currentBranch, selectedTask.store],
+                        [taskCopy.fields.priority, titleCaseStatus(selectedTask.priority)],
+                        [taskCopy.fields.currentStatus, titleCaseStatus(selectedTask.status)],
+                        [taskCopy.fields.created, selectedTask.createdAt],
+                        [taskCopy.fields.due, selectedTask.dueAt],
                       ].map(([label, value]) => (
                         <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
                           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
@@ -202,22 +211,22 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
                       ))}
                     </div>
                     <div className="rounded-[12px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Task Note</p>
-                      <p className="mt-2 text-sm leading-6 text-slate-600">{selectedTask.description.en}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{taskCopy.fields.taskNote}</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">{getLocalizedTaskText(selectedTask.description, currentLocale)}</p>
                     </div>
                   </div>
                 </MeWorkspaceSection>
 
-                <MeWorkspaceSection title="Related Records" description="Connected procurement, supplier, inventory, and issue records used during task review.">
+                <MeWorkspaceSection title={taskCopy.sections.relatedRecords} description={taskCopy.sections.relatedRecordsDescription}>
                   <MeDataTable
                     embedded
-                    columns={["Module", "Record", "Description", "Route"]}
+                    columns={[taskCopy.fields.module, taskCopy.fields.record, taskCopy.fields.description, taskCopy.fields.route]}
                     rows={selectedTask.linkedRecords.map((record) => [
                       titleCaseStatus(record.moduleCode),
                       record.recordId,
-                      record.label.en,
+                      getLocalizedTaskText(record.label, currentLocale),
                       <Link key={`${record.recordId}-route`} href={mapModuleRoute(record.moduleCode)} className="text-blue-700 hover:underline">
-                        Open workspace
+                        {taskCopy.actions.openWorkspace}
                       </Link>,
                     ])}
                   />
@@ -230,10 +239,10 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
           selectedTask ? (
             <MeStatusTimeline
               embedded
-              title="Activity"
+              title={taskCopy.sections.activity}
               items={selectedTask.timeline.map((entry) => ({
-                title: entry.title.en,
-                description: `${entry.description.en} · ${selectedTask.ownerRole}`,
+                title: getLocalizedTaskText(entry.title, currentLocale),
+                description: `${getLocalizedTaskText(entry.description, currentLocale)} · ${selectedTask.ownerRole}`,
                 time: entry.timestamp,
               }))}
             />
