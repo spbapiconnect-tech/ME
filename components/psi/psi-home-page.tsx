@@ -51,7 +51,7 @@ export function PsiHomePage() {
   const rightRail = [
     {
       title: psiCopy.rightRail.psiStatus,
-      badge: "Live view",
+      badge: psiCopy.rightRail.liveView,
       items: [
         psiCopy.rightRail.procurementQueueVisible,
         psiCopy.rightRail.supplierRisksSurfaced,
@@ -114,7 +114,7 @@ export function PsiHomePage() {
         <div className="grid gap-3 md:grid-cols-4">
           {[
             [psiCopy.shared.supplier, "ABC Food Supply"],
-            ["Branch", "KCH"],
+            [psiCopy.shared.branch, "KCH"],
             [psiCopy.overview.requestType, psiCopy.overview.procurementRequest],
             [psiCopy.shared.priority, "High"],
           ].map(([label, value]) => (
@@ -168,11 +168,11 @@ export function PsiHomePage() {
               <div className="grid gap-3 md:grid-cols-2">
                 {[
                   [psiCopy.shared.supplier, "ABC Food Supply"],
-                  ["Branch", "KCH"],
+                  [psiCopy.shared.branch, "KCH"],
                   [psiCopy.overview.requestType, psiCopy.overview.procurementRequest],
                   [psiCopy.shared.priority, "High"],
                   [psiCopy.shared.status, "Review"],
-                  ["Receiving site", "KCH backroom"],
+                  [psiCopy.shared.receivingSite, "KCH backroom"],
                 ].map(([label, value]) => (
                   <div key={label} className="rounded-[18px] bg-slate-50/90 px-4 py-3 ring-1 ring-slate-200/75">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
@@ -190,7 +190,7 @@ export function PsiHomePage() {
             </MeWorkspaceSection>
 
             <MeWorkspaceSection title={psiCopy.overview.items} description={psiCopy.overview.itemsDescription}>
-              <MeDataTable columns={["Item", "Qty", psiCopy.shared.priority, psiCopy.shared.status]} rows={lineItems} />
+              <MeDataTable columns={[psiCopy.shared.item, psiCopy.shared.quantity, psiCopy.shared.priority, psiCopy.shared.status]} rows={lineItems} />
             </MeWorkspaceSection>
 
             <MeWorkspaceSection title={psiCopy.overview.supplierAndReceiving} description={psiCopy.overview.supplierAndReceivingDescription}>
@@ -240,7 +240,7 @@ export function PsiHomePage() {
                 },
                 {
                   title: psiCopy.overview.serviceScope,
-                  badge: "Current release",
+                  badge: psiCopy.rightRail.currentRelease,
                   items: ["PSI preview only", "No stock posting", "No supplier write-back"],
                 },
               ]}
