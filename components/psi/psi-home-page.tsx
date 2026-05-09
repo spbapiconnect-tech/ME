@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { DemoPresentationNote } from "@/components/demo-mode/demo-presentation-note";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import {
-  DemoPresentationNote,
   MeActionBar,
   MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MeKpiStrip,
   MePageHeader,
   MeRecordSummary,
   MeRightRail,
@@ -132,14 +131,21 @@ export function PsiHomePage() {
         ]}
       />
 
-      <MeKpiStrip
-        items={[
-          [psiCopy.shared.procurement, "12"],
-          [psiCopy.shared.supplier, "4"],
-          [psiCopy.shared.inventory, "8"],
-          [psiCopy.shared.issues, "6"],
-        ]}
-      />
+      <MeWorkspaceSection title={psiCopy.overview.currentFocus} description={psiCopy.rightRail.workCoverage}>
+        <div className="grid gap-3 md:grid-cols-4">
+          {[
+            [psiCopy.shared.procurement, "12"],
+            [psiCopy.shared.supplier, "4"],
+            [psiCopy.shared.inventory, "8"],
+            [psiCopy.shared.issues, "6"],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-[20px] bg-white/95 px-4 py-3 shadow-[0_14px_32px_-28px_rgba(15,23,42,0.35)] ring-1 ring-slate-200/80">
+              <div className="text-xs font-medium text-slate-500">{label}</div>
+              <div className="mt-1 text-xl font-semibold text-slate-950">{value}</div>
+            </div>
+          ))}
+        </div>
+      </MeWorkspaceSection>
 
       <MeTabs
         tabs={[
