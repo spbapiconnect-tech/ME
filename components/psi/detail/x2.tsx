@@ -4,16 +4,15 @@ import Link from "next/link";
 
 import {
   MeActionBar,
-  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MePageHeader,
   MeRecordSummary,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { DisplayRecord } from "@/types/display-model";
@@ -131,24 +130,19 @@ export function PsiWorkspaceLayoutV072({
   );
 
   return (
-    <MeDashboardShell activeKey={activeKey} rightRail={rightRail}>
-      <MePageHeader
-        eyebrow={psiCopy.workspace.eyebrow}
-        title={pageTitle}
-        description={pageSubtitle}
-        notice={error ?? `${psiCopy.workspace.mainRecordsDescription}`}
-        badges={[
-          { label: moduleLabel },
-          { label: psiCopy.rightRail.operationalQueue, variant: "secondary" },
-          { label: psiCopy.rightRail.currentServiceScope, variant: "outline" },
-        ]}
-        meta={[
-          { label: psiCopy.shared.source, value: source },
-          { label: psiCopy.rightRail.visibleRecords, value: String(records.length) },
-          { label: psiCopy.rightRail.issueWatchMeta, value: String(issueRecords.length) },
-          { label: psiCopy.rightRail.deliveryMode, value: isMock ? psiCopy.rightRail.catalogLayerShort : psiCopy.rightRail.connectedServiceShort },
-        ]}
-      />
+    <ErpShell activeHref={detailBasePath}>
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "PSI", moduleLabel]}
+          title={pageTitle}
+          zhTitle={moduleLabel}
+          subtitle={
+            error ??
+            `${pageSubtitle} · ${psiCopy.shared.source}: ${source} · ${
+              isMock ? psiCopy.rightRail.catalogLayerShort : psiCopy.rightRail.connectedServiceShort
+            } · ${records.length} ${psiCopy.rightRail.visibleRecordsSuffix}`
+          }
+        />
 
       <MeActionBar
         actions={[
@@ -260,6 +254,7 @@ export function PsiWorkspaceLayoutV072({
           />
         }
       />
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   );
 }
