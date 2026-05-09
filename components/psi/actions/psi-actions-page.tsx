@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import {
   countPsiActionDraftFields,
   countPsiActionDraftRequiredFields,
@@ -64,9 +65,42 @@ interface PsiActionsPageProps {
   actions: PsiActionDraftContract[];
 }
 
+function optionLabel(value: string, psiCopy: ReturnType<typeof getPsiCopy>) {
+  const map: Record<string, string> = {
+    all: psiCopy.actions.options.all,
+    procurement: psiCopy.actions.options.procurement,
+    supplier: psiCopy.actions.options.supplier,
+    inventory: psiCopy.actions.options.inventory,
+    receiving: psiCopy.actions.options.receiving,
+    issue: psiCopy.actions.options.issue,
+    stock: psiCopy.actions.options.stock,
+    system: psiCopy.actions.options.system,
+    create: psiCopy.actions.options.create,
+    "update-placeholder": psiCopy.actions.options.updatePlaceholder,
+    review: psiCopy.actions.options.review,
+    "approve-placeholder": psiCopy.actions.options.approvePlaceholder,
+    receive: psiCopy.actions.options.receive,
+    adjust: psiCopy.actions.options.adjust,
+    transfer: psiCopy.actions.options.transfer,
+    "report-issue": psiCopy.actions.options.reportIssue,
+    suggest: psiCopy.actions.options.suggest,
+    configure: psiCopy.actions.options.configure,
+    placeholder: psiCopy.actions.options.placeholder,
+    draft: psiCopy.actions.options.draft,
+    "preview-only": psiCopy.actions.options.previewOnly,
+    "coming-soon": psiCopy.actions.options.comingSoon,
+    blocked: psiCopy.actions.options.blocked,
+    disabled: psiCopy.actions.options.disabled,
+  };
+
+  return map[value] ?? value;
+}
+
 export function PsiActionsPage({ actions }: PsiActionsPageProps) {
-  const locale = useUiPreferencesStore((state) => (state.hydrated ? state.locale : "en"));
-  const currentLocale: SupportedLocale = locale;
+  const rawLocale = useUiPreferencesStore((state) => (state.hydrated ? state.locale : "en"));
+  const currentLocale: SupportedLocale = rawLocale === "zh" ? "zh" : "en";
+  const psiLocale: PsiLocale = currentLocale === "zh" ? "zh" : "en";
+  const psiCopy = getPsiCopy(psiLocale);
 
   const [category, setCategory] = React.useState<PsiActionDraftCategory | "all">("all");
   const [intent, setIntent] = React.useState<PsiActionDraftIntent | "all">("all");
@@ -102,47 +136,52 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
     return { total, procurement, supplier, inventory, placeholder, fields, requiredFields };
   }, [actions]);
 
+  const statCards = [
+    [psiCopy.actions.total, stats.total],
+    [psiCopy.shared.procurement, stats.procurement],
+    [psiCopy.shared.supplier, stats.supplier],
+    [psiCopy.shared.inventory, stats.inventory],
+    [psiCopy.actions.placeholder, stats.placeholder],
+    [psiCopy.actions.fields, stats.fields],
+    [psiCopy.actions.requiredFields, stats.requiredFields],
+  ];
+
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
       <Card>
         <CardHeader>
-          <CardTitle>ME PSI Actions</CardTitle>
-          <CardDescription>Action Draft / Form Placeholder Design</CardDescription>
-          <CardDescription>
-            Placeholder only. No real submit, no database/API, no write action, no approval engine, no stock posting, and
-            no task/notification/workflow execution.
-          </CardDescription>
+          <CardTitle>{psiCopy.actions.title}</CardTitle>
+          <CardDescription>{psiCopy.actions.description}</CardDescription>
+          <CardDescription>{psiCopy.actions.notice}</CardDescription>
         </CardHeader>
       </Card>
 
       <Card size="sm">
         <CardHeader>
-          <CardTitle className="text-sm">Stats</CardTitle>
+          <CardTitle className="text-sm">{psiCopy.actions.statsTitle}</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-2 text-xs md:grid-cols-4">
-          <div className="rounded-xl border p-2">total: {stats.total}</div>
-          <div className="rounded-xl border p-2">procurement: {stats.procurement}</div>
-          <div className="rounded-xl border p-2">supplier: {stats.supplier}</div>
-          <div className="rounded-xl border p-2">inventory: {stats.inventory}</div>
-          <div className="rounded-xl border p-2">placeholder: {stats.placeholder}</div>
-          <div className="rounded-xl border p-2">fields: {stats.fields}</div>
-          <div className="rounded-xl border p-2">required fields: {stats.requiredFields}</div>
+          {statCards.map(([label, value]) => (
+            <div key={String(label)} className="rounded-xl border p-2">
+              {label}: {value}
+            </div>
+          ))}
         </CardContent>
       </Card>
 
       <Card size="sm">
         <CardHeader>
-          <CardTitle className="text-sm">Filters</CardTitle>
+          <CardTitle className="text-sm">{psiCopy.actions.filters}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           <Select value={category} onValueChange={(value) => setCategory(value as PsiActionDraftCategory | "all")}>
             <SelectTrigger className="h-8 text-xs">
-              <SelectValue placeholder="Category" />
+              <SelectValue placeholder={psiCopy.actions.category} />
             </SelectTrigger>
             <SelectContent>
               {categoryOptions.map((value) => (
                 <SelectItem key={value} value={value}>
-                  {value}
+                  {optionLabel(value, psiCopy)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -150,12 +189,12 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
 
           <Select value={intent} onValueChange={(value) => setIntent(value as PsiActionDraftIntent | "all")}>
             <SelectTrigger className="h-8 text-xs">
-              <SelectValue placeholder="Intent" />
+              <SelectValue placeholder={psiCopy.actions.intent} />
             </SelectTrigger>
             <SelectContent>
               {intentOptions.map((value) => (
                 <SelectItem key={value} value={value}>
-                  {value}
+                  {optionLabel(value, psiCopy)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -163,12 +202,12 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
 
           <Select value={status} onValueChange={(value) => setStatus(value as PsiActionDraftStatus | "all")}>
             <SelectTrigger className="h-8 text-xs">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder={psiCopy.actions.status} />
             </SelectTrigger>
             <SelectContent>
               {statusOptions.map((value) => (
                 <SelectItem key={value} value={value}>
-                  {value}
+                  {optionLabel(value, psiCopy)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -176,12 +215,12 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
 
           <Select value={moduleCode} onValueChange={setModuleCode}>
             <SelectTrigger className="h-8 text-xs">
-              <SelectValue placeholder="Module" />
+              <SelectValue placeholder={psiCopy.actions.module} />
             </SelectTrigger>
             <SelectContent>
               {moduleOptions.map((value) => (
                 <SelectItem key={value} value={value}>
-                  {value}
+                  {optionLabel(value, psiCopy)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -192,7 +231,7 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
       <section className="grid gap-4 lg:grid-cols-2">
         <Card size="sm">
           <CardHeader>
-            <CardTitle className="text-sm">Action Drafts</CardTitle>
+            <CardTitle className="text-sm">{psiCopy.actions.actionDrafts}</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-2">
             {filteredActions.map((item) => (
@@ -200,7 +239,7 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
                 <PsiActionCard action={item} locale={currentLocale} />
               </button>
             ))}
-            {filteredActions.length === 0 ? <div className="text-xs text-muted-foreground">No action draft found.</div> : null}
+            {filteredActions.length === 0 ? <div className="text-xs text-muted-foreground">{psiCopy.actions.noActionDraftFound}</div> : null}
           </CardContent>
         </Card>
 
