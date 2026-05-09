@@ -252,10 +252,6 @@ export function PsiHomePage() {
       <DemoPresentationNote
         title={psiCopy.overview.workspaceNote}
         description={psiCopy.overview.workspaceNoteDescription}
-        bullets={[
-          [psiCopy.values.object, psiCopy.overview.procurementRequest],
-          [psiCopy.values.tabs, `${psiCopy.shared.overview}, ${psiCopy.overview.items}, ${psiCopy.shared.supplier}, ${psiCopy.shared.receiving}, ${psiCopy.shared.activity}, ${psiCopy.shared.attachments}`],
-        ]}
       />
     </MeDashboardShell>
   );
