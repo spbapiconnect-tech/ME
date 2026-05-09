@@ -80,7 +80,7 @@ export function RoleWorkspacePage({ roles }: RoleWorkspacePageProps) {
           { label: "Review role profile" },
           { label: "Open access view", variant: "secondary" },
           { label: "Open permissions", variant: "outline" },
-          { label: "Assign training", variant: "outline" },
+          { label: "Preview training scope", variant: "outline" },
           { label: "View history", variant: "ghost" },
         ]}
       />
