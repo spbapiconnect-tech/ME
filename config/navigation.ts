@@ -31,9 +31,9 @@ const businessWorkspace = createItem({
   status: "active",
   tone: "info",
   badge: { zh: "工作台", en: "Workspace" },
-  isPrimary: true,
+  isPrimary: false,
   isFoundation: false,
-  notes: "Shares the homepage route with Dashboard for IA clarity.",
+  notes: "Dashboard alias only. Shares the homepage route and should not compete as a primary navigation item.",
 });
 
 const psiWorkspace = createItem({
@@ -533,8 +533,9 @@ const navigationIa = createItem({
   status: "preview-only",
   tone: "info",
   badge: { zh: "IA", en: "IA" },
-  isPrimary: true,
+  isPrimary: false,
   isFoundation: false,
+  notes: "Navigation IA is a system/demo reference route and should not compete with daily primary business routes.",
 });
 
 const demoStory = createItem({
@@ -1206,7 +1207,7 @@ const sidebarGroups: MeSidebarNavigationGroup[] = [
 ];
 
 export const navigationMap: MeNavigationMap = {
-  primaryItems: [dashboard, psiWorkspace, reports, systemFoundation, navigationIa],
+  primaryItems: [dashboard, psiWorkspace, reports, systemFoundation],
   groups: [
     {
       key: "business",
