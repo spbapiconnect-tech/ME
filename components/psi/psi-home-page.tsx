@@ -8,7 +8,6 @@ import {
   MeActionBar,
   MeDataTable,
   MeDetailWorkspace,
-  MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
@@ -47,30 +46,6 @@ export function PsiHomePage() {
     },
   ];
 
-  const rightRail = [
-    {
-      title: psiCopy.rightRail.psiStatus,
-      badge: psiCopy.rightRail.liveView,
-      items: [
-        psiCopy.rightRail.procurementQueueVisible,
-        psiCopy.rightRail.supplierRisksSurfaced,
-        psiCopy.rightRail.inventoryFollowUpCoordinated,
-      ],
-    },
-    {
-      title: psiCopy.rightRail.todayFocus,
-      items: ["PR-KCH-0001", "KCH replenishment watchlist", "ABC Food Supply"],
-    },
-    {
-      title: psiCopy.rightRail.workCoverage,
-      items: [
-        psiCopy.rightRail.procurementCoordination,
-        psiCopy.rightRail.supplierReview,
-        psiCopy.rightRail.inventoryWatch,
-        psiCopy.rightRail.operationalFollowUp,
-      ],
-    },
-  ];
 
   return (
     <ErpShell activeHref="/psi">
