@@ -4,16 +4,15 @@ import Link from "next/link";
 
 import {
   MeActionBar,
-  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MePageHeader,
   MeRecordSummary,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { Card, CardContent } from "@/components/ui/card";
 import type { TaskRecord } from "@/types/task";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
@@ -95,24 +94,14 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
   );
 
   return (
-    <MeDashboardShell activeKey="tasks" rightRail={rightRail}>
-      <MePageHeader
-        eyebrow={taskCopy.page.eyebrow}
-        title={taskCopy.page.title}
-        description={taskCopy.page.description}
-        notice={dataError ? `${taskCopy.page.serviceNoticePrefix} ${dataError}` : taskCopy.page.notice}
-        badges={[
-          { label: taskCopy.badges.taskQueue },
-          { label: taskCopy.badges.branchFollowUp, variant: "secondary" },
-          { label: taskCopy.badges.operationalReview, variant: "outline" },
-        ]}
-        meta={[
-          { label: taskCopy.fields.queueSize, value: String(stats.total) },
-          { label: taskCopy.fields.branchScope, value: taskCopy.values.allStoresScope },
-          { label: taskCopy.fields.priorityWatch, value: `${stats.critical} ${taskCopy.kpis.critical}` },
-          { label: taskCopy.fields.workstream, value: taskCopy.values.dailyOperations },
-        ]}
-      />
+    <ErpShell activeHref="/tasks">
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "Tasks", taskCopy.page.eyebrow]}
+          title={taskCopy.page.title}
+          zhTitle="任务工作台"
+          subtitle={dataError ? `${taskCopy.page.serviceNoticePrefix} ${dataError}` : taskCopy.page.description}
+        />
 
       <MeActionBar
         actions={[
@@ -251,6 +240,7 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
           ) : undefined
         }
       />
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   );
 }

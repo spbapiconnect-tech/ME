@@ -4,16 +4,15 @@ import Link from "next/link";
 
 import {
   MeActionBar,
-  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MePageHeader,
   MeRecordSummary,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { ErpPageHeader, ErpShell } from "@/components/erp";
 import type { TaskRecord } from "@/types/task";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import { getTaskCopy, type TaskLocale } from "@/config/task-language-copy";
@@ -60,19 +59,16 @@ export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps)
 
   if (!task) {
     return (
-      <MeDashboardShell activeKey="tasks">
-        <MePageHeader
-          eyebrow={taskCopy.page.eyebrow}
-          title={taskCopy.page.emptyTitle}
-          description={taskCopy.page.emptyDescription}
-          notice={dataError ?? taskCopy.page.emptyNotice}
-          badges={[{ label: taskCopy.badges.taskQueue }, { label: taskCopy.badges.recordCheck, variant: "outline" }]}
-          meta={[
-            { label: taskCopy.fields.record, value: taskId },
-            { label: taskCopy.fields.route, value: "/tasks" },
-          ]}
-        />
-      </MeDashboardShell>
+      <ErpShell activeHref="/tasks">
+        <div className="space-y-6">
+          <ErpPageHeader
+            breadcrumbs={["ME", "Tasks", taskId]}
+            title={taskCopy.page.emptyTitle}
+            zhTitle="任务详情"
+            subtitle={dataError ?? taskCopy.page.emptyDescription}
+          />
+        </div>
+      </ErpShell>
     );
   }
 
@@ -97,24 +93,14 @@ export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps)
   );
 
   return (
-    <MeDashboardShell activeKey="tasks" rightRail={rightRail}>
-      <MePageHeader
-        eyebrow={taskCopy.page.eyebrow}
-        title={task.id}
-        description={getLocalizedTaskText(task.title, currentLocale)}
-        notice={getLocalizedTaskText(task.description, currentLocale)}
-        badges={[
-          { label: titleCaseStatus(task.taskType) },
-          { label: titleCaseStatus(task.sourceModule), variant: "secondary" },
-          { label: titleCaseStatus(task.priority), variant: "outline" },
-        ]}
-        meta={[
-          { label: taskCopy.fields.branch, value: task.store },
-          { label: taskCopy.fields.owner, value: `${task.ownerName} · ${task.ownerRole}` },
-          { label: taskCopy.fields.status, value: titleCaseStatus(task.status) },
-          { label: taskCopy.fields.due, value: task.dueAt },
-        ]}
-      />
+    <ErpShell activeHref="/tasks">
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "Tasks", task.id]}
+          title={task.id}
+          zhTitle="任务详情"
+          subtitle={getLocalizedTaskText(task.title, currentLocale)}
+        />
 
       <MeRecordSummary
         title={task.id}
@@ -209,6 +195,7 @@ export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps)
         }
         context={<MeStatusTimeline embedded title={taskCopy.sections.activity} items={task.timeline.map((entry) => ({ title: getLocalizedTaskText(entry.title, currentLocale), description: getLocalizedTaskText(entry.description, currentLocale), time: entry.timestamp }))} />}
       />
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   );
 }
