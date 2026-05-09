@@ -4,16 +4,15 @@ import Link from "next/link";
 
 import {
   MeActionBar,
-  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MePageHeader,
   MeRecordSummary,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { PsiDetailPanelData } from "@/types/psi";
@@ -131,24 +130,19 @@ export function PsiDetailLayoutV072({
   );
 
   return (
-    <MeDashboardShell activeKey={activeKey} rightRail={rightRail}>
-      <MePageHeader
-        eyebrow={psiCopy.detail.psiRecord}
-        title={summaryTitle}
-        description={summarySubtitle}
-        notice={error ?? psiCopy.detail.reviewNotice}
-        badges={[
-          { label: moduleLabel },
-          { label: psiCopy.detail.recordDetail, variant: "secondary" },
-          { label: psiCopy.rightRail.currentServiceScope, variant: "outline" },
-        ]}
-        meta={[
-          { label: psiCopy.shared.source, value: source },
-          { label: psiCopy.detail.timeline, value: String(detailPanelData?.timeline.length ?? 0) },
-          { label: psiCopy.shared.relatedActions, value: String(relatedActions.length) },
-          { label: psiCopy.shared.relatedRecords, value: String(detailPanelData?.linkedRecords.length ?? 0) },
-        ]}
-      />
+    <ErpShell activeHref={backHref}>
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "PSI", moduleLabel, psiCopy.detail.recordDetail]}
+          title={summaryTitle}
+          zhTitle={moduleLabel}
+          subtitle={
+            error ??
+            `${summarySubtitle} · ${psiCopy.shared.source}: ${source} · ${
+              isMock ? psiCopy.rightRail.catalogLayerShort : psiCopy.rightRail.connectedServiceShort
+            } · ${psiCopy.shared.relatedActions}: ${relatedActions.length}`
+          }
+        />
 
       <MeRecordSummary
         title={summaryTitle}
@@ -246,6 +240,7 @@ export function PsiDetailLayoutV072({
           />
         }
       />
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   );
 }
