@@ -24,9 +24,9 @@ export function PackageSourceCard({ pkg, locale }: { pkg: PackageContract; local
           ))}
         </div>
         {pkg.linkedRoute ? <div>{locale === "zh" ? "关联路由" : "Linked Route"}: {pkg.linkedRoute}</div> : null}
-        <div>{locale === "zh" ? "未来计费键" : "Future Billing Key"}: {pkg.futureBillingKey ?? "-"}</div>
-        <div>{locale === "zh" ? "未来订阅键" : "Future Subscription Key"}: {pkg.futureSubscriptionKey ?? "-"}</div>
-        <div>{locale === "zh" ? "未来开通键" : "Future Provisioning Key"}: {pkg.futureProvisioningKey ?? "-"}</div>
+        <div>{locale === "zh" ? "未来计费引用" : "Future Billing Ref"}: {pkg.futureBillingKey ?? "-"}</div>
+        <div>{locale === "zh" ? "未来订阅引用" : "Future Subscription Ref"}: {pkg.futureSubscriptionKey ?? "-"}</div>
+        <div>{locale === "zh" ? "未来开通引用" : "Future Provisioning Ref"}: {pkg.futureProvisioningKey ?? "-"}</div>
       </CardContent>
     </Card>
   );

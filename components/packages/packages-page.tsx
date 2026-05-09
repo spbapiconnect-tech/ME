@@ -122,7 +122,7 @@ export function PackagesPage() {
         <CardContent className="grid gap-3">
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
             <div className="rounded-xl bg-muted/40 p-3"><div className="text-xs text-muted-foreground">Total</div><div className="text-lg font-semibold">{stats.total}</div></div>
-            <div className="rounded-xl bg-muted/40 p-3"><div className="text-xs text-muted-foreground">Active</div><div className="text-lg font-semibold">{stats.active}</div></div>
+            <div className="rounded-xl bg-muted/40 p-3"><div className="text-xs text-muted-foreground">Catalog Active</div><div className="text-lg font-semibold">{stats.active}</div></div>
             <div className="rounded-xl bg-muted/40 p-3"><div className="text-xs text-muted-foreground">Placeholder</div><div className="text-lg font-semibold">{stats.placeholder}</div></div>
             <div className="rounded-xl bg-muted/40 p-3"><div className="text-xs text-muted-foreground">Enterprise</div><div className="text-lg font-semibold">{stats.enterprise}</div></div>
           </div>

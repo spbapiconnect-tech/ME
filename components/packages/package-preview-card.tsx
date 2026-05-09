@@ -17,7 +17,7 @@ export function PackagePreviewCard({ pkg, locale }: { pkg: PackageContract; loca
       <CardContent className="grid gap-2 text-xs text-muted-foreground">
         <div className="flex flex-wrap gap-1.5">
           <Badge variant={preview.canUse ? "default" : "outline"}>
-            {preview.canUse ? (locale === "zh" ? "可使用（元数据）" : "Usable (metadata)") : (locale === "zh" ? "不可使用" : "Not Usable")}
+            {preview.canUse ? (locale === "zh" ? "可用于预览" : "Preview Usable") : (locale === "zh" ? "不可使用" : "Not Usable")}
           </Badge>
           <PackageChip kind="status" locale={locale} status={preview.status} />
           <PackageChip kind="tier" locale={locale} tier={preview.tier} />
@@ -28,11 +28,11 @@ export function PackagePreviewCard({ pkg, locale }: { pkg: PackageContract; loca
           <div>{locale === "zh" ? "模块数量" : "Module Count"}: {preview.moduleCount}</div>
           <div>{locale === "zh" ? "功能数量" : "Feature Count"}: {preview.featureCount}</div>
           <div>{locale === "zh" ? "限制数量" : "Limit Count"}: {preview.limitCount}</div>
-          <div>{locale === "zh" ? "计费模式" : "Billing Mode"}: {preview.billingMode}</div>
+          <div>{locale === "zh" ? "计费占位" : "Billing Placeholder"}: {preview.billingMode}</div>
         </div>
-        <div>{locale === "zh" ? "计费键占位" : "Billing Key Placeholder"}: {pkg.futureBillingKey ?? "-"}</div>
-        <div>{locale === "zh" ? "订阅键占位" : "Subscription Key Placeholder"}: {pkg.futureSubscriptionKey ?? "-"}</div>
-        <div>{locale === "zh" ? "开通键占位" : "Provisioning Key Placeholder"}: {pkg.futureProvisioningKey ?? "-"}</div>
+        <div>{locale === "zh" ? "未来计费引用" : "Future Billing Ref"}: {pkg.futureBillingKey ?? "-"}</div>
+        <div>{locale === "zh" ? "未来订阅引用" : "Future Subscription Ref"}: {pkg.futureSubscriptionKey ?? "-"}</div>
+        <div>{locale === "zh" ? "未来开通引用" : "Future Provisioning Ref"}: {pkg.futureProvisioningKey ?? "-"}</div>
         <div className="rounded-xl border border-dashed border-border bg-muted/20 p-3">
           {locale === "zh"
             ? "说明：方案预览仅用于元数据，不执行真实计费、支付、订阅门禁、租户开通、模块启用、API 或后端逻辑。"

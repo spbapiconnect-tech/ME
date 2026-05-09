@@ -27,7 +27,7 @@ export function PackageCard({ pkg, locale }: { pkg: PackageContract; locale: Sup
           <div>{locale === "zh" ? "功能" : "Features"}: {pkg.features.length}</div>
           <div>{locale === "zh" ? "限制" : "Limits"}: {pkg.limits.length}</div>
         </div>
-        <div>{locale === "zh" ? "计费模式" : "Billing Mode"}: {pkg.billingMode}</div>
+        <div>{locale === "zh" ? "计费占位" : "Billing Placeholder"}: {pkg.billingMode}</div>
         <div>{locale === "zh" ? "推荐角色" : "Recommended Roles"}: {pkg.recommendedRoles.join(", ") || "-"}</div>
         <div>{locale === "zh" ? "推荐皮肤" : "Recommended Skins"}: {pkg.recommendedSkins.join(", ") || "-"}</div>
         <div>{locale === "zh" ? "推荐看板" : "Recommended Dashboards"}: {pkg.recommendedDashboards.join(", ") || "-"}</div>
