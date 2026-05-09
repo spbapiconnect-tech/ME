@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import { DemoPresentationNote } from "@/components/demo-mode";
@@ -14,7 +16,9 @@ import {
   MeWorkspaceSection,
 } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import type { DataMeta } from "@/lib/data";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 
 interface PsiSupplierPageProps {
   source: DataMeta["source"];
@@ -22,93 +26,99 @@ interface PsiSupplierPageProps {
 }
 
 export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
+  const rawLocale = useUiPreferencesStore((state) => state.locale);
+  const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
+  const psiCopy = getPsiCopy(currentLocale);
+  const c = psiCopy.standalone.common;
+  const sup = psiCopy.standalone.supplier;
+
   return (
     <MeDashboardShell activeKey="supplier">
       <MePageHeader
-        eyebrow="PSI Supplier"
-        title="Supplier operations detail"
-        description="Supplier profile, contact context, linked orders, and issue visibility inside the shared detail workspace pattern."
-        notice={`Source: ${source}. ${isMock ? "This workspace is currently published through the shared catalog layer." : "This workspace is currently published through the connected service layer."} Use it to review supplier performance, contacts, linked orders, and open follow-up items.`}
+        eyebrow={sup.eyebrow}
+        title={sup.title}
+        description={sup.description}
+        notice={`${c.sourceNotice}: ${source}. ${isMock ? c.catalogLayerNotice : c.connectedServiceNotice} ${sup.noticeSuffix}`}
         badges={[
-          { label: "Supplier detail" },
-          { label: "Operations workspace", variant: "secondary" },
-          { label: "Supplier operations", variant: "outline" },
+          { label: sup.badgeDetail },
+          { label: sup.badgeWorkspace, variant: "secondary" },
+          { label: sup.badgeOperations, variant: "outline" },
         ]}
         actions={
           <>
             <Button asChild size="sm">
-              <Link href="/psi">Back to PSI</Link>
+              <Link href="/psi">{c.backToPsi}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/psi/procurement">Open Procurement</Link>
+              <Link href="/psi/procurement">{c.openProcurement}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/psi/inventory">Open Inventory</Link>
+              <Link href="/psi/inventory">{c.openInventory}</Link>
             </Button>
           </>
         }
         meta={[
-          { label: "Coverage", value: "KCH / BTU" },
-          { label: "Category", value: "Food Supply" },
-          { label: "Lead time", value: "3-5 days" },
-          { label: "Owner", value: "Purchasing" },
+          { label: c.coverage, value: "KCH / BTU" },
+          { label: c.category, value: "Food Supply" },
+          { label: c.leadTime, value: "3-5 days" },
+          { label: c.owner, value: "Purchasing" },
         ]}
       />
 
       <MeRecordSummary
         title="ABC Food Supply"
-        subtitle="Supplier profile"
+        subtitle={sup.supplierProfile}
         status="Active / Review Needed"
         meta={[
-          { label: "Branch coverage", value: "KCH / BTU" },
-          { label: "Category", value: "Food Supply" },
-          { label: "Lead time", value: "3-5 days" },
-          { label: "Owner", value: "Purchasing" },
-          { label: "Service region", value: "Kuching / Bintulu corridor" },
-          { label: "Contact status", value: "Primary contact active" },
-          { label: "Current risk", value: "Review pricing alignment" },
-          { label: "Last updated", value: "Today 13:18" },
+          { label: sup.branchCoverage, value: "KCH / BTU" },
+          { label: c.category, value: "Food Supply" },
+          { label: c.leadTime, value: "3-5 days" },
+          { label: c.owner, value: "Purchasing" },
+          { label: sup.serviceRegion, value: "Kuching / Bintulu corridor" },
+          { label: sup.contactStatus, value: "Primary contact active" },
+          { label: sup.currentRisk, value: "Review pricing alignment" },
+          { label: c.lastUpdated, value: "Today 13:18" },
         ]}
       />
 
       <MeActionBar
         actions={[
-          { label: "Review Supplier", href: "#" },
-          { label: "Open issue queue", variant: "secondary", href: "#" },
-          { label: "Assign Follow-up", variant: "outline", href: "#" },
-          { label: "Export Profile", variant: "outline", href: "#" },
-          { label: "Add Note", variant: "outline", href: "#" },
-          { label: "View History", variant: "ghost", href: "#" },
+          { label: sup.reviewSupplier, href: "#" },
+          { label: sup.openIssueQueue, variant: "secondary", href: "#" },
+          { label: sup.assignFollowUp, variant: "outline", href: "#" },
+          { label: c.exportProfile, variant: "outline", href: "#" },
+          { label: c.addNote, variant: "outline", href: "#" },
+          { label: c.viewHistory, variant: "ghost", href: "#" },
         ]}
       />
 
       <MeTabs
         style="detail"
         tabs={[
-          { label: "Overview", active: true },
-          { label: "Contacts" },
-          { label: "Orders", badge: "3" },
-          { label: "Issues", badge: "2" },
-          { label: "Documents" },
-          { label: "Activity" },
+          { label: c.overview, active: true },
+          { label: sup.contacts },
+          { label: sup.orders, badge: "3" },
+          { label: c.issues, badge: "2" },
+          { label: c.documents },
+          { label: c.activity },
         ]}
       />
 
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title="Overview" description="Core supplier profile fields and commercial context.">
+            <MeWorkspaceSection title={c.overview} description={sup.supplierOverviewDescription}>
               <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
                 <div className="grid gap-3 md:grid-cols-2">
                   {[
-                    ["Supplier name", "ABC Food Supply"],
-                    ["Supplier code", "SUP-KCH-0012"],
-                    ["Category", "Food Supply"],
-                    ["Branch coverage", "KCH / BTU"],
-                    ["Lead time", "3-5 days"],
-                    ["Owner", "Purchasing"],
-                    ["Commercial status", "Review needed"],
-                    ["Primary escalation", "Pricing update requested"],
+                    [sup.supplierName, "ABC Food Supply"],
+                    [sup.supplierCode, "SUP-KCH-0012"],
+                    [c.category, "Food Supply"],
+                    [sup.branchCoverage, "KCH / BTU"],
+                    [c.leadTime, "3-5 days"],
+                    [c.owner, "Purchasing"],
+                    [sup.commercialStatus, "Review needed"],
+                    [sup.primaryEscalation, "Pricing update requested"],
                   ].map(([label, value]) => (
                     <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
@@ -117,18 +127,16 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
                   ))}
                 </div>
                 <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Supplier Note</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    ABC Food Supply is an active food supplier used by KCH and BTU. Current follow-up is focused on price review and keeping delivery windows aligned with procurement demand.
-                  </p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{sup.supplierNote}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{sup.supplierNoteBody}</p>
                 </div>
               </div>
             </MeWorkspaceSection>
 
-            <MeWorkspaceSection title="Contacts" description="Primary contacts and communication ownership.">
+            <MeWorkspaceSection title={sup.contacts} description={sup.contactsDescription}>
               <MeDataTable
                 embedded
-                columns={["Contact", "Role", "Phone", "Email", "Status"]}
+                columns={[sup.contact, sup.role, sup.phone, sup.email, c.status]}
                 rows={[
                   ["Alice Wong", "Account Manager", "+60 12-555 0101", "alice@abcfoodsupply.example", "Active"],
                   ["Ben Lau", "Operations Liaison", "+60 12-555 0188", "ben@abcfoodsupply.example", "Standby"],
@@ -137,11 +145,11 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
             </MeWorkspaceSection>
 
             <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_20rem]">
-              <MeWorkspaceSection title="Orders and Issues" description="Recent linked procurement records and current supplier issues.">
+              <MeWorkspaceSection title={sup.ordersAndIssues} description={sup.ordersAndIssuesDescription}>
                 <div className="grid gap-4">
                   <MeDataTable
                     embedded
-                    columns={["Order", "Branch", "Value", "Status"]}
+                    columns={[sup.order, c.branch, sup.value, c.status]}
                     rows={[
                       ["PR-KCH-0001", "KCH", "RM 3,480", "Pending review"],
                       ["PR-BTU-0004", "BTU", "RM 2,140", "Awaiting quote refresh"],
@@ -149,15 +157,15 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
                     ]}
                   />
                   <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Open Issue Snapshot</p>
-                    <p className="mt-2 text-sm text-slate-600">Two supplier issues remain open: one price confirmation gap and one delivery-slot coordination issue tied to KCH replenishment.</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{sup.openIssueSnapshot}</p>
+                    <p className="mt-2 text-sm text-slate-600">{sup.openIssueSnapshotBody}</p>
                   </div>
                 </div>
               </MeWorkspaceSection>
 
               <MeStatusTimeline
                 embedded
-                title="Activity"
+                title={c.activity}
                 items={[
                   { title: "Profile reviewed", description: "Commercial details verified for current procurement cycle.", time: "08:45" },
                   { title: "Quote refreshed", description: "Latest quote attached to linked procurement records.", time: "10:10" },
@@ -173,24 +181,24 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
             sticky={false}
             sections={[
               {
-                title: "Supplier Health",
-                badge: "Review",
+                title: sup.supplierHealth,
+                badge: sup.review,
                 items: ["Coverage active for KCH / BTU", "Pricing follow-up required", "Lead time remains within target"],
               },
               {
-                title: "Open Issues",
+                title: sup.openIssues,
                 items: ["2 active supplier issues", "1 pricing variance", "1 delivery coordination gap"],
               },
               {
-                title: "Linked Records",
+                title: sup.linkedRecords,
                 items: ["PR-KCH-0001", "PR-BTU-0004", "PR-KCH-0007"],
               },
               {
-                title: "Next Steps",
+                title: c.nextSteps,
                 items: ["Review current quote", "Confirm next delivery slot", "Export profile if needed"],
               },
               {
-                title: "Operating Notes",
+                title: c.operatingNotes,
                 badge: "Supplier view",
                 items: ["Portal coordination managed centrally", "Document uploads reviewed in workspace", "Operational history remains visible", "Activity follows workspace actions"],
               },
@@ -199,7 +207,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
         }
       />
 
-      <DemoPresentationNote title="Workspace Note" description="Supplier detail centralizes profile health, contacts, order history, and issue review for purchasing teams." />
+      <DemoPresentationNote title={sup.workspaceNote} description={sup.workspaceNoteDescription} />
     </MeDashboardShell>
   );
 }

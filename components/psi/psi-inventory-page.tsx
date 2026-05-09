@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import { DemoPresentationNote } from "@/components/demo-mode";
@@ -14,7 +16,9 @@ import {
   MeWorkspaceSection,
 } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import type { DataMeta } from "@/lib/data";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 
 interface PsiInventoryPageProps {
   source: DataMeta["source"];
@@ -22,36 +26,42 @@ interface PsiInventoryPageProps {
 }
 
 export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
+  const rawLocale = useUiPreferencesStore((state) => state.locale);
+  const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
+  const psiCopy = getPsiCopy(currentLocale);
+  const c = psiCopy.standalone.common;
+  const inv = psiCopy.standalone.inventory;
+
   return (
     <MeDashboardShell activeKey="inventory">
       <MePageHeader
-        eyebrow="PSI Inventory"
-        title="Inventory stock detail"
-        description="Stock profile, movement context, expiry visibility, and linked procurement records using the shared detail pattern."
-        notice={`Source: ${source}. ${isMock ? "This workspace is currently published through the shared catalog layer." : "This workspace is currently published through the connected service layer."} Use it to review stock position, movement history, expiry watch, and replenishment linkage.`}
+        eyebrow={inv.eyebrow}
+        title={inv.title}
+        description={inv.description}
+        notice={`${c.sourceNotice}: ${source}. ${isMock ? c.catalogLayerNotice : c.connectedServiceNotice} ${inv.noticeSuffix}`}
         badges={[
-          { label: "Inventory detail" },
-          { label: "Warehouse workspace", variant: "secondary" },
-          { label: "Inventory control", variant: "outline" },
+          { label: inv.badgeDetail },
+          { label: inv.badgeWarehouse, variant: "secondary" },
+          { label: inv.badgeControl, variant: "outline" },
         ]}
         actions={
           <>
             <Button asChild size="sm">
-              <Link href="/psi">Back to PSI</Link>
+              <Link href="/psi">{c.backToPsi}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/psi/procurement">Open Procurement</Link>
+              <Link href="/psi/procurement">{c.openProcurement}</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/psi/supplier">Open Supplier</Link>
+              <Link href="/psi/supplier">{c.openSupplier}</Link>
             </Button>
           </>
         }
         meta={[
-          { label: "Branch", value: "KCH" },
-          { label: "Storage", value: "Freezer" },
-          { label: "Owner", value: "Warehouse" },
-          { label: "Risk", value: "Low stock" },
+          { label: c.branch, value: "KCH" },
+          { label: c.storage, value: "Freezer" },
+          { label: c.owner, value: "Warehouse" },
+          { label: c.risk, value: "Low stock" },
         ]}
       />
 
@@ -60,57 +70,57 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         subtitle="Coated Fries"
         status="Low Stock"
         meta={[
-          { label: "Branch", value: "KCH" },
-          { label: "Storage", value: "Freezer" },
-          { label: "Current stock", value: "42 bags" },
-          { label: "Min stock", value: "60 bags" },
-          { label: "Owner", value: "Warehouse" },
-          { label: "Supplier", value: "ABC Food Supply" },
-          { label: "Coverage", value: "2.1 days" },
-          { label: "Last updated", value: "Today 11:40" },
+          { label: c.branch, value: "KCH" },
+          { label: c.storage, value: "Freezer" },
+          { label: inv.currentStock, value: "42 bags" },
+          { label: inv.minStock, value: "60 bags" },
+          { label: c.owner, value: "Warehouse" },
+          { label: psiCopy.shared.supplier, value: "ABC Food Supply" },
+          { label: c.coverage, value: "2.1 days" },
+          { label: c.lastUpdated, value: "Today 11:40" },
         ]}
       />
 
       <MeActionBar
         actions={[
-          { label: "Review Stock", href: "#" },
-          { label: "Open risk watch", variant: "secondary", href: "#" },
-          { label: "Link Procurement", variant: "outline", href: "#" },
-          { label: "Export Stock Card", variant: "outline", href: "#" },
-          { label: "Add Note", variant: "outline", href: "#" },
-          { label: "View Movement", variant: "ghost", href: "#" },
+          { label: inv.reviewStock, href: "#" },
+          { label: inv.openRiskWatch, variant: "secondary", href: "#" },
+          { label: inv.linkProcurement, variant: "outline", href: "#" },
+          { label: inv.exportStockCard, variant: "outline", href: "#" },
+          { label: c.addNote, variant: "outline", href: "#" },
+          { label: inv.viewMovement, variant: "ghost", href: "#" },
         ]}
       />
 
       <MeTabs
         style="detail"
         tabs={[
-          { label: "Overview", active: true },
-          { label: "Stock Movement" },
-          { label: "Expiry" },
-          { label: "Procurement" },
-          { label: "Issues" },
-          { label: "Activity" },
+          { label: c.overview, active: true },
+          { label: inv.stockMovement },
+          { label: inv.expiry },
+          { label: psiCopy.shared.procurement },
+          { label: c.issues },
+          { label: c.activity },
         ]}
       />
 
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title="Overview" description="Stock profile and operating thresholds for the selected SKU.">
+            <MeWorkspaceSection title={c.overview} description={inv.stockOverviewDescription}>
               <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
                 <div className="grid gap-3 md:grid-cols-2">
                   {[
                     ["SKU", "SKU-KCH-0007"],
-                    ["Item", "Coated Fries"],
-                    ["Branch", "KCH"],
-                    ["Storage", "Freezer"],
-                    ["Current stock", "42 bags"],
-                    ["Minimum stock", "60 bags"],
-                    ["Reorder signal", "Triggered"],
-                    ["Owner", "Warehouse"],
-                    ["Status", "Low Stock"],
-                    ["Linked supplier", "ABC Food Supply"],
+                    [inv.item, "Coated Fries"],
+                    [c.branch, "KCH"],
+                    [c.storage, "Freezer"],
+                    [inv.currentStock, "42 bags"],
+                    [inv.minimumStock, "60 bags"],
+                    [inv.reorderSignal, "Triggered"],
+                    [c.owner, "Warehouse"],
+                    [c.status, "Low Stock"],
+                    [inv.linkedSupplier, "ABC Food Supply"],
                   ].map(([label, value]) => (
                     <div key={label} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{label}</p>
@@ -119,37 +129,35 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
                   ))}
                 </div>
                 <div className="rounded-[22px] bg-slate-50/82 px-4 py-4 ring-1 ring-slate-200/70">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Stock Note</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    KCH freezer stock for coated fries is below threshold and is already linked to the active procurement queue. This is a planning view only and does not post movements or adjust stock.
-                  </p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{inv.stockNote}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{inv.stockNoteBody}</p>
                 </div>
               </div>
             </MeWorkspaceSection>
 
-            <MeWorkspaceSection title="Stock Movement" description="Recent movement rows and replenishment context.">
+            <MeWorkspaceSection title={inv.stockMovement} description={inv.movementDescription}>
               <MeDataTable
                 embedded
-                columns={["Date", "Movement", "Qty", "Reference", "Status"]}
+                columns={[inv.date, inv.movement, inv.qty, inv.reference, c.status]}
                 rows={[
                   ["Today 08:20", "Outlet issue", "-12", "SO-KCH-091", "Posted in prior cycle"],
-                  ["Yesterday 17:10", "Receiving", "+18", "RCV-KCH-044", "Linked to last inbound"],
+                  ["Yesterday 17:10", psiCopy.shared.receiving, "+18", "RCV-KCH-044", "Linked to last inbound"],
                   ["Yesterday 11:00", "Transfer out", "-8", "TR-KCH-009", "Complete"],
                 ]}
               />
             </MeWorkspaceSection>
 
             <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_20rem]">
-              <MeWorkspaceSection title="Expiry and Procurement" description="Operational watch items tied to stock quality and replenishment.">
+              <MeWorkspaceSection title={inv.expiryAndProcurement} description={inv.expiryAndProcurementDescription}>
                 <div className="grid gap-3">
                   <div className="rounded-[22px] bg-slate-50/82 px-4 py-3.5 ring-1 ring-slate-200/70">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Expiry Watch</p>
-                    <p className="mt-1.5 text-sm font-semibold text-slate-900">No immediate expiry risk</p>
-                    <p className="mt-1 text-sm text-slate-600">Nearest tracked expiry window is 19 days out and remains outside escalation range.</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{inv.expiryWatch}</p>
+                    <p className="mt-1.5 text-sm font-semibold text-slate-900">{inv.noImmediateExpiryRisk}</p>
+                    <p className="mt-1 text-sm text-slate-600">{inv.nearestExpiry}</p>
                   </div>
                   <MeDataTable
                     embedded
-                    columns={["Procurement", "ETA", "Qty", "Status"]}
+                    columns={[psiCopy.shared.procurement, inv.eta, inv.qty, c.status]}
                     rows={[
                       ["PR-KCH-0001", "Tomorrow 09:00", "24 bags", "Pending review"],
                       ["PR-KCH-0009", "This week", "18 bags", "Planned replenishment"],
@@ -160,7 +168,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
 
               <MeStatusTimeline
                 embedded
-                title="Activity"
+                title={c.activity}
                 items={[
                   { title: "Low stock threshold hit", description: "Available stock dropped below minimum target.", time: "07:55" },
                   { title: "Procurement linked", description: "PR-KCH-0001 attached as replenishment response.", time: "08:10" },
@@ -176,24 +184,24 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
             sticky={false}
             sections={[
               {
-                title: "Low-stock Risk",
-                badge: "Watch",
+                title: inv.lowStockRisk,
+                badge: inv.watch,
                 items: ["Current stock below minimum", "Coverage at 2.1 days", "Replenishment already linked"],
               },
               {
-                title: "Expiry Watch",
-                items: ["No immediate expiry risk", "Next tracked expiry in 19 days", "Freezer storage stable"],
+                title: inv.expiryWatch,
+                items: [inv.noImmediateExpiryRisk, "Next tracked expiry in 19 days", "Freezer storage stable"],
               },
               {
-                title: "Related Context",
+                title: inv.relatedContext,
                 items: ["Supplier: ABC Food Supply", "Warehouse review: inventory follow-up", "Procurement: PR-KCH-0001"],
               },
               {
-                title: "Next Steps",
+                title: c.nextSteps,
                 items: ["Review stock card", "Confirm inbound timing", "Export stock card if needed"],
               },
               {
-                title: "Operating Notes",
+                title: c.operatingNotes,
                 badge: "Inventory view",
                 items: ["Warehouse review remains active", "Procurement linkage is visible", "Movement history stays in sync with the workspace", "Follow-up actions can be escalated from this page"],
               },
@@ -202,7 +210,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
         }
       />
 
-      <DemoPresentationNote title="Workspace Note" description="Inventory detail brings stock position, movement review, supplier linkage, and replenishment context into one operational record page." />
+      <DemoPresentationNote title={inv.workspaceNote} description={inv.workspaceNoteDescription} />
     </MeDashboardShell>
   );
 }
