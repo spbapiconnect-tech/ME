@@ -5,16 +5,15 @@ import Link from "next/link";
 import { DemoPresentationNote } from "@/components/demo-mode";
 import {
   MeActionBar,
-  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MePageHeader,
   MeRecordSummary,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { Button } from "@/components/ui/button";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import type { DataMeta } from "@/lib/data";
@@ -33,37 +32,27 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
   const inv = psiCopy.standalone.inventory;
 
   return (
-    <MeDashboardShell activeKey="inventory">
-      <MePageHeader
-        eyebrow={inv.eyebrow}
-        title={inv.title}
-        description={inv.description}
-        notice={`${c.sourceNotice}: ${source}. ${isMock ? c.catalogLayerNotice : c.connectedServiceNotice} ${inv.noticeSuffix}`}
-        badges={[
-          { label: inv.badgeDetail },
-          { label: inv.badgeWarehouse, variant: "secondary" },
-          { label: inv.badgeControl, variant: "outline" },
-        ]}
-        actions={
-          <>
-            <Button asChild size="sm">
-              <Link href="/psi">{c.backToPsi}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/psi/procurement">{c.openProcurement}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/psi/supplier">{c.openSupplier}</Link>
-            </Button>
-          </>
-        }
-        meta={[
-          { label: c.branch, value: "KCH" },
-          { label: c.storage, value: "Freezer" },
-          { label: c.owner, value: "Warehouse" },
-          { label: c.risk, value: "Low stock" },
-        ]}
-      />
+    <ErpShell activeHref="/psi/inventory">
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "PSI", "Inventory"]}
+          title={inv.title}
+          zhTitle="库存工作台"
+          subtitle={`${inv.description} ${c.sourceNotice}: ${source}. ${isMock ? c.catalogLayerNotice : c.connectedServiceNotice} ${inv.noticeSuffix}`}
+          actions={
+            <>
+              <Button asChild size="sm">
+                <Link href="/psi">{c.backToPsi}</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/psi/procurement">{c.openProcurement}</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link href="/psi/supplier">{c.openSupplier}</Link>
+              </Button>
+            </>
+          }
+        />
 
       <MeRecordSummary
         title="SKU-KCH-0007"
@@ -211,6 +200,7 @@ export function PsiInventoryPage({ source, isMock }: PsiInventoryPageProps) {
       />
 
       <DemoPresentationNote title={inv.workspaceNote} description={inv.workspaceNoteDescription} />
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   );
 }
