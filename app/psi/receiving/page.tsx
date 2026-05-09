@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { RestaurantModulePage } from "@/components/operations";
+import { PsiReceivingErpPage } from "@/components/psi/psi-receiving-erp-page";
 import { getRestaurantModuleByKey } from "@/lib/restaurant-modules";
 
 export default function ReceivingPage() {
@@ -10,5 +10,5 @@ export default function ReceivingPage() {
     notFound();
   }
 
-  return <RestaurantModulePage module={moduleItem} />;
+  return <PsiReceivingErpPage module={moduleItem} />;
 }
