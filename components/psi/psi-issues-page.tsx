@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import {
@@ -11,6 +13,8 @@ import {
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { PsiIssuePlaceholderRow } from "@/lib/page-data/psi/issues-page-data";
 
 interface PsiIssuesPageProps {
@@ -20,18 +24,36 @@ interface PsiIssuesPageProps {
   error?: string;
 }
 
+function getModuleLabel(moduleCode: PsiIssuePlaceholderRow["moduleCode"], psiCopy: ReturnType<typeof getPsiCopy>) {
+  if (moduleCode === "supplier") return psiCopy.shared.supplier;
+  if (moduleCode === "inventory") return psiCopy.shared.inventory;
+  return psiCopy.shared.procurement;
+}
+
 export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProps) {
+  const rawLocale = useUiPreferencesStore((state) => state.locale);
+  const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
+  const psiCopy = getPsiCopy(currentLocale);
+
   const rightRail = (
     <MeRightRail
       sections={[
         {
-          title: "Issue Context",
-          badge: "PSI",
-          items: ["Procurement follow-up", "Supplier coordination", "Inventory risk review"],
+          title: psiCopy.rightRail.issueContext,
+          badge: psiCopy.shared.psi,
+          items: [
+            psiCopy.rightRail.procurementFollowUp,
+            psiCopy.rightRail.supplierCoordination,
+            psiCopy.rightRail.inventoryRiskReview,
+          ],
         },
         {
-          title: "Current Queue",
-          items: [`${rows.length} active issues`, isMock ? "Published through the shared catalog layer" : "Published through the connected service layer", `Source: ${source}`],
+          title: psiCopy.rightRail.currentQueue,
+          items: [
+            currentLocale === "zh" ? `${rows.length} ${psiCopy.rightRail.activeIssuesSuffix}` : `${rows.length} ${psiCopy.rightRail.activeIssuesSuffix}`,
+            isMock ? psiCopy.rightRail.catalogLayer : psiCopy.rightRail.connectedService,
+            `${psiCopy.shared.source}: ${source}`,
+          ],
         },
       ]}
     />
@@ -40,53 +62,68 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
   return (
     <MeDashboardShell activeKey="psi-issues" rightRail={rightRail}>
       <MePageHeader
-        eyebrow="PSI Issues"
-        title="Issue and incident queue"
-        description="Cross-module issue queue for procurement, supplier, and inventory follow-up."
-        notice={error ?? "Use this workspace to review issue severity, lifecycle stage, linked records, and follow-up actions."}
+        eyebrow={psiCopy.issues.eyebrow}
+        title={psiCopy.issues.title}
+        description={psiCopy.issues.description}
+        notice={error ?? psiCopy.issues.notice}
         badges={[
-          { label: "Issues" },
-          { label: "PSI coordination", variant: "secondary" },
-          { label: "Current release", variant: "outline" },
+          { label: psiCopy.issues.issues },
+          { label: psiCopy.issues.psiCoordination, variant: "secondary" },
+          { label: psiCopy.rightRail.currentRelease, variant: "outline" },
         ]}
         meta={[
-          { label: "Source", value: source },
-          { label: "Queue size", value: String(rows.length) },
-          { label: "Coverage", value: "Procurement / Supplier / Inventory" },
-          { label: "Delivery mode", value: isMock ? "Catalog layer" : "Connected service" },
+          { label: psiCopy.shared.source, value: source },
+          { label: psiCopy.rightRail.queueSize, value: String(rows.length) },
+          { label: psiCopy.issues.coverage, value: psiCopy.issues.coverageValue },
+          { label: psiCopy.rightRail.deliveryMode, value: isMock ? psiCopy.rightRail.catalogLayerShort : psiCopy.rightRail.connectedServiceShort },
         ]}
       />
 
       <MeActionBar
         actions={[
-          { label: "Open PSI", href: "/psi" },
-          { label: "Open Reports", href: "/reports", variant: "secondary" },
-          { label: "Open Branches", href: "/branches", variant: "outline" },
-          { label: "Open Actions", href: "/psi/actions", variant: "outline" },
+          { label: psiCopy.issues.openPsi, href: "/psi" },
+          { label: psiCopy.issues.openReports, href: "/reports", variant: "secondary" },
+          { label: psiCopy.rightRail.openBranches, href: "/branches", variant: "outline" },
+          { label: psiCopy.issues.openActions, href: "/psi/actions", variant: "outline" },
         ]}
       />
 
-      <MeTabs style="detail" tabs={[{ label: "Overview", active: true }, { label: "Queue", badge: String(rows.length) }, { label: "Lifecycle" }, { label: "Activity" }]} />
+      <MeTabs
+        style="detail"
+        tabs={[
+          { label: psiCopy.shared.overview, active: true },
+          { label: psiCopy.rightRail.queue, badge: String(rows.length) },
+          { label: psiCopy.rightRail.lifecycle },
+          { label: psiCopy.shared.activity },
+        ]}
+      />
 
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title="Issue Queue" description="Priority, status, module source, and linked detail access for active PSI issues.">
+            <MeWorkspaceSection title={psiCopy.issues.issueQueue} description={psiCopy.issues.issueQueueDescription}>
               <MeDataTable
                 embedded
-                columns={["Issue", "Module", "Priority", "Status", "Lifecycle", "Detail"]}
+                columns={[
+                  psiCopy.issues.columns.issue,
+                  psiCopy.issues.columns.module,
+                  psiCopy.issues.columns.priority,
+                  psiCopy.issues.columns.status,
+                  psiCopy.issues.columns.lifecycle,
+                  psiCopy.issues.columns.detail,
+                ]}
                 rows={rows.map((row) => [
                   row.title,
-                  row.moduleCode,
+                  getModuleLabel(row.moduleCode, psiCopy),
                   row.priority,
                   row.status,
                   row.lifecycleStage,
                   row.detailHref ? (
                     <Link key={`${row.issueId}-detail`} href={row.detailHref} className="text-blue-700 hover:underline">
-                      Open detail
+                      {psiCopy.rightRail.openDetail}
                     </Link>
                   ) : (
-                    "Current workspace"
+                    psiCopy.rightRail.currentWorkspace
                   ),
                 ])}
               />
@@ -96,10 +133,10 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
         context={
           <MeStatusTimeline
             embedded
-            title="Issue Activity"
+            title={psiCopy.issues.issueActivity}
             items={rows.slice(0, 4).map((row) => ({
               title: row.title,
-              description: `${row.moduleCode} · ${row.sourceRef} · ${row.status}`,
+              description: `${getModuleLabel(row.moduleCode, psiCopy)} · ${row.sourceRef} · ${row.status}`,
               time: row.lifecycleStage,
             }))}
           />
