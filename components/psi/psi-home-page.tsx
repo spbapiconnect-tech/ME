@@ -10,7 +10,6 @@ import {
   MeDataTable,
   MeDetailWorkspace,
   MePageHeader,
-  MeRecordSummary,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
@@ -111,17 +110,21 @@ export function PsiHomePage() {
         </div>
       </MeWorkspaceSection>
 
-      <MeRecordSummary
-        title="PR-KCH-0001"
-        subtitle={psiCopy.overview.procurementRequest}
-        status="Review"
-        metrics={[
-          { label: psiCopy.shared.supplier, value: "ABC Food Supply" },
-          { label: "Branch", value: "KCH" },
-          { label: psiCopy.overview.requestType, value: psiCopy.overview.procurementRequest },
-          { label: psiCopy.shared.priority, value: "High" },
-        ]}
-      />
+      <MeWorkspaceSection title="PR-KCH-0001" description={psiCopy.overview.procurementRequest}>
+        <div className="grid gap-3 md:grid-cols-4">
+          {[
+            [psiCopy.shared.supplier, "ABC Food Supply"],
+            ["Branch", "KCH"],
+            [psiCopy.overview.requestType, psiCopy.overview.procurementRequest],
+            [psiCopy.shared.priority, "High"],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-[20px] bg-white/95 px-4 py-3 shadow-[0_14px_32px_-28px_rgba(15,23,42,0.35)] ring-1 ring-slate-200/80">
+              <div className="text-xs font-medium text-slate-500">{label}</div>
+              <div className="mt-1 text-sm font-semibold text-slate-950">{value}</div>
+            </div>
+          ))}
+        </div>
+      </MeWorkspaceSection>
 
       <MeActionBar
         actions={[
