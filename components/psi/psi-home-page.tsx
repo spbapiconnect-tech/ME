@@ -202,17 +202,27 @@ export function PsiHomePage() {
             title={currentLocale === "zh" ? "工作区说明" : "Workspace Note"}
             description={
               currentLocale === "zh"
-                ? "PSI 总览只负责跨模块判断，详细单据保留在 Procurement / Supplier / Inventory / Receiving 页面。"
+                ? "PSI 总览只负责跨模块判断；单据级操作保留在采购、供应商、库存、收货页面。"
                 : "PSI overview is for cross-module triage. Record-level work stays inside Procurement, Supplier, Inventory, and Receiving."
             }
+            className="min-h-0"
           >
-            <div className="flex flex-wrap gap-2">
-              <Button asChild size="sm">
-                <Link href="/system-foundation">Open System Center</Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/psi/procurement">Open Procurement Detail</Link>
-              </Button>
+            <div className="grid gap-3">
+              <PsiSoftCard>
+                <p className={psiVisual.eyebrow}>{currentLocale === "zh" ? "页面定位" : "Page Role"}</p>
+                <p className={psiVisual.value}>
+                  {currentLocale === "zh" ? "总览 / 判断 / 入口" : "Overview / triage / entry point"}
+                </p>
+              </PsiSoftCard>
+
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="sm">
+                  <Link href="/system-foundation">{currentLocale === "zh" ? "打开系统中心" : "Open System Center"}</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/psi/procurement">{currentLocale === "zh" ? "打开采购工作台" : "Open Procurement Workspace"}</Link>
+                </Button>
+              </div>
             </div>
           </PsiSection>
         </div>
