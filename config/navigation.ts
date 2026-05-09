@@ -1264,7 +1264,7 @@ export const navigationMap: MeNavigationMap = {
     },
   ],
   sidebarGroups,
-  footerItems: [demoStory, demoMode, stakeholderSummary, demoReadiness, modules, demo, templates],
+  footerItems: [navigationIa, demoStory, demoMode, stakeholderSummary, demoReadiness, modules, demo, templates],
   generatedAt: "2026-05-06T00:00:00.000Z",
   notice: {
     zh: "当前导航 IA 仅用于 UI/导航演示，不包含认证、权限、数据库、API 或真实写操作。",
