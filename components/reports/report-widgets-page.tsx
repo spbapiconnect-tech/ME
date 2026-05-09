@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { dashboardLayoutCatalog, reportWidgetRegistry } from "@/config/reports";
+import { getReportCopy, type ReportLocale } from "@/config/report-language-copy";
 import {
   getDashboardLayoutByKey,
   getDrillDownWidgets,
@@ -110,6 +111,8 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
   }, [hydrated, locale, theme]);
 
   const currentLocale: SupportedLocale = hydrated ? locale : "en";
+  const reportLocale: ReportLocale = currentLocale === "zh" ? "zh" : "en";
+  const reportCopy = getReportCopy(reportLocale);
   const [widgetTypeFilter, setWidgetTypeFilter] = React.useState<ReportWidgetType | "all">("all");
   const [sourceModuleFilter, setSourceModuleFilter] = React.useState<string>("all");
   const [statusFilter, setStatusFilter] = React.useState<ReportWidgetStatus | "all">("all");
@@ -161,21 +164,21 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
     <MeRightRail
       sections={[
         {
-          title: "Report Readiness",
-          badge: "Catalog scope",
-          items: [`${stats.active} active widgets`, `${stats.exportable} export-ready surfaces`, `${stats.refreshable} refresh-capable review surfaces`],
+          title: reportCopy.rightRail.reportReadiness,
+          badge: reportCopy.badges.catalog,
+          items: [`${stats.active} ${reportCopy.metrics.activeWidgets}`, `${stats.exportable} ${reportCopy.metrics.exportable}`, `${stats.refreshable} ${reportCopy.metrics.refreshable}`],
         },
         {
-          title: "Current Focus",
+          title: reportCopy.rightRail.currentFilter,
           items: [
-            `Filter: ${widgetTypeFilter}`,
-            `Status: ${statusFilter}`,
-            `Severity: ${severityFilter}`,
+            `${reportCopy.filters.widgetType}: ${widgetTypeFilter}`,
+            `${reportCopy.filters.status}: ${statusFilter}`,
+            `${reportCopy.filters.severity}: ${severityFilter}`,
           ],
         },
         {
-          title: "Service Scope",
-          items: ["Report catalog", "Operational filters", "Export review", "Scheduled distribution setup"],
+          title: reportCopy.rightRail.exportReview,
+          items: [reportCopy.rightRail.reportCatalog, reportCopy.rightRail.operationalFilters, reportCopy.rightRail.exportReview, reportCopy.rightRail.scheduledDistributionSetup],
         },
       ]}
     />
@@ -184,68 +187,64 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
   return (
     <MeDashboardShell activeKey="reports" rightRail={rightRail}>
       <MePageHeader
-        eyebrow="Reports Workspace"
-        title="Reporting and export readiness workspace"
-        description="Operational report shell with category tabs, widget catalog review, and layout previews."
-        notice={
-          currentLocale === "zh"
-            ? "该页面用于统一管理报表目录、筛选条件、版式模板与导出准备状态。"
-            : "Use this workspace to manage report catalogs, filter sets, layout templates, and export-readiness review."
-        }
+        eyebrow={reportCopy.page.eyebrow}
+        title={reportCopy.page.title}
+        description={reportCopy.page.description}
+        notice={reportCopy.page.notice}
         badges={[
-          { label: "Reports" },
-          { label: "Report center", variant: "outline" },
-          { label: "Export center", variant: "secondary" },
+          { label: reportCopy.badges.reports },
+          { label: reportCopy.badges.reportCenter, variant: "outline" },
+          { label: reportCopy.actions.exportReview, variant: "secondary" },
         ]}
         actions={
           <>
             <Button asChild size="sm">
-              <Link href="/psi">Open PSI</Link>
+              <Link href="/psi">PSI</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/branches">Open Branches</Link>
+              <Link href="/branches">Branches</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href="/reports/pos">Open POS Reports</Link>
+              <Link href="/reports/pos">{reportCopy.actions.openPosReports}</Link>
             </Button>
           </>
         }
         meta={[
-          { label: "Overview", value: "PSI report workspace" },
-          { label: "Export center", value: "Scheduled distribution" },
-          { label: "Filter mode", value: "Interactive shell" },
-          { label: "Layouts", value: `${dashboardLayoutCatalog.length} presets` },
+          { label: reportCopy.values.overview, value: reportCopy.values.psiReportWorkspace },
+          { label: reportCopy.actions.exportReview, value: reportCopy.rightRail.scheduledDistributionSetup },
+          { label: reportCopy.filters.filterMode, value: reportCopy.filters.interactiveShell },
+          { label: reportCopy.tabs.dashboardLayouts, value: `${dashboardLayoutCatalog.length}` },
         ]}
       />
 
       <MeActionBar
         actions={[
-          { label: "Refresh preview" },
-          { label: "Open filter set", variant: "secondary" },
-          { label: "Export", variant: "outline" },
+          { label: reportCopy.actions.refreshPreview },
+          { label: reportCopy.filters.reportFilters, variant: "secondary" },
+          { label: reportCopy.actions.exportReview, variant: "outline" },
           { label: "Share deck", variant: "outline" },
-          { label: "View history", variant: "ghost" },
+          { label: "History", variant: "ghost" },
         ]}
       />
 
       <MeTabs
         tabs={[
-          { label: "Overview", active: true },
-          { label: "POS Reports", badge: "Live" },
-          { label: "Sales Analytics", badge: "Catalog" },
-          { label: "Branch Performance", badge: "Catalog" },
-          { label: "Export Center", badge: "Scheduled" },
+          { label: reportCopy.tabs.reportOverview, active: true },
+          { label: reportCopy.tabs.posReports, badge: reportCopy.badges.live },
+          { label: reportCopy.tabs.salesAnalytics, badge: reportCopy.badges.catalog },
+          { label: "Branch Performance", badge: reportCopy.badges.catalog },
+          { label: reportCopy.actions.exportReview, badge: reportCopy.rightRail.scheduledDistributionSetup },
         ]}
       />
 
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
         {[
-          ["Total widgets", String(stats.total)],
-          ["Active", String(stats.active)],
-          ["Catalog", String(stats.placeholder)],
-          ["Exportable", String(stats.exportable)],
-          ["Refreshable", String(stats.refreshable)],
-          ["Drill down", String(stats.drillDown)],
+          [reportCopy.metrics.totalWidgets, String(stats.total)],
+          [reportCopy.metrics.activeWidgets, String(stats.active)],
+          [reportCopy.metrics.placeholders, String(stats.placeholder)],
+          [reportCopy.metrics.exportable, String(stats.exportable)],
+          [reportCopy.metrics.refreshable, String(stats.refreshable)],
+          [reportCopy.metrics.drillDown, String(stats.drillDown)],
         ].map(([label, value]) => (
           <div key={label} className="rounded-[22px] bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(244,248,255,0.94))] px-4 py-4 ring-1 ring-slate-200/75 shadow-[0_16px_24px_-24px_rgba(15,23,42,0.14)]">
             <div className="flex items-center justify-between gap-3">
@@ -258,35 +257,35 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
       </section>
 
       {psiDashboardData ? (
-        <MeWorkspaceSection title="PSI Report Preview" description="PSI operational summary inside the shared reporting shell.">
+        <MeWorkspaceSection title={reportCopy.sections.psiReportPreview} description={reportCopy.sections.psiReportPreviewDescription}>
           <PsiReportDashboardPanel data={psiDashboardData} locale={currentLocale} />
         </MeWorkspaceSection>
       ) : null}
 
       <MeListWorkspace
         filters={
-          <MeWorkspaceSection title="Report Filters" description="Operational filtering shell for the widget registry." contentClassName="xl:grid-cols-4">
+          <MeWorkspaceSection title={reportCopy.sections.reportFilters} description={reportCopy.sections.reportFiltersDescription} contentClassName="xl:grid-cols-4">
             <Select value={widgetTypeFilter} onValueChange={(value) => setWidgetTypeFilter(value as ReportWidgetType | "all")}>
-              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Widget Type" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={reportCopy.filters.widgetType} /></SelectTrigger>
               <SelectContent>{widgetTypeOptions.map((value) => <SelectItem key={value} value={value}>{widgetTypeOptionLabel[value]}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={sourceModuleFilter} onValueChange={setSourceModuleFilter}>
-              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Source Module" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={reportCopy.filters.sourceModule} /></SelectTrigger>
               <SelectContent>{sourceModules.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as ReportWidgetStatus | "all")}>
-              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={reportCopy.filters.status} /></SelectTrigger>
               <SelectContent>{statusOptions.map((value) => <SelectItem key={value} value={value}>{statusOptionLabel[value]}</SelectItem>)}</SelectContent>
             </Select>
             <Select value={severityFilter} onValueChange={(value) => setSeverityFilter(value as ReportWidgetSeverity | "all")}>
-              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Severity" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={reportCopy.filters.severity} /></SelectTrigger>
               <SelectContent>{severityOptions.map((value) => <SelectItem key={value} value={value}>{value}</SelectItem>)}</SelectContent>
             </Select>
           </MeWorkspaceSection>
         }
         list={
           <>
-            <MeWorkspaceSection title="Widget Catalog" description={`${filteredWidgets.length} of ${reportWidgetRegistry.length} widgets visible under the current filter set.`}>
+            <MeWorkspaceSection title={reportCopy.sections.widgetCatalog} description={`${filteredWidgets.length} ${reportCopy.values.of} ${reportWidgetRegistry.length} ${reportCopy.sections.widgetCatalogDescriptionSuffix}`}>
               <div className="grid gap-3">
                 {filteredWidgets.map((item) => (
                   <button key={item.key} type="button" className="rounded-[24px] text-left transition hover:-translate-y-0.5" onClick={() => setSelectedWidgetKey(item.key)}>
@@ -296,10 +295,10 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
               </div>
             </MeWorkspaceSection>
 
-            <MeWorkspaceSection title="Dashboard Layout Templates" description="Reusable report layout references for future mapping.">
+            <MeWorkspaceSection title={reportCopy.sections.dashboardLayoutTemplates} description={reportCopy.sections.dashboardLayoutTemplatesDescription}>
               <div className="flex flex-wrap gap-2">
                 <Select value={selectedLayoutKey} onValueChange={setSelectedLayoutKey}>
-                  <SelectTrigger className="h-8 text-xs min-w-[16rem]"><SelectValue placeholder="Dashboard Layout" /></SelectTrigger>
+                  <SelectTrigger className="h-8 text-xs min-w-[16rem]"><SelectValue placeholder={reportCopy.tabs.dashboardLayouts} /></SelectTrigger>
                   <SelectContent>{dashboardLayoutCatalog.map((item) => <SelectItem key={item.key} value={item.key}>{currentLocale === "zh" ? item.name.zh : item.name.en}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
@@ -316,12 +315,12 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
           <>
             {selectedWidget ? <ReportWidgetPreviewCard widget={selectedWidget} locale={currentLocale} /> : null}
             {selectedWidget ? <ReportWidgetSourceCard widget={selectedWidget} locale={currentLocale} /> : null}
-            <MeWorkspaceSection title="Computed Metrics" description="Operational metric framing for the current report workspace.">
+            <MeWorkspaceSection title={reportCopy.sections.computedMetrics} description={reportCopy.sections.computedMetricsDescription}>
               <div className="grid gap-2">
                 {[
-                  "Branch performance variance remains part of the current review workflow.",
-                  "Export center remains part of the scheduled reporting workflow.",
-                  "Widget refresh is visual only and does not call an API.",
+                  currentLocale === "zh" ? "门店表现差异仍属于当前复核流程的一部分。" : "Branch performance variance remains part of the current review workflow.",
+                  reportCopy.values.exportCenterWorkflow,
+                  reportCopy.values.widgetRefreshVisualOnly,
                 ].map((item) => (
                   <div key={item} className="rounded-[18px] bg-slate-50/88 px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-200/70">
                     {item}
@@ -329,7 +328,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
                 ))}
               </div>
             </MeWorkspaceSection>
-            <MeWorkspaceSection title="Widget Mix" description="Current registry distribution.">
+            <MeWorkspaceSection title={reportCopy.sections.widgetMix} description={reportCopy.sections.widgetMixDescription}>
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(stats.byType).map(([key, value]) => (
                   <Badge key={key} variant="secondary">
@@ -346,7 +345,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
               </div>
             </MeWorkspaceSection>
             {layoutBySelectedWidget.length > 0 ? (
-              <MeWorkspaceSection title="Selected Widget Layout Links" description="Layouts that currently reference the selected widget.">
+              <MeWorkspaceSection title={reportCopy.sections.selectedWidgetLayoutLinks} description={reportCopy.sections.selectedWidgetLayoutLinksDescription}>
                 <div className="grid gap-2">
                   {layoutBySelectedWidget.map((layout) => (
                     <div key={layout.key} className="rounded-[22px] bg-slate-50/88 px-4 py-3.5 text-sm text-slate-700 ring-1 ring-slate-200/75">
@@ -360,7 +359,7 @@ export function ReportWidgetsPage({ psiDashboardData }: { psiDashboardData?: Psi
         }
       />
 
-      <DemoPresentationNote title="Workspace Note" description="The reports center aligns operational metrics, POS views, export readiness, and layout references in one reporting workspace." />
+      <DemoPresentationNote title={reportCopy.sections.workspaceNote} description={reportCopy.sections.workspaceNoteDescription} />
     </MeDashboardShell>
   );
 }
