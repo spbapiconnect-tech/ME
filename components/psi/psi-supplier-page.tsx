@@ -5,16 +5,15 @@ import Link from "next/link";
 import { DemoPresentationNote } from "@/components/demo-mode";
 import {
   MeActionBar,
-  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
-  MePageHeader,
   MeRecordSummary,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { Button } from "@/components/ui/button";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import type { DataMeta } from "@/lib/data";
@@ -33,37 +32,14 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
   const sup = psiCopy.standalone.supplier;
 
   return (
-    <MeDashboardShell activeKey="supplier">
-      <MePageHeader
-        eyebrow={sup.eyebrow}
-        title={sup.title}
-        description={sup.description}
-        notice={`${c.sourceNotice}: ${source}. ${isMock ? c.catalogLayerNotice : c.connectedServiceNotice} ${sup.noticeSuffix}`}
-        badges={[
-          { label: sup.badgeDetail },
-          { label: sup.badgeWorkspace, variant: "secondary" },
-          { label: sup.badgeOperations, variant: "outline" },
-        ]}
-        actions={
-          <>
-            <Button asChild size="sm">
-              <Link href="/psi">{c.backToPsi}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/psi/procurement">{c.openProcurement}</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/psi/inventory">{c.openInventory}</Link>
-            </Button>
-          </>
-        }
-        meta={[
-          { label: c.coverage, value: "KCH / BTU" },
-          { label: c.category, value: "Food Supply" },
-          { label: c.leadTime, value: "3-5 days" },
-          { label: c.owner, value: "Purchasing" },
-        ]}
-      />
+    <ErpShell activeHref="/psi/supplier">
+      <div className="space-y-6">
+        <ErpPageHeader
+          breadcrumbs={["ME", "PSI", "Supplier"]}
+          title={sup.title}
+          zhTitle="供应商工作台"
+          subtitle={sup.description}
+        />
 
       <MeRecordSummary
         title="ABC Food Supply"
@@ -208,6 +184,7 @@ export function PsiSupplierPage({ source, isMock }: PsiSupplierPageProps) {
       />
 
       <DemoPresentationNote title={sup.workspaceNote} description={sup.workspaceNoteDescription} />
-    </MeDashboardShell>
+      </div>
+    </ErpShell>
   );
 }
