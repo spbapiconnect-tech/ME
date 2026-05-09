@@ -1,5 +1,5 @@
-import { BranchErpPage } from "@/components/branches/branch-erp-page";
+import { BranchWorkspacePage } from "@/components/branches/branch-workspace-page";
 
 export default function BranchesPage() {
-  return <BranchErpPage />;
+  return <BranchWorkspacePage />;
 }
