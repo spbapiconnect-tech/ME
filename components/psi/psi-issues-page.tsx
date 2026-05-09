@@ -41,7 +41,12 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
           breadcrumbs={["ME", "PSI", "Issues"]}
           title={psiCopy.issues.title}
           zhTitle="PSI 问题队列"
-          subtitle={error ?? psiCopy.issues.description}
+          subtitle={
+            error ??
+            `${psiCopy.issues.description} · ${psiCopy.shared.source}: ${source} · ${
+              isMock ? psiCopy.rightRail.catalogLayerShort : psiCopy.rightRail.connectedServiceShort
+            }`
+          }
         />
 
       <MeActionBar
