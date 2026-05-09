@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { InspectionErpPage } from "@/components/inspection/inspection-erp-page";
+import { RestaurantModulePage } from "@/components/operations/restaurant-module-page";
 import { getRestaurantModuleByKey } from "@/lib/restaurant-modules";
 
 export default function InspectionPage() {
@@ -10,5 +10,5 @@ export default function InspectionPage() {
     notFound();
   }
 
-  return <InspectionErpPage module={moduleItem} />;
+  return <RestaurantModulePage module={moduleItem} />;
 }
