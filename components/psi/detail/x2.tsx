@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import {
@@ -12,6 +14,8 @@ import {
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
+import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
+import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { DisplayRecord } from "@/types/display-model";
 
 interface PsiWorkspaceLayoutV072Props {
@@ -31,6 +35,46 @@ function getMetaValue(record: DisplayRecord, key: string, fallback = "Operationa
   return record.meta.find((item) => item.label.en.toLowerCase().includes(key.toLowerCase()))?.value ?? fallback;
 }
 
+function getLocalizedMetaLabel(record: DisplayRecord["meta"][number], locale: PsiLocale) {
+  return locale === "zh" ? record.label.zh : record.label.en;
+}
+
+function getModuleLabel(activeKey: "procurement" | "supplier" | "inventory", psiCopy: ReturnType<typeof getPsiCopy>) {
+  if (activeKey === "supplier") return psiCopy.shared.supplier;
+  if (activeKey === "inventory") return psiCopy.shared.inventory;
+  return psiCopy.shared.procurement;
+}
+
+function getPageTitle(activeKey: "procurement" | "supplier" | "inventory", fallbackTitle: string, psiCopy: ReturnType<typeof getPsiCopy>) {
+  if (activeKey === "supplier") return psiCopy.workspace.supplierTitle;
+  if (activeKey === "inventory") return psiCopy.workspace.inventoryTitle;
+  if (activeKey === "procurement") return psiCopy.workspace.procurementTitle;
+  return fallbackTitle;
+}
+
+function getPageSubtitle(activeKey: "procurement" | "supplier" | "inventory", fallbackSubtitle: string, psiCopy: ReturnType<typeof getPsiCopy>) {
+  if (activeKey === "supplier") return psiCopy.workspace.supplierSubtitle;
+  if (activeKey === "inventory") return psiCopy.workspace.inventorySubtitle;
+  if (activeKey === "procurement") return psiCopy.workspace.procurementSubtitle;
+  return fallbackSubtitle;
+}
+
+function getStatLabel(label: string, psiCopy: ReturnType<typeof getPsiCopy>) {
+  const key = label.toLowerCase();
+  if (key.includes("purchase requests")) return psiCopy.workspace.stats.purchaseRequests;
+  if (key.includes("pending requests")) return psiCopy.workspace.stats.pendingRequests;
+  if (key.includes("purchase orders")) return psiCopy.workspace.stats.purchaseOrders;
+  if (key.includes("issue open")) return psiCopy.workspace.stats.issueOpen;
+  return label;
+}
+
+function getActionShortcutLabel(actionKey: string, fallbackLabel: string, psiCopy: ReturnType<typeof getPsiCopy>) {
+  if (actionKey === "psi.action.createPurchaseRequest") return psiCopy.workspace.createPurchaseRequest;
+  if (actionKey === "psi.action.recordReceiving") return psiCopy.workspace.recordReceiving;
+  if (actionKey === "psi.action.reportPurchaseIssue") return psiCopy.workspace.reportPurchaseIssue;
+  return fallbackLabel;
+}
+
 export function PsiWorkspaceLayoutV072({
   title,
   subtitle,
@@ -43,6 +87,9 @@ export function PsiWorkspaceLayoutV072({
   detailBasePath,
   actionShortcuts = [],
 }: PsiWorkspaceLayoutV072Props) {
+  const rawLocale = useUiPreferencesStore((state) => state.locale);
+  const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
+  const psiCopy = getPsiCopy(currentLocale);
   const selectedRecord = records[0];
 
   const activeKey = detailBasePath.includes("supplier")
@@ -51,25 +98,33 @@ export function PsiWorkspaceLayoutV072({
       ? "inventory"
       : "procurement";
 
+  const moduleLabel = getModuleLabel(activeKey, psiCopy);
+  const pageTitle = getPageTitle(activeKey, title, psiCopy);
+  const pageSubtitle = getPageSubtitle(activeKey, subtitle, psiCopy);
+
   const rightRail = (
     <MeRightRail
       sections={[
         {
-          title: "Workspace Context",
-          badge: activeKey === "procurement" ? "Procurement" : activeKey === "supplier" ? "Supplier" : "Inventory",
-          items: ["Queue review", "Linked issue context", "Branch coordination"],
+          title: psiCopy.rightRail.workspaceContext,
+          badge: moduleLabel,
+          items: [psiCopy.rightRail.queueReview, psiCopy.rightRail.linkedIssueContext, psiCopy.rightRail.branchCoordination],
         },
         {
-          title: "Service Layer",
+          title: psiCopy.rightRail.serviceLayer,
           items: [
-            isMock ? "Published through the shared catalog layer" : "Published through the connected service layer",
-            `Source: ${source}`,
-            `${records.length} active records in scope`,
+            isMock ? psiCopy.rightRail.catalogLayer : psiCopy.rightRail.connectedService,
+            `${psiCopy.shared.source}: ${source}`,
+            currentLocale === "zh" ? `${records.length} ${psiCopy.rightRail.visibleRecordsSuffix}` : `${records.length} ${psiCopy.rightRail.visibleRecordsSuffix}`,
           ],
         },
         {
-          title: "Issue Watch",
-          items: [`${issueRecords.length} linked issue records`, "Escalation review", "Timeline follow-up"],
+          title: psiCopy.rightRail.issueWatch,
+          items: [
+            currentLocale === "zh" ? `${issueRecords.length} ${psiCopy.rightRail.linkedIssueRecordsSuffix}` : `${issueRecords.length} ${psiCopy.rightRail.linkedIssueRecordsSuffix}`,
+            psiCopy.rightRail.escalationReview,
+            psiCopy.rightRail.timelineFollowUp,
+          ],
         },
       ]}
     />
@@ -78,30 +133,30 @@ export function PsiWorkspaceLayoutV072({
   return (
     <MeDashboardShell activeKey={activeKey} rightRail={rightRail}>
       <MePageHeader
-        eyebrow="PSI Workspace"
-        title={title}
-        description={subtitle}
-        notice={error ?? `Use this workspace to review queue records, issue watch items, and operating activity for ${title.toLowerCase()}.`}
+        eyebrow={psiCopy.workspace.eyebrow}
+        title={pageTitle}
+        description={pageSubtitle}
+        notice={error ?? `${psiCopy.workspace.mainRecordsDescription}`}
         badges={[
-          { label: activeKey === "procurement" ? "Procurement" : activeKey === "supplier" ? "Supplier" : "Inventory" },
-          { label: "Operational queue", variant: "secondary" },
-          { label: "Current service scope", variant: "outline" },
+          { label: moduleLabel },
+          { label: psiCopy.rightRail.operationalQueue, variant: "secondary" },
+          { label: psiCopy.rightRail.currentServiceScope, variant: "outline" },
         ]}
         meta={[
-          { label: "Source", value: source },
-          { label: "Visible records", value: String(records.length) },
-          { label: "Issue watch", value: String(issueRecords.length) },
-          { label: "Delivery mode", value: isMock ? "Catalog layer" : "Connected service" },
+          { label: psiCopy.shared.source, value: source },
+          { label: psiCopy.rightRail.visibleRecords, value: String(records.length) },
+          { label: psiCopy.rightRail.issueWatchMeta, value: String(issueRecords.length) },
+          { label: psiCopy.rightRail.deliveryMode, value: isMock ? psiCopy.rightRail.catalogLayerShort : psiCopy.rightRail.connectedServiceShort },
         ]}
       />
 
       <MeActionBar
         actions={[
-          { label: "Open PSI Actions", href: "/psi/actions" },
-          { label: "Open Issues", href: "/psi/issues", variant: "secondary" },
-          { label: "Open Reports", href: "/reports", variant: "outline" },
+          { label: psiCopy.workspace.openPsiActions, href: "/psi/actions" },
+          { label: psiCopy.workspace.openIssues, href: "/psi/issues", variant: "secondary" },
+          { label: psiCopy.workspace.openReports, href: "/reports", variant: "outline" },
           ...actionShortcuts.slice(0, 2).map((item) => ({
-            label: item.label,
+            label: getActionShortcutLabel(item.actionKey, item.label, psiCopy),
             href: `/psi/actions/${item.actionKey}`,
             variant: "outline" as const,
           })),
@@ -110,7 +165,7 @@ export function PsiWorkspaceLayoutV072({
 
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => (
-          <MeWorkspaceSection key={item.label} title={item.label} className="shadow-[0_1px_2px_rgba(15,23,42,0.04)]" description={undefined}>
+          <MeWorkspaceSection key={item.label} title={getStatLabel(item.label, psiCopy)} className="shadow-[0_1px_2px_rgba(15,23,42,0.04)]" description={undefined}>
             <p className="text-[1.55rem] font-semibold tracking-[-0.02em] text-slate-950">{item.value}</p>
           </MeWorkspaceSection>
         ))}
@@ -121,14 +176,14 @@ export function PsiWorkspaceLayoutV072({
           title={selectedRecord.id}
           subtitle={selectedRecord.title}
           status={selectedRecord.status}
-          guardrail="Current service scope"
+          guardrail={psiCopy.rightRail.currentServiceScope}
           meta={[
-            { label: "Priority", value: selectedRecord.priority },
-            { label: "Owner", value: getMetaValue(selectedRecord, "owner") },
-            { label: "Supplier", value: getMetaValue(selectedRecord, "supplier") },
-            { label: "Branch", value: getMetaValue(selectedRecord, "branch") },
-            { label: "Lifecycle", value: getMetaValue(selectedRecord, "lifecycle", "Active") },
-            { label: "Action", value: getMetaValue(selectedRecord, "related action", "Operational follow-up") },
+            { label: psiCopy.shared.priority, value: selectedRecord.priority },
+            { label: psiCopy.workspace.owner, value: getMetaValue(selectedRecord, "owner") },
+            { label: psiCopy.workspace.supplier, value: getMetaValue(selectedRecord, "supplier") },
+            { label: psiCopy.workspace.branch, value: getMetaValue(selectedRecord, "branch") },
+            { label: psiCopy.workspace.lifecycle, value: getMetaValue(selectedRecord, "lifecycle", "Active") },
+            { label: psiCopy.workspace.action, value: getMetaValue(selectedRecord, "related action", psiCopy.workspace.operationalFollowUp) },
           ]}
         />
       ) : null}
@@ -136,21 +191,21 @@ export function PsiWorkspaceLayoutV072({
       <MeTabs
         style="detail"
         tabs={[
-          { label: "Overview", active: true },
-          { label: "Queue", badge: String(records.length) },
-          { label: "Issues", badge: String(issueRecords.length) },
-          { label: "Activity" },
-          { label: "Attachments" },
+          { label: psiCopy.shared.overview, active: true },
+          { label: psiCopy.workspace.queue, badge: String(records.length) },
+          { label: psiCopy.shared.issues, badge: String(issueRecords.length) },
+          { label: psiCopy.shared.activity },
+          { label: psiCopy.shared.attachments },
         ]}
       />
 
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title="Main Records" description="Primary queue records currently visible for operational review.">
+            <MeWorkspaceSection title={psiCopy.workspace.mainRecords} description={psiCopy.workspace.mainRecordsDescription}>
               <MeDataTable
                 embedded
-                columns={["Record", "Title", "Status", "Priority", "Open"]}
+                columns={[psiCopy.workspace.columns.record, psiCopy.workspace.title, psiCopy.shared.status, psiCopy.shared.priority, psiCopy.workspace.openRecord]}
                 rows={records.map((record) => [
                   record.id,
                   <div key={`${record.id}-title`}>
@@ -160,18 +215,18 @@ export function PsiWorkspaceLayoutV072({
                   record.status,
                   record.priority,
                   <Link key={`${record.id}-open`} href={`${detailBasePath}/${record.id}`} className="text-blue-700 hover:underline">
-                    Open record
+                    {psiCopy.workspace.openRecord}
                   </Link>,
                 ])}
               />
             </MeWorkspaceSection>
 
             {selectedRecord ? (
-              <MeWorkspaceSection title="Selected Record" description="Structured metadata for the currently highlighted queue record.">
+              <MeWorkspaceSection title={psiCopy.workspace.selectedRecord} description={psiCopy.workspace.selectedRecordDescription}>
                 <div className="grid gap-3 md:grid-cols-2">
                   {selectedRecord.meta.map((item) => (
                     <div key={item.label.en} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{item.label.en}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{getLocalizedMetaLabel(item, currentLocale)}</p>
                       <p className="mt-1.5 text-sm font-semibold text-slate-900">{item.value}</p>
                     </div>
                   ))}
@@ -179,10 +234,10 @@ export function PsiWorkspaceLayoutV072({
               </MeWorkspaceSection>
             ) : null}
 
-            <MeWorkspaceSection title="Issue Queue" description="Issue and follow-up records linked to the current PSI workspace.">
+            <MeWorkspaceSection title={psiCopy.workspace.issueQueue} description={psiCopy.workspace.issueQueueDescription}>
               <MeDataTable
                 embedded
-                columns={["Issue", "Status", "Priority", "Lifecycle"]}
+                columns={[psiCopy.workspace.columns.issue, psiCopy.shared.status, psiCopy.shared.priority, psiCopy.workspace.columns.lifecycle]}
                 rows={issueRecords.map((record) => [
                   record.title,
                   record.status,
@@ -196,7 +251,7 @@ export function PsiWorkspaceLayoutV072({
         context={
           <MeStatusTimeline
             embedded
-            title="Activity"
+            title={psiCopy.shared.activity}
             items={issueRecords.slice(0, 4).map((record, index) => ({
               title: record.title,
               description: record.description,
