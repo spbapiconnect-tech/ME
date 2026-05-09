@@ -6,14 +6,15 @@ import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import {
   MeActionBar,
+  MeDashboardShell,
   MeDataTable,
   MeDetailWorkspace,
+  MePageHeader,
   MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
 } from "@/components/layout";
-import { ErpPageHeader, ErpShell } from "@/components/erp";
 
 const lineItems = [
   ["Chicken broth base", "12 carton", "High", "Supplier confirmed"],
@@ -47,6 +48,30 @@ export function PsiHomePage() {
     },
   ];
 
+  const rightRail = [
+    {
+      title: psiCopy.rightRail.psiStatus,
+      badge: psiCopy.rightRail.liveView,
+      items: [
+        psiCopy.rightRail.procurementQueueVisible,
+        psiCopy.rightRail.supplierRisksSurfaced,
+        psiCopy.rightRail.inventoryFollowUpCoordinated,
+      ],
+    },
+    {
+      title: psiCopy.rightRail.todayFocus,
+      items: ["PR-KCH-0001", "KCH replenishment watchlist", "ABC Food Supply"],
+    },
+    {
+      title: psiCopy.rightRail.workCoverage,
+      items: [
+        psiCopy.rightRail.procurementCoordination,
+        psiCopy.rightRail.supplierReview,
+        psiCopy.rightRail.inventoryWatch,
+        psiCopy.rightRail.operationalFollowUp,
+      ],
+    },
+  ];
 
   return (
     <MeDashboardShell activeKey="psi-workspace" rightRail={<MeRightRail sections={rightRail} />}>
@@ -228,7 +253,6 @@ export function PsiHomePage() {
         title={psiCopy.overview.workspaceNote}
         description={psiCopy.overview.workspaceNoteDescription}
       />
-      </div>
-    </ErpShell>
+    </MeDashboardShell>
   );
 }
