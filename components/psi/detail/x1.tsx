@@ -7,7 +7,6 @@ import {
   MeDataTable,
   MeDetailWorkspace,
   MeRecordSummary,
-  MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
@@ -100,34 +99,6 @@ export function PsiDetailLayoutV072({
       : detailPanelData.subtitle.en
     : psiCopy.detail.psiRecord;
 
-  const rightRail = (
-    <MeRightRail
-      sections={[
-        {
-          title: psiCopy.detail.recordContext,
-          badge: moduleLabel,
-          items: [
-            isMock ? psiCopy.rightRail.catalogLayer : psiCopy.rightRail.connectedService,
-            `${psiCopy.shared.source}: ${source}`,
-            `${psiCopy.detail.actionsCountPrefix}: ${relatedActions.length}`,
-          ],
-        },
-        {
-          title: psiCopy.shared.linkedRecords,
-          items: detailPanelData?.linkedRecords.map((record) => `${record.moduleCode} · ${record.recordId}`) ?? [psiCopy.detail.noLinkedRecords],
-        },
-        {
-          title: psiCopy.detail.operationalWatch,
-          items:
-            detailPanelData?.insights.slice(0, 3).map((item) => {
-              const label = currentLocale === "zh" ? item.label.zh : item.label.en;
-              const value = currentLocale === "zh" ? item.value.zh : item.value.en;
-              return `${label}: ${value}`;
-            }) ?? [psiCopy.detail.queueReview, psiCopy.detail.relatedActivity, psiCopy.detail.crossModuleFollowUp],
-        },
-      ]}
-    />
-  );
 
   return (
     <ErpShell activeHref={backHref}>
