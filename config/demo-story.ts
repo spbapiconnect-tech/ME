@@ -248,6 +248,7 @@ export const meDemoStorySteps: MeDemoStoryStep[] = [
     highlights: [
       { zh: "静态导览先服务于 stakeholder demo", en: "The static tour serves stakeholder demos first" },
       { zh: "现可衔接 Stakeholder Summary 与 Demo Readiness 作为演示收尾", en: "It now hands off into Stakeholder Summary and Demo Readiness for the presentation close" },
+      { zh: "下一步进入 UI walkthrough testing，而不是接真实 API 或权限", en: "The next step is UI walkthrough testing, not real APIs or permission enforcement" },
       { zh: "未来再迁移到真实 onboarding / guided tour engine", en: "A real onboarding or guided-tour engine can be added later" },
       { zh: "当前不引入任何用户级状态或个性化", en: "No user-level state or personalization is introduced now" },
     ],

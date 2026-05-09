@@ -61,7 +61,7 @@ export const meStakeholderSummaryMetrics: MeStakeholderSummaryMetric[] = [
     tone: "info",
     description: localized(
       "把首页、Demo Story、Demo Mode、导航、角色、门店、PSI、报表、Stakeholder Summary 与最终 QA 串成可讲解路径。",
-      "Connects the homepage, Demo Story, Demo Mode, navigation, roles, branches, PSI, reports, Stakeholder Summary, and the final QA route into one explainable path.",
+      "Connects the homepage, Demo Story, Demo Mode, navigation, roles, branches, PSI, reports, settings, integration, access, packages, Stakeholder Summary, and the final QA route into one explainable path.",
     ),
   }),
   createMetric({
@@ -469,6 +469,22 @@ export const meStakeholderRoadmapItems: MeStakeholderRoadmapItem[] = [
     tag: "completed",
   }),
   createRoadmapItem({
+    key: "v0-8-8-navigation-settings-access-package-polish",
+    title: localized("v0.8.8 后台治理与套餐抛光", "v0.8.8 Governance and Package Polish"),
+    description: localized("Navigation / IA、Settings / Integration、Role / Access 与 Package / Plan preview-safe 抛光完成。", "Navigation / IA, Settings / Integration, Role / Access, and Package / Plan preview-safe polish completed."),
+    status: "completed",
+    route: "/packages",
+    tag: "completed",
+  }),
+  createRoadmapItem({
+    key: "v0-8-9-ui-walkthrough-testing",
+    title: localized("v0.8.9 UI 走查测试准备", "v0.8.9 UI Walkthrough Testing Prep"),
+    description: localized("下一步进入 localhost UI 路由走查、文案安全、响应式与演示路径检查。", "Next step enters localhost UI route walkthrough, wording safety, responsive, and presentation-flow checks."),
+    status: "planned",
+    route: "/demo-readiness",
+    tag: "planned",
+  }),
+  createRoadmapItem({
     key: "v0-9-x-api-database-prep",
     title: localized("v0.9.x API / 数据库准备", "v0.9.x API / Database Preparation"),
     description: localized("为后续真实 API、数据库与服务边界做准备。", "Prepare service boundaries for future real APIs and database connectivity."),
@@ -540,6 +556,41 @@ export const meStakeholderDemoRouteMap: MeStakeholderDemoRoute[] = [
     description: localized("总结 KPI 与 PSI 风险信号。", "Summarize KPI and PSI risk signals."),
     route: "/reports",
     tone: "success",
+  }),
+  createDemoRoute({
+    key: "pos-reports",
+    title: localized("POS 报表预览", "ME POS Reports Preview"),
+    description: localized("检查 POS 销售日报与门店销量 preview-safe framing。", "Review POS daily sales and branch sales preview-safe framing."),
+    route: "/reports/pos",
+    tone: "success",
+  }),
+  createDemoRoute({
+    key: "tasks",
+    title: localized("任务工作区", "ME Tasks"),
+    description: localized("检查任务队列、来源映射与闭环占位。", "Review task queue, source mapping, and close-loop placeholders."),
+    route: "/tasks",
+    tone: "warning",
+  }),
+  createDemoRoute({
+    key: "settings-integration",
+    title: localized("设置与集成", "ME Settings / Integration"),
+    description: localized("检查设置、POS、Printer、API 与 webhook 预览入口。", "Review settings, POS, printer, API, and webhook preview surfaces."),
+    route: "/settings",
+    tone: "muted",
+  }),
+  createDemoRoute({
+    key: "access-control",
+    title: localized("访问控制", "ME Access Control"),
+    description: localized("检查角色、权限、plan 与 scope contract preview。", "Review role, permission, plan, and scope contract previews."),
+    route: "/access-control",
+    tone: "muted",
+  }),
+  createDemoRoute({
+    key: "packages",
+    title: localized("套餐预览", "ME Package Plan Preview"),
+    description: localized("检查 SaaS 套餐、模块包与 future billing reference 文案。", "Review SaaS plans, module packs, and future billing reference wording."),
+    route: "/packages",
+    tone: "muted",
   }),
   createDemoRoute({
     key: "system-foundation",
