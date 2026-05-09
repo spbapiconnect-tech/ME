@@ -82,7 +82,7 @@ export function PsiHomePage() {
           }
         />
 
-      <MeWorkspaceSection title={psiCopy.overview.operationModules} description={psiCopy.overview.operationModulesDescription}>
+      <MeWorkspaceSection className={psiVisual.section} title={psiCopy.overview.operationModules} description={psiCopy.overview.operationModulesDescription}>
         <div className={psiVisual.moduleGrid}>
           {psiModules.map((item) => (
             <PsiModuleCard
@@ -96,7 +96,7 @@ export function PsiHomePage() {
         </div>
       </MeWorkspaceSection>
 
-      <MeWorkspaceSection title="PR-KCH-0001" description={psiCopy.overview.procurementRequest}>
+      <MeWorkspaceSection className={psiVisual.section} title="PR-KCH-0001" description={psiCopy.overview.procurementRequest}>
         <div className="grid gap-3 md:grid-cols-4">
           {[
             [psiCopy.shared.supplier, "ABC Food Supply"],
@@ -120,7 +120,7 @@ export function PsiHomePage() {
         ]}
       />
 
-      <MeWorkspaceSection title={psiCopy.overview.currentFocus} description={psiCopy.rightRail.workCoverage}>
+      <MeWorkspaceSection className={psiVisual.section} title={psiCopy.overview.currentFocus} description={psiCopy.rightRail.workCoverage}>
         <div className="grid gap-3 md:grid-cols-4">
           {[
             [psiCopy.shared.procurement, "12"],
@@ -150,7 +150,7 @@ export function PsiHomePage() {
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title={psiCopy.shared.overview} description="Structured request information for procurement review.">
+            <MeWorkspaceSection className={psiVisual.section} title={psiCopy.shared.overview} description="Structured request information for procurement review.">
               <div className="grid gap-3 md:grid-cols-2">
                 {[
                   [psiCopy.shared.supplier, "ABC Food Supply"],
@@ -175,11 +175,11 @@ export function PsiHomePage() {
               </div>
             </MeWorkspaceSection>
 
-            <MeWorkspaceSection title={psiCopy.overview.items} description={psiCopy.overview.itemsDescription}>
+            <MeWorkspaceSection className={psiVisual.section} title={psiCopy.overview.items} description={psiCopy.overview.itemsDescription}>
               <MeDataTable columns={[psiCopy.shared.item, psiCopy.shared.quantity, psiCopy.shared.priority, psiCopy.shared.status]} rows={lineItems} />
             </MeWorkspaceSection>
 
-            <MeWorkspaceSection title={psiCopy.overview.supplierAndReceiving} description={psiCopy.overview.supplierAndReceivingDescription}>
+            <MeWorkspaceSection className={psiVisual.section} title={psiCopy.overview.supplierAndReceiving} description={psiCopy.overview.supplierAndReceivingDescription}>
               <div className="grid gap-3 md:grid-cols-2">
                 <div className={psiVisual.softCard}>
                   <p className={psiVisual.eyebrow}>{psiCopy.shared.supplier}</p>

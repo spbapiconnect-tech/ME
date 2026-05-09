@@ -77,7 +77,7 @@ export function PsiReceivingErpPage({ module }: { module: RestaurantModuleDefini
         ) : null}
 
         {preview.filters?.length ? (
-          <MeWorkspaceSection title={locale === "zh" ? "工作区筛选" : "Workspace Filters"} description={locale === "zh" ? "当前收货页面的运营筛选范围。" : "Operating filters for the receiving workspace."}>
+          <MeWorkspaceSection className={psiVisual.section} title={locale === "zh" ? "工作区筛选" : "Workspace Filters"} description={locale === "zh" ? "当前收货页面的运营筛选范围。" : "Operating filters for the receiving workspace."}>
             <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
               {preview.filters.map((filterItem) => (
                 <PsiSoftCard key={filterItem.label}>
@@ -105,7 +105,7 @@ export function PsiReceivingErpPage({ module }: { module: RestaurantModuleDefini
           main={
             <>
               {selectedRow ? (
-                <MeWorkspaceSection title={locale === "zh" ? "已选记录" : "Selected record"} description={locale === "zh" ? "当前收货记录的重点字段。" : "Key fields for the current receiving record."}>
+                <MeWorkspaceSection className={psiVisual.section} title={locale === "zh" ? "已选记录" : "Selected record"} description={locale === "zh" ? "当前收货记录的重点字段。" : "Key fields for the current receiving record."}>
                   <div className="grid gap-4 md:grid-cols-3">
                     {firstTableSection?.kind === "table"
                       ? firstTableSection.columns.slice(0, selectedRow.length).map((column, index) => (
