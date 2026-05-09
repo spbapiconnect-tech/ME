@@ -13,6 +13,8 @@ export function PsiHomePage() {
   const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
   const psiCopy = getPsiCopy(currentLocale);
 
+  const isZh = currentLocale === "zh";
+
   const psiModules = [
     {
       title: psiCopy.shared.procurement,
@@ -33,48 +35,117 @@ export function PsiHomePage() {
       metric: psiCopy.overview.inventoryMetric,
     },
     {
-      title: currentLocale === "zh" ? "收货" : "Receiving",
-      description:
-        currentLocale === "zh"
-          ? "供应商到货、数量差异、入库交接与收货检查。"
-          : "Supplier receiving, variance review, inventory handoff, and delivery checks.",
+      title: isZh ? "收货" : "Receiving",
+      description: isZh
+        ? "供应商到货、数量差异、入库交接与收货检查。"
+        : "Supplier receiving, variance review, inventory handoff, and delivery checks.",
       href: "/psi/receiving",
-      metric: currentLocale === "zh" ? "3 条待验证" : "3 awaiting verification",
+      metric: isZh ? "3 条待验证" : "3 awaiting verification",
     },
   ];
 
   const kpis = [
-    [psiCopy.shared.procurement, "12", currentLocale === "zh" ? "待处理采购事项" : "Open procurement work"],
-    [psiCopy.shared.supplier, "4", currentLocale === "zh" ? "供应商关注事项" : "Supplier watch items"],
-    [psiCopy.shared.inventory, "8", currentLocale === "zh" ? "库存风险项目" : "Inventory watch items"],
-    [psiCopy.shared.issues, "6", currentLocale === "zh" ? "跨模块问题" : "Cross-module issues"],
+    {
+      label: isZh ? "待处理采购" : "Pending Procurement",
+      value: "12",
+      hint: isZh ? "需要经理或采购复核" : "Need manager or purchasing review",
+    },
+    {
+      label: isZh ? "供应商问题" : "Supplier Issues",
+      value: "4",
+      hint: isZh ? "价格、交期或沟通待跟进" : "Pricing, lead time, or communication follow-up",
+    },
+    {
+      label: isZh ? "低库存项目" : "Low Stock Items",
+      value: "8",
+      hint: isZh ? "低于安全库存或覆盖天数不足" : "Below safety stock or coverage target",
+    },
+    {
+      label: isZh ? "收货差异" : "Receiving Variance",
+      value: "3",
+      hint: isZh ? "数量或入库验证待处理" : "Quantity or posting verification pending",
+    },
   ];
 
-  const operatingQueue = [
+  const attentionQueue = [
     {
-      title: "PR-KCH-0001",
-      label: psiCopy.overview.procurementRequest,
-      meta: "ABC Food Supply · KCH · High",
+      id: "PR-KCH-0001",
+      type: isZh ? "采购请求" : "Procurement Request",
+      subject: "ABC Food Supply",
+      risk: isZh ? "高风险" : "High Risk",
+      next: isZh ? "下一步：经理复核" : "Next: Manager Review",
       href: "/psi/procurement/PR-1001",
     },
     {
-      title: "SKU-KCH-0007",
-      label: currentLocale === "zh" ? "库存低于安全线" : "Low-stock watch",
-      meta: "Coated Fries · Freezer · 2.1 days",
+      id: "SKU-KCH-0007",
+      type: isZh ? "低库存" : "Low Stock",
+      subject: isZh ? "Coated Fries · 2.1 天覆盖" : "Coated Fries · 2.1 days coverage",
+      risk: isZh ? "库存风险" : "Inventory Risk",
+      next: isZh ? "下一步：关联采购请求" : "Next: Link Purchase Request",
       href: "/psi/inventory/SKU-KCH-0007",
     },
     {
-      title: "RCV-KCH-240507",
-      label: currentLocale === "zh" ? "收货待验证" : "Receiving verification",
-      meta: "PO-KCH-0098 · ABC Food Supply · Today",
+      id: "RCV-KCH-240507",
+      type: isZh ? "收货差异" : "Receiving Variance",
+      subject: "PO-KCH-0098 · ABC Food Supply",
+      risk: isZh ? "待验证" : "Awaiting Verification",
+      next: isZh ? "下一步：确认数量" : "Next: Verify Quantity",
       href: "/psi/receiving",
     },
   ];
 
+  const riskSummary = [
+    isZh ? "3 个高风险事项需要今天处理" : "3 high-risk items need action today",
+    isZh ? "2 个供应商交期需要确认" : "2 supplier lead times need confirmation",
+    isZh ? "8 个库存项目低于关注线" : "8 stock items are below watch level",
+    isZh ? "3 条收货记录等待验证" : "3 receiving records are awaiting verification",
+  ];
+
   const activity = [
-    ["09:26", currentLocale === "zh" ? "供应商报价已关联" : "Supplier quote attached", "ABC Food Supply quotation linked for procurement reference."],
-    ["09:35", currentLocale === "zh" ? "库存风险已关联" : "Inventory risk linked", "KCH broth coverage risk attached to procurement request."],
-    ["14:22", currentLocale === "zh" ? "等待经理复核" : "Awaiting manager review", "Procurement request is queued for branch review."],
+    {
+      time: "09:26",
+      title: isZh ? "供应商报价已关联" : "Supplier quote attached",
+      description: isZh
+        ? "ABC Food Supply 报价已关联到采购请求。"
+        : "ABC Food Supply quotation linked to procurement request.",
+    },
+    {
+      time: "09:35",
+      title: isZh ? "库存风险已关联" : "Inventory risk linked",
+      description: isZh
+        ? "KCH 库存覆盖风险已加入 PSI 队列。"
+        : "KCH stock coverage risk added to PSI queue.",
+    },
+    {
+      time: "14:22",
+      title: isZh ? "等待经理复核" : "Awaiting manager review",
+      description: isZh
+        ? "采购请求已进入门店经理复核。"
+        : "Procurement request moved into branch manager review.",
+    },
+  ];
+
+  const quickActions = [
+    {
+      label: isZh ? "新建采购请求" : "Create Request",
+      href: "/psi/procurement",
+      variant: "default" as const,
+    },
+    {
+      label: isZh ? "查看低库存" : "Review Low Stock",
+      href: "/psi/inventory",
+      variant: "outline" as const,
+    },
+    {
+      label: isZh ? "处理收货差异" : "Open Receiving Variance",
+      href: "/psi/receiving",
+      variant: "outline" as const,
+    },
+    {
+      label: isZh ? "查看 PSI 报表" : "View PSI Report",
+      href: "/reports",
+      variant: "outline" as const,
+    },
   ];
 
   return (
@@ -88,17 +159,108 @@ export function PsiHomePage() {
           actions={
             <>
               <Button asChild size="sm">
-                <Link href="/psi/procurement">{psiCopy.overview.openProcurement}</Link>
+                <Link href="/psi/procurement">{isZh ? "新建采购" : "Create Request"}</Link>
               </Button>
               <Button asChild size="sm" variant="outline">
-                <Link href="/reports">{psiCopy.overview.openPsiReports}</Link>
+                <Link href="/reports">{isZh ? "查看 PSI 报表" : "View PSI Report"}</Link>
               </Button>
               <Button asChild size="sm" variant="outline">
-                <Link href="/psi/issues">{psiCopy.overview.openIssues}</Link>
+                <Link href="/psi/issues">{isZh ? "打开问题" : "Open Issues"}</Link>
               </Button>
             </>
           }
         />
+
+        <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {kpis.map((item) => (
+            <PsiSoftCard key={item.label}>
+              <p className={psiVisual.eyebrow}>{item.label}</p>
+              <p className={psiVisual.metric}>{item.value}</p>
+              <p className={`mt-1 ${psiVisual.muted}`}>{item.hint}</p>
+            </PsiSoftCard>
+          ))}
+        </section>
+
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+          <PsiSection
+            title={isZh ? "需要处理的 PSI 队列" : "Attention Queue"}
+            description={
+              isZh
+                ? "跨采购、供应商、库存与收货的优先事项。"
+                : "Priority work across procurement, supplier, inventory, and receiving."
+            }
+          >
+            <div className="grid gap-3">
+              {attentionQueue.map((item) => (
+                <Link key={item.id} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
+                  <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className={psiVisual.title}>{item.id}</p>
+                        <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
+                          {item.type}
+                        </span>
+                      </div>
+                      <p className={`mt-1 ${psiVisual.body}`}>{item.subject}</p>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 md:justify-end">
+                      <span className={psiVisual.pill}>{item.risk}</span>
+                      <span className={psiVisual.pill}>{item.next}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </PsiSection>
+
+          <PsiSection
+            title={isZh ? "风险摘要" : "Risk Summary"}
+            description={isZh ? "今天优先处理的 PSI 风险。" : "PSI risks that should be reviewed first today."}
+          >
+            <div className="grid gap-3">
+              {riskSummary.map((item) => (
+                <PsiSoftCard key={item}>
+                  <p className={psiVisual.value}>{item}</p>
+                </PsiSoftCard>
+              ))}
+            </div>
+          </PsiSection>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
+          <PsiSection
+            title={isZh ? "今日活动" : "Today Activity"}
+            description={isZh ? "PSI 工作区今日最新联动。" : "Latest PSI coordination events today."}
+          >
+            <div className="grid gap-3">
+              {activity.map((item) => (
+                <PsiSoftCard key={`${item.time}-${item.title}`}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className={psiVisual.title}>{item.title}</p>
+                      <p className={`mt-1 ${psiVisual.body}`}>{item.description}</p>
+                    </div>
+                    <span className="text-xs font-medium text-muted-foreground">{item.time}</span>
+                  </div>
+                </PsiSoftCard>
+              ))}
+            </div>
+          </PsiSection>
+
+          <PsiSection
+            title={isZh ? "快速操作" : "Quick Actions"}
+            description={isZh ? "直接进入常用 PSI 操作。" : "Jump into common PSI operating actions."}
+          >
+            <div className="grid gap-2">
+              {quickActions.map((action) => (
+                <Button key={action.href} asChild size="sm" variant={action.variant}>
+                  <Link href={action.href}>{action.label}</Link>
+                </Button>
+              ))}
+            </div>
+          </PsiSection>
+        </div>
 
         <PsiSection
           title={psiCopy.overview.operationModules}
@@ -116,116 +278,6 @@ export function PsiHomePage() {
             ))}
           </div>
         </PsiSection>
-
-        <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {kpis.map(([label, value, hint]) => (
-            <PsiSoftCard key={label}>
-              <p className={psiVisual.eyebrow}>{label}</p>
-              <p className={psiVisual.metric}>{value}</p>
-              <p className={`mt-1 ${psiVisual.muted}`}>{hint}</p>
-            </PsiSoftCard>
-          ))}
-        </section>
-
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-          <PsiSection
-            title={currentLocale === "zh" ? "当前 PSI 队列" : "Current PSI Queue"}
-            description={
-              currentLocale === "zh"
-                ? "只显示需要跨采购、供应商、库存、收货协调的事项。"
-                : "Only cross-module work that needs procurement, supplier, inventory, or receiving coordination."
-            }
-          >
-            <div className="grid gap-3">
-              {operatingQueue.map((item) => (
-                <Link key={item.title} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className={psiVisual.title}>{item.title}</p>
-                      <p className={`mt-1 ${psiVisual.body}`}>{item.label}</p>
-                    </div>
-                    <span className={psiVisual.pill}>{item.meta}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </PsiSection>
-
-          <PsiSection
-            title={currentLocale === "zh" ? "PSI 健康检查" : "PSI Health Check"}
-            description={
-              currentLocale === "zh"
-                ? "用于经理快速判断今天要先处理什么。"
-                : "Manager-facing snapshot for what needs attention first today."
-            }
-          >
-            <div className="grid gap-3">
-              {[
-                currentLocale === "zh" ? "采购请求仍有 12 条待处理" : "12 procurement requests still open",
-                currentLocale === "zh" ? "4 个供应商需要跟进" : "4 suppliers need follow-up",
-                currentLocale === "zh" ? "8 个库存项目低于关注线" : "8 inventory items are under watch",
-                currentLocale === "zh" ? "3 条收货记录等待验证" : "3 receiving records awaiting verification",
-              ].map((item) => (
-                <PsiSoftCard key={item}>
-                  <p className={psiVisual.value}>{item}</p>
-                </PsiSoftCard>
-              ))}
-            </div>
-          </PsiSection>
-        </div>
-
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-          <PsiSection
-            title={currentLocale === "zh" ? "今日活动" : "Today Activity"}
-            description={
-              currentLocale === "zh"
-                ? "显示 PSI dashboard 层面的最新联动，不进入单据明细。"
-                : "Latest PSI coordination signals without turning this dashboard into a record detail page."
-            }
-          >
-            <div className="grid gap-3">
-              {activity.map(([time, title, description]) => (
-                <PsiSoftCard key={`${time}-${title}`}>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className={psiVisual.title}>{title}</p>
-                      <p className={`mt-1 ${psiVisual.body}`}>{description}</p>
-                    </div>
-                    <span className="text-xs font-medium text-muted-foreground">{time}</span>
-                  </div>
-                </PsiSoftCard>
-              ))}
-            </div>
-          </PsiSection>
-
-          <PsiSection
-            title={currentLocale === "zh" ? "工作区说明" : "Workspace Note"}
-            description={
-              currentLocale === "zh"
-                ? "PSI 总览只负责跨模块判断；单据级操作保留在采购、供应商、库存、收货页面。"
-                : "PSI overview is for cross-module triage. Record-level work stays inside Procurement, Supplier, Inventory, and Receiving."
-            }
-            className="min-h-0"
-          >
-            <div className="grid gap-3">
-              <PsiSoftCard>
-                <p className={psiVisual.eyebrow}>{currentLocale === "zh" ? "页面定位" : "Page Role"}</p>
-                <p className={psiVisual.value}>
-                  {currentLocale === "zh" ? "总览 / 判断 / 入口" : "Overview / triage / entry point"}
-                </p>
-              </PsiSoftCard>
-
-              <div className="flex flex-wrap gap-2">
-                <Button asChild size="sm">
-                  <Link href="/system-foundation">{currentLocale === "zh" ? "打开系统中心" : "Open System Center"}</Link>
-                </Button>
-                <Button asChild size="sm" variant="outline">
-                  <Link href="/psi/procurement">{currentLocale === "zh" ? "打开采购工作台" : "Open Procurement Workspace"}</Link>
-                </Button>
-              </div>
-            </div>
-          </PsiSection>
-        </div>
       </div>
     </ErpShell>
   );
