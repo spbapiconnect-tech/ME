@@ -3,7 +3,7 @@
 import Link from "next/link";
 import * as React from "react";
 
-import { MeBreadcrumbs } from "@/components/navigation";
+import { MeDashboardShell, MePageHeader } from "@/components/layout";
 import { PackageCard } from "@/components/packages/package-card";
 import { PackageGroupCard } from "@/components/packages/package-group-card";
 import { PackagePreviewCard } from "@/components/packages/package-preview-card";
@@ -95,27 +95,31 @@ export function PackagesPage() {
   }, []);
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
-      <MeBreadcrumbs locale={currentLocale} />
-
-      <Card>
-        <CardHeader className="gap-2">
-          <CardTitle className="text-xl">ME Packages</CardTitle>
-          <CardDescription>Module Package / SaaS Plan Builder Contract</CardDescription>
-          <CardDescription>
-            {currentLocale === "zh"
-              ? "该页面仅用于方案与模块包元数据预览，不执行真实计费、支付、订阅门禁、租户开通、模块运行时启停、API/后端/数据库或会话查询。"
-              : "Metadata-only package/plan preview. No real billing, payment, subscription enforcement, tenant provisioning, runtime module enable/disable, API/backend/database, or session lookup."}
-          </CardDescription>
-          <div className="flex flex-wrap gap-2">
+    <MeDashboardShell activeKey="packages">
+      <MePageHeader
+        eyebrow={currentLocale === "zh" ? "套餐 / 方案" : "Packages / Plans"}
+        title="ME Packages"
+        description="Module Package / SaaS Plan Builder Contract"
+        notice={
+          currentLocale === "zh"
+            ? "该页面仅用于方案与模块包元数据预览，不执行真实计费、支付、订阅门禁、租户开通、模块运行时启停、API/后端/数据库或会话查询。"
+            : "Metadata-only package/plan preview. No real billing, payment, subscription enforcement, tenant provisioning, runtime module enable/disable, API/backend/database, or session lookup."
+        }
+        badges={[
+          { label: "Catalog Active", variant: "secondary" },
+          { label: "Preview Usable", variant: "outline" },
+          { label: "Billing Placeholder", variant: "outline" },
+        ]}
+        actions={
+          <>
             {quickLinks.map((item) => (
               <Button key={item.key} asChild variant="outline" size="sm">
                 <Link href={item.href}>{resolveNavigationLabel(item, currentLocale)}</Link>
               </Button>
             ))}
-          </div>
-        </CardHeader>
-      </Card>
+          </>
+        }
+      />
 
       <Card size="sm">
         <CardHeader className="gap-1"><CardTitle className="text-sm">Package Stats</CardTitle></CardHeader>
@@ -177,6 +181,6 @@ export function PackagesPage() {
           {packageGroups.map((group) => <PackageGroupCard key={group.key} group={group} locale={currentLocale} />)}
         </CardContent>
       </Card>
-    </main>
+    </MeDashboardShell>
   );
 }
