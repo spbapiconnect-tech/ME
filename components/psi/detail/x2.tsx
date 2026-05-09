@@ -7,7 +7,6 @@ import {
   MeDataTable,
   MeDetailWorkspace,
   MeRecordSummary,
-  MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
@@ -101,33 +100,6 @@ export function PsiWorkspaceLayoutV072({
   const pageTitle = getPageTitle(activeKey, title, psiCopy);
   const pageSubtitle = getPageSubtitle(activeKey, subtitle, psiCopy);
 
-  const rightRail = (
-    <MeRightRail
-      sections={[
-        {
-          title: psiCopy.rightRail.workspaceContext,
-          badge: moduleLabel,
-          items: [psiCopy.rightRail.queueReview, psiCopy.rightRail.linkedIssueContext, psiCopy.rightRail.branchCoordination],
-        },
-        {
-          title: psiCopy.rightRail.serviceLayer,
-          items: [
-            isMock ? psiCopy.rightRail.catalogLayer : psiCopy.rightRail.connectedService,
-            `${psiCopy.shared.source}: ${source}`,
-            currentLocale === "zh" ? `${records.length} ${psiCopy.rightRail.visibleRecordsSuffix}` : `${records.length} ${psiCopy.rightRail.visibleRecordsSuffix}`,
-          ],
-        },
-        {
-          title: psiCopy.rightRail.issueWatch,
-          items: [
-            currentLocale === "zh" ? `${issueRecords.length} ${psiCopy.rightRail.linkedIssueRecordsSuffix}` : `${issueRecords.length} ${psiCopy.rightRail.linkedIssueRecordsSuffix}`,
-            psiCopy.rightRail.escalationReview,
-            psiCopy.rightRail.timelineFollowUp,
-          ],
-        },
-      ]}
-    />
-  );
 
   return (
     <ErpShell activeHref={detailBasePath}>
