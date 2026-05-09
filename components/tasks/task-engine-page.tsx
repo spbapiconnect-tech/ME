@@ -7,7 +7,6 @@ import {
   MeDataTable,
   MeDetailWorkspace,
   MeRecordSummary,
-  MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
@@ -73,25 +72,6 @@ export function TaskEnginePage({ tasks, dataError }: TaskEnginePageProps) {
   const stats = summarizeTasks(tasks);
   const selectedTask = tasks[0];
 
-  const rightRail = (
-    <MeRightRail
-      sections={[
-        {
-          title: taskCopy.rightRail.taskContext,
-          badge: taskCopy.rightRail.operations,
-          items: [taskCopy.rightRail.branchFollowUp, taskCopy.rightRail.issueCoordination, taskCopy.rightRail.inventoryProcurementLinkage],
-        },
-        {
-          title: taskCopy.rightRail.currentFocus,
-          items: [`${stats.review} ${taskCopy.rightRail.recordsWaitingForReview}`, `${stats.overdue} ${taskCopy.rightRail.overdueItems}`, `${stats.critical} ${taskCopy.rightRail.criticalPriorityTasks}`],
-        },
-        {
-          title: taskCopy.rightRail.todaysPriorities,
-          items: [taskCopy.rightRail.replenishmentReview, taskCopy.rightRail.deliveryDelayEscalation, taskCopy.rightRail.scheduleTrainingFollowUp],
-        },
-      ]}
-    />
-  );
 
   return (
     <ErpShell activeHref="/tasks">

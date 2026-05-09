@@ -7,7 +7,6 @@ import {
   MeDataTable,
   MeDetailWorkspace,
   MeRecordSummary,
-  MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
@@ -72,25 +71,6 @@ export function TaskDetailPage({ taskId, task, dataError }: TaskDetailPageProps)
     );
   }
 
-  const rightRail = (
-    <MeRightRail
-      sections={[
-        {
-          title: taskCopy.rightRail.taskStatus,
-          badge: titleCaseStatus(task.status),
-          items: [`${taskCopy.fields.priority}: ${titleCaseStatus(task.priority)}`, `${taskCopy.fields.owner}: ${task.ownerRole}`, `${taskCopy.fields.branch}: ${task.store}`],
-        },
-        {
-          title: taskCopy.rightRail.followUp,
-          items: [taskCopy.rightRail.commentTrail, taskCopy.rightRail.escalationReview, taskCopy.rightRail.relatedRecordCoordination],
-        },
-        {
-          title: taskCopy.rightRail.relatedModules,
-          items: task.linkedRecords.map((record) => `${titleCaseStatus(record.moduleCode)} · ${record.recordId}`),
-        },
-      ]}
-    />
-  );
 
   return (
     <ErpShell activeHref="/tasks">
