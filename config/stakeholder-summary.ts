@@ -479,7 +479,7 @@ export const meStakeholderRoadmapItems: MeStakeholderRoadmapItem[] = [
   createRoadmapItem({
     key: "v0-8-9-ui-walkthrough-testing",
     title: localized("v0.8.9 UI 走查测试准备", "v0.8.9 UI Walkthrough Testing Prep"),
-    description: localized("下一步进入 localhost UI 路由走查、文案安全、响应式与演示路径检查。", "Next step enters localhost UI route walkthrough, wording safety, responsive, and presentation-flow checks."),
+    description: localized("下一步进入 localhost UI walkthrough testing，检查路由走查、文案安全、响应式与演示路径。", "Next step enters localhost UI walkthrough testing for route walkthrough, wording safety, responsive behavior, and presentation-flow checks."),
     status: "planned",
     route: "/demo-readiness",
     tag: "planned",
@@ -574,7 +574,7 @@ export const meStakeholderDemoRouteMap: MeStakeholderDemoRoute[] = [
   createDemoRoute({
     key: "settings-integration",
     title: localized("设置与集成", "ME Settings / Integration"),
-    description: localized("检查设置、POS、Printer、API 与 webhook 预览入口。", "Review settings, POS, printer, API, and webhook preview surfaces."),
+    description: localized("检查 `/settings`、`/integration` 与 `/integration/POS-KCH-PRIMARY` 的设置、POS、Printer、API 与 webhook 预览入口。", "Review `/settings`, `/integration`, and `/integration/POS-KCH-PRIMARY` for settings, POS, printer, API, and webhook preview surfaces."),
     route: "/settings",
     tone: "muted",
   }),

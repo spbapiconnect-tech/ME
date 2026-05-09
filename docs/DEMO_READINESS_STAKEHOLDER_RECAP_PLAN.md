@@ -89,8 +89,10 @@ The final recap should reflect these completed stabilization phases:
 7. Settings / Integration preview-safe polish
 8. Role / Access preview-safe polish
 9. Package / Plan preview-safe polish
-10. Demo Readiness / Stakeholder Summary recap
-11. UI Test Checklist / Route Walkthrough next
+10. v0.8.8 Governance and Package Polish recap
+11. v0.8.9 UI Walkthrough Testing Prep
+12. Demo Readiness / Stakeholder Summary recap
+13. UI Test Checklist / Route Walkthrough next
 
 ## Recommended Route Sequence For UI Testing
 
