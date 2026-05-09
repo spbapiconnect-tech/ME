@@ -6,7 +6,6 @@ import {
   MeActionBar,
   MeDataTable,
   MeDetailWorkspace,
-  MeRightRail,
   MeStatusTimeline,
   MeTabs,
   MeWorkspaceSection,
@@ -34,29 +33,6 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
   const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
   const psiCopy = getPsiCopy(currentLocale);
 
-  const rightRail = (
-    <MeRightRail
-      sections={[
-        {
-          title: psiCopy.rightRail.issueContext,
-          badge: psiCopy.shared.psi,
-          items: [
-            psiCopy.rightRail.procurementFollowUp,
-            psiCopy.rightRail.supplierCoordination,
-            psiCopy.rightRail.inventoryRiskReview,
-          ],
-        },
-        {
-          title: psiCopy.rightRail.currentQueue,
-          items: [
-            currentLocale === "zh" ? `${rows.length} ${psiCopy.rightRail.activeIssuesSuffix}` : `${rows.length} ${psiCopy.rightRail.activeIssuesSuffix}`,
-            isMock ? psiCopy.rightRail.catalogLayer : psiCopy.rightRail.connectedService,
-            `${psiCopy.shared.source}: ${source}`,
-          ],
-        },
-      ]}
-    />
-  );
 
   return (
     <ErpShell activeHref="/psi/issues">
