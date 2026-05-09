@@ -180,38 +180,73 @@ export function PsiHomePage() {
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_21rem]">
           <PsiSection
-            title={isZh ? "库存 · 采购 · GRN 联动表" : "Stock · Purchase · GRN Flow"}
+            title={isZh ? "PSI 多维运营表" : "PSI Operating Matrix"}
             description={
               isZh
-                ? "把 stock level、stock movement、PR / PO、GRN 状态放在同一张 PSI 运营视图。"
-                : "One PSI operating view for stock level, stock movement, PR / PO, and GRN status."
+                ? "把 SKU、库存水位、库存流动、采购进度、GRN / 收货、供应商与下一步动作放在同一张表。"
+                : "A single operating table for SKU, stock level, stock movement, purchase flow, GRN / receiving, supplier, and next action."
             }
           >
-            <div className="grid gap-3">
-              {stockPurchaseFlow.map((row) => (
-                <Link key={row.sku} href={row.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
-                  <div className="grid gap-3 xl:grid-cols-[1.2fr_1fr_1fr_1fr_auto] xl:items-center">
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
+              <div className="grid min-w-[1040px] grid-cols-[1.25fr_1fr_1fr_1.15fr_1.05fr_1fr_0.9fr] border-b border-border bg-muted/35 px-4 py-3">
+                {[
+                  isZh ? "SKU / ITEM" : "SKU / ITEM",
+                  isZh ? "库存水位" : "STOCK LEVEL",
+                  isZh ? "库存流动" : "MOVEMENT",
+                  isZh ? "采购进度" : "PURCHASE FLOW",
+                  isZh ? "GRN / 收货" : "GRN / RECEIVING",
+                  isZh ? "供应商" : "SUPPLIER",
+                  isZh ? "动作" : "ACTION",
+                ].map((head) => (
+                  <div key={head} className={psiVisual.eyebrow}>{head}</div>
+                ))}
+              </div>
+
+              <div className="overflow-x-auto">
+                {stockPurchaseFlow.map((row) => (
+                  <Link
+                    key={row.sku}
+                    href={row.href}
+                    className="grid min-w-[1040px] grid-cols-[1.25fr_1fr_1fr_1.15fr_1.05fr_1fr_0.9fr] items-center border-b border-border/70 px-4 py-4 transition hover:bg-muted/30 last:border-b-0"
+                  >
                     <div>
                       <p className={psiVisual.title}>{row.sku}</p>
                       <p className={`mt-1 ${psiVisual.body}`}>{row.item}</p>
                     </div>
+
                     <div>
-                      <p className={psiVisual.eyebrow}>{isZh ? "库存水位" : "Stock Level"}</p>
                       <p className={psiVisual.value}>{row.stock}</p>
+                      <p className={psiVisual.muted}>{row.status}</p>
                     </div>
+
                     <div>
-                      <p className={psiVisual.eyebrow}>{isZh ? "库存流动" : "Movement"}</p>
                       <p className={psiVisual.value}>{row.movement}</p>
+                      <p className={psiVisual.muted}>{isZh ? "今日变动" : "Today"}</p>
                     </div>
+
                     <div>
-                      <p className={psiVisual.eyebrow}>{isZh ? "采购 / GRN" : "Purchase / GRN"}</p>
                       <p className={psiVisual.value}>{row.purchase}</p>
-                      <p className={`mt-1 ${psiVisual.muted}`}>{row.grn}</p>
+                      <p className={psiVisual.muted}>{isZh ? "采购关联" : "Purchase link"}</p>
                     </div>
-                    <span className={psiVisual.pill}>{row.status}</span>
-                  </div>
-                </Link>
-              ))}
+
+                    <div>
+                      <p className={psiVisual.value}>{row.grn}</p>
+                      <p className={psiVisual.muted}>{isZh ? "收货状态" : "Receiving status"}</p>
+                    </div>
+
+                    <div>
+                      <p className={psiVisual.value}>ABC Food Supply</p>
+                      <p className={psiVisual.muted}>{isZh ? "主要供应商" : "Primary supplier"}</p>
+                    </div>
+
+                    <div>
+                      <span className={psiVisual.pill}>
+                        {row.status}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
           </PsiSection>
 
