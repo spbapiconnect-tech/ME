@@ -2,3 +2,11 @@ export { RestaurantModuleDetailPreview } from "./restaurant-module-detail-previe
 export { RestaurantModulePage } from "./restaurant-module-page";
 export { RestaurantModuleRightRail } from "./restaurant-module-right-rail";
 export { RestaurantModuleTable } from "./restaurant-module-table";
+export { CompactStatStrip } from "./compact-stat-strip";
+export { ContextQueuePanel } from "./context-queue-panel";
+export { ListToolbar } from "./list-toolbar";
+export { MultidimensionalTable } from "./multidimensional-table";
+export { RecordDetailPanel } from "./record-detail-panel";
+export { TableActionBar } from "./table-action-bar";
+export { TableFieldChip } from "./table-field-chip";
+export { TableViewTabs } from "./table-view-tabs";

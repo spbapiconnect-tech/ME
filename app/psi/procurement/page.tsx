@@ -1,28 +1,26 @@
 "use client";
 
 import { ErpPageHeader, ErpShell } from "@/components/erp";
-import {
-  ModulePageStack,
-  ModuleSection,
-  ModuleMatrixTable,
-  ModuleMatrixRow,
-  ModuleTwoColumn,
-  moduleVisual,
-} from "@/components/erp/module-shell";
+import { ModulePageStack, ModuleSection, ModuleTwoColumn, moduleVisual } from "@/components/erp/module-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CompactStatStrip } from "@/components/operations/compact-stat-strip";
-import { ListToolbar } from "@/components/operations/list-toolbar";
-import { ContextQueuePanel } from "@/components/operations/context-queue-panel";
+import { TableActionBar } from "@/components/operations/table-action-bar";
+import { TableFieldChip } from "@/components/operations/table-field-chip";
+import { TableViewTabs } from "@/components/operations/table-view-tabs";
+import { MultidimensionalTable, type MultiDimColumn } from "@/components/operations/multidimensional-table";
+import { RecordDetailPanel } from "@/components/operations/record-detail-panel";
 import { getPsiProcurementWorkspacePageData } from "@/lib/page-data/psi";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PsiProcurementWorkspacePageData } from "@/lib/page-data/psi";
-import { cn } from "@/lib/utils";
 import { FileDown, Plus, MoreHorizontal } from "lucide-react";
 
 export default function PsiProcurementPage() {
   const [data, setData] = useState<PsiProcurementWorkspacePageData | null>(null);
+  const [viewKey, setViewKey] = useState("all");
+  const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
+  const [focusedRequestId, setFocusedRequestId] = useState<string | null>(null);
   const locale = useUiPreferencesStore((state) => state.locale);
   const isZh = locale === "zh";
 
@@ -30,13 +28,109 @@ export default function PsiProcurementPage() {
     getPsiProcurementWorkspacePageData().then(setData);
   }, []);
 
-  if (!data) return null;
+  const pageData = data?.pageData;
+  const requests = useMemo(() => pageData?.purchaseRequests ?? [], [pageData]);
+  const orders = useMemo(() => pageData?.purchaseOrders ?? [], [pageData]);
+  const issues = useMemo(() => pageData?.purchaseIssues ?? [], [pageData]);
+  const receivingRecords = useMemo(() => pageData?.receivingRecords ?? [], [pageData]);
 
-  const pageData = data.pageData;
-  const requests = pageData?.purchaseRequests ?? [];
-  const orders = pageData?.purchaseOrders ?? [];
-  const issues = pageData?.purchaseIssues ?? [];
-  const waitingApproval = requests.filter((item) => item.status === "pending" || item.status === "review");
+  const viewTabs = useMemo(
+    () => [
+      { key: "all", label: isZh ? "全部 PR" : "All PR", count: requests.length },
+      { key: "draft", label: isZh ? "草稿" : "Draft", count: requests.filter((item) => item.status === "draft").length },
+      { key: "pending", label: isZh ? "待审批" : "Pending Approval", count: requests.filter((item) => item.status === "pending" || item.status === "review").length },
+      { key: "approved", label: isZh ? "已审批" : "Approved", count: requests.filter((item) => item.status === "approved").length },
+      { key: "po", label: isZh ? "PO 已下达" : "PO Issued", count: orders.length },
+      { key: "supplier", label: isZh ? "供应商待确认" : "Supplier Pending", count: issues.filter((item) => item.status === "pending").length },
+      { key: "receiving", label: isZh ? "收货中" : "Receiving", count: receivingRecords.filter((item) => item.status !== "completed").length },
+      { key: "exception", label: isZh ? "异常" : "Exception", count: issues.filter((item) => item.status === "disputed" || item.status === "blocked" || item.status === "rejected").length },
+    ],
+    [isZh, issues, orders.length, receivingRecords, requests]
+  );
+
+  const filteredRequests = useMemo(() => {
+    switch (viewKey) {
+      case "draft":
+        return requests.filter((item) => item.status === "draft");
+      case "pending":
+        return requests.filter((item) => item.status === "pending" || item.status === "review");
+      case "approved":
+        return requests.filter((item) => item.status === "approved");
+      case "po":
+        return requests.filter((item) => orders.some((order) => order.requestId === item.requestId));
+      case "supplier":
+        return requests.filter((item) => issues.some((issue) => issue.requestId === item.requestId && issue.status === "pending"));
+      case "receiving":
+        return requests.filter((item) => receivingRecords.some((record) => record.orderId && orders.some((order) => order.orderId === record.orderId && order.requestId === item.requestId)));
+      case "exception":
+        return requests.filter((item) =>
+          issues.some(
+            (issue) =>
+              issue.requestId === item.requestId &&
+              (issue.status === "disputed" || issue.status === "blocked" || issue.status === "rejected")
+          )
+        );
+      default:
+        return requests;
+    }
+  }, [issues, orders, receivingRecords, requests, viewKey]);
+
+  const focusedRequest = useMemo(() => {
+    if (!filteredRequests.length) return null;
+    return filteredRequests.find((item) => item.requestId === focusedRequestId) ?? filteredRequests[0];
+  }, [filteredRequests, focusedRequestId]);
+  const linkedOrder = focusedRequest ? orders.find((item) => item.requestId === focusedRequest.requestId) : null;
+  const linkedReceiving = linkedOrder ? receivingRecords.find((item) => item.orderId === linkedOrder.orderId) : null;
+  const linkedIssues = focusedRequest ? issues.filter((item) => item.requestId === focusedRequest.requestId) : [];
+
+  const columns: MultiDimColumn<(typeof filteredRequests)[number]>[] = [
+    { key: "requestNo", label: isZh ? "PR No" : "PR No", width: "120px", render: (row) => <p className={moduleVisual.title}>{row.requestNo}</p> },
+    { key: "branch", label: isZh ? "Branch" : "Branch", width: "95px", render: (row) => <p className={moduleVisual.body}>{row.storeId}</p> },
+    { key: "requester", label: isZh ? "Requester" : "Requester", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.audit.createdBy || "-"}</p> },
+    { key: "supplier", label: isZh ? "Supplier" : "Supplier", width: "130px", render: (row) => <p className={moduleVisual.body}>{row.supplierId || "-"}</p> },
+    { key: "items", label: isZh ? "Items" : "Items", width: "70px", render: (row) => <p className={moduleVisual.body}>{row.lines.length}</p> },
+    { key: "amount", label: isZh ? "Total Amount" : "Total Amount", width: "115px", render: (row) => <p className={moduleVisual.title}>{row.totalAmount.amount}</p> },
+    { key: "needBy", label: isZh ? "Need By" : "Need By", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.neededBy || "-"}</p> },
+    {
+      key: "approval",
+      label: isZh ? "Approval" : "Approval",
+      width: "120px",
+      render: (row) => <TableFieldChip label={row.status} tone={row.status === "approved" ? "success" : row.status === "rejected" ? "danger" : "warning"} />,
+    },
+    { key: "poStatus", label: isZh ? "PO Status" : "PO Status", width: "110px", render: (row) => <TableFieldChip label={orders.some((item) => item.requestId === row.requestId) ? "Issued" : "Pending"} tone="muted" /> },
+    { key: "supplierConfirm", label: isZh ? "Supplier Confirm" : "Supplier Confirm", width: "130px", render: (row) => <TableFieldChip label={issues.some((item) => item.requestId === row.requestId && item.status === "pending") ? "Pending" : "Confirmed"} tone="muted" /> },
+    { key: "receiving", label: isZh ? "Receiving Status" : "Receiving Status", width: "130px", render: (row) => <TableFieldChip label={receivingRecords.some((record) => orders.some((order) => order.orderId === record.orderId && order.requestId === row.requestId)) ? "Linked" : "-"} tone="muted" /> },
+    {
+      key: "action",
+      label: isZh ? "Action" : "Action",
+      width: "70px",
+      render: () => (
+        <Button variant="ghost" size="icon" className="h-7 w-7">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      ),
+    },
+  ];
+
+  const toggleRow = (id: string) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = (checked: boolean, ids: string[]) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (checked) ids.forEach((id) => next.add(id));
+      else ids.forEach((id) => next.delete(id));
+      return next;
+    });
+  };
+
+  if (!data || !pageData) return null;
 
   return (
     <ErpShell activeHref="/psi/procurement">
@@ -63,29 +157,32 @@ export default function PsiProcurementPage() {
           }
         />
 
+        <TableViewTabs tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+
         <CompactStatStrip
           items={[
             { label: isZh ? "PR Open" : "PR Open", value: pageData?.stats.totalRequests ?? 0 },
-            { label: isZh ? "Waiting Approval" : "Waiting Approval", value: waitingApproval.length, tone: "warning" },
+            { label: isZh ? "Waiting Approval" : "Waiting Approval", value: requests.filter((item) => item.status === "pending" || item.status === "review").length, tone: "warning" },
             { label: isZh ? "PO Issued" : "PO Issued", value: pageData?.stats.totalOrders ?? 0, tone: "success" },
             { label: isZh ? "Supplier Pending" : "Supplier Pending", value: issues.filter((item) => item.status === "pending").length, tone: "danger" },
           ]}
         />
 
-        <ListToolbar
+        <TableActionBar
           searchPlaceholder={isZh ? "搜索 PR / PO 单号..." : "Search PR / PO No..."}
+          selectedCount={selectedRowIds.size}
           filters={
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "分支: 全部" : "Branch: All"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "供应商: 全部" : "Supplier: All"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "优先级: 全部" : "Priority: All"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed text-primary border-primary/30 bg-primary/5">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-primary border-primary/30 bg-primary/5">
                 {isZh ? "状态: 待审批" : "Status: Pending"}
               </Badge>
             </div>
@@ -98,47 +195,16 @@ export default function PsiProcurementPage() {
               title={isZh ? "采购申请与订单列表" : "Procurement Request / PO List"}
               className="p-3"
             >
-              <ModuleMatrixTable
-                gridTemplateColumns="100px 80px 100px 120px 80px 100px 100px 100px 100px 120px 120px 80px 80px"
-                columns={[
-                  isZh ? "单号" : "PR No",
-                  isZh ? "分支" : "Branch",
-                  isZh ? "申请人" : "Requester",
-                  isZh ? "供应商" : "Supplier",
-                  isZh ? "品项" : "Items",
-                  isZh ? "总金额" : "Total Amount",
-                  isZh ? "需求日期" : "Need By",
-                  isZh ? "审批" : "Approval",
-                  isZh ? "PO 状态" : "PO Status",
-                  isZh ? "供应商确认" : "Supplier Confirm",
-                  isZh ? "收货状态" : "Receiving Status",
-                  isZh ? "操作" : "Action",
-                ]}
-              >
-                {requests.map((pr) => (
-                  <ModuleMatrixRow
-                    key={pr.requestId}
-                    href={`/psi/procurement/${pr.requestId}`}
-                    gridTemplateColumns="100px 80px 100px 120px 80px 100px 100px 100px 100px 120px 120px 80px 80px"
-                  >
-                    <p className={moduleVisual.title}>{pr.requestNo}</p>
-                    <p className={moduleVisual.body}>{pr.storeId}</p>
-                    <p className={moduleVisual.body}>{pr.audit.createdBy || "-"}</p>
-                    <p className={moduleVisual.body}>{pr.supplierId || "-"}</p>
-                    <p className={moduleVisual.body}>{pr.lines.length}</p>
-                    <p className={moduleVisual.title}>{pr.totalAmount.amount}</p>
-                    <p className={moduleVisual.body}>{pr.neededBy || "-"}</p>
-                    <Badge variant={pr.status === "approved" ? "outline" : pr.status === "rejected" ? "destructive" : "secondary"} className="text-[10px] w-fit">
-                      {pr.status}
-                    </Badge>
-                    <p className={moduleVisual.body}>-</p>
-                    <p className={moduleVisual.body}>-</p>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </ModuleMatrixRow>
-                ))}
-              </ModuleMatrixTable>
+              <MultidimensionalTable
+                columns={columns}
+                rows={filteredRequests}
+                rowIdKey="requestId"
+                selectedRowIds={selectedRowIds}
+                onToggleRow={toggleRow}
+                onToggleAll={toggleAll}
+                selectedRecordId={focusedRequest?.requestId}
+                onRowFocus={setFocusedRequestId}
+              />
             </ModuleSection>
 
             <ModuleSection
@@ -161,29 +227,56 @@ export default function PsiProcurementPage() {
             </ModuleSection>
           </div>
 
-          <div className="space-y-3 xl:sticky xl:top-4 self-start">
-            <ContextQueuePanel title={isZh ? "Approval Queue" : "Approval Queue"}>
-              {waitingApproval.map((pr) => (
-                <div key={pr.requestId} className="rounded-md border border-border/60 px-2.5 py-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className={moduleVisual.title}>{pr.requestNo}</p>
-                    <Badge variant="outline" className="text-[10px]">{pr.priority}</Badge>
-                  </div>
-                  <p className={moduleVisual.muted}>{pr.totalAmount.amount} {pr.totalAmount.currency}</p>
-                </div>
-              ))}
-            </ContextQueuePanel>
-            <ContextQueuePanel title={isZh ? "Overdue PO" : "Overdue PO"}>
-              <p className={moduleVisual.muted}>{isZh ? "暂无逾期订单" : "No overdue purchase orders."}</p>
-            </ContextQueuePanel>
-            <ContextQueuePanel title={isZh ? "Linked Variance" : "Linked Variance"}>
-              {issues.map((issue) => (
-                <div key={issue.issueId} className="rounded-md border border-destructive/30 bg-destructive/5 px-2.5 py-2">
-                  <p className={cn(moduleVisual.title, "text-destructive")}>{issue.title[locale]}</p>
-                  <p className={moduleVisual.muted}>{issue.issueId}</p>
-                </div>
-              ))}
-            </ContextQueuePanel>
+          <div className="xl:sticky xl:top-4 self-start">
+            <RecordDetailPanel
+              title={isZh ? "选中采购申请" : "Selected PR"}
+              subtitle={focusedRequest?.requestNo ?? "-"}
+              fields={[
+                { label: isZh ? "PR No" : "PR No", value: focusedRequest?.requestNo ?? "-" },
+                { label: isZh ? "供应商" : "Supplier", value: focusedRequest?.supplierId ?? "-" },
+                { label: isZh ? "分支" : "Branch", value: focusedRequest?.storeId ?? "-" },
+                { label: isZh ? "金额" : "Amount", value: focusedRequest ? `${focusedRequest.totalAmount.amount} ${focusedRequest.totalAmount.currency}` : "-" },
+                { label: isZh ? "审批状态" : "Approval", value: focusedRequest?.status ?? "-" },
+                { label: isZh ? "PO 状态" : "PO Status", value: linkedOrder?.status ?? "-" },
+                { label: isZh ? "收货状态" : "Receiving", value: linkedReceiving?.status ?? "-" },
+                { label: isZh ? "关联差异" : "Linked Variance", value: linkedIssues.length },
+              ]}
+              sections={[
+                {
+                  title: isZh ? "审批时间线" : "Approval Timeline",
+                  items: focusedRequest
+                    ? [
+                        <div key="audit-created">
+                          <p className={moduleVisual.title}>{isZh ? "创建" : "Created"}</p>
+                          <p className={moduleVisual.muted}>{focusedRequest.audit.createdAt}</p>
+                        </div>,
+                        <div key="audit-updated">
+                          <p className={moduleVisual.title}>{isZh ? "更新" : "Updated"}</p>
+                          <p className={moduleVisual.muted}>{focusedRequest.audit.updatedAt}</p>
+                        </div>,
+                        <div key="audit-owner">
+                          <p className={moduleVisual.title}>{isZh ? "创建人" : "Owner"}</p>
+                          <p className={moduleVisual.muted}>{focusedRequest.audit.createdBy ?? "-"}</p>
+                        </div>,
+                      ]
+                    : [
+                    <div key="audit-empty">
+                      <p className={moduleVisual.muted}>-</p>
+                    </div>
+                  ],
+                },
+                {
+                  title: isZh ? "品项汇总" : "Item Summary",
+                  items: (focusedRequest?.lines ?? []).slice(0, 3).map((line) => (
+                    <div key={line.lineId}>
+                      <p className={moduleVisual.title}>{line.productName}</p>
+                      <p className={moduleVisual.muted}>{line.requestedQty.value} {line.requestedQty.unit}</p>
+                    </div>
+                  )),
+                },
+              ]}
+              actionLabels={[isZh ? "审核" : "Review", isZh ? "创建 PO" : "Create PO", isZh ? "添加备注" : "Add Note"]}
+            />
           </div>
         </ModuleTwoColumn>
       </ModulePageStack>

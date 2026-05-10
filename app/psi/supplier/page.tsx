@@ -1,28 +1,26 @@
 "use client";
 
 import { ErpPageHeader, ErpShell } from "@/components/erp";
-import {
-  ModulePageStack,
-  ModuleSection,
-  ModuleMatrixTable,
-  ModuleMatrixRow,
-  ModuleTwoColumn,
-  moduleVisual,
-} from "@/components/erp/module-shell";
+import { ModulePageStack, ModuleSection, ModuleTwoColumn, moduleVisual } from "@/components/erp/module-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CompactStatStrip } from "@/components/operations/compact-stat-strip";
-import { ListToolbar } from "@/components/operations/list-toolbar";
-import { ContextQueuePanel } from "@/components/operations/context-queue-panel";
+import { TableActionBar } from "@/components/operations/table-action-bar";
+import { TableFieldChip } from "@/components/operations/table-field-chip";
+import { TableViewTabs } from "@/components/operations/table-view-tabs";
+import { MultidimensionalTable, type MultiDimColumn } from "@/components/operations/multidimensional-table";
+import { RecordDetailPanel } from "@/components/operations/record-detail-panel";
 import { getPsiSupplierWorkspacePageData } from "@/lib/page-data/psi";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PsiSupplierWorkspacePageData } from "@/lib/page-data/psi";
-import { cn } from "@/lib/utils";
 import { Plus, FileDown, MoreHorizontal, Star } from "lucide-react";
 
 export default function PsiSupplierPage() {
   const [data, setData] = useState<PsiSupplierWorkspacePageData | null>(null);
+  const [viewKey, setViewKey] = useState("all");
+  const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
+  const [focusedSupplierId, setFocusedSupplierId] = useState<string | null>(null);
   const locale = useUiPreferencesStore((state) => state.locale);
   const isZh = locale === "zh";
 
@@ -30,13 +28,102 @@ export default function PsiSupplierPage() {
     getPsiSupplierWorkspacePageData().then(setData);
   }, []);
 
-  if (!data) return null;
-
-  const pageData = data.pageData;
-  const suppliers = pageData?.suppliers ?? [];
-  const issues = pageData?.issues ?? [];
-  const contracts = pageData?.contracts ?? [];
+  const pageData = data?.pageData;
+  const suppliers = useMemo(() => pageData?.suppliers ?? [], [pageData]);
+  const issues = useMemo(() => pageData?.issues ?? [], [pageData]);
+  const contracts = useMemo(() => pageData?.contracts ?? [], [pageData]);
   const contractExpiring = contracts.filter((item) => item.status === "review");
+
+  const viewTabs = useMemo(
+    () => [
+      { key: "all", label: isZh ? "全部供应商" : "All Suppliers", count: suppliers.length },
+      { key: "active", label: isZh ? "活跃" : "Active", count: suppliers.filter((item) => item.status === "active").length },
+      { key: "expiring", label: isZh ? "合同将到期" : "Contract Expiring", count: contractExpiring.length },
+      { key: "quality", label: isZh ? "质量异常" : "Quality Issues", count: issues.length },
+      { key: "review", label: isZh ? "待复核" : "Review Needed", count: suppliers.filter((item) => item.status === "review").length },
+    ],
+    [contractExpiring.length, isZh, issues.length, suppliers]
+  );
+
+  const filteredSuppliers = useMemo(() => {
+    switch (viewKey) {
+      case "active":
+        return suppliers.filter((item) => item.status === "active");
+      case "expiring":
+        return suppliers.filter((item) => contracts.some((contract) => contract.supplierId === item.supplierId && contract.status === "review"));
+      case "quality":
+        return suppliers.filter((item) => issues.some((issue) => issue.supplierId === item.supplierId));
+      case "review":
+        return suppliers.filter((item) => item.status === "review");
+      default:
+        return suppliers;
+    }
+  }, [contracts, issues, suppliers, viewKey]);
+
+  const focusedSupplier = useMemo(() => {
+    if (!filteredSuppliers.length) return null;
+    return filteredSuppliers.find((item) => item.supplierId === focusedSupplierId) ?? filteredSuppliers[0];
+  }, [filteredSuppliers, focusedSupplierId]);
+  const focusedContact = focusedSupplier ? pageData?.contacts.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
+  const focusedContract = focusedSupplier ? contracts.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
+  const focusedRating = focusedSupplier ? pageData?.ratings.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
+  const focusedIssues = focusedSupplier ? issues.filter((item) => item.supplierId === focusedSupplier.supplierId) : [];
+  const focusedProducts = focusedSupplier ? (pageData?.products ?? []).filter((item) => item.supplierId === focusedSupplier.supplierId) : [];
+
+  const columns: MultiDimColumn<(typeof filteredSuppliers)[number]>[] = [
+    { key: "code", label: isZh ? "Supplier Code" : "Supplier Code", width: "110px", render: (row) => <p className={moduleVisual.title}>{row.supplierCode}</p> },
+    { key: "name", label: isZh ? "Supplier Name" : "Supplier Name", width: "1.4fr", render: (row) => <p className={moduleVisual.title}>{row.name}</p> },
+    { key: "category", label: isZh ? "Category" : "Category", width: "100px", render: (row) => <p className={moduleVisual.body}>{row.category}</p> },
+    { key: "region", label: isZh ? "Region/Coverage" : "Region/Coverage", width: "130px", render: (row) => <p className={moduleVisual.body}>{row.serviceRegion}</p> },
+    { key: "contact", label: isZh ? "Contact" : "Contact", width: "100px", render: (row) => <p className={moduleVisual.body}>{(pageData?.contacts.find((item) => item.supplierId === row.supplierId)?.name) ?? "-"}</p> },
+    { key: "phone", label: isZh ? "Phone" : "Phone", width: "120px", render: (row) => <p className={moduleVisual.body}>{(pageData?.contacts.find((item) => item.supplierId === row.supplierId)?.phone) ?? "-"}</p> },
+    { key: "lead", label: isZh ? "Lead Time" : "Lead Time", width: "90px", render: (row) => <p className={moduleVisual.body}>{row.leadTimeDays}d</p> },
+    { key: "contract", label: isZh ? "Contract" : "Contract", width: "110px", render: (row) => <TableFieldChip label={contracts.find((item) => item.supplierId === row.supplierId)?.status ?? "-"} tone="muted" /> },
+    { key: "lastOrder", label: isZh ? "Last Order" : "Last Order", width: "110px", render: () => <p className={moduleVisual.body}>-</p> },
+    { key: "issues", label: isZh ? "Open Issues" : "Open Issues", width: "95px", render: (row) => <p className={moduleVisual.body}>{issues.filter((item) => item.supplierId === row.supplierId).length}</p> },
+    {
+      key: "rating",
+      label: isZh ? "Rating" : "Rating",
+      width: "85px",
+      render: (row) => (
+        <div className="flex items-center gap-1">
+          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+          <span className={moduleVisual.title}>{pageData?.ratings.find((item) => item.supplierId === row.supplierId)?.grade ?? "N/A"}</span>
+        </div>
+      ),
+    },
+    { key: "risk", label: isZh ? "Risk" : "Risk", width: "90px", render: (row) => <TableFieldChip label={issues.some((item) => item.supplierId === row.supplierId) ? "Watch" : "Low"} tone={issues.some((item) => item.supplierId === row.supplierId) ? "warning" : "success"} /> },
+    {
+      key: "action",
+      label: isZh ? "Action" : "Action",
+      width: "70px",
+      render: () => (
+        <Button variant="ghost" size="icon" className="h-7 w-7">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      ),
+    },
+  ];
+
+  const toggleRow = (id: string) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = (checked: boolean, ids: string[]) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (checked) ids.forEach((id) => next.add(id));
+      else ids.forEach((id) => next.delete(id));
+      return next;
+    });
+  };
+
+  if (!data || !pageData) return null;
 
   return (
     <ErpShell activeHref="/psi/supplier">
@@ -63,6 +150,8 @@ export default function PsiSupplierPage() {
           }
         />
 
+        <TableViewTabs tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+
         <CompactStatStrip
           items={[
             { label: isZh ? "Total Suppliers" : "Total Suppliers", value: pageData?.stats.totalSuppliers ?? 0 },
@@ -72,20 +161,21 @@ export default function PsiSupplierPage() {
           ]}
         />
 
-        <ListToolbar
+        <TableActionBar
           searchPlaceholder={isZh ? "搜索供应商名称 / 编码..." : "Search supplier name / code..."}
+          selectedCount={selectedRowIds.size}
           filters={
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "分类: 全部" : "Category: All"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "区域: 全部" : "Region: All"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "合同: 全部" : "Contract: All"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed text-success border-success/30 bg-success/5">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-emerald-400 border-emerald-500/30 bg-emerald-500/5">
                 {isZh ? "状态: 活跃" : "Status: Active"}
               </Badge>
             </div>
@@ -98,57 +188,16 @@ export default function PsiSupplierPage() {
               title={isZh ? "供应商名录" : "Supplier Master List"}
               className="p-3"
             >
-              <ModuleMatrixTable
-                gridTemplateColumns="100px 1.5fr 100px 100px 100px 80px 100px 100px 100px 80px 80px 80px"
-                columns={[
-                  isZh ? "编码" : "Supplier Code",
-                  isZh ? "供应商名称" : "Supplier Name",
-                  isZh ? "分类" : "Category",
-                  isZh ? "区域" : "Region",
-                  isZh ? "联系人" : "Contact",
-                  isZh ? "提前期" : "Lead Time",
-                  isZh ? "合同" : "Contract",
-                  isZh ? "最后订单" : "Last Order",
-                  isZh ? "异常" : "Issues",
-                  isZh ? "评分" : "Rating",
-                  isZh ? "风险" : "Risk",
-                  isZh ? "操作" : "Action",
-                ]}
-              >
-                {suppliers.map((sup) => {
-                  const rating = pageData?.ratings.find(r => r.supplierId === sup.supplierId);
-                  const contact = pageData?.contacts.find(c => c.supplierId === sup.supplierId);
-                  const contract = pageData?.contracts.find(c => c.supplierId === sup.supplierId);
-                  
-                  return (
-                    <ModuleMatrixRow
-                      key={sup.supplierId}
-                      href={`/psi/supplier/${sup.supplierId}`}
-                      gridTemplateColumns="100px 1.5fr 100px 100px 100px 80px 100px 100px 100px 80px 80px 80px"
-                    >
-                      <p className={moduleVisual.title}>{sup.supplierCode}</p>
-                      <p className={moduleVisual.title}>{sup.name}</p>
-                      <p className={moduleVisual.body}>{sup.category}</p>
-                      <p className={moduleVisual.body}>{sup.serviceRegion}</p>
-                      <p className={moduleVisual.body}>{contact?.name || "-"}</p>
-                      <p className={moduleVisual.body}>{sup.leadTimeDays}d</p>
-                    <Badge variant={contract?.status === "active" ? "outline" : "secondary"} className="text-[10px] w-fit">
-                        {contract?.status || "None"}
-                      </Badge>
-                      <p className={moduleVisual.body}>-</p>
-                    <p className={moduleVisual.body}>{issues.filter((item) => item.supplierId === sup.supplierId).length}</p>
-                      <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                        <span className={moduleVisual.title}>{rating?.grade || "N/A"}</span>
-                      </div>
-                    <p className={moduleVisual.body}>{issues.some((item) => item.supplierId === sup.supplierId) ? "Watch" : "Low"}</p>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </ModuleMatrixRow>
-                  );
-                })}
-              </ModuleMatrixTable>
+              <MultidimensionalTable
+                columns={columns}
+                rows={filteredSuppliers}
+                rowIdKey="supplierId"
+                selectedRowIds={selectedRowIds}
+                onToggleRow={toggleRow}
+                onToggleAll={toggleAll}
+                selectedRecordId={focusedSupplier?.supplierId}
+                onRowFocus={setFocusedSupplierId}
+              />
             </ModuleSection>
 
             <ModuleSection
@@ -166,34 +215,50 @@ export default function PsiSupplierPage() {
             </ModuleSection>
           </div>
 
-          <div className="space-y-3 xl:sticky xl:top-4 self-start">
-            <ContextQueuePanel title={isZh ? "Supplier Pulse" : "Supplier Pulse"}>
-              {suppliers.slice(0, 3).map((supplierItem) => (
-                <div key={supplierItem.supplierId} className="rounded-md border border-border/60 px-2.5 py-2">
-                  <p className={moduleVisual.title}>{supplierItem.name}</p>
-                  <p className={moduleVisual.muted}>{supplierItem.supplierCode} · {supplierItem.status}</p>
-                </div>
-              ))}
-            </ContextQueuePanel>
-            <ContextQueuePanel title={isZh ? "Contract Expiry" : "Contract Expiry"}>
-              {contractExpiring.map((contractItem) => (
-                <div key={contractItem.contractId} className="rounded-md border border-border/60 px-2.5 py-2">
-                  <p className={moduleVisual.title}>{contractItem.contractNo}</p>
-                  <p className={moduleVisual.muted}>{contractItem.effectiveTo ?? "-"}</p>
-                </div>
-              ))}
-            </ContextQueuePanel>
-            <ContextQueuePanel title={isZh ? "Quality Issues" : "Quality Issues"}>
-              {issues.map((issue) => (
-                <div key={issue.issueId} className="rounded-md border border-destructive/30 bg-destructive/5 px-2.5 py-2">
-                  <p className={cn(moduleVisual.title, "text-destructive")}>{issue.title[locale]}</p>
-                  <p className={moduleVisual.muted}>{issue.supplierId}</p>
-                </div>
-              ))}
-            </ContextQueuePanel>
-            <ContextQueuePanel title={isZh ? "Late Response" : "Late Response"}>
-              <p className={moduleVisual.muted}>{isZh ? "当前无超时回复供应商。" : "No suppliers currently beyond response SLA."}</p>
-            </ContextQueuePanel>
+          <div className="xl:sticky xl:top-4 self-start">
+            <RecordDetailPanel
+              title={isZh ? "选中供应商" : "Selected Supplier"}
+              subtitle={focusedSupplier ? `${focusedSupplier.name} / ${focusedSupplier.supplierCode}` : "-"}
+              fields={[
+                { label: isZh ? "分类" : "Category", value: focusedSupplier?.category ?? "-" },
+                { label: isZh ? "联系人" : "Contact", value: focusedContact?.name ?? "-" },
+                { label: isZh ? "电话" : "Phone", value: focusedContact?.phone ?? "-" },
+                { label: isZh ? "覆盖区域" : "Branch Coverage", value: focusedSupplier?.serviceRegion ?? "-" },
+                { label: isZh ? "合同状态" : "Contract", value: focusedContract?.status ?? "-" },
+                { label: isZh ? "质量问题数" : "Quality Issues", value: focusedIssues.length },
+                { label: isZh ? "评分" : "Rating", value: focusedRating?.grade ?? "N/A" },
+              ]}
+              sections={[
+                {
+                  title: isZh ? "最近订单" : "Recent Orders",
+                  items: focusedProducts.slice(0, 3).map((item) => (
+                    <div key={item.productLinkId}>
+                      <p className={moduleVisual.title}>{item.productName}</p>
+                      <p className={moduleVisual.muted}>MOQ {item.moq}</p>
+                    </div>
+                  )),
+                },
+                {
+                  title: isZh ? "证照/文档" : "Documents / Certificates",
+                  items: [
+                    <div key="doc-status">
+                      <p className={moduleVisual.title}>{isZh ? "营业执照" : "Business License"}</p>
+                      <p className={moduleVisual.muted}>{isZh ? "有效（预览）" : "Valid (Preview)"}</p>
+                    </div>,
+                  ],
+                },
+                {
+                  title: isZh ? "活动" : "Activity",
+                  items: focusedIssues.slice(0, 3).map((issue) => (
+                    <div key={issue.issueId}>
+                      <p className={moduleVisual.title}>{issue.title[locale]}</p>
+                      <p className={moduleVisual.muted}>{issue.status}</p>
+                    </div>
+                  )),
+                },
+              ]}
+              actionLabels={[isZh ? "查看档案" : "View Profile", isZh ? "添加备注" : "Add Note", isZh ? "关联 PR" : "Link PR"]}
+            />
           </div>
         </ModuleTwoColumn>
       </ModulePageStack>

@@ -4,25 +4,28 @@ import { ErpPageHeader, ErpShell } from "@/components/erp";
 import {
   ModulePageStack,
   ModuleSection,
-  ModuleMatrixTable,
-  ModuleMatrixRow,
   ModuleTwoColumn,
   moduleVisual,
 } from "@/components/erp/module-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CompactStatStrip } from "@/components/operations/compact-stat-strip";
-import { ListToolbar } from "@/components/operations/list-toolbar";
-import { ContextQueuePanel } from "@/components/operations/context-queue-panel";
+import { TableActionBar } from "@/components/operations/table-action-bar";
+import { TableFieldChip } from "@/components/operations/table-field-chip";
+import { TableViewTabs } from "@/components/operations/table-view-tabs";
+import { MultidimensionalTable, type MultiDimColumn } from "@/components/operations/multidimensional-table";
+import { RecordDetailPanel } from "@/components/operations/record-detail-panel";
 import { getPsiProcurementWorkspacePageData } from "@/lib/page-data/psi";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { PsiProcurementWorkspacePageData } from "@/lib/page-data/psi";
-import { cn } from "@/lib/utils";
 import { Plus, FileDown, MoreHorizontal } from "lucide-react";
 
 export default function ReceivingPage() {
   const [data, setData] = useState<PsiProcurementWorkspacePageData | null>(null);
+  const [viewKey, setViewKey] = useState("all");
+  const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
+  const [focusedReceivingId, setFocusedReceivingId] = useState<string | null>(null);
   const locale = useUiPreferencesStore((state) => state.locale);
   const isZh = locale === "zh";
 
@@ -30,12 +33,93 @@ export default function ReceivingPage() {
     getPsiProcurementWorkspacePageData().then(setData);
   }, []);
 
-  if (!data) return null;
-
-  const pageData = data.pageData;
-  const receiving = pageData?.receivingRecords ?? [];
-  const issues = pageData?.purchaseIssues.filter(i => i.issueType === "receiving") ?? [];
+  const pageData = data?.pageData;
+  const receiving = useMemo(() => pageData?.receivingRecords ?? [], [pageData]);
+  const orders = useMemo(() => pageData?.purchaseOrders ?? [], [pageData]);
+  const issues = useMemo(() => (pageData?.purchaseIssues ?? []).filter((item) => item.issueType === "receiving"), [pageData]);
   const pendingPosting = receiving.filter((item) => item.status === "pending");
+  const disputedReceiving = receiving.filter((item) => item.status === "disputed");
+
+  const viewTabs = useMemo(
+    () => [
+      { key: "all", label: isZh ? "全部收货" : "All Receiving", count: receiving.length },
+      { key: "pending", label: isZh ? "待过账" : "Pending Posting", count: pendingPosting.length },
+      { key: "disputed", label: isZh ? "差异异常" : "Variance Disputed", count: disputedReceiving.length },
+      { key: "completed", label: isZh ? "已完成" : "Completed", count: receiving.filter((item) => item.status === "completed").length },
+      { key: "issue", label: isZh ? "异常事项" : "Issue Linked", count: issues.length },
+    ],
+    [disputedReceiving.length, isZh, issues.length, pendingPosting.length, receiving]
+  );
+
+  const filteredReceiving = useMemo(() => {
+    switch (viewKey) {
+      case "pending":
+        return receiving.filter((item) => item.status === "pending");
+      case "disputed":
+        return receiving.filter((item) => item.status === "disputed");
+      case "completed":
+        return receiving.filter((item) => item.status === "completed");
+      case "issue":
+        return receiving.filter((item) => issues.some((issue) => issue.orderId === item.orderId));
+      default:
+        return receiving;
+    }
+  }, [issues, receiving, viewKey]);
+
+  const focusedReceiving = useMemo(() => {
+    if (!filteredReceiving.length) return null;
+    return filteredReceiving.find((item) => item.receivingId === focusedReceivingId) ?? filteredReceiving[0];
+  }, [filteredReceiving, focusedReceivingId]);
+  const focusedOrder = focusedReceiving ? orders.find((item) => item.orderId === focusedReceiving.orderId) : null;
+  const focusedIssues = focusedReceiving ? issues.filter((item) => item.orderId === focusedReceiving.orderId) : [];
+
+  const columns: MultiDimColumn<(typeof filteredReceiving)[number]>[] = [
+    { key: "grn", label: isZh ? "GRN No" : "GRN No", width: "120px", render: (row) => <p className={moduleVisual.title}>{row.receivingNo}</p> },
+    { key: "po", label: isZh ? "PO No" : "PO No", width: "120px", render: (row) => <p className={moduleVisual.body}>{row.orderId}</p> },
+    { key: "supplier", label: isZh ? "Supplier" : "Supplier", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.supplierId}</p> },
+    { key: "branch", label: isZh ? "Branch" : "Branch", width: "95px", render: (row) => <p className={moduleVisual.body}>{row.warehouseId}</p> },
+    { key: "receivedDate", label: isZh ? "Received At" : "Received At", width: "120px", render: (row) => <p className={moduleVisual.body}>{row.receivedAt.split("T")[0]}</p> },
+    { key: "lines", label: isZh ? "Items" : "Items", width: "70px", render: (row) => <p className={moduleVisual.body}>{row.lines.length}</p> },
+    {
+      key: "variance",
+      label: isZh ? "Variance" : "Variance",
+      width: "95px",
+      render: (row) => <TableFieldChip label={row.status === "disputed" ? (isZh ? "发现" : "Found") : (isZh ? "无" : "None")} tone={row.status === "disputed" ? "danger" : "success"} />,
+    },
+    { key: "inspection", label: isZh ? "Inspection" : "Inspection", width: "95px", render: (row) => <TableFieldChip label={row.status === "completed" ? (isZh ? "通过" : "Passed") : (isZh ? "待处理" : "Pending")} tone={row.status === "completed" ? "success" : "warning"} /> },
+    { key: "posting", label: isZh ? "Posting" : "Posting", width: "95px", render: (row) => <TableFieldChip label={row.status} tone={row.status === "completed" ? "success" : row.status === "disputed" ? "danger" : "warning"} /> },
+    { key: "issues", label: isZh ? "Linked Issues" : "Linked Issues", width: "100px", render: (row) => <p className={moduleVisual.body}>{issues.filter((item) => item.orderId === row.orderId).length}</p> },
+    {
+      key: "action",
+      label: isZh ? "Action" : "Action",
+      width: "70px",
+      render: () => (
+        <Button variant="ghost" size="icon" className="h-7 w-7">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      ),
+    },
+  ];
+
+  const toggleRow = (id: string) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = (checked: boolean, ids: string[]) => {
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (checked) ids.forEach((id) => next.add(id));
+      else ids.forEach((id) => next.delete(id));
+      return next;
+    });
+  };
+
+  if (!data || !pageData) return null;
 
   return (
     <ErpShell activeHref="/psi/receiving">
@@ -71,20 +155,23 @@ export default function ReceivingPage() {
           ]}
         />
 
-        <ListToolbar
+        <TableViewTabs tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+
+        <TableActionBar
           searchPlaceholder={isZh ? "搜索 GRN / PO 单号..." : "Search GRN / PO No..."}
+          selectedCount={selectedRowIds.size}
           filters={
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "分支: 全部" : "Branch: All"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "供应商: 全部" : "Supplier: All"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
                 {isZh ? "差异: 仅有差异" : "Variance: Only Variance"}
               </Badge>
-              <Badge variant="outline" className="h-8 px-2.5 font-normal border-dashed text-primary border-primary/30 bg-primary/5">
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-primary border-primary/30 bg-primary/5">
                 {isZh ? "过账: 待过账" : "Posting: Pending"}
               </Badge>
             </div>
@@ -97,51 +184,16 @@ export default function ReceivingPage() {
               title={isZh ? "收货记录与 GRN 列表" : "GRN / Receiving List"}
               className="p-3"
             >
-              <ModuleMatrixTable
-                gridTemplateColumns="120px 120px 1.5fr 100px 120px 120px 120px 80px 100px 100px 100px 80px"
-                columns={[
-                  isZh ? "收货单号" : "GRN No",
-                  isZh ? "PO 单号" : "PO No",
-                  isZh ? "供应商" : "Supplier",
-                  isZh ? "分支" : "Branch",
-                  isZh ? "预计日期" : "Expected",
-                  isZh ? "收货日期" : "Received",
-                  isZh ? "收货人" : "Received By",
-                  isZh ? "品项" : "Items",
-                  isZh ? "数量差异" : "Variance",
-                  isZh ? "验收状态" : "Inspection",
-                  isZh ? "过账状态" : "Posting",
-                  isZh ? "操作" : "Action",
-                ]}
-              >
-                {receiving.map((rcv) => (
-                  <ModuleMatrixRow
-                    key={rcv.receivingId}
-                    href={`/psi/receiving/${rcv.receivingId}`}
-                    gridTemplateColumns="120px 120px 1.5fr 100px 120px 120px 120px 80px 100px 100px 100px 80px"
-                    className="py-2.5"
-                  >
-                    <p className={moduleVisual.title}>{rcv.receivingNo}</p>
-                    <p className={moduleVisual.body}>{rcv.orderId}</p>
-                    <p className={moduleVisual.body}>{rcv.supplierId}</p>
-                    <p className={moduleVisual.body}>{rcv.warehouseId}</p>
-                    <p className={moduleVisual.body}>-</p>
-                    <p className={moduleVisual.body}>{rcv.receivedAt.split('T')[0]}</p>
-                    <p className={moduleVisual.body}>-</p>
-                    <p className={moduleVisual.body}>{rcv.lines.length}</p>
-                    <p className={cn(moduleVisual.title, rcv.status === "disputed" ? "text-destructive" : "text-success")}>
-                      {rcv.status === "disputed" ? "Found" : "None"}
-                    </p>
-                    <p className={moduleVisual.body}>-</p>
-                    <Badge variant={rcv.status === "completed" ? "outline" : "secondary"} className="text-[10px] w-fit">
-                      {rcv.status}
-                    </Badge>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </ModuleMatrixRow>
-                ))}
-              </ModuleMatrixTable>
+              <MultidimensionalTable
+                columns={columns}
+                rows={filteredReceiving}
+                rowIdKey="receivingId"
+                selectedRowIds={selectedRowIds}
+                onToggleRow={toggleRow}
+                onToggleAll={toggleAll}
+                selectedRecordId={focusedReceiving?.receivingId}
+                onRowFocus={setFocusedReceivingId}
+              />
             </ModuleSection>
 
             <ModuleSection
@@ -164,36 +216,51 @@ export default function ReceivingPage() {
             </ModuleSection>
           </div>
 
-          <div className="space-y-3 xl:sticky xl:top-4 self-start">
-            <ContextQueuePanel title={isZh ? "Expected Arrivals" : "Expected Arrivals"}>
-              <div className="rounded-md border border-border/60 px-2.5 py-2">
-                <div className="flex items-center justify-between">
-                  <p className={moduleVisual.title}>PO-1002</p>
-                  <Badge variant="outline" className="text-[10px]">{isZh ? "今日" : "Today"}</Badge>
-                </div>
-                <p className={moduleVisual.muted}>SUP-1003 · 180 cups</p>
-              </div>
-            </ContextQueuePanel>
-            <ContextQueuePanel title={isZh ? "Variance Queue" : "Variance Queue"}>
-              {issues.map((issue) => (
-                <div key={issue.issueId} className="rounded-md border border-destructive/30 bg-destructive/5 px-2.5 py-2">
-                  <p className={cn(moduleVisual.title, "text-destructive")}>{issue.title[locale]}</p>
-                  <p className={moduleVisual.muted}>{issue.orderId} · {issue.status}</p>
-                </div>
-              ))}
-            </ContextQueuePanel>
-            <ContextQueuePanel title={isZh ? "Posting Blocked" : "Posting Blocked"}>
-              {pendingPosting.length ? (
-                pendingPosting.map((item) => (
-                  <div key={item.receivingId} className="rounded-md border border-border/60 px-2.5 py-2">
-                    <p className={moduleVisual.title}>{item.receivingNo}</p>
-                    <p className={moduleVisual.muted}>{item.orderId}</p>
-                  </div>
-                ))
-              ) : (
-                <p className={moduleVisual.muted}>{isZh ? "暂无过账阻塞" : "No posting blocked."}</p>
-              )}
-            </ContextQueuePanel>
+          <div className="xl:sticky xl:top-4 self-start">
+            <RecordDetailPanel
+              title={isZh ? "选中收货记录" : "Selected Receiving"}
+              subtitle={focusedReceiving?.receivingNo ?? "-"}
+              fields={[
+                { label: isZh ? "PO No" : "PO No", value: focusedReceiving?.orderId ?? "-" },
+                { label: isZh ? "供应商" : "Supplier", value: focusedReceiving?.supplierId ?? "-" },
+                { label: isZh ? "分支/仓库" : "Branch / Warehouse", value: focusedReceiving?.warehouseId ?? "-" },
+                { label: isZh ? "收货日期" : "Received Date", value: focusedReceiving?.receivedAt.split("T")[0] ?? "-" },
+                { label: isZh ? "品项数" : "Items", value: focusedReceiving?.lines.length ?? "-" },
+                { label: isZh ? "收货状态" : "Receiving Status", value: focusedReceiving?.status ?? "-" },
+                { label: isZh ? "过账状态" : "Posting Status", value: focusedReceiving?.status ?? "-" },
+                { label: isZh ? "关联异常" : "Linked Issues", value: focusedIssues.length },
+              ]}
+              sections={[
+                {
+                  title: isZh ? "收货明细摘要" : "Line Summary",
+                  items: (focusedReceiving?.lines ?? []).slice(0, 3).map((line) => (
+                    <div key={line.lineId}>
+                      <p className={moduleVisual.title}>{line.skuId}</p>
+                      <p className={moduleVisual.muted}>{line.receivedQty.value} {line.receivedQty.unit}</p>
+                    </div>
+                  )),
+                },
+                {
+                  title: isZh ? "关联采购订单" : "Linked Purchase Order",
+                  items: [
+                    <div key={focusedOrder?.orderId ?? "no-order"}>
+                      <p className={moduleVisual.title}>{focusedOrder?.orderNo ?? "-"}</p>
+                      <p className={moduleVisual.muted}>{focusedOrder?.status ?? "-"}</p>
+                    </div>,
+                  ],
+                },
+                {
+                  title: isZh ? "差异/异常事项" : "Variance / Issues",
+                  items: focusedIssues.slice(0, 3).map((issue) => (
+                    <div key={issue.issueId}>
+                      <p className={moduleVisual.title}>{issue.title[locale]}</p>
+                      <p className={moduleVisual.muted}>{issue.status}</p>
+                    </div>
+                  )),
+                },
+              ]}
+              actionLabels={[isZh ? "查看 GRN" : "View GRN", isZh ? "添加备注" : "Add Note", isZh ? "关联问题" : "Link Issue"]}
+            />
           </div>
         </ModuleTwoColumn>
       </ModulePageStack>
