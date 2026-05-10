@@ -1,11 +1,9 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Menu } from "lucide-react";
 import { ErpSidebar } from "./erp-sidebar";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ErpTopbar } from "./erp-topbar";
+import { ErpMobileBottomNav } from "./erp-mobile-bottom-nav";
 
 export function ErpShell({
   activeHref,
@@ -33,24 +31,12 @@ export function ErpShell({
                 <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Enterprise ERP</div>
               </div>
             </div>
-
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="h-9 w-9">
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[280px] p-0">
-                <SheetHeader className="sr-only">
-                  <SheetTitle>ERP Navigation</SheetTitle>
-                  <SheetDescription>Mobile navigation for ME Branch ERP modules.</SheetDescription>
-                </SheetHeader>
-                <ErpSidebar activeHref={activeHref} />
-              </SheetContent>
-            </Sheet>
           </div>
-          <ErpTopbar />
-          <main className="min-h-0 flex-1 overflow-y-auto p-3 md:p-4">{children}</main>
+          <div className="hidden md:block">
+            <ErpTopbar />
+          </div>
+          <main className="min-h-0 flex-1 overflow-y-auto p-3 pb-24 md:p-4 md:pb-4">{children}</main>
+          <ErpMobileBottomNav />
         </div>
       </div>
     </div>
