@@ -792,7 +792,7 @@ export default function InventoryPage() {
             <FullItemDetail item={selectedItem} onBack={() => setViewMode("grid")} onPreview={showPreview} />
           </section>
         ) : (
-          <section className="space-y-4">
+          <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
             <div className="rounded-xl border border-border bg-card">
               <div className="flex items-center justify-between border-b border-border p-4">
                 <div>
@@ -825,35 +825,11 @@ export default function InventoryPage() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                    Selected SKU Summary
-                  </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <span className="text-base font-semibold text-foreground">{selectedItem.itemName}</span>
-                    <Badge variant="outline">{selectedItem.sku}</Badge>
-                    <Badge variant={selectedItem.risk === "high" ? "destructive" : "outline"}>{selectedItem.risk}</Badge>
-                  </div>
-                </div>
-
-                <Button onClick={() => openDetail(selectedItem.sku)}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  View Detail
-                </Button>
-              </div>
-
-              <div className="mt-4 grid gap-2 md:grid-cols-4 xl:grid-cols-7">
-                <FactRow label="Current Stock" value={selectedItem.currentStock} />
-                <FactRow label="Safety Stock" value={selectedItem.safetyStock} />
-                <FactRow label="Reorder Point" value={selectedItem.reorderPoint} />
-                <FactRow label="Coverage Days" value={selectedItem.coverageDays} />
-                <FactRow label="Purchase UOM" value={selectedItem.purchaseUom} />
-                <FactRow label="Unit Cost" value={selectedItem.unitCost} />
-                <FactRow label="BOM Usage" value={selectedItem.bomUsage} />
-              </div>
-            </div>
+            <GridSummaryDetail
+              item={selectedItem}
+              onViewDetail={() => openDetail(selectedItem.sku)}
+              onPreview={showPreview}
+            />
           </section>
         )}
 
