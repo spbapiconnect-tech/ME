@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
  * Visual tokens for ERP module pages, unified with /branches design.
  */
 export const moduleVisual = {
-  pageStack: "space-y-6",
+  pageStack: "space-y-4",
   
   // Containers
-  section: "rounded-xl border border-border bg-card p-5 shadow-sm",
+  section: "rounded-xl border border-border bg-card p-4 shadow-sm",
   card: "rounded-[20px] border border-border/70 bg-card p-4 shadow-sm transition",
   cardHover: "hover:-translate-y-0.5 hover:border-primary/35 hover:bg-muted/35 hover:shadow-md",
   
@@ -32,9 +32,9 @@ export const moduleVisual = {
   // Table / Matrix
   tableWrapper: "overflow-hidden rounded-xl border border-border bg-card",
   tableScroll: "overflow-x-auto",
-  tableContent: "max-h-[460px] min-w-[980px] overflow-y-auto xl:min-w-0",
+  tableContent: "max-h-[620px] min-w-[980px] overflow-y-auto xl:min-w-0",
   tableHeader: "sticky top-0 z-10 grid border-b border-border bg-muted/80 px-4 py-3 backdrop-blur",
-  tableRow: "grid items-center border-b border-border/70 px-4 py-4 transition hover:bg-muted/30 last:border-b-0",
+  tableRow: "grid items-center border-b border-border/70 px-4 py-2.5 transition hover:bg-muted/30 last:border-b-0",
   
   // Pills / Badges
   pill: "inline-flex rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground",
@@ -286,4 +286,3 @@ export function ModuleTwoColumn({
     </div>
   );
 }
-
