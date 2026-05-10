@@ -13,6 +13,7 @@ import {
 import { ErpShell } from "@/components/erp/erp-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { MultidimensionalTable, type MultiDimColumn } from "@/components/operations/multidimensional-table";
 
 type InventoryItem = {
   sku: string;
@@ -402,7 +403,7 @@ function QuickList({
 
       <div className="overflow-hidden px-3 pt-3">
         <div className="grid h-10 grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          <div className="me-grid-action-cell flex justify-center">
+          <div className="me-inventory-sticky-check flex justify-center">
             <span className="h-5 w-5 rounded border border-primary/70" />
           </div>
           <div>SKU</div>
@@ -429,7 +430,7 @@ function QuickList({
                   active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                 ].join(" ")}
               >
-                <div className="me-grid-action-cell flex justify-center">
+                <div className="me-inventory-sticky-check flex justify-center">
                   <button
                     type="button"
                     aria-label={`Select ${item.sku}`}
@@ -445,7 +446,7 @@ function QuickList({
                 </div>
                 <div className="font-semibold text-foreground">{item.sku}</div>
                 <div className="truncate font-medium">{item.itemName}</div>
-                <div className="me-grid-action-cell flex justify-center">
+                <div className="me-inventory-sticky-check flex justify-center">
                   <Button
                     type="button"
                     variant="ghost"
@@ -469,7 +470,7 @@ function QuickList({
               key={`empty-${index}`}
               className="grid h-[38px] grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center border-b border-border text-sm text-muted-foreground/35"
             >
-              <div className="me-grid-action-cell flex justify-center">
+              <div className="me-inventory-sticky-check flex justify-center">
                 <span className="h-5 w-5 rounded border border-border/70" />
               </div>
               <div>—</div>
@@ -679,6 +680,40 @@ export default function InventoryPage() {
     setPreviewMessage(`${label} preview only. No API, database, stock posting, formula, brain, or write executed.`);
   };
 
+  const gridColumns: MultiDimColumn<InventoryItem>[] = [
+    { key: "sku", label: "SKU", width: "120px", render: (row) => <span className="font-semibold text-foreground">{row.sku}</span> },
+    { key: "item", label: "Item Name", width: "220px", render: (row) => <span className="truncate font-medium">{row.itemName}</span> },
+    { key: "category", label: "Category", width: "120px", render: (row) => <span className="text-muted-foreground">{row.category}</span> },
+    { key: "branch", label: "Branch", width: "100px", render: (row) => <span className="text-muted-foreground">{row.branch}</span> },
+    { key: "storage", label: "Storage", width: "100px", render: (row) => <span className="text-muted-foreground">{row.storage}</span> },
+    { key: "stock", label: "Current Stock", width: "130px", render: (row) => <span className={row.risk === "high" ? "font-semibold text-destructive" : "font-semibold text-foreground"}>{row.currentStock}</span> },
+    { key: "uom", label: "UOM", width: "80px", render: (row) => <span className="text-muted-foreground">{row.stockUom}</span> },
+    { key: "safety", label: "Safety", width: "100px", render: (row) => <span className="text-muted-foreground">{row.safetyStock}</span> },
+    { key: "coverage", label: "Coverage", width: "110px", render: (row) => <span className="text-muted-foreground">{row.coverageDays}</span> },
+    { key: "supplier", label: "Supplier", width: "170px", render: (row) => <span className="block truncate text-muted-foreground">{row.primarySupplier}</span> },
+    { key: "cost", label: "Unit Cost", width: "140px", render: (row) => <span className="block truncate text-muted-foreground">{row.unitCost}</span> },
+    {
+      key: "action",
+      label: "Action",
+      width: "64px",
+      render: (row) => (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-md"
+          onClick={(event) => {
+            event.stopPropagation();
+            openDetail(row.sku);
+          }}
+          title={`View ${row.sku} detail`}
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <ErpShell activeHref="/psi/inventory">
       <div className="space-y-4">
@@ -770,91 +805,23 @@ export default function InventoryPage() {
                 </Button>
               </div>
 
-              <div className="overflow-x-auto p-3">
-                <div className="min-w-[1250px]">
-                  <div className="grid h-10 grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_110px_56px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                    {["", "SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "UOM", "Safety", "Coverage", "Supplier", "Unit Cost", ""].map((head, index) => (
-                      <div key={`${head}-${index}`} className={head === "Action" || head === "" ? "me-grid-action-header px-0 text-center" : "px-3"}>{head}</div>
-                    ))}
-                  </div>
-
-                  <div className="min-h-[760px] border-x border-border">
-                    {inventoryItems.map((item) => {
-                      const active = selectedSku === item.sku;
-                      const checked = selectedRows.includes(item.sku);
-
-                      return (
-                        <div
-                          key={item.sku}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => selectRow(item.sku)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter" || event.key === " ") selectRow(item.sku);
-                          }}
-                          className={[
-                            "grid h-[38px] cursor-pointer grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_110px_56px] items-center border-b border-border text-sm transition",
-                            active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
-                          ].join(" ")}
-                        >
-                          <div className="me-grid-action-cell flex justify-center">
-                            <button
-                              type="button"
-                              aria-label={`Select ${item.sku}`}
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                toggleRow(item.sku);
-                              }}
-                              className={[
-                                "h-5 w-5 rounded border",
-                                checked ? "border-primary bg-primary/20" : "border-primary/70",
-                              ].join(" ")}
-                            />
-                          </div>
-                          <div className="px-3 font-semibold text-foreground">{item.sku}</div>
-                          <div className="truncate px-3 font-medium">{item.itemName}</div>
-                          <div className="px-3 text-muted-foreground">{item.category}</div>
-                          <div className="px-3 text-muted-foreground">{item.branch}</div>
-                          <div className="px-3 text-muted-foreground">{item.storage}</div>
-                          <div className={["px-3 font-semibold", item.risk === "high" ? "text-destructive" : "text-foreground"].join(" ")}>{item.currentStock}</div>
-                          <div className="px-3 text-muted-foreground">{item.stockUom}</div>
-                          <div className="px-3 text-muted-foreground">{item.safetyStock}</div>
-                          <div className="px-3 text-muted-foreground">{item.coverageDays}</div>
-                          <div className="truncate px-3 text-muted-foreground">{item.primarySupplier}</div>
-                          <div className="px-3 text-muted-foreground">{item.unitCost}</div>
-                          <div className="me-grid-action-cell flex justify-center">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                openDetail(item.sku);
-                              }}
-                              title={`View ${item.sku} detail`}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex h-12 flex-wrap items-center justify-between gap-2 rounded-b-lg border border-border bg-secondary/10 px-3 text-xs text-muted-foreground">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span>Showing 1–20 of 872</span>
-                      <span>Selected {selectedRows.length}</span>
-                      <span>Rows per page 20 / 50 / 100</span>
-                      <span>Page 1 of 44</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="h-8">Prev</Button>
-                      <Button variant="outline" size="sm" className="h-8">Next</Button>
-                    </div>
-                  </div>
-                </div>
+              <div className="p-3">
+                <MultidimensionalTable
+                  columns={gridColumns}
+                  rows={inventoryItems}
+                  rowIdKey="sku"
+                  selectedRowIds={new Set(selectedRows)}
+                  onToggleRow={toggleRow}
+                  onToggleAll={(checked, ids) => setSelectedRows(checked ? ids : [])}
+                  selectedRecordId={selectedSku}
+                  onRowFocus={selectRow}
+                  pageLabel="Showing 1–20 of 872"
+                  rowsPerPageLabel="Rows per page 20 / 50 / 100"
+                  minWidth="1460px"
+                  density="compact"
+                  pinnedColumnCount={0}
+                  stickySelectionColumn={false}
+                />
               </div>
             </div>
 
