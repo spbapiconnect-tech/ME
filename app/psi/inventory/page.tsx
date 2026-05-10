@@ -377,6 +377,26 @@ function DetailSection({
   );
 }
 
+
+function InventoryActionControls({ onPreview }: { onPreview: (label: string) => void }) {
+  return (
+    <div className="ml-auto flex flex-wrap items-center gap-2">
+      {["Columns", "Density", "Sort", "Export", "More"].map((label) => (
+        <Button
+          key={label}
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-9 text-xs"
+          onClick={() => onPreview(label)}
+        >
+          {label}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
 function QuickList({
   selectedSku,
   selectedRows,
@@ -397,13 +417,13 @@ function QuickList({
           <h2 className="text-base font-semibold">Quick SKU List</h2>
           <p className="mt-1 text-xs text-muted-foreground">Fixed 20-row speed list · SKU and item name only.</p>
         </div>
-        <PackageSearch className="h-5 w-5 text-primary" />
+        <PackageSearch className="h-4 w-4 text-primary" />
       </div>
 
       <div className="overflow-hidden px-3 pt-3">
-        <div className="grid h-10 grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          <div className="flex justify-center">
-            <span className="h-5 w-5 rounded border border-primary/70" />
+        <div className="grid h-9 grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="flex w-[52px] min-w-[52px] items-center justify-center px-0">
+            <span className="h-4 w-4 rounded border border-primary/70" />
           </div>
           <div>SKU</div>
           <div>Item Name</div>
@@ -425,11 +445,11 @@ function QuickList({
                   if (event.key === "Enter" || event.key === " ") onSelect(item.sku);
                 }}
                 className={[
-                  "grid h-[38px] cursor-pointer grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center border-b border-border text-sm transition",
+                  "grid h-9 cursor-pointer grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center border-b border-border text-xs transition",
                   active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                 ].join(" ")}
               >
-                <div className="flex justify-center">
+                <div className="flex w-[52px] min-w-[52px] items-center justify-center px-0">
                   <button
                     type="button"
                     aria-label={`Select ${item.sku}`}
@@ -438,19 +458,19 @@ function QuickList({
                       onToggleRow(item.sku);
                     }}
                     className={[
-                      "h-5 w-5 rounded border",
+                      "h-4 w-4 rounded border",
                       checked ? "border-primary bg-primary/20" : "border-primary/70",
                     ].join(" ")}
                   />
                 </div>
                 <div className="font-semibold text-foreground">{item.sku}</div>
                 <div className="truncate font-medium">{item.itemName}</div>
-                <div className="flex justify-center">
+                <div className="flex w-[52px] min-w-[52px] items-center justify-center px-0">
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7"
+                    className="h-7 w-7 p-0"
                     onClick={(event) => {
                       event.stopPropagation();
                       onOpenDetail(item.sku);
@@ -467,10 +487,10 @@ function QuickList({
           {emptyRows.map((_, index) => (
             <div
               key={`empty-${index}`}
-              className="grid h-[38px] grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center border-b border-border text-sm text-muted-foreground/35"
+              className="grid h-9 grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center border-b border-border text-sm text-muted-foreground/35"
             >
-              <div className="flex justify-center">
-                <span className="h-5 w-5 rounded border border-border/70" />
+              <div className="flex w-[52px] min-w-[52px] items-center justify-center px-0">
+                <span className="h-4 w-4 rounded border border-border/70" />
               </div>
               <div>—</div>
               <div>Empty row slot</div>
@@ -479,7 +499,7 @@ function QuickList({
           ))}
         </div>
 
-        <div className="flex h-12 flex-wrap items-center justify-between gap-2 rounded-b-lg border border-border bg-secondary/10 px-3 text-xs text-muted-foreground">
+        <div className="flex h-11 flex-wrap items-center justify-between gap-2 rounded-b-lg border border-t-0 border-border bg-secondary/10 px-3 text-xs text-muted-foreground">
           <div className="flex flex-wrap items-center gap-3">
             <span>Showing 1–20 of 872</span>
             <span>Selected {selectedRows.length}</span>
@@ -650,7 +670,7 @@ export default function InventoryPage() {
   const [viewMode, setViewMode] = useState<"grid" | "detail">("grid");
   const [selectedSku, setSelectedSku] = useState("SKU-1001");
   const [selectedRows, setSelectedRows] = useState<string[]>(["SKU-1001"]);
-  const [previewMessage, setPreviewMessage] = useState("Controls are UI-only previews. No write executed.");
+  const [previewMessage, setPreviewMessage] = useState("Selected 0 · Export selected · Add note · Review / Link / View · Clear selection");
   const gridScrollRef = useRef<HTMLDivElement | null>(null);
 
   const selectedItem = useMemo(
@@ -760,6 +780,7 @@ export default function InventoryPage() {
             <Button variant="outline" size="sm" className="h-9 rounded-full border-primary/50 text-primary" onClick={() => showPreview("More Filters")}>
               More Filters
             </Button>
+            <InventoryActionControls onPreview={showPreview} />
           </div>
 
           <div className="mt-3 rounded-lg border border-border bg-secondary/10 px-3 py-2 text-xs text-muted-foreground">
@@ -800,13 +821,13 @@ export default function InventoryPage() {
                 className="overflow-x-auto p-3"
               >
                 <div className="min-w-[1250px]">
-                  <div className="grid h-10 grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_150px_56px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="grid h-9 grid-cols-[36px_104px_210px_110px_90px_96px_124px_70px_92px_100px_126px_128px_52px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     {["", "SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "UOM", "Safety", "Coverage", "Supplier", "Unit Cost", ""].map((head, index) => (
                       <div
                         key={`${head}-${index}`}
                         className={index === 12 ? "flex items-center justify-center px-0" : "px-3"}
                       >
-                        {index === 12 ? "View" : head}
+                        {index === 12 ? "Action" : head}
                       </div>
                     ))}
                   </div>
@@ -826,11 +847,11 @@ export default function InventoryPage() {
                             if (event.key === "Enter" || event.key === " ") selectRow(item.sku);
                           }}
                           className={[
-                            "grid h-[38px] cursor-pointer grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_150px_56px] items-center border-b border-border text-sm transition",
+                            "grid h-9 cursor-pointer grid-cols-[36px_104px_210px_110px_90px_96px_124px_70px_92px_100px_126px_128px_52px] items-center border-b border-border text-xs transition",
                             active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                           ].join(" ")}
                         >
-                          <div className="flex justify-center">
+                          <div className="flex w-[52px] min-w-[52px] items-center justify-center px-0">
                             <button
                               type="button"
                               aria-label={`Select ${item.sku}`}
@@ -839,7 +860,7 @@ export default function InventoryPage() {
                                 toggleRow(item.sku);
                               }}
                               className={[
-                                "h-5 w-5 rounded border",
+                                "h-4 w-4 rounded border",
                                 checked ? "border-primary bg-primary/20" : "border-primary/70",
                               ].join(" ")}
                             />
@@ -855,12 +876,12 @@ export default function InventoryPage() {
                           <div className="px-3 text-muted-foreground">{item.coverageDays}</div>
                           <div className="truncate px-3 text-muted-foreground">{item.primarySupplier}</div>
                           <div className="whitespace-nowrap px-3 text-muted-foreground">{item.unitCost}</div>
-                          <div className="flex w-[56px] min-w-[56px] items-center justify-center px-0">
+                          <div className="flex w-[52px] min-w-[52px] items-center justify-center px-0">
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="h-8 w-8 p-0"
+                              className="h-7 w-7 p-0"
                               onClick={(event) => {
                                 event.stopPropagation();
                                 openDetail(item.sku);
@@ -875,7 +896,7 @@ export default function InventoryPage() {
                     })}
                   </div>
 
-                  <div className="flex h-12 flex-wrap items-center justify-between gap-2 rounded-b-lg border border-border bg-secondary/10 px-3 text-xs text-muted-foreground">
+                  <div className="flex h-11 flex-wrap items-center justify-between gap-2 rounded-b-lg border border-t-0 border-border bg-secondary/10 px-3 text-xs text-muted-foreground">
                     <div className="flex flex-wrap items-center gap-3">
                       <span>Showing 1–20 of 872</span>
                       <span>Selected {selectedRows.length}</span>
