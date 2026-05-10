@@ -4,142 +4,16 @@ import Link from "next/link";
 
 import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { Button } from "@/components/ui/button";
-import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
-import { PsiModuleCard, PsiSection, PsiSoftCard, psiVisual } from "@/components/psi/psi-visual";
+import type { PsiLocale } from "@/config/psi-language-copy";
+import { getPsiOverviewPageData } from "@/lib/page-data/psi/overview-page-data";
+import { PsiModuleCard, PsiSection, psiVisual } from "@/components/psi/psi-visual";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 
 export function PsiHomePage() {
   const rawLocale = useUiPreferencesStore((state) => state.locale);
   const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
-  const psiCopy = getPsiCopy(currentLocale);
   const isZh = currentLocale === "zh";
-
-  const snapshot = [
-    {
-      label: isZh ? "库存水位" : "Stock Level",
-      value: "8",
-      hint: isZh ? "SKU 低于关注线" : "SKUs below watch level",
-      href: "/psi/inventory",
-    },
-    {
-      label: isZh ? "库存流动" : "Stock Movement",
-      value: "24",
-      hint: isZh ? "今日出入库 / 调整记录" : "Stock in / out / adjustment today",
-      href: "/psi/inventory",
-    },
-    {
-      label: isZh ? "采购进度" : "Purchase Flow",
-      value: "12",
-      hint: isZh ? "PR / PO 等待处理" : "PR / PO awaiting action",
-      href: "/psi/procurement",
-    },
-    {
-      label: isZh ? "GRN / 收货" : "GRN / Receiving",
-      value: "3",
-      hint: isZh ? "收货差异待验证" : "Receiving variances awaiting check",
-      href: "/psi/receiving",
-    },
-  ];
-
-  const stockPurchaseFlow = [
-    {
-      sku: "SKU-KCH-0007",
-      item: isZh ? "Coated Fries" : "Coated Fries",
-      stock: "42 / 60 bags",
-      movement: isZh ? "今日 -18 bags" : "-18 bags today",
-      purchase: isZh ? "PR-KCH-0001 已关联" : "PR-KCH-0001 linked",
-      grn: isZh ? "等待 PO 收货" : "Awaiting PO receiving",
-      status: isZh ? "低库存" : "Low Stock",
-      href: "/psi/inventory/SKU-KCH-0007",
-    },
-    {
-      sku: "SKU-KCH-0012",
-      item: isZh ? "Chicken Broth Base" : "Chicken Broth Base",
-      stock: "12 carton",
-      movement: isZh ? "今日 -4 carton" : "-4 carton today",
-      purchase: isZh ? "供应商已确认" : "Supplier confirmed",
-      grn: isZh ? "明日预计到货" : "ETA tomorrow",
-      status: isZh ? "需跟进" : "Follow-up",
-      href: "/psi/procurement/PR-1001",
-    },
-    {
-      sku: "SKU-KCH-0021",
-      item: isZh ? "Burger Sauce Cup" : "Burger Sauce Cup",
-      stock: "600 pcs",
-      movement: isZh ? "今日 -120 pcs" : "-120 pcs today",
-      purchase: isZh ? "PO-KCH-0098" : "PO-KCH-0098",
-      grn: isZh ? "数量待验证" : "Qty variance",
-      status: isZh ? "GRN 差异" : "GRN Variance",
-      href: "/psi/receiving",
-    },
-  ];
-
-  const grnWatch = [
-    {
-      title: "RCV-KCH-240507",
-      desc: isZh ? "PO-KCH-0098 · Burger Sauce Cup · 数量差异 1 line" : "PO-KCH-0098 · Burger Sauce Cup · 1 variance line",
-    },
-    {
-      title: "RCV-KCH-240508",
-      desc: isZh ? "ABC Food Supply · 到货时间待确认" : "ABC Food Supply · delivery time pending",
-    },
-    {
-      title: "RCV-KCH-240509",
-      desc: isZh ? "Freezer stock 入库前复核" : "Freezer stock check before posting",
-    },
-  ];
-
-  const riskSummary = [
-    isZh ? "3 个 SKU 覆盖天数低于目标" : "3 SKUs below coverage target",
-    isZh ? "2 个 PO 等待供应商确认 ETA" : "2 POs awaiting supplier ETA confirmation",
-    isZh ? "3 条 GRN / 收货记录待验证" : "3 GRN / receiving records awaiting verification",
-    isZh ? "1 个采购请求需要经理复核" : "1 purchase request needs manager review",
-  ];
-
-  const activity = [
-    {
-      time: "09:26",
-      title: isZh ? "采购请求已连接库存风险" : "Purchase request linked to stock risk",
-      desc: isZh ? "PR-KCH-0001 由 SKU-KCH-0007 低库存触发。" : "PR-KCH-0001 was triggered by SKU-KCH-0007 low stock.",
-    },
-    {
-      time: "09:35",
-      title: isZh ? "供应商报价已加入" : "Supplier quote attached",
-      desc: isZh ? "ABC Food Supply 报价已可用于采购复核。" : "ABC Food Supply quote is available for procurement review.",
-    },
-    {
-      time: "14:22",
-      title: isZh ? "收货差异等待验证" : "Receiving variance awaiting verification",
-      desc: isZh ? "PO-KCH-0098 有 1 条数量差异待确认。" : "PO-KCH-0098 has 1 quantity variance pending check.",
-    },
-  ];
-
-  const moduleShortcuts = [
-    {
-      title: psiCopy.shared.procurement,
-      description: isZh ? "PR / PO / 供应商确认 / 采购复核。" : "PR, PO, supplier confirmation, and purchase review.",
-      href: "/psi/procurement",
-      metric: isZh ? "12 项待复核" : "12 pending review",
-    },
-    {
-      title: psiCopy.shared.supplier,
-      description: isZh ? "供应商交期、报价、问题与沟通状态。" : "Supplier ETA, quote, issue, and communication status.",
-      href: "/psi/supplier",
-      metric: isZh ? "4 项供应商问题" : "4 vendor issues",
-    },
-    {
-      title: psiCopy.shared.inventory,
-      description: isZh ? "库存水位、覆盖天数、移动与补货上下文。" : "Stock level, coverage, movement, and replenishment context.",
-      href: "/psi/inventory",
-      metric: isZh ? "8 项观察库存" : "8 watch items",
-    },
-    {
-      title: isZh ? "收货" : "Receiving",
-      description: isZh ? "GRN、数量差异、入库确认与收货交接。" : "GRN, quantity variance, posting check, and receiving handoff.",
-      href: "/psi/receiving",
-      metric: isZh ? "3 条待验证" : "3 awaiting verification",
-    },
-  ];
+  const pageData = getPsiOverviewPageData(currentLocale);
 
   return (
     <ErpShell activeHref="/psi">
@@ -155,21 +29,17 @@ export function PsiHomePage() {
           }
           actions={
             <>
-              <Button asChild size="sm">
-                <Link href="/psi/procurement">{isZh ? "新建采购" : "Create Request"}</Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/psi/receiving">{isZh ? "查看 GRN" : "Open GRN"}</Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/reports">{isZh ? "查看 PSI 报表" : "View PSI Report"}</Link>
-              </Button>
+              {pageData.quickActions.map((action) => (
+                <Button key={action.href} asChild size="sm" variant={action.variant}>
+                  <Link href={action.href}>{action.label}</Link>
+                </Button>
+              ))}
             </>
           }
         />
 
         <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {snapshot.map((item) => (
+          {pageData.snapshot.map((item) => (
             <Link key={item.label} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
               <p className={psiVisual.eyebrow}>{item.label}</p>
               <p className={psiVisual.metric}>{item.value}</p>
@@ -177,6 +47,31 @@ export function PsiHomePage() {
             </Link>
           ))}
         </section>
+
+        <PsiSection
+          title={isZh ? "运营对比视图" : "Operating Compare View"}
+          description={
+            isZh
+              ? "用图形先判断库存、采购、GRN 与供应商风险，再进入表格细节。"
+              : "Visual comparison for stock, purchase, GRN, and supplier risk before opening record details."
+          }
+        >
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {pageData.compareCards.map((card) => (
+              <Link key={card.label} href={card.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
+                <p className={psiVisual.eyebrow}>{card.label}</p>
+                <div className="mt-3 flex items-end justify-between gap-3">
+                  <p className={psiVisual.metric}>{card.value}</p>
+                  <p className={psiVisual.muted}>{card.target}</p>
+                </div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full rounded-full bg-primary" style={{ width: `${card.percent}%` }} />
+                </div>
+                <p className={`mt-3 ${psiVisual.body}`}>{card.note}</p>
+              </Link>
+            ))}
+          </div>
+        </PsiSection>
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_21rem]">
           <PsiSection
@@ -188,64 +83,41 @@ export function PsiHomePage() {
             }
           >
             <div className="overflow-hidden rounded-xl border border-border bg-card">
-              <div className="grid min-w-[1040px] grid-cols-[1.25fr_1fr_1fr_1.15fr_1.05fr_1fr_0.9fr] border-b border-border bg-muted/35 px-4 py-3">
-                {[
-                  isZh ? "SKU / ITEM" : "SKU / ITEM",
-                  isZh ? "库存水位" : "STOCK LEVEL",
-                  isZh ? "库存流动" : "MOVEMENT",
-                  isZh ? "采购进度" : "PURCHASE FLOW",
-                  isZh ? "GRN / 收货" : "GRN / RECEIVING",
-                  isZh ? "供应商" : "SUPPLIER",
-                  isZh ? "动作" : "ACTION",
-                ].map((head) => (
-                  <div key={head} className={psiVisual.eyebrow}>{head}</div>
-                ))}
-              </div>
-
               <div className="overflow-x-auto">
-                {stockPurchaseFlow.map((row) => (
-                  <Link
-                    key={row.sku}
-                    href={row.href}
-                    className="grid min-w-[1040px] grid-cols-[1.25fr_1fr_1fr_1.15fr_1.05fr_1fr_0.9fr] items-center border-b border-border/70 px-4 py-4 transition hover:bg-muted/30 last:border-b-0"
-                  >
-                    <div>
-                      <p className={psiVisual.title}>{row.sku}</p>
-                      <p className={`mt-1 ${psiVisual.body}`}>{row.item}</p>
-                    </div>
+                <div className="max-h-[420px] min-w-[1120px] overflow-y-auto">
+                  <div className="sticky top-0 z-10 grid grid-cols-[1.15fr_1fr_1fr_1.15fr_1.15fr_1fr_0.9fr] border-b border-border bg-muted/80 px-4 py-3 backdrop-blur">
+                    {[
+                      "SKU / ITEM",
+                      isZh ? "库存水位" : "STOCK LEVEL",
+                      isZh ? "库存流动" : "MOVEMENT",
+                      isZh ? "采购进度" : "PURCHASE FLOW",
+                      isZh ? "GRN / 收货" : "GRN / RECEIVING",
+                      isZh ? "供应商" : "SUPPLIER",
+                      isZh ? "动作" : "ACTION",
+                    ].map((head) => (
+                      <div key={head} className={psiVisual.eyebrow}>{head}</div>
+                    ))}
+                  </div>
 
-                    <div>
+                  {pageData.matrixRows.map((row) => (
+                    <Link
+                      key={row.sku}
+                      href={row.href}
+                      className="grid grid-cols-[1.15fr_1fr_1fr_1.15fr_1.15fr_1fr_0.9fr] items-center border-b border-border/70 px-4 py-4 transition hover:bg-muted/30 last:border-b-0"
+                    >
+                      <div>
+                        <p className={psiVisual.title}>{row.sku}</p>
+                        <p className={`mt-1 ${psiVisual.body}`}>{row.item}</p>
+                      </div>
                       <p className={psiVisual.value}>{row.stock}</p>
-                      <p className={psiVisual.muted}>{row.status}</p>
-                    </div>
-
-                    <div>
                       <p className={psiVisual.value}>{row.movement}</p>
-                      <p className={psiVisual.muted}>{isZh ? "今日变动" : "Today"}</p>
-                    </div>
-
-                    <div>
                       <p className={psiVisual.value}>{row.purchase}</p>
-                      <p className={psiVisual.muted}>{isZh ? "采购关联" : "Purchase link"}</p>
-                    </div>
-
-                    <div>
                       <p className={psiVisual.value}>{row.grn}</p>
-                      <p className={psiVisual.muted}>{isZh ? "收货状态" : "Receiving status"}</p>
-                    </div>
-
-                    <div>
-                      <p className={psiVisual.value}>ABC Food Supply</p>
-                      <p className={psiVisual.muted}>{isZh ? "主要供应商" : "Primary supplier"}</p>
-                    </div>
-
-                    <div>
-                      <span className={psiVisual.pill}>
-                        {row.status}
-                      </span>
-                    </div>
-                  </Link>
-                ))}
+                      <p className={psiVisual.value}>{row.supplier}</p>
+                      <span className={psiVisual.pill}>{row.status}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </PsiSection>
@@ -255,11 +127,11 @@ export function PsiHomePage() {
             description={isZh ? "只显示影响库存入账的收货事项。" : "Receiving items that affect stock posting."}
           >
             <div className="grid gap-3">
-              {grnWatch.map((item) => (
-                <PsiSoftCard key={item.title}>
+              {pageData.grnWatch.map((item) => (
+                <Link key={item.title} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
                   <p className={psiVisual.title}>{item.title}</p>
                   <p className={`mt-1 ${psiVisual.body}`}>{item.desc}</p>
-                </PsiSoftCard>
+                </Link>
               ))}
             </div>
           </PsiSection>
@@ -271,8 +143,8 @@ export function PsiHomePage() {
             description={isZh ? "显示采购、库存、收货之间的最新联动。" : "Latest activity across purchase, inventory, and receiving."}
           >
             <div className="grid gap-3">
-              {activity.map((item) => (
-                <PsiSoftCard key={`${item.time}-${item.title}`}>
+              {pageData.activity.map((item) => (
+                <Link key={`${item.time}-${item.title}`} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <p className={psiVisual.title}>{item.title}</p>
@@ -280,7 +152,7 @@ export function PsiHomePage() {
                     </div>
                     <span className="text-xs font-medium text-muted-foreground">{item.time}</span>
                   </div>
-                </PsiSoftCard>
+                </Link>
               ))}
             </div>
           </PsiSection>
@@ -290,10 +162,11 @@ export function PsiHomePage() {
             description={isZh ? "经理今天应该优先看的 PSI 风险。" : "PSI risks managers should review first today."}
           >
             <div className="grid gap-3">
-              {riskSummary.map((item) => (
-                <PsiSoftCard key={item}>
-                  <p className={psiVisual.value}>{item}</p>
-                </PsiSoftCard>
+              {pageData.riskSummary.map((item) => (
+                <Link key={item.title} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
+                  <p className={psiVisual.title}>{item.title}</p>
+                  <p className={`mt-1 ${psiVisual.body}`}>{item.desc}</p>
+                </Link>
               ))}
             </div>
           </PsiSection>
@@ -308,7 +181,7 @@ export function PsiHomePage() {
           }
         >
           <div className={psiVisual.moduleGrid}>
-            {moduleShortcuts.map((item) => (
+            {pageData.moduleShortcuts.map((item) => (
               <PsiModuleCard
                 key={item.href}
                 href={item.href}
