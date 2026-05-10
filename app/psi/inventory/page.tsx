@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -651,11 +651,18 @@ export default function InventoryPage() {
   const [selectedSku, setSelectedSku] = useState("SKU-1001");
   const [selectedRows, setSelectedRows] = useState<string[]>(["SKU-1001"]);
   const [previewMessage, setPreviewMessage] = useState("Controls are UI-only previews. No write executed.");
+  const gridScrollRef = useRef<HTMLDivElement | null>(null);
 
   const selectedItem = useMemo(
     () => inventoryItems.find((item) => item.sku === selectedSku) || inventoryItems[0],
     [selectedSku]
   );
+
+  useEffect(() => {
+    if (viewMode === "grid" && gridScrollRef.current) {
+      gridScrollRef.current.scrollLeft = 0;
+    }
+  }, [viewMode]);
 
   const selectRow = (sku: string) => {
     setSelectedSku(sku);
@@ -770,7 +777,7 @@ export default function InventoryPage() {
                 </Button>
               </div>
 
-              <div className="overflow-x-auto p-3">
+              <div ref={gridScrollRef} className="overflow-x-auto p-3">
                 <div className="min-w-[1250px]">
                   <div className="grid h-10 grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_150px_56px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     {["", "SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "UOM", "Safety", "Coverage", "Supplier", "Unit Cost", ""].map((head, index) => (
