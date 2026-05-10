@@ -89,31 +89,6 @@ export function PsiWorkspaceLayoutV072({
   const rawLocale = useUiPreferencesStore((state) => state.locale);
   const currentLocale: PsiLocale = rawLocale === "zh" ? "zh" : "en";
   const psiCopy = getPsiCopy(currentLocale);
-  const isZh = currentLocale === "zh";
-  const procurementLocale = {
-    openPsiActions: isZh ? "打开 PSI 操作" : "Open PSI Actions",
-    openIssues: isZh ? "打开问题" : "Open Issues",
-    openReports: isZh ? "打开报表" : "Open Reports",
-    createPurchaseRequest: isZh ? "新建采购请求" : "Create Purchase Request",
-    recordReceiving: isZh ? "记录收货" : "Record Receiving",
-    purchaseRequests: isZh ? "采购请求" : "Purchase Requests",
-    pendingRequests: isZh ? "待处理请求" : "Pending Requests",
-    purchaseOrders: isZh ? "采购订单" : "Purchase Orders",
-    issueOpen: isZh ? "未处理问题" : "Issue Open",
-    recordSummary: isZh ? "记录摘要" : "Record Summary",
-    selectedRecord: isZh ? "当前记录" : "Selected Record",
-    selectedRecordDesc: isZh ? "当前高亮队列记录的结构化元数据。" : "Structured metadata for the currently highlighted queue record.",
-    issueQueue: isZh ? "问题队列" : "Issue Queue",
-    issueQueueDesc: isZh ? "与当前 PSI 工作区关联的问题与跟进记录。" : "Issue and follow-up records linked to the current PSI workspace.",
-    record: isZh ? "记录" : "Record",
-    titleColumn: isZh ? "标题" : "Title",
-    status: isZh ? "状态" : "Status",
-    priority: isZh ? "优先级" : "Priority",
-    openRecord: isZh ? "打开记录" : "Open record",
-    requestDate: isZh ? "申请日期" : "Request Date",
-    needBy: isZh ? "需求日期" : "Need By",
-    lifecycle: isZh ? "生命周期" : "Lifecycle",
-  };
 
   const selectedRecord = records[0];
 

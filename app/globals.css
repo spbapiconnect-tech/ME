@@ -492,3 +492,46 @@ textarea:focus:not(:focus-visible) {
 .psi-procurement-scope .rounded-\[24px\] {
   border-color: hsl(var(--border)) !important;
 }
+
+/* PSI procurement detail UI polish */
+.psi-procurement-scope th,
+.psi-procurement-scope td {
+  border-color: hsl(var(--border) / 0.65) !important;
+}
+
+.psi-procurement-scope table {
+  border-color: hsl(var(--border) / 0.7) !important;
+}
+
+.psi-procurement-scope .border-l,
+.psi-procurement-scope .border-r,
+.psi-procurement-scope .border-t,
+.psi-procurement-scope .border-b {
+  border-color: hsl(var(--border) / 0.75) !important;
+}
+
+.psi-procurement-scope [class*="bg-gray"],
+.psi-procurement-scope [class*="bg-neutral"] {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.psi-procurement-scope [class*="text-white"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+.psi-procurement-scope [class*="text-black"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+.psi-procurement-scope [class*="bg-muted"] {
+  color: hsl(var(--foreground));
+}
+
+.psi-procurement-scope [class*="rounded"] {
+  border-color: hsl(var(--border) / 0.8) !important;
+}
+
+.psi-procurement-scope a:hover {
+  color: hsl(var(--primary));
+}
