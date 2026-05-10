@@ -4,6 +4,16 @@ import { getPsiInventoryWorkspacePageData } from "@/lib/page-data/psi";
 export default async function PsiInventoryRoute() {
   const data = await getPsiInventoryWorkspacePageData();
 
+  const pageData = data.pageData as
+    | {
+        skuList?: Array<{ status?: string }>;
+        issues?: unknown[];
+      }
+    | undefined;
+
+  const skuList = pageData?.skuList ?? [];
+  const issues = pageData?.issues ?? [];
+
   return (
     <PsiWorkspacePage
       title="ME PSI Inventory"
@@ -12,10 +22,10 @@ export default async function PsiInventoryRoute() {
       isMock={data.isMock}
       error={data.error}
       stats={[
-        { label: "Total SKUs", value: (data.pageData?.skuList ?? []).length },
-        { label: "Low Stock Alerts", value: data.pageData?.skuList.filter(s => s.status === "low-stock").length ?? 0 },
-        { label: "Out of Stock", value: data.pageData?.skuList.filter(s => s.status === "out-of-stock").length ?? 0 },
-        { label: "Issues Open", value: (data.pageData?.issues ?? []).length },
+        { label: "Total SKUs", value: skuList.length },
+        { label: "Low Stock Alerts", value: skuList.filter((item) => item.status === "low-stock").length },
+        { label: "Out of Stock", value: skuList.filter((item) => item.status === "out-of-stock").length },
+        { label: "Issues Open", value: issues.length },
       ]}
       records={data.records}
       issueRecords={data.issueRecords}
