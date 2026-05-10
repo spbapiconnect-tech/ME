@@ -2,12 +2,33 @@
 
 import Link from "next/link";
 
+function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
+
+
 import { ErpPageHeader, ErpShell } from "@/components/erp";
 import { Button } from "@/components/ui/button";
 import type { PsiLocale } from "@/config/psi-language-copy";
 import { getPsiOverviewPageData } from "@/lib/page-data/psi/overview-page-data";
-import { PsiModuleCard, PsiSection, psiVisual } from "@/components/psi/psi-visual";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
+import {
+  ModulePageStack,
+  ModuleKpiGrid,
+  ModuleKpiCard,
+  ModuleSection,
+  ModuleCompareGrid,
+  ModuleCompareCard,
+  ModuleMatrixTable,
+  ModuleMatrixRow,
+  ModuleTwoColumn,
+  ModuleSidePanel,
+  ModuleActivityList,
+  ModuleShortcutGrid,
+  ModuleShortcutCard,
+  ModuleStatusPill,
+  moduleVisual,
+} from "@/components/erp/module-shell";
 
 export function PsiHomePage() {
   const rawLocale = useUiPreferencesStore((state) => state.locale);
@@ -17,7 +38,7 @@ export function PsiHomePage() {
 
   return (
     <ErpShell activeHref="/psi">
-      <div className={psiVisual.pageStack}>
+      <ModulePageStack>
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "运营总览" : "Operations Overview"]}
           title={isZh ? "PSI 运营总览" : "PSI Operations Overview"}
@@ -28,27 +49,31 @@ export function PsiHomePage() {
               : "Central view for stock level, stock movement, purchase flow, GRN / receiving variance, and supplier risk."
           }
           actions={
-            <>
+            <div className="flex items-center gap-2">
               {pageData.quickActions.map((action) => (
                 <Button key={action.href} asChild size="sm" variant={action.variant}>
                   <Link href={action.href}>{action.label}</Link>
                 </Button>
               ))}
-            </>
+            </div>
           }
         />
 
-        <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        {/* KPI Grid */}
+        <ModuleKpiGrid>
           {pageData.snapshot.map((item) => (
-            <Link key={item.label} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
-              <p className={psiVisual.eyebrow}>{item.label}</p>
-              <p className={psiVisual.metric}>{item.value}</p>
-              <p className={`mt-1 ${psiVisual.muted}`}>{item.hint}</p>
-            </Link>
+            <ModuleKpiCard
+              key={item.label}
+              label={item.label}
+              value={item.value}
+              hint={item.hint}
+              href={item.href}
+            />
           ))}
-        </section>
+        </ModuleKpiGrid>
 
-        <PsiSection
+        {/* Operating Compare View */}
+        <ModuleSection
           title={isZh ? "运营对比视图" : "Operating Compare View"}
           description={
             isZh
@@ -56,25 +81,24 @@ export function PsiHomePage() {
               : "Visual comparison for stock, purchase, GRN, and supplier risk before opening record details."
           }
         >
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <ModuleCompareGrid>
             {pageData.compareCards.map((card) => (
-              <Link key={card.label} href={card.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
-                <p className={psiVisual.eyebrow}>{card.label}</p>
-                <div className="mt-3 flex items-end justify-between gap-3">
-                  <p className={psiVisual.metric}>{card.value}</p>
-                  <p className={psiVisual.muted}>{card.target}</p>
-                </div>
-                <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${card.percent}%` }} />
-                </div>
-                <p className={`mt-3 ${psiVisual.body}`}>{card.note}</p>
-              </Link>
+              <ModuleCompareCard
+                key={card.label}
+                label={card.label}
+                value={card.value}
+                target={card.target}
+                percent={card.percent}
+                note={card.note}
+                href={card.href}
+              />
             ))}
-          </div>
-        </PsiSection>
+          </ModuleCompareGrid>
+        </ModuleSection>
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_21rem]">
-          <PsiSection
+        {/* Main Matrix and Watch Panel */}
+        <ModuleTwoColumn>
+          <ModuleSection
             title={isZh ? "PSI 多维运营表" : "PSI Operating Matrix"}
             description={
               isZh
@@ -82,97 +106,106 @@ export function PsiHomePage() {
                 : "A single operating table for SKU, stock level, stock movement, purchase flow, GRN / receiving, supplier, and next action."
             }
           >
-            <div className="overflow-hidden rounded-xl border border-border bg-card">
-              <div className="overflow-x-auto">
-                <div className="max-h-[460px] min-w-[980px] overflow-y-auto xl:min-w-0">
-                  <div className="sticky top-0 z-10 grid grid-cols-[1.35fr_0.95fr_0.95fr_1.1fr_1.1fr_1.15fr_0.8fr] border-b border-border bg-muted/80 px-4 py-3 backdrop-blur">
-                    {[
-                      "SKU / ITEM",
-                      isZh ? "库存水位" : "STOCK LEVEL",
-                      isZh ? "库存流动" : "MOVEMENT",
-                      isZh ? "采购进度" : "PURCHASE FLOW",
-                      isZh ? "GRN / 收货" : "GRN / RECEIVING",
-                      isZh ? "供应商" : "SUPPLIER",
-                      isZh ? "动作" : "ACTION",
-                    ].map((head) => (
-                      <div key={head} className={psiVisual.eyebrow}>{head}</div>
-                    ))}
+            <ModuleMatrixTable
+              gridTemplateColumns="1.35fr 0.95fr 0.95fr 1.1fr 1.1fr 1.15fr 0.8fr"
+              columns={[
+                "SKU / ITEM",
+                isZh ? "库存水位" : "STOCK LEVEL",
+                isZh ? "库存流动" : "MOVEMENT",
+                isZh ? "采购进度" : "PURCHASE FLOW",
+                isZh ? "GRN / 收货" : "GRN / RECEIVING",
+                isZh ? "供应商" : "SUPPLIER",
+                isZh ? "动作" : "ACTION",
+              ]}
+            >
+              {pageData.matrixRows.map((row) => (
+                <ModuleMatrixRow
+                  key={row.sku}
+                  href={row.href}
+                  gridTemplateColumns="1.35fr 0.95fr 0.95fr 1.1fr 1.1fr 1.15fr 0.8fr"
+                >
+                  <div>
+                    <p className={moduleVisual.title}>{row.sku}</p>
+                    <p className={moduleVisual.body}>{row.item}</p>
                   </div>
+                  <p className={moduleVisual.metric.replace("text-[1.55rem]", "text-sm font-semibold")}>{row.stock}</p>
+                  <p className={moduleVisual.metric.replace("text-[1.55rem]", "text-sm font-semibold")}>{row.movement}</p>
+                  <p className={moduleVisual.metric.replace("text-[1.55rem]", "text-sm font-semibold")}>{row.purchase}</p>
+                  <p className={moduleVisual.metric.replace("text-[1.55rem]", "text-sm font-semibold")}>{row.grn}</p>
+                  <p className={moduleVisual.metric.replace("text-[1.55rem]", "text-sm font-semibold")}>{row.supplier}</p>
+                  <div>
+                    <ModuleStatusPill>{row.status}</ModuleStatusPill>
+                  </div>
+                </ModuleMatrixRow>
+              ))}
+            </ModuleMatrixTable>
+          </ModuleSection>
 
-                  {pageData.matrixRows.map((row) => (
-                    <Link
-                      key={row.sku}
-                      href={row.href}
-                      className="grid grid-cols-[1.35fr_0.95fr_0.95fr_1.1fr_1.1fr_1.15fr_0.8fr] items-center border-b border-border/70 px-4 py-4 transition hover:bg-muted/30 last:border-b-0"
-                    >
-                      <div>
-                        <p className={psiVisual.title}>{row.sku}</p>
-                        <p className={`mt-1 ${psiVisual.body}`}>{row.item}</p>
-                      </div>
-                      <p className={psiVisual.value}>{row.stock}</p>
-                      <p className={psiVisual.value}>{row.movement}</p>
-                      <p className={psiVisual.value}>{row.purchase}</p>
-                      <p className={psiVisual.value}>{row.grn}</p>
-                      <p className={psiVisual.value}>{row.supplier}</p>
-                      <span className={psiVisual.pill}>{row.status}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </PsiSection>
-
-          <PsiSection
+          <ModuleSidePanel
             title={isZh ? "GRN / 收货观察" : "GRN / Receiving Watch"}
             description={isZh ? "只显示影响库存入账的收货事项。" : "Receiving items that affect stock posting."}
           >
-            <div className="grid gap-3">
+            <ModuleActivityList>
               {pageData.grnWatch.map((item) => (
-                <Link key={item.title} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
-                  <p className={psiVisual.title}>{item.title}</p>
-                  <p className={`mt-1 ${psiVisual.body}`}>{item.desc}</p>
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className={cn(moduleVisual.card, moduleVisual.cardHover)}
+                >
+                  <p className={moduleVisual.title}>{item.title}</p>
+                  <p className={cn("mt-1", moduleVisual.body)}>{item.desc}</p>
                 </Link>
               ))}
-            </div>
-          </PsiSection>
-        </div>
+            </ModuleActivityList>
+          </ModuleSidePanel>
+        </ModuleTwoColumn>
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_21rem]">
-          <PsiSection
+        {/* Activity and Risk Panel */}
+        <ModuleTwoColumn>
+          <ModuleSection
             title={isZh ? "今日 PSI 活动" : "Today PSI Activity"}
             description={isZh ? "显示采购、库存、收货之间的最新联动。" : "Latest activity across purchase, inventory, and receiving."}
           >
-            <div className="grid gap-3">
+            <ModuleActivityList>
               {pageData.activity.map((item) => (
-                <Link key={`${item.time}-${item.title}`} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
+                <Link
+                  key={`${item.time}-${item.title}`}
+                  href={item.href}
+                  className={cn(moduleVisual.card, moduleVisual.cardHover)}
+                >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className={psiVisual.title}>{item.title}</p>
-                      <p className={`mt-1 ${psiVisual.body}`}>{item.desc}</p>
+                      <p className={moduleVisual.title}>{item.title}</p>
+                      <p className={cn("mt-1", moduleVisual.body)}>{item.desc}</p>
                     </div>
                     <span className="text-xs font-medium text-muted-foreground">{item.time}</span>
                   </div>
                 </Link>
               ))}
-            </div>
-          </PsiSection>
+            </ModuleActivityList>
+          </ModuleSection>
 
-          <PsiSection
+          <ModuleSidePanel
             title={isZh ? "风险摘要" : "Risk Summary"}
             description={isZh ? "经理今天应该优先看的 PSI 风险。" : "PSI risks managers should review first today."}
           >
-            <div className="grid gap-3">
+            <ModuleActivityList>
               {pageData.riskSummary.map((item) => (
-                <Link key={item.title} href={item.href} className={`${psiVisual.card} ${psiVisual.cardHover}`}>
-                  <p className={psiVisual.title}>{item.title}</p>
-                  <p className={`mt-1 ${psiVisual.body}`}>{item.desc}</p>
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className={cn(moduleVisual.card, moduleVisual.cardHover)}
+                >
+                  <p className={moduleVisual.title}>{item.title}</p>
+                  <p className={cn("mt-1", moduleVisual.body)}>{item.desc}</p>
                 </Link>
               ))}
-            </div>
-          </PsiSection>
-        </div>
+            </ModuleActivityList>
+          </ModuleSidePanel>
+        </ModuleTwoColumn>
 
-        <PsiSection
+        {/* Module Shortcuts */}
+        <ModuleSection
           title={isZh ? "模块入口" : "Module Shortcuts"}
           description={
             isZh
@@ -180,9 +213,9 @@ export function PsiHomePage() {
               : "Open record-level workspaces. PSI overview keeps operating judgement here, not every detail."
           }
         >
-          <div className={psiVisual.moduleGrid}>
+          <ModuleShortcutGrid>
             {pageData.moduleShortcuts.map((item) => (
-              <PsiModuleCard
+              <ModuleShortcutCard
                 key={item.href}
                 href={item.href}
                 title={item.title}
@@ -190,9 +223,9 @@ export function PsiHomePage() {
                 metric={item.metric}
               />
             ))}
-          </div>
-        </PsiSection>
-      </div>
+          </ModuleShortcutGrid>
+        </ModuleSection>
+      </ModulePageStack>
     </ErpShell>
   );
 }

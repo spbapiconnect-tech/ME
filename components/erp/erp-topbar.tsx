@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useErpTheme } from "@/lib/erp/erp-theme";
@@ -30,6 +32,12 @@ const themeIcons = {
 } as const;
 
 export function ErpTopbar() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const { theme, setTheme } = useErpTheme();
   const { language, setLanguage } = useErpLanguage();
   const dict = useDictionary();
@@ -95,7 +103,7 @@ export function ErpTopbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-foreground">
-                <ThemeIcon className="h-4 w-4" />
+                {isMounted ? <ThemeIcon className="h-4 w-4" /> : <span className="h-4 w-4" aria-hidden="true" />}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
