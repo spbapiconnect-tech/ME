@@ -5,6 +5,8 @@ import { ErpSidebar } from "./erp-sidebar";
 import { ErpTopbar } from "./erp-topbar";
 import { ErpMobileBottomNav } from "./erp-mobile-bottom-nav";
 
+let sidebarCollapsedMemory = false;
+
 export function ErpShell({
   activeHref,
   children,
@@ -12,7 +14,14 @@ export function ErpShell({
   activeHref?: string;
   children: ReactNode;
 }) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(sidebarCollapsedMemory);
+
+  const toggleSidebarCollapsed = () => {
+    setIsSidebarCollapsed((prev) => {
+      sidebarCollapsedMemory = !prev;
+      return sidebarCollapsedMemory;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -20,14 +29,11 @@ export function ErpShell({
         <ErpSidebar
           activeHref={activeHref}
           collapsed={isSidebarCollapsed}
-          onToggleCollapsed={() => setIsSidebarCollapsed((prev) => !prev)}
+          onToggleCollapsed={toggleSidebarCollapsed}
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <ErpTopbar
-            isSidebarCollapsed={isSidebarCollapsed}
-            onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
-          />
+          <ErpTopbar />
           <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4">{children}</main>
         </div>
       </div>
