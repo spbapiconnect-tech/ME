@@ -772,9 +772,14 @@ export default function InventoryPage() {
 
               <div className="overflow-x-auto p-3">
                 <div className="min-w-[1250px]">
-                  <div className="grid h-10 grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_110px_70px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="grid h-10 grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_150px_56px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     {["", "SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "UOM", "Safety", "Coverage", "Supplier", "Unit Cost", ""].map((head, index) => (
-                      <div key={`${head}-${index}`} className="px-3">{head}</div>
+                      <div
+                        key={`${head}-${index}`}
+                        className={index === 12 ? "flex items-center justify-center px-0" : "px-3"}
+                      >
+                        {index === 12 ? "View" : head}
+                      </div>
                     ))}
                   </div>
 
@@ -793,7 +798,7 @@ export default function InventoryPage() {
                             if (event.key === "Enter" || event.key === " ") selectRow(item.sku);
                           }}
                           className={[
-                            "grid h-[38px] cursor-pointer grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_110px_70px] items-center border-b border-border text-sm transition",
+                            "grid h-[38px] cursor-pointer grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_150px_56px] items-center border-b border-border text-sm transition",
                             active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                           ].join(" ")}
                         >
@@ -821,13 +826,13 @@ export default function InventoryPage() {
                           <div className="px-3 text-muted-foreground">{item.safetyStock}</div>
                           <div className="px-3 text-muted-foreground">{item.coverageDays}</div>
                           <div className="truncate px-3 text-muted-foreground">{item.primarySupplier}</div>
-                          <div className="px-3 text-muted-foreground">{item.unitCost}</div>
-                          <div className="flex justify-center">
+                          <div className="whitespace-nowrap px-3 text-muted-foreground">{item.unitCost}</div>
+                          <div className="flex w-[56px] min-w-[56px] items-center justify-center px-0">
                             <Button
                               type="button"
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7"
+                              className="h-8 w-8 p-0"
                               onClick={(event) => {
                                 event.stopPropagation();
                                 openDetail(item.sku);
