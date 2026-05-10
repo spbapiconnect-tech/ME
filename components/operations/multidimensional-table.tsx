@@ -27,6 +27,7 @@ export function MultidimensionalTable<T extends object>({
   totalCount,
   rowsPerPageLabel,
   showPagination = true,
+  density = "standard",
 }: {
   columns: MultiDimColumn<T>[];
   rows: T[];
@@ -42,26 +43,31 @@ export function MultidimensionalTable<T extends object>({
   totalCount?: number;
   rowsPerPageLabel?: string;
   showPagination?: boolean;
+  density?: "compact" | "standard" | "comfortable";
 }) {
   const allIds = rows.map((row) => String(row[rowIdKey]));
   const allChecked = allIds.length > 0 && allIds.every((id) => selectedRowIds.has(id));
   const selectedCount = selectedRowIds.size;
   const pageCount = Math.max(1, Math.ceil((totalCount ?? rows.length) / 50));
   const gridTemplateColumns = `42px ${columns.map((column) => column.width).join(" ")}`;
+  const rowPadding = density === "compact" ? "py-1" : density === "comfortable" ? "py-2.5" : "py-1.5";
+  const headerPadding = density === "compact" ? "py-1.5" : "py-2";
+  const lineHeight = density === "compact" ? "leading-[18px]" : "leading-5";
 
   return (
     <div className={cn("overflow-hidden rounded-lg border border-border/70 bg-card/75", className)}>
       <div className="overflow-x-auto">
         <div style={{ minWidth }}>
           <div className="sticky top-0 z-20 grid border-b border-border/80 bg-muted/90" style={{ gridTemplateColumns }}>
-            <div className="sticky left-0 z-30 flex items-center justify-center border-r border-border/70 bg-muted/95 px-2 py-2">
+            <div className={cn("sticky left-0 z-30 flex items-center justify-center border-r border-border/70 bg-muted/95 px-2", headerPadding)}>
               <Checkbox checked={allChecked} onCheckedChange={(checked) => onToggleAll(Boolean(checked), allIds)} aria-label="Select all rows" />
             </div>
             {columns.map((column, index) => (
               <div
                 key={column.key}
                 className={cn(
-                  "border-r border-border/60 px-2.5 py-2",
+                  "border-r border-border/60 px-2.5",
+                  headerPadding,
                   index < 2 && "bg-muted/95"
                 )}
               >
@@ -87,7 +93,7 @@ export function MultidimensionalTable<T extends object>({
                   onClick={() => onRowFocus?.(id)}
                 >
                   <div
-                    className={cn("sticky left-0 z-10 flex items-center justify-center border-r border-border/55 px-2 py-1.5", focused ? "bg-primary/10" : "bg-card/95")}
+                    className={cn("sticky left-0 z-10 flex items-center justify-center border-r border-border/55 px-2", rowPadding, focused ? "bg-primary/10" : "bg-card/95")}
                     onClick={(event) => event.stopPropagation()}
                   >
                     <Checkbox checked={selected} onCheckedChange={() => onToggleRow(id)} aria-label={`Select ${id}`} />
@@ -95,9 +101,9 @@ export function MultidimensionalTable<T extends object>({
                   {columns.map((column, index) => (
                     <div
                       key={column.key}
-                      className={cn("border-r border-border/45 px-2.5 py-1.5", index < 2 && (focused ? "bg-primary/6" : "bg-card/85"))}
+                      className={cn("border-r border-border/45 px-2.5", rowPadding, index < 2 && (focused ? "bg-primary/6" : "bg-card/85"))}
                     >
-                      <div className="block w-full truncate text-left text-xs leading-5">
+                      <div className={cn("block w-full truncate text-left text-xs", lineHeight)}>
                         {column.render(row)}
                       </div>
                     </div>

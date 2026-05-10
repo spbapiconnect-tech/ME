@@ -22,6 +22,8 @@ export default function PsiInventoryRoute() {
   const [viewKey, setViewKey] = useState("all");
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
   const [focusedSkuId, setFocusedSkuId] = useState<string | null>(null);
+  const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("compact");
+  const [rowActionPreview, setRowActionPreview] = useState<string | null>(null);
   const locale = useUiPreferencesStore((state) => state.locale);
   const isZh = locale === "zh";
 
@@ -108,7 +110,15 @@ export default function PsiInventoryRoute() {
       label: isZh ? "Action" : "Action",
       width: "70px",
       render: () => (
-        <Button variant="ghost" size="icon" className="h-7 w-7">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={(event) => {
+            event.stopPropagation();
+            setRowActionPreview("View item preview opened from row action.");
+          }}
+        >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       ),
@@ -170,6 +180,16 @@ export default function PsiInventoryRoute() {
         <TableActionBar
           searchPlaceholder={isZh ? "搜索 SKU / 品项名称..." : "Search SKU / item name..."}
           selectedCount={selectedRowIds.size}
+          bulkActionLabel={isZh ? "创建 PR 预览" : "Create PR Preview"}
+          bulkActionKey="inventory.create_pr_preview"
+          density={density}
+          onDensityChange={setDensity}
+          onClearSelection={() => setSelectedRowIds(new Set())}
+          columns={["SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "Coverage Days", "Supplier", "Reorder Status"]}
+          sortOptions={["Current Stock", "Coverage Days", "Last Movement", "Supplier"]}
+          advancedFilters={[
+            { title: "Inventory", items: ["Branch", "Storage", "Category", "Supplier", "Stock Status", "Expiry Range", "Coverage Days", "BOM Usage", "Price Range"] },
+          ]}
           filters={
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "分支: 全部" : "Branch: All"}</Badge>
@@ -196,9 +216,10 @@ export default function PsiInventoryRoute() {
                 onToggleAll={toggleAll}
                 selectedRecordId={focusedSku?.skuId}
                 onRowFocus={setFocusedSkuId}
-                pageLabel={isZh ? "显示 1–50 / 共 872" : "Showing 1–50 of 872"}
-                rowsPerPageLabel={isZh ? "每页 50 / 100 / 200" : "Rows per page 50 / 100 / 200"}
+                pageLabel={isZh ? "显示 1–20 / 共 872" : "Showing 1–20 of 872"}
+                rowsPerPageLabel={isZh ? "每页 20 / 50 / 100" : "Rows per page 20 / 50 / 100"}
                 minWidth="1500px"
+                density={density}
               />
             </ModuleSection>
           </div>
@@ -208,16 +229,52 @@ export default function PsiInventoryRoute() {
               title={isZh ? "选中 SKU" : "Selected SKU"}
               subtitle={focusedSku ? `${focusedSku.productName} / ${focusedSku.skuCode}` : "-"}
               fields={[
-                { label: isZh ? "分支 / 存储" : "Branch / Storage", value: focusedWarehouse ? `${focusedWarehouse.warehouseCode} / ${focusedWarehouse.type}` : "-" },
+                { label: "SKU", value: focusedSku?.skuCode ?? "-" },
+                { label: isZh ? "Item Name" : "Item Name", value: focusedSku?.productName ?? "-" },
+                { label: isZh ? "Category" : "Category", value: focusedSku ? pageData?.products.find((item) => item.productId === focusedSku.productId)?.category ?? "-" : "-" },
+                { label: isZh ? "Status" : "Status", value: focusedSku?.status ?? "-" },
+                { label: isZh ? "Branch / Storage" : "Branch / Storage", value: focusedWarehouse ? `${focusedWarehouse.warehouseCode} / ${focusedWarehouse.type}` : "-" },
                 { label: isZh ? "当前库存" : "Current Stock", value: focusedStock ? `${focusedStock.availableQty.value} ${focusedStock.availableQty.unit}` : "-" },
                 { label: isZh ? "安全库存" : "Safety Stock", value: focusedSku?.safetyStock ?? "-" },
+                { label: isZh ? "Reorder Point" : "Reorder Point", value: focusedSku?.safetyStock ?? "-" },
                 { label: isZh ? "覆盖天数" : "Coverage Days", value: focusedStock && focusedSku ? (focusedStock.availableQty.value < focusedSku.safetyStock ? "0.8d" : "12.5d") : "-" },
+                { label: isZh ? "Stock Risk" : "Stock Risk", value: focusedStock && focusedSku && focusedStock.availableQty.value < focusedSku.safetyStock ? "high" : "stable" },
+                { label: isZh ? "Purchase UOM" : "Purchase UOM", value: focusedSku?.unit ?? "-" },
+                { label: isZh ? "Unit Cost" : "Unit Cost", value: "36.40 MYR" },
+                { label: isZh ? "BOM Usage" : "BOM Usage", value: "8 recipes / 14 menu items" },
                 { label: isZh ? "效期批次" : "Expiry Batch", value: "-" },
                 { label: isZh ? "关联供应商" : "Linked Supplier", value: "-" },
                 { label: isZh ? "关联采购" : "Linked Procurement", value: focusedReorder?.sourceRef.recordId ?? "-" },
                 { label: isZh ? "补货建议" : "Reorder Suggestion", value: focusedReorder?.suggestedQty.value ? `${focusedReorder.suggestedQty.value} ${focusedReorder.suggestedQty.unit}` : "-" },
               ]}
               sections={[
+                {
+                  title: isZh ? "Supplier & Purchase" : "Supplier & Purchase",
+                  items: [
+                    <div key="supplier-purchase">
+                      <p className={moduleVisual.title}>Primary Supplier: SUP-Dairy</p>
+                      <p className={moduleVisual.muted}>Supplier Code: SD-011 / Lead Time: 3d / Last Purchase: 2026-05-08</p>
+                    </div>,
+                  ],
+                },
+                {
+                  title: isZh ? "UOM & Costing" : "UOM & Costing",
+                  items: [
+                    <div key="uom-cost">
+                      <p className={moduleVisual.title}>Base UOM: kg | Stock UOM: kg | Purchase UOM: carton</p>
+                      <p className={moduleVisual.muted}>Conversion: 1 carton = 24 kg | Last Cost: 36.40 | Average Cost: 35.85 | List Price: 39.00</p>
+                    </div>,
+                  ],
+                },
+                {
+                  title: isZh ? "Usage / BOM" : "Usage / BOM",
+                  items: [
+                    <div key="usage-bom">
+                      <p className={moduleVisual.title}>Daily Usage Estimate: 21.5 kg</p>
+                      <p className={moduleVisual.muted}>Wastage Watch: Normal</p>
+                    </div>,
+                  ],
+                },
                 {
                   title: isZh ? "最近移动" : "Recent Movement",
                   items: focusedMovement.map((item) => (
@@ -244,12 +301,17 @@ export default function PsiInventoryRoute() {
                     </div>
                   )),
                 },
+                {
+                  title: isZh ? "Row Action Preview" : "Row Action Preview",
+                  items: rowActionPreview ? [<div key="row-preview">{rowActionPreview}</div>] : [],
+                },
               ]}
-              actionLabels={[
-                isZh ? "查看品项" : "View Item",
-                isZh ? "创建 PR 预览" : "Create PR Preview",
-                isZh ? "添加备注" : "Add Note",
-                isZh ? "盘点预览" : "Count Stock Preview",
+              actions={[
+                { label: isZh ? "查看品项" : "View Item", controlKey: "table.export" },
+                { label: isZh ? "创建 PR 预览" : "Create PR Preview", controlKey: "inventory.create_pr_preview" },
+                { label: isZh ? "添加备注" : "Add Note", controlKey: "supplier.add_note_preview" },
+                { label: isZh ? "盘点预览" : "Count Stock Preview", controlKey: "inventory.count_stock_preview" },
+                { label: isZh ? "查看 BOM 用量" : "View BOM Usage", controlKey: "table.export" },
               ]}
               statusLabel={focusedSku?.status}
             />

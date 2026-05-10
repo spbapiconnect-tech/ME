@@ -21,6 +21,8 @@ export default function PsiProcurementPage() {
   const [viewKey, setViewKey] = useState("all");
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
   const [focusedRequestId, setFocusedRequestId] = useState<string | null>(null);
+  const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("compact");
+  const [rowActionPreview, setRowActionPreview] = useState<string | null>(null);
   const locale = useUiPreferencesStore((state) => state.locale);
   const isZh = locale === "zh";
 
@@ -126,7 +128,15 @@ export default function PsiProcurementPage() {
       label: isZh ? "Action" : "Action",
       width: "70px",
       render: () => (
-        <Button variant="ghost" size="icon" className="h-7 w-7">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={(event) => {
+            event.stopPropagation();
+            setRowActionPreview("Procurement row action preview opened.");
+          }}
+        >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       ),
@@ -188,7 +198,16 @@ export default function PsiProcurementPage() {
         <TableActionBar
           searchPlaceholder={isZh ? "搜索 PR / PO No..." : "Search PR / PO no..."}
           selectedCount={selectedRowIds.size}
-          bulkActionLabel={isZh ? "批量动作（预览）" : "Bulk Action (Preview)"}
+          bulkActionLabel={isZh ? "审批预览" : "Approve Preview"}
+          bulkActionKey="procurement.approve_preview"
+          density={density}
+          onDensityChange={setDensity}
+          onClearSelection={() => setSelectedRowIds(new Set())}
+          columns={["PR No", "PO No", "Branch", "Requester", "Supplier", "Total Amount", "Need By", "Approval", "PO Status", "Receiving Status"]}
+          sortOptions={["Need By Date", "Total Amount", "Approval Status", "PO Status"]}
+          advancedFilters={[
+            { title: "Procurement", items: ["Branch", "Supplier", "Requester", "Priority", "Approval Status", "PO Status", "Need By Date"] },
+          ]}
           filters={
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "分支: 全部" : "Branch: All"}</Badge>
@@ -217,6 +236,7 @@ export default function PsiProcurementPage() {
                 onRowFocus={setFocusedRequestId}
                 pageLabel={isZh ? "显示 1–50 / 共 248" : "Showing 1–50 of 248"}
                 rowsPerPageLabel={isZh ? "每页 50 / 100 / 200" : "Rows per page 50 / 100 / 200"}
+                density={density}
               />
             </ModuleSection>
           </div>
@@ -247,13 +267,17 @@ export default function PsiProcurementPage() {
                     </div>
                   )),
                 },
+                {
+                  title: isZh ? "Row Action Preview" : "Row Action Preview",
+                  items: rowActionPreview ? [<div key="row-preview">{rowActionPreview}</div>] : [],
+                },
               ]}
-              actionLabels={[
-                isZh ? "查看 PR" : "View PR",
-                isZh ? "审批预览" : "Approve Preview",
-                isZh ? "下达 PO 预览" : "Issue PO Preview",
-                isZh ? "关联收货预览" : "Link Receiving Preview",
-                isZh ? "添加备注" : "Add Note",
+              actions={[
+                { label: isZh ? "查看 PR" : "View PR", controlKey: "table.export" },
+                { label: isZh ? "审批预览" : "Approve Preview", controlKey: "procurement.approve_preview" },
+                { label: isZh ? "下达 PO 预览" : "Issue PO Preview", controlKey: "procurement.reject_preview" },
+                { label: isZh ? "关联收货预览" : "Link Receiving Preview", controlKey: "procurement.link_receiving_preview" },
+                { label: isZh ? "添加备注" : "Add Note", controlKey: "supplier.add_note_preview" },
               ]}
               statusLabel={focusedRequest?.status}
             />

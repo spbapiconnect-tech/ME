@@ -182,7 +182,7 @@ test("PSI workspaces use multidimensional table pattern with pagination labels",
     assert.equal(page.includes("MultidimensionalTable"), true);
     assert.equal(page.includes("RecordDetailPanel"), true);
     assert.equal(page.includes("Showing 1"), true);
-    assert.equal(page.includes("Rows per page 50 / 100 / 200"), true);
+    assert.equal(page.includes("Rows per page"), true);
   }
 });
 

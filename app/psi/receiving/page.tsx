@@ -21,6 +21,8 @@ export default function ReceivingPage() {
   const [viewKey, setViewKey] = useState("all");
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
   const [focusedReceivingId, setFocusedReceivingId] = useState<string | null>(null);
+  const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("compact");
+  const [rowActionPreview, setRowActionPreview] = useState<string | null>(null);
   const locale = useUiPreferencesStore((state) => state.locale);
   const isZh = locale === "zh";
 
@@ -104,7 +106,15 @@ export default function ReceivingPage() {
       label: isZh ? "Action" : "Action",
       width: "70px",
       render: () => (
-        <Button variant="ghost" size="icon" className="h-7 w-7">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={(event) => {
+            event.stopPropagation();
+            setRowActionPreview("Receiving row action preview opened.");
+          }}
+        >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       ),
@@ -166,6 +176,16 @@ export default function ReceivingPage() {
         <TableActionBar
           searchPlaceholder={isZh ? "搜索 GRN / PO no..." : "Search GRN / PO no..."}
           selectedCount={selectedRowIds.size}
+          bulkActionLabel={isZh ? "复核差异" : "Review Variance"}
+          bulkActionKey="receiving.review_variance_preview"
+          density={density}
+          onDensityChange={setDensity}
+          onClearSelection={() => setSelectedRowIds(new Set())}
+          columns={["GRN No", "PO No", "Supplier", "Branch", "Expected Date", "Received Date", "Received By", "Variance", "Inspection", "Posting Status"]}
+          sortOptions={["Received Date", "Variance", "Posting Status", "Supplier"]}
+          advancedFilters={[
+            { title: "Receiving", items: ["Branch", "Supplier", "Warehouse", "Variance", "Posting Status", "Received Date"] },
+          ]}
           filters={
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "分支: 全部" : "Branch: All"}</Badge>
@@ -193,6 +213,7 @@ export default function ReceivingPage() {
                 onRowFocus={setFocusedReceivingId}
                 pageLabel={isZh ? "显示 1–50 / 共 184" : "Showing 1–50 of 184"}
                 rowsPerPageLabel={isZh ? "每页 50 / 100 / 200" : "Rows per page 50 / 100 / 200"}
+                density={density}
               />
             </ModuleSection>
           </div>
@@ -229,12 +250,17 @@ export default function ReceivingPage() {
                     </div>
                   )),
                 },
+                {
+                  title: isZh ? "Row Action Preview" : "Row Action Preview",
+                  items: rowActionPreview ? [<div key="row-preview">{rowActionPreview}</div>] : [],
+                },
               ]}
-              actionLabels={[
-                isZh ? "查看 GRN" : "View GRN",
-                isZh ? "复核差异" : "Review Variance",
-                isZh ? "过账预览" : "Post Stock Preview",
-                isZh ? "添加备注" : "Add Note",
+              actions={[
+                { label: isZh ? "查看 GRN" : "View GRN", controlKey: "table.export" },
+                { label: isZh ? "复核差异" : "Review Variance", controlKey: "receiving.review_variance_preview" },
+                { label: isZh ? "过账预览" : "Post Stock Preview", controlKey: "receiving.post_stock_preview" },
+                { label: isZh ? "附加单据" : "Attach Document", controlKey: "table.export" },
+                { label: isZh ? "添加备注" : "Add Note", controlKey: "supplier.add_note_preview" },
               ]}
               statusLabel={focusedReceiving?.status}
             />

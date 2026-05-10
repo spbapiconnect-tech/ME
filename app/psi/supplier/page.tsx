@@ -21,6 +21,8 @@ export default function PsiSupplierPage() {
   const [viewKey, setViewKey] = useState("all");
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
   const [focusedSupplierId, setFocusedSupplierId] = useState<string | null>(null);
+  const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("compact");
+  const [rowActionPreview, setRowActionPreview] = useState<string | null>(null);
   const locale = useUiPreferencesStore((state) => state.locale);
   const isZh = locale === "zh";
 
@@ -115,7 +117,15 @@ export default function PsiSupplierPage() {
       label: isZh ? "Action" : "Action",
       width: "70px",
       render: () => (
-        <Button variant="ghost" size="icon" className="h-7 w-7">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7"
+          onClick={(event) => {
+            event.stopPropagation();
+            setRowActionPreview("Supplier row action preview opened.");
+          }}
+        >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       ),
@@ -177,7 +187,16 @@ export default function PsiSupplierPage() {
         <TableActionBar
           searchPlaceholder={isZh ? "搜索供应商名称 / 编码..." : "Search supplier name / code..."}
           selectedCount={selectedRowIds.size}
-          bulkActionLabel={isZh ? "批量动作（预览）" : "Bulk Action (Preview)"}
+          bulkActionLabel={isZh ? "创建 PR 预览" : "Create PR Preview"}
+          bulkActionKey="supplier.create_pr_preview"
+          density={density}
+          onDensityChange={setDensity}
+          onClearSelection={() => setSelectedRowIds(new Set())}
+          columns={["Supplier Code", "Supplier Name", "Category", "Region", "Contact", "Lead Time", "Contract Status", "Rating", "Risk"]}
+          sortOptions={["Supplier Name", "Lead Time", "Open Issues", "Rating"]}
+          advancedFilters={[
+            { title: "Supplier", items: ["Category", "Region", "Contract Status", "Rating", "Risk", "Status", "Lead Time"] },
+          ]}
           filters={
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "分类: 全部" : "Category: All"}</Badge>
@@ -205,6 +224,7 @@ export default function PsiSupplierPage() {
                 onRowFocus={setFocusedSupplierId}
                 pageLabel={isZh ? "显示 1–50 / 共 126" : "Showing 1–50 of 126"}
                 rowsPerPageLabel={isZh ? "每页 50 / 100 / 200" : "Rows per page 50 / 100 / 200"}
+                density={density}
               />
             </ModuleSection>
           </div>
@@ -242,12 +262,16 @@ export default function PsiSupplierPage() {
                     </div>
                   )),
                 },
+                {
+                  title: isZh ? "Row Action Preview" : "Row Action Preview",
+                  items: rowActionPreview ? [<div key="row-preview">{rowActionPreview}</div>] : [],
+                },
               ]}
-              actionLabels={[
-                isZh ? "查看供应商" : "View Supplier",
-                isZh ? "创建 PR 预览" : "Create PR Preview",
-                isZh ? "新增问题" : "Add Issue",
-                isZh ? "添加备注" : "Add Note",
+              actions={[
+                { label: isZh ? "查看供应商" : "View Supplier", controlKey: "table.export" },
+                { label: isZh ? "创建 PR 预览" : "Create PR Preview", controlKey: "supplier.create_pr_preview" },
+                { label: isZh ? "新增问题" : "Add Issue", controlKey: "table.export" },
+                { label: isZh ? "添加备注" : "Add Note", controlKey: "supplier.add_note_preview" },
               ]}
               statusLabel={focusedSupplier?.status}
             />

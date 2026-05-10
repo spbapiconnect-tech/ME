@@ -1,9 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { getControlByKey } from "@/lib/control-registry";
 
 export interface DetailField {
   label: string;
@@ -15,12 +16,18 @@ export interface DetailSection {
   items: ReactNode[];
 }
 
+export interface DetailAction {
+  label: string;
+  controlKey: string;
+}
+
 export function RecordDetailPanel({
   title,
   subtitle,
   fields,
   sections = [],
   actionLabels = [],
+  actions = [],
   className,
   statusLabel,
 }: {
@@ -29,9 +36,17 @@ export function RecordDetailPanel({
   fields: DetailField[];
   sections?: DetailSection[];
   actionLabels?: string[];
+  actions?: DetailAction[];
   className?: string;
   statusLabel?: string;
 }) {
+  const [selectedAction, setSelectedAction] = useState<DetailAction | null>(null);
+  const actionList = useMemo(
+    () => (actions.length ? actions : actionLabels.map((label) => ({ label, controlKey: "table.export" }))),
+    [actionLabels, actions]
+  );
+  const controlMeta = selectedAction ? getControlByKey(selectedAction.controlKey) : null;
+
   return (
     <aside className={cn("space-y-3 rounded-lg border border-border/70 bg-card/75 p-3", className)}>
       <div className="space-y-1 border-b border-border/60 pb-2.5">
@@ -68,14 +83,23 @@ export function RecordDetailPanel({
         </section>
       ))}
 
-      {actionLabels.length > 0 ? (
+      {actionList.length > 0 ? (
         <div className="grid grid-cols-1 gap-2 border-t border-border/60 pt-2.5">
-          {actionLabels.map((label) => (
-            <Button key={label} variant="outline" size="sm" className="h-8 justify-start text-xs">
-              {label}
+          {actionList.map((action) => (
+            <Button key={action.label} variant="outline" size="sm" className="h-8 justify-start text-xs" onClick={() => setSelectedAction(action)}>
+              {action.label}
             </Button>
           ))}
         </div>
+      ) : null}
+
+      {selectedAction ? (
+        <section className="space-y-1 rounded-md border border-border/60 bg-muted/20 px-2.5 py-2 text-xs">
+          <p className="font-semibold text-foreground">{selectedAction.label}</p>
+          <p className="text-muted-foreground">{controlMeta?.layer ?? "PREVIEW_ACTION"}</p>
+          <p className="text-muted-foreground">{controlMeta?.executionBoundary ?? "no_write_execution"}</p>
+          <p className="text-muted-foreground">No write executed</p>
+        </section>
       ) : null}
     </aside>
   );
