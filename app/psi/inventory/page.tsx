@@ -91,9 +91,9 @@ export default function PsiInventoryRoute() {
 
   const columns: MultiDimColumn<(typeof filteredSkus)[number]>[] = [
     { key: "sku", label: "SKU", width: "120px", render: (row) => <p className={moduleVisual.title}>{row.skuCode}</p> },
-    { key: "item", label: isZh ? "Item Name" : "Item Name", width: "1.4fr", render: (row) => <p className={moduleVisual.title}>{row.productName}</p> },
-    { key: "category", label: isZh ? "Category" : "Category", width: "100px", render: (row) => <p className={moduleVisual.body}>{pageData?.products.find((item) => item.productId === row.productId)?.category ?? "-"}</p> },
-    { key: "branch", label: isZh ? "Branch" : "Branch", width: "100px", render: (row) => <p className={moduleVisual.body}>{pageData?.warehouses.find((item) => item.warehouseId === pageData?.storeStocks.find((stock) => stock.skuId === row.skuId)?.warehouseId)?.warehouseCode ?? "-"}</p> },
+    { key: "item", label: isZh ? "Item Name" : "Item Name", width: "220px", render: (row) => <p className={moduleVisual.title}>{row.productName}</p> },
+    { key: "category", label: isZh ? "Category" : "Category", width: "120px", render: (row) => <p className={moduleVisual.body}>{pageData?.products.find((item) => item.productId === row.productId)?.category ?? "-"}</p> },
+    { key: "branch", label: isZh ? "Branch" : "Branch", width: "110px", render: (row) => <p className={moduleVisual.body}>{pageData?.warehouses.find((item) => item.warehouseId === pageData?.storeStocks.find((stock) => stock.skuId === row.skuId)?.warehouseId)?.warehouseCode ?? "-"}</p> },
     { key: "storage", label: isZh ? "Storage" : "Storage", width: "95px", render: (row) => <p className={moduleVisual.body}>{pageData?.warehouses.find((item) => item.warehouseId === pageData?.storeStocks.find((stock) => stock.skuId === row.skuId)?.warehouseId)?.type ?? "-"}</p> },
     { key: "current", label: isZh ? "Current Stock" : "Current Stock", width: "110px", render: (row) => <p className={cn(moduleVisual.title, (pageData?.storeStocks.find((item) => item.skuId === row.skuId)?.availableQty.value ?? 0) < row.safetyStock && "text-destructive")}>{pageData?.storeStocks.find((item) => item.skuId === row.skuId)?.availableQty.value ?? 0}</p> },
     { key: "uom", label: "UOM", width: "75px", render: (row) => <p className={moduleVisual.body}>{row.unit}</p> },
@@ -251,6 +251,7 @@ export default function PsiInventoryRoute() {
                 isZh ? "添加备注" : "Add Note",
                 isZh ? "盘点预览" : "Count Stock Preview",
               ]}
+              statusLabel={focusedSku?.status}
             />
           </div>
         </ModuleTwoColumn>

@@ -13,7 +13,7 @@ export function TableFieldChip({
   className?: string;
 }) {
   const toneClassMap: Record<NonNullable<typeof tone>, string> = {
-    default: "border-border/70 bg-muted/40 text-foreground",
+    default: "border-border/70 bg-muted/35 text-foreground",
     success: "border-emerald-500/25 bg-emerald-500/10 text-emerald-400",
     warning: "border-yellow-500/25 bg-yellow-500/10 text-yellow-400",
     danger: "border-destructive/30 bg-destructive/10 text-destructive",
@@ -21,7 +21,7 @@ export function TableFieldChip({
   };
 
   return (
-    <Badge variant="outline" className={cn("h-5 rounded-sm px-2 text-[10px] font-medium", toneClassMap[tone], className)}>
+    <Badge variant="outline" className={cn("inline-flex h-5 min-w-[56px] justify-center rounded-sm px-1.5 text-[10px] font-medium", toneClassMap[tone], className)}>
       {label}
     </Badge>
   );

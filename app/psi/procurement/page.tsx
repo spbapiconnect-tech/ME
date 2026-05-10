@@ -86,7 +86,7 @@ export default function PsiProcurementPage() {
     { key: "poNo", label: "PO No", width: "120px", render: (row) => <p className={moduleVisual.body}>{orders.find((item) => item.requestId === row.requestId)?.orderNo ?? "-"}</p> },
     { key: "branch", label: isZh ? "Branch" : "Branch", width: "95px", render: (row) => <p className={moduleVisual.body}>{row.storeId}</p> },
     { key: "requester", label: isZh ? "Requester" : "Requester", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.audit.createdBy || "-"}</p> },
-    { key: "supplier", label: isZh ? "Supplier" : "Supplier", width: "130px", render: (row) => <p className={moduleVisual.body}>{row.supplierId || "-"}</p> },
+    { key: "supplier", label: isZh ? "Supplier" : "Supplier", width: "150px", render: (row) => <p className={moduleVisual.body}>{row.supplierId || "-"}</p> },
     { key: "items", label: isZh ? "Items" : "Items", width: "70px", render: (row) => <p className={moduleVisual.body}>{row.lines.length}</p> },
     { key: "amount", label: isZh ? "Total Amount" : "Total Amount", width: "115px", render: (row) => <p className={moduleVisual.title}>{row.totalAmount.amount}</p> },
     { key: "needBy", label: isZh ? "Need By" : "Need By", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.neededBy || "-"}</p> },
@@ -255,6 +255,7 @@ export default function PsiProcurementPage() {
                 isZh ? "关联收货预览" : "Link Receiving Preview",
                 isZh ? "添加备注" : "Add Note",
               ]}
+              statusLabel={focusedRequest?.status}
             />
           </div>
         </ModuleTwoColumn>

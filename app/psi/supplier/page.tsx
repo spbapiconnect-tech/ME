@@ -80,9 +80,9 @@ export default function PsiSupplierPage() {
 
   const columns: MultiDimColumn<(typeof filteredSuppliers)[number]>[] = [
     { key: "code", label: isZh ? "Supplier Code" : "Supplier Code", width: "115px", render: (row) => <p className={moduleVisual.title}>{row.supplierCode}</p> },
-    { key: "name", label: isZh ? "Supplier Name" : "Supplier Name", width: "1.4fr", render: (row) => <p className={moduleVisual.title}>{row.name}</p> },
-    { key: "category", label: isZh ? "Category" : "Category", width: "95px", render: (row) => <p className={moduleVisual.body}>{row.category}</p> },
-    { key: "region", label: isZh ? "Region" : "Region", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.serviceRegion}</p> },
+    { key: "name", label: isZh ? "Supplier Name" : "Supplier Name", width: "220px", render: (row) => <p className={moduleVisual.title}>{row.name}</p> },
+    { key: "category", label: isZh ? "Category" : "Category", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.category}</p> },
+    { key: "region", label: isZh ? "Region" : "Region", width: "130px", render: (row) => <p className={moduleVisual.body}>{row.serviceRegion}</p> },
     { key: "contact", label: isZh ? "Contact" : "Contact", width: "100px", render: (row) => <p className={moduleVisual.body}>{pageData?.contacts.find((item) => item.supplierId === row.supplierId)?.name ?? "-"}</p> },
     { key: "lead", label: isZh ? "Lead Time" : "Lead Time", width: "90px", render: (row) => <p className={moduleVisual.body}>{row.leadTimeDays}d</p> },
     { key: "contract", label: isZh ? "Contract Status" : "Contract Status", width: "115px", render: (row) => <TableFieldChip label={contracts.find((item) => item.supplierId === row.supplierId)?.status ?? "-"} tone="muted" /> },
@@ -249,6 +249,7 @@ export default function PsiSupplierPage() {
                 isZh ? "新增问题" : "Add Issue",
                 isZh ? "添加备注" : "Add Note",
               ]}
+              statusLabel={focusedSupplier?.status}
             />
           </div>
         </ModuleTwoColumn>

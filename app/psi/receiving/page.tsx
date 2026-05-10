@@ -75,7 +75,7 @@ export default function ReceivingPage() {
   const columns: MultiDimColumn<(typeof filteredReceiving)[number]>[] = [
     { key: "grn", label: "GRN No", width: "120px", render: (row) => <p className={moduleVisual.title}>{row.receivingNo}</p> },
     { key: "po", label: "PO No", width: "120px", render: (row) => <p className={moduleVisual.body}>{orders.find((item) => item.orderId === row.orderId)?.orderNo ?? row.orderId}</p> },
-    { key: "supplier", label: isZh ? "Supplier" : "Supplier", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.supplierId}</p> },
+    { key: "supplier", label: isZh ? "Supplier" : "Supplier", width: "130px", render: (row) => <p className={moduleVisual.body}>{row.supplierId}</p> },
     { key: "branch", label: isZh ? "Branch" : "Branch", width: "90px", render: (row) => <p className={moduleVisual.body}>{row.warehouseId}</p> },
     { key: "expected", label: isZh ? "Expected Date" : "Expected Date", width: "110px", render: (row) => <p className={moduleVisual.body}>{orders.find((item) => item.orderId === row.orderId)?.expectedReceivingDate?.split("T")[0] ?? "-"}</p> },
     { key: "received", label: isZh ? "Received Date" : "Received Date", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.receivedAt.split("T")[0]}</p> },
@@ -236,6 +236,7 @@ export default function ReceivingPage() {
                 isZh ? "过账预览" : "Post Stock Preview",
                 isZh ? "添加备注" : "Add Note",
               ]}
+              statusLabel={focusedReceiving?.status}
             />
           </div>
         </ModuleTwoColumn>
