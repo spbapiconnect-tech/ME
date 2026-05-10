@@ -81,3 +81,14 @@ test(".write_test is not referenced in mobile navigation files", async () => {
   const content = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
   assert.equal(content.includes(".write_test"), false);
 });
+
+test("ErpShell keeps desktop sidebar and main content structure", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const shell = await readFile("components/erp/erp-shell.tsx", "utf8");
+
+  assert.equal(shell.includes("hidden min-h-screen md:flex"), true);
+  assert.equal(shell.includes("min-w-0 flex-1 flex-col"), true);
+  assert.equal(shell.includes("<ErpTopbar />"), true);
+  assert.equal(shell.includes("md:hidden"), true);
+  assert.equal(shell.includes("<ErpMobileBottomNav />"), true);
+});
