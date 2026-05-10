@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -658,10 +658,25 @@ export default function InventoryPage() {
     [selectedSku]
   );
 
-  useEffect(() => {
-    if (viewMode === "grid" && gridScrollRef.current) {
-      gridScrollRef.current.scrollLeft = 0;
-    }
+  useLayoutEffect(() => {
+    if (viewMode !== "grid") return;
+
+    const resetGridScroll = () => {
+      if (gridScrollRef.current) {
+        gridScrollRef.current.scrollLeft = 0;
+      }
+    };
+
+    resetGridScroll();
+    const frameOne = requestAnimationFrame(resetGridScroll);
+    const frameTwo = requestAnimationFrame(() => requestAnimationFrame(resetGridScroll));
+    const timeout = window.setTimeout(resetGridScroll, 80);
+
+    return () => {
+      cancelAnimationFrame(frameOne);
+      cancelAnimationFrame(frameTwo);
+      window.clearTimeout(timeout);
+    };
   }, [viewMode]);
 
   const selectRow = (sku: string) => {
@@ -777,7 +792,13 @@ export default function InventoryPage() {
                 </Button>
               </div>
 
-              <div ref={gridScrollRef} className="overflow-x-auto p-3">
+              <div
+                ref={(node) => {
+                  gridScrollRef.current = node;
+                  if (node) node.scrollLeft = 0;
+                }}
+                className="overflow-x-auto p-3"
+              >
                 <div className="min-w-[1250px]">
                   <div className="grid h-10 grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_150px_56px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     {["", "SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "UOM", "Safety", "Coverage", "Supplier", "Unit Cost", ""].map((head, index) => (
