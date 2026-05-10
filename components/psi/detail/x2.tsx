@@ -12,6 +12,7 @@ import {
   MeWorkspaceSection,
 } from "@/components/layout";
 import { ErpPageHeader, ErpShell } from "@/components/erp";
+import { psiVisual } from "@/components/psi/psi-visual";
 import { getPsiCopy, type PsiLocale } from "@/config/psi-language-copy";
 import { useUiPreferencesStore } from "@/stores/ui-preferences";
 import type { DisplayRecord } from "@/types/display-model";
@@ -103,7 +104,7 @@ export function PsiWorkspaceLayoutV072({
 
   return (
     <ErpShell activeHref={detailBasePath}>
-      <div className="space-y-6">
+      <div className={psiVisual.pageStack}>
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", moduleLabel]}
           title={pageTitle}
@@ -132,7 +133,7 @@ export function PsiWorkspaceLayoutV072({
       <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => (
           <MeWorkspaceSection key={item.label} title={getStatLabel(item.label, psiCopy)} className="shadow-[0_1px_2px_rgba(15,23,42,0.04)]" description={undefined}>
-            <p className="text-[1.55rem] font-semibold tracking-[-0.02em] text-slate-950">{item.value}</p>
+            <p className="text-[1.55rem] font-semibold tracking-[-0.02em] text-foreground">{item.value}</p>
           </MeWorkspaceSection>
         ))}
       </section>
@@ -175,8 +176,8 @@ export function PsiWorkspaceLayoutV072({
                 rows={records.map((record) => [
                   record.id,
                   <div key={`${record.id}-title`}>
-                    <p className="font-medium text-slate-900">{record.title}</p>
-                    <p className="mt-1 text-xs text-slate-500">{record.subtitle}</p>
+                    <p className="font-medium text-foreground">{record.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{record.subtitle}</p>
                   </div>,
                   record.status,
                   record.priority,
@@ -192,8 +193,8 @@ export function PsiWorkspaceLayoutV072({
                 <div className="grid gap-3 md:grid-cols-2">
                   {selectedRecord.meta.map((item) => (
                     <div key={item.label.en} className="border-b border-slate-100/90 pb-3 last:border-b-0 md:last:border-b md:last:pb-3">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{getLocalizedMetaLabel(item, currentLocale)}</p>
-                      <p className="mt-1.5 text-sm font-semibold text-slate-900">{item.value}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{getLocalizedMetaLabel(item, currentLocale)}</p>
+                      <p className="mt-1.5 text-sm font-semibold text-foreground">{item.value}</p>
                     </div>
                   ))}
                 </div>
