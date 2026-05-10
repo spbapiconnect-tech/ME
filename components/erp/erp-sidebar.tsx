@@ -96,6 +96,12 @@ const sidebarGroups: SidebarGroup[] = [
 
 function isItemActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
+
+  // Module overview routes should not stay active when a child module route is open.
+  // Example: /psi should not be active for /psi/procurement.
+  const overviewOnlyRoutes = new Set(["/psi"]);
+  if (overviewOnlyRoutes.has(href)) return pathname === href;
+
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
