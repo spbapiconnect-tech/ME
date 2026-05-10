@@ -402,7 +402,7 @@ function QuickList({
 
       <div className="overflow-hidden px-3 pt-3">
         <div className="grid h-10 grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          <div className="me-grid-action-cell flex justify-center">
+          <div className="flex justify-center">
             <span className="h-5 w-5 rounded border border-primary/70" />
           </div>
           <div>SKU</div>
@@ -429,7 +429,7 @@ function QuickList({
                   active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                 ].join(" ")}
               >
-                <div className="me-grid-action-cell flex justify-center">
+                <div className="flex justify-center">
                   <button
                     type="button"
                     aria-label={`Select ${item.sku}`}
@@ -445,7 +445,7 @@ function QuickList({
                 </div>
                 <div className="font-semibold text-foreground">{item.sku}</div>
                 <div className="truncate font-medium">{item.itemName}</div>
-                <div className="me-grid-action-cell flex justify-center">
+                <div className="flex justify-center">
                   <Button
                     type="button"
                     variant="ghost"
@@ -469,7 +469,7 @@ function QuickList({
               key={`empty-${index}`}
               className="grid h-[38px] grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center border-b border-border text-sm text-muted-foreground/35"
             >
-              <div className="me-grid-action-cell flex justify-center">
+              <div className="flex justify-center">
                 <span className="h-5 w-5 rounded border border-border/70" />
               </div>
               <div>—</div>
@@ -772,9 +772,9 @@ export default function InventoryPage() {
 
               <div className="overflow-x-auto p-3">
                 <div className="min-w-[1250px]">
-                  <div className="grid h-10 grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_110px_56px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  <div className="grid h-10 grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_110px_70px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     {["", "SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "UOM", "Safety", "Coverage", "Supplier", "Unit Cost", ""].map((head, index) => (
-                      <div key={`${head}-${index}`} className={head === "Action" || head === "" ? "me-grid-action-header px-0 text-center" : "px-3"}>{head}</div>
+                      <div key={`${head}-${index}`} className="px-3">{head}</div>
                     ))}
                   </div>
 
@@ -793,11 +793,11 @@ export default function InventoryPage() {
                             if (event.key === "Enter" || event.key === " ") selectRow(item.sku);
                           }}
                           className={[
-                            "grid h-[38px] cursor-pointer grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_110px_56px] items-center border-b border-border text-sm transition",
+                            "grid h-[38px] cursor-pointer grid-cols-[42px_120px_220px_120px_100px_100px_130px_80px_110px_120px_120px_110px_70px] items-center border-b border-border text-sm transition",
                             active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                           ].join(" ")}
                         >
-                          <div className="me-grid-action-cell flex justify-center">
+                          <div className="flex justify-center">
                             <button
                               type="button"
                               aria-label={`Select ${item.sku}`}
@@ -822,7 +822,7 @@ export default function InventoryPage() {
                           <div className="px-3 text-muted-foreground">{item.coverageDays}</div>
                           <div className="truncate px-3 text-muted-foreground">{item.primarySupplier}</div>
                           <div className="px-3 text-muted-foreground">{item.unitCost}</div>
-                          <div className="me-grid-action-cell flex justify-center">
+                          <div className="flex justify-center">
                             <Button
                               type="button"
                               variant="ghost"
