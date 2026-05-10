@@ -12,10 +12,10 @@ export default async function PsiInventoryRoute() {
       isMock={data.isMock}
       error={data.error}
       stats={[
-        { label: "Total SKUs", value: data.pageData?.skuList.length ?? 0 },
+        { label: "Total SKUs", value: (data.pageData?.skuList ?? []).length },
         { label: "Low Stock Alerts", value: data.pageData?.skuList.filter(s => s.status === "low-stock").length ?? 0 },
         { label: "Out of Stock", value: data.pageData?.skuList.filter(s => s.status === "out-of-stock").length ?? 0 },
-        { label: "Issues Open", value: data.pageData?.issues.length ?? 0 },
+        { label: "Issues Open", value: (data.pageData?.issues ?? []).length },
       ]}
       records={data.records}
       issueRecords={data.issueRecords}
