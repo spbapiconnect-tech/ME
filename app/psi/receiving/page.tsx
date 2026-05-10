@@ -132,7 +132,7 @@ export default function ReceivingPage() {
   if (!data || !pageData) return null;
 
   return (
-    <ErpShell activeHref="/psi/receiving" compactSidebar>
+    <ErpShell activeHref="/psi/receiving">
       <ModulePageStack className="space-y-3">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "收货" : "Receiving"]}

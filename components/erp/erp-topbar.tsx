@@ -20,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Search, Bell, Globe, User, MoonStar, Sparkles, SunMedium } from "lucide-react";
+import { Search, Bell, Globe, User, MoonStar, Sparkles, SunMedium, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { useDictionary } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -30,16 +30,26 @@ const themeIcons = {
   moon: MoonStar,
 } as const;
 
-export function ErpTopbar() {
+export function ErpTopbar({
+  isSidebarVisible = true,
+  onToggleSidebar,
+}: {
+  isSidebarVisible?: boolean;
+  onToggleSidebar?: () => void;
+}) {
 
   const { theme, setTheme } = useErpTheme();
   const { language, setLanguage } = useErpLanguage();
   const dict = useDictionary();
-  const ThemeIcon = themeIcons[theme as keyof typeof themeIcons] || SunMedium;
 
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-border bg-card/80 backdrop-blur-md px-6">
       <div className="flex items-center gap-4 flex-1">
+        {onToggleSidebar ? (
+          <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={onToggleSidebar} aria-label={isSidebarVisible ? "Hide sidebar" : "Show sidebar"}>
+            {isSidebarVisible ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+          </Button>
+        ) : null}
         <div className="relative w-full max-w-[320px] group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input

@@ -136,7 +136,7 @@ export default function PsiInventoryRoute() {
   if (!data || !pageData) return null;
 
   return (
-    <ErpShell activeHref="/psi/inventory" compactSidebar>
+    <ErpShell activeHref="/psi/inventory">
       <ModulePageStack className="space-y-3">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "库存" : "Inventory"]}

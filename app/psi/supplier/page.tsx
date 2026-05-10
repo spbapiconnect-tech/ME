@@ -143,7 +143,7 @@ export default function PsiSupplierPage() {
   if (!data || !pageData) return null;
 
   return (
-    <ErpShell activeHref="/psi/supplier" compactSidebar>
+    <ErpShell activeHref="/psi/supplier">
       <ModulePageStack className="space-y-3">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "供应商" : "Supplier"]}

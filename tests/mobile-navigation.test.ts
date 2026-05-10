@@ -88,7 +88,21 @@ test("ErpShell keeps desktop sidebar and main content structure", async () => {
 
   assert.equal(shell.includes("hidden min-h-screen md:flex"), true);
   assert.equal(shell.includes("min-w-0 flex-1 flex-col"), true);
-  assert.equal(shell.includes("<ErpTopbar />"), true);
+  assert.equal(shell.includes("<ErpTopbar isSidebarVisible={isSidebarVisible}"), true);
   assert.equal(shell.includes("md:hidden"), true);
   assert.equal(shell.includes("<ErpMobileBottomNav />"), true);
+});
+
+test("desktop sidebar contains grouped labels and PSI routes", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const sidebar = await readFile("components/erp/erp-sidebar.tsx", "utf8");
+
+  for (const label of ["Dashboard", "Store Operations", "PSI", "Workforce", "Business", "System"]) {
+    assert.equal(sidebar.includes(`label: \"${label}\"`), true);
+  }
+  for (const href of ["/psi", "/psi/procurement", "/psi/supplier", "/psi/inventory", "/psi/receiving"]) {
+    assert.equal(sidebar.includes(`href: \"${href}\"`), true);
+  }
+  assert.equal(sidebar.includes("manualOpenGroups"), true);
+  assert.equal(sidebar.includes("activeGroups"), true);
 });
