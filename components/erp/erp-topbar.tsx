@@ -31,10 +31,10 @@ const themeIcons = {
 } as const;
 
 export function ErpTopbar({
-  isSidebarVisible = true,
+  isSidebarCollapsed = false,
   onToggleSidebar,
 }: {
-  isSidebarVisible?: boolean;
+  isSidebarCollapsed?: boolean;
   onToggleSidebar?: () => void;
 }) {
 
@@ -46,8 +46,8 @@ export function ErpTopbar({
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b border-border bg-card/80 backdrop-blur-md px-6">
       <div className="flex items-center gap-4 flex-1">
         {onToggleSidebar ? (
-          <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={onToggleSidebar} aria-label={isSidebarVisible ? "Hide sidebar" : "Show sidebar"}>
-            {isSidebarVisible ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
+          <Button variant="outline" size="icon" className="h-9 w-9 shrink-0" onClick={onToggleSidebar} aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar to icon bar"}>
+            {isSidebarCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
           </Button>
         ) : null}
         <div className="relative w-full max-w-[320px] group">

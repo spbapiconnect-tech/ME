@@ -12,18 +12,22 @@ export function ErpShell({
   activeHref?: string;
   children: ReactNode;
 }) {
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
       <div className="hidden min-h-screen md:flex">
-        {isSidebarVisible ? (
-          <div className="w-56 shrink-0">
-            <ErpSidebar activeHref={activeHref} />
-          </div>
-        ) : null}
+        <ErpSidebar
+          activeHref={activeHref}
+          collapsed={isSidebarCollapsed}
+          onToggleCollapsed={() => setIsSidebarCollapsed((prev) => !prev)}
+        />
+
         <div className="flex min-w-0 flex-1 flex-col">
-          <ErpTopbar isSidebarVisible={isSidebarVisible} onToggleSidebar={() => setIsSidebarVisible((prev) => !prev)} />
+          <ErpTopbar
+            isSidebarCollapsed={isSidebarCollapsed}
+            onToggleSidebar={() => setIsSidebarCollapsed((prev) => !prev)}
+          />
           <main className="min-h-0 min-w-0 flex-1 overflow-y-auto p-4">{children}</main>
         </div>
       </div>
@@ -38,7 +42,7 @@ export function ErpShell({
             </div>
           </div>
         </div>
-        <main className="min-w-0 pb-24 p-3">{children}</main>
+        <main className="min-w-0 p-3 pb-24">{children}</main>
         <ErpMobileBottomNav />
       </div>
     </div>
