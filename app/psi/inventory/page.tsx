@@ -820,12 +820,12 @@ export default function InventoryPage() {
                 }}
                 className="overflow-x-auto p-3"
               >
-                <div className="min-w-[1250px]">
-                  <div className="grid h-9 grid-cols-[36px_104px_210px_110px_90px_96px_124px_70px_92px_100px_126px_128px_52px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                <div className="min-w-[1280px]">
+                  <div className="grid h-9 grid-cols-[52px_104px_210px_110px_90px_96px_124px_70px_92px_100px_126px_128px_52px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground [&>div]:border-r [&>div]:border-border/45 [&>div:last-child]:border-r-0">
                     {["", "SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "UOM", "Safety", "Coverage", "Supplier", "Unit Cost", ""].map((head, index) => (
                       <div
                         key={`${head}-${index}`}
-                        className={index === 12 ? "flex items-center justify-center px-0" : "px-3"}
+                        className={index === 12 ? "flex items-center justify-center border-l border-border/45 px-0" : "px-3"}
                       >
                         {index === 12 ? "Action" : head}
                       </div>
@@ -847,11 +847,11 @@ export default function InventoryPage() {
                             if (event.key === "Enter" || event.key === " ") selectRow(item.sku);
                           }}
                           className={[
-                            "grid h-9 cursor-pointer grid-cols-[36px_104px_210px_110px_90px_96px_124px_70px_92px_100px_126px_128px_52px] items-center border-b border-border text-xs transition",
+                            "grid h-9 cursor-pointer grid-cols-[52px_104px_210px_110px_90px_96px_124px_70px_92px_100px_126px_128px_52px] items-center border-b border-border text-xs transition [&>div]:border-r [&>div]:border-border/45 [&>div:last-child]:border-r-0",
                             active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                           ].join(" ")}
                         >
-                          <div className="flex w-[52px] min-w-[52px] items-center justify-center px-0">
+                          <div className="flex items-center justify-center border-l border-border/45 px-0">
                             <button
                               type="button"
                               aria-label={`Select ${item.sku}`}
@@ -876,7 +876,7 @@ export default function InventoryPage() {
                           <div className="px-3 text-muted-foreground">{item.coverageDays}</div>
                           <div className="truncate px-3 text-muted-foreground">{item.primarySupplier}</div>
                           <div className="whitespace-nowrap px-3 text-muted-foreground">{item.unitCost}</div>
-                          <div className="flex w-[52px] min-w-[52px] items-center justify-center px-0">
+                          <div className="flex items-center justify-center px-0">
                             <Button
                               type="button"
                               variant="ghost"
