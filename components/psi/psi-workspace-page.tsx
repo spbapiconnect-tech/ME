@@ -1,4 +1,4 @@
-import { PsiWorkspaceLayoutV072 } from "@/components/psi/detail/x2";
+import { PsiWorkspaceUnified } from "@/components/psi/psi-workspace-unified";
 
 import type { DisplayRecord } from "@/types/display-model";
 
@@ -16,5 +16,5 @@ interface WorkspacePageProps {
 }
 
 export function PsiWorkspacePage(props: WorkspacePageProps) {
-  return <PsiWorkspaceLayoutV072 {...props} />;
+  return <PsiWorkspaceUnified {...props} />;
 }
