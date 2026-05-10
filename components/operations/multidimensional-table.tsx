@@ -76,8 +76,20 @@ export function MultidimensionalTable<T extends object>({
               const selected = selectedRowIds.has(id);
               const focused = selectedRecordId === id;
               return (
-                <div key={id} className={cn("grid border-b border-border/55", focused ? "bg-primary/8" : "hover:bg-muted/25")} style={{ gridTemplateColumns }}>
-                  <div className={cn("sticky left-0 z-10 flex items-center justify-center border-r border-border/55 px-2 py-1.5", focused ? "bg-primary/10" : "bg-card/95")}>
+                <div
+                  key={id}
+                  className={cn(
+                    "grid border-b border-border/55",
+                    onRowFocus ? "cursor-pointer" : "",
+                    focused ? "bg-primary/8" : "hover:bg-muted/25"
+                  )}
+                  style={{ gridTemplateColumns }}
+                  onClick={() => onRowFocus?.(id)}
+                >
+                  <div
+                    className={cn("sticky left-0 z-10 flex items-center justify-center border-r border-border/55 px-2 py-1.5", focused ? "bg-primary/10" : "bg-card/95")}
+                    onClick={(event) => event.stopPropagation()}
+                  >
                     <Checkbox checked={selected} onCheckedChange={() => onToggleRow(id)} aria-label={`Select ${id}`} />
                   </div>
                   {columns.map((column, index) => (
@@ -85,9 +97,9 @@ export function MultidimensionalTable<T extends object>({
                       key={column.key}
                       className={cn("border-r border-border/45 px-2.5 py-1.5", index < 2 && (focused ? "bg-primary/6" : "bg-card/85"))}
                     >
-                      <button type="button" className="block w-full truncate text-left text-xs leading-5" onClick={() => onRowFocus?.(id)}>
+                      <div className="block w-full truncate text-left text-xs leading-5">
                         {column.render(row)}
-                      </button>
+                      </div>
                     </div>
                   ))}
                 </div>
