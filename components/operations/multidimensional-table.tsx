@@ -70,7 +70,7 @@ export function MultidimensionalTable<T extends object>({
             ))}
           </div>
 
-          <div className="max-h-[620px] overflow-y-auto">
+          <div className="min-h-[560px] max-h-[calc(100vh-280px)] overflow-y-auto">
             {rows.map((row) => {
               const id = String(row[rowIdKey]);
               const selected = selectedRowIds.has(id);

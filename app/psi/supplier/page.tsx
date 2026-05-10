@@ -143,7 +143,7 @@ export default function PsiSupplierPage() {
   if (!data || !pageData) return null;
 
   return (
-    <ErpShell activeHref="/psi/supplier">
+    <ErpShell activeHref="/psi/supplier" compactSidebar>
       <ModulePageStack className="space-y-3">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "供应商" : "Supplier"]}
@@ -191,7 +191,7 @@ export default function PsiSupplierPage() {
           }
         />
 
-        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_18.5rem]">
           <div className="space-y-3">
             <ModuleSection title={isZh ? "供应商主数据列表" : "Supplier Master List"} className="p-3">
               <MultidimensionalTable

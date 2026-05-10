@@ -136,7 +136,7 @@ export default function PsiInventoryRoute() {
   if (!data || !pageData) return null;
 
   return (
-    <ErpShell activeHref="/psi/inventory">
+    <ErpShell activeHref="/psi/inventory" compactSidebar>
       <ModulePageStack className="space-y-3">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "库存" : "Inventory"]}
@@ -184,7 +184,7 @@ export default function PsiInventoryRoute() {
           }
         />
 
-        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_18.5rem]">
           <div className="space-y-3">
             <ModuleSection title={isZh ? "库存 SKU 矩阵" : "Inventory SKU Matrix"} className="p-3">
               <MultidimensionalTable
@@ -196,7 +196,7 @@ export default function PsiInventoryRoute() {
                 onToggleAll={toggleAll}
                 selectedRecordId={focusedSku?.skuId}
                 onRowFocus={setFocusedSkuId}
-                pageLabel={isZh ? "显示 1–100 / 共 872" : "Showing 1–100 of 872"}
+                pageLabel={isZh ? "显示 1–50 / 共 872" : "Showing 1–50 of 872"}
                 rowsPerPageLabel={isZh ? "每页 50 / 100 / 200" : "Rows per page 50 / 100 / 200"}
                 minWidth="1500px"
               />

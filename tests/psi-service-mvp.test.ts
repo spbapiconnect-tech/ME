@@ -101,6 +101,21 @@ test("psi routes import without crashing", async () => {
   }
 });
 
+test("PSI table/layout shell components import without crashing", async () => {
+  const [operations, moduleShell, erpShell, erpSidebar] = await Promise.all([
+    import("../components/operations"),
+    import("../components/erp/module-shell"),
+    import("../components/erp/erp-shell"),
+    import("../components/erp/erp-sidebar"),
+  ]);
+  assert.equal(typeof operations.MultidimensionalTable, "function");
+  assert.equal(typeof operations.TableActionBar, "function");
+  assert.equal(typeof operations.RecordDetailPanel, "function");
+  assert.equal(typeof moduleShell.ModuleTwoColumn, "function");
+  assert.equal(typeof erpShell.ErpShell, "function");
+  assert.equal(typeof erpSidebar.ErpSidebar, "function");
+});
+
 test("no PSI service/repository/helper contains fetch or axios", async () => {
   const { readFile } = await import("node:fs/promises");
   const files = [
@@ -131,6 +146,9 @@ test("PSI workspace files contain no storage/api/db/write execution calls", asyn
     "components/operations/table-action-bar.tsx",
     "components/operations/table-view-tabs.tsx",
     "components/operations/record-detail-panel.tsx",
+    "components/erp/erp-shell.tsx",
+    "components/erp/erp-sidebar.tsx",
+    "components/erp/module-shell.tsx",
   ];
   const content = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
   for (const forbidden of [

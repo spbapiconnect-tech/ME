@@ -132,7 +132,7 @@ export default function ReceivingPage() {
   if (!data || !pageData) return null;
 
   return (
-    <ErpShell activeHref="/psi/receiving">
+    <ErpShell activeHref="/psi/receiving" compactSidebar>
       <ModulePageStack className="space-y-3">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "收货" : "Receiving"]}
@@ -179,7 +179,7 @@ export default function ReceivingPage() {
           }
         />
 
-        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_18.5rem]">
           <div className="space-y-3">
             <ModuleSection title={isZh ? "收货 / GRN 列表" : "Receiving / GRN List"} className="p-3">
               <MultidimensionalTable

@@ -154,7 +154,7 @@ export default function PsiProcurementPage() {
   if (!data || !pageData) return null;
 
   return (
-    <ErpShell activeHref="/psi/procurement">
+    <ErpShell activeHref="/psi/procurement" compactSidebar>
       <ModulePageStack className="space-y-3">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "采购" : "Procurement"]}
@@ -203,7 +203,7 @@ export default function PsiProcurementPage() {
           }
         />
 
-        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_18.5rem]">
           <div className="space-y-3">
             <ModuleSection title={isZh ? "PR / PO 操作列表" : "PR / PO Operations List"} className="p-3">
               <MultidimensionalTable
