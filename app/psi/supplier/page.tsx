@@ -1,30 +1,43 @@
 "use client";
 
-import { ErpPageHeader, ErpShell } from "@/components/erp";
-import { ModulePageStack, ModuleSection, ModuleTwoColumn, moduleVisual } from "@/components/erp/module-shell";
-import { Button } from "@/components/ui/button";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, Eye, FileDown, Plus, Star } from "lucide-react";
+import { ErpShell } from "@/components/erp/erp-shell";
 import { Badge } from "@/components/ui/badge";
-import { CompactStatStrip } from "@/components/operations/compact-stat-strip";
+import { Button } from "@/components/ui/button";
 import { TableActionBar } from "@/components/operations/table-action-bar";
 import { TableFieldChip } from "@/components/operations/table-field-chip";
 import { TableViewTabs } from "@/components/operations/table-view-tabs";
 import { MultidimensionalTable, type MultiDimColumn } from "@/components/operations/multidimensional-table";
-import { RecordDetailPanel } from "@/components/operations/record-detail-panel";
-import { getPsiSupplierWorkspacePageData } from "@/lib/page-data/psi";
-import { useUiPreferencesStore } from "@/stores/ui-preferences";
-import { useEffect, useMemo, useState } from "react";
-import type { PsiSupplierWorkspacePageData } from "@/lib/page-data/psi";
-import { Plus, FileDown, MoreHorizontal, Star } from "lucide-react";
+import { CompactStatStrip } from "@/components/operations/compact-stat-strip";
+import { getPsiSupplierWorkspacePageData, type PsiSupplierWorkspacePageData } from "@/lib/page-data/psi";
+
+function FactRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="grid grid-cols-[145px_1fr] gap-3 rounded-lg border border-border/70 bg-secondary/20 px-3 py-2 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium text-foreground">{value}</span>
+    </div>
+  );
+}
+
+function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="space-y-2">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">{title}</div>
+      <div className="grid gap-2 md:grid-cols-2">{children}</div>
+    </section>
+  );
+}
 
 export default function PsiSupplierPage() {
   const [data, setData] = useState<PsiSupplierWorkspacePageData | null>(null);
   const [viewKey, setViewKey] = useState("all");
+  const [viewMode, setViewMode] = useState<"grid" | "detail">("grid");
   const [selectedRowIds, setSelectedRowIds] = useState<Set<string>>(new Set());
   const [focusedSupplierId, setFocusedSupplierId] = useState<string | null>(null);
   const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("compact");
-  const [rowActionPreview, setRowActionPreview] = useState<string | null>(null);
-  const locale = useUiPreferencesStore((state) => state.locale);
-  const isZh = locale === "zh";
+  const [previewMessage, setPreviewMessage] = useState("Ready.");
 
   useEffect(() => {
     getPsiSupplierWorkspacePageData().then(setData);
@@ -39,15 +52,15 @@ export default function PsiSupplierPage() {
 
   const viewTabs = useMemo(
     () => [
-      { key: "all", label: isZh ? "全部供应商" : "All Suppliers", count: suppliers.length },
-      { key: "active", label: isZh ? "活跃" : "Active", count: suppliers.filter((item) => item.status === "active").length },
-      { key: "expiring", label: isZh ? "合同将到期" : "Contract Expiring", count: contracts.filter((item) => item.status === "review").length },
-      { key: "quality", label: isZh ? "质量异常" : "Quality Issues", count: issues.length },
-      { key: "late", label: isZh ? "响应延迟" : "Late Response", count: issues.filter((item) => item.priority === "high" || item.priority === "critical").length },
-      { key: "blocked", label: isZh ? "已阻断" : "Blocked", count: suppliers.filter((item) => item.status === "blocked").length },
-      { key: "category", label: isZh ? "按分类" : "By Category", count: new Set(suppliers.map((item) => item.category)).size },
+      { key: "all", label: "All Suppliers", count: suppliers.length },
+      { key: "active", label: "Active", count: suppliers.filter((item) => item.status === "active").length },
+      { key: "expiring", label: "Contract Expiring", count: contracts.filter((item) => item.status === "review").length },
+      { key: "quality", label: "Quality Issues", count: issues.length },
+      { key: "late", label: "Late Response", count: issues.filter((item) => item.priority === "high" || item.priority === "critical").length },
+      { key: "blocked", label: "Blocked", count: suppliers.filter((item) => item.status === "blocked").length },
+      { key: "category", label: "By Category", count: new Set(suppliers.map((item) => item.category)).size },
     ],
-    [contracts, isZh, issues, suppliers]
+    [contracts, issues, suppliers]
   );
 
   const filteredSuppliers = useMemo(() => {
@@ -63,7 +76,7 @@ export default function PsiSupplierPage() {
       case "blocked":
         return suppliers.filter((item) => item.status === "blocked");
       case "category":
-        return suppliers.filter((item) => ["Dairy", "Dry Goods", "Beverage"].includes(item.category));
+        return suppliers;
       default:
         return suppliers;
     }
@@ -78,55 +91,37 @@ export default function PsiSupplierPage() {
   const focusedContract = focusedSupplier ? contracts.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
   const focusedRating = focusedSupplier ? ratings.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
   const focusedIssues = focusedSupplier ? issues.filter((item) => item.supplierId === focusedSupplier.supplierId) : [];
-  const linkedOrders = focusedSupplier ? quotations.filter((item) => item.supplierId === focusedSupplier.supplierId).slice(0, 2) : [];
+  const linkedOrders = focusedSupplier ? quotations.filter((item) => item.supplierId === focusedSupplier.supplierId).slice(0, 3) : [];
+
+  const emptyRows = Array.from({ length: Math.max(0, 20 - filteredSuppliers.length) });
+
+  const openDetail = (id: string) => {
+    setFocusedSupplierId(id);
+    setSelectedRowIds(new Set([id]));
+    setViewMode("detail");
+  };
+
+  const showPreview = (label: string) => setPreviewMessage(`${label} preview only.`);
 
   const columns: MultiDimColumn<(typeof filteredSuppliers)[number]>[] = [
-    { key: "code", label: isZh ? "Supplier Code" : "Supplier Code", width: "115px", render: (row) => <p className={moduleVisual.title}>{row.supplierCode}</p> },
-    { key: "name", label: isZh ? "Supplier Name" : "Supplier Name", width: "220px", render: (row) => <p className={moduleVisual.title}>{row.name}</p> },
-    { key: "category", label: isZh ? "Category" : "Category", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.category}</p> },
-    { key: "region", label: isZh ? "Region" : "Region", width: "130px", render: (row) => <p className={moduleVisual.body}>{row.serviceRegion}</p> },
-    { key: "contact", label: isZh ? "Contact" : "Contact", width: "100px", render: (row) => <p className={moduleVisual.body}>{pageData?.contacts.find((item) => item.supplierId === row.supplierId)?.name ?? "-"}</p> },
-    { key: "lead", label: isZh ? "Lead Time" : "Lead Time", width: "90px", render: (row) => <p className={moduleVisual.body}>{row.leadTimeDays}d</p> },
-    { key: "contract", label: isZh ? "Contract Status" : "Contract Status", width: "115px", render: (row) => <TableFieldChip label={contracts.find((item) => item.supplierId === row.supplierId)?.status ?? "-"} tone="muted" /> },
-    { key: "lastOrder", label: isZh ? "Last Order" : "Last Order", width: "110px", render: (row) => <p className={moduleVisual.body}>{quotations.find((item) => item.supplierId === row.supplierId)?.effectiveFrom ?? "-"}</p> },
-    { key: "issues", label: isZh ? "Open Issues" : "Open Issues", width: "95px", render: (row) => <p className={moduleVisual.body}>{issues.filter((item) => item.supplierId === row.supplierId).length}</p> },
-    {
-      key: "rating",
-      label: isZh ? "Rating" : "Rating",
-      width: "90px",
-      render: (row) => (
-        <div className="flex items-center gap-1">
-          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          <span className={moduleVisual.title}>{ratings.find((item) => item.supplierId === row.supplierId)?.grade ?? "N/A"}</span>
-        </div>
-      ),
-    },
-    {
-      key: "risk",
-      label: isZh ? "Risk" : "Risk",
-      width: "90px",
-      render: (row) => (
-        <TableFieldChip
-          label={issues.some((item) => item.supplierId === row.supplierId) ? "watch" : "low"}
-          tone={issues.some((item) => item.supplierId === row.supplierId) ? "warning" : "success"}
-        />
-      ),
-    },
+    { key: "code", label: "Supplier Code", width: "120px", render: (row) => <p className="font-semibold">{row.supplierCode}</p> },
+    { key: "name", label: "Supplier Name", width: "220px", render: (row) => <p className="font-semibold">{row.name}</p> },
+    { key: "category", label: "Category", width: "120px", render: (row) => <p>{row.category}</p> },
+    { key: "region", label: "Region", width: "120px", render: (row) => <p>{row.serviceRegion}</p> },
+    { key: "contact", label: "Contact", width: "130px", render: (row) => <p>{pageData?.contacts.find((item) => item.supplierId === row.supplierId)?.name ?? "-"}</p> },
+    { key: "lead", label: "Lead Time", width: "90px", render: (row) => <p>{row.leadTimeDays}d</p> },
+    { key: "contract", label: "Contract Status", width: "130px", render: (row) => <TableFieldChip label={contracts.find((item) => item.supplierId === row.supplierId)?.status ?? "-"} tone="muted" /> },
+    { key: "lastOrder", label: "Last Order", width: "110px", render: (row) => <p>{quotations.find((item) => item.supplierId === row.supplierId)?.effectiveFrom ?? "-"}</p> },
+    { key: "issues", label: "Open Issues", width: "90px", render: (row) => <p>{issues.filter((item) => item.supplierId === row.supplierId).length}</p> },
+    { key: "rating", label: "Rating", width: "90px", render: (row) => <div className="flex items-center gap-1"><Star className="h-3 w-3 fill-yellow-400 text-yellow-400" /><span className="font-semibold">{ratings.find((item) => item.supplierId === row.supplierId)?.grade ?? "N/A"}</span></div> },
+    { key: "risk", label: "Risk", width: "95px", render: (row) => <TableFieldChip label={issues.some((item) => item.supplierId === row.supplierId) ? "watch" : "low"} tone={issues.some((item) => item.supplierId === row.supplierId) ? "warning" : "success"} /> },
     {
       key: "action",
-      label: isZh ? "Action" : "Action",
-      width: "70px",
-      render: () => (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
-          onClick={(event) => {
-            event.stopPropagation();
-            setRowActionPreview("Supplier row action preview opened.");
-          }}
-        >
-          <MoreHorizontal className="h-4 w-4" />
+      label: "Action",
+      width: "80px",
+      render: (row) => (
+        <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={(event) => { event.stopPropagation(); openDetail(row.supplierId); }} title="View Detail">
+          <Eye className="h-4 w-4" />
         </Button>
       ),
     },
@@ -150,134 +145,230 @@ export default function PsiSupplierPage() {
     });
   };
 
-  if (!data || !pageData) return null;
+  if (!data || !pageData || !focusedSupplier) return null;
 
   return (
     <ErpShell activeHref="/psi/supplier">
-      <ModulePageStack className="space-y-3">
-        <ErpPageHeader
-          breadcrumbs={["ME", "PSI", isZh ? "供应商" : "Supplier"]}
-          title={isZh ? "ME PSI 供应商" : "ME PSI Supplier"}
-          subtitle={isZh ? "供应商主数据与风险管理工作台。" : "Supplier master list and risk management workspace."}
-          actions={
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" className="hidden md:inline-flex">
-                <FileDown className="mr-2 h-4 w-4" />
-                {isZh ? "导出" : "Export"}
+      <div className="space-y-4">
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-xs text-muted-foreground">ME / PSI / Supplier</div>
+            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">ME PSI Supplier</h1>
+            <p className="mt-1 text-sm text-muted-foreground">{viewMode === "grid" ? "Normal View: wide supplier master grid with compact selected supplier summary." : "Detail View: 40% quick supplier list and 60% full supplier detail."}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {viewMode === "detail" ? (
+              <Button variant="outline" size="sm" onClick={() => setViewMode("grid")}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Grid
               </Button>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                {isZh ? "新增供应商" : "Add Supplier"}
-              </Button>
-            </div>
-          }
-        />
+            ) : null}
+            <Button variant="outline" size="sm" onClick={() => showPreview("Export")}> 
+              <FileDown className="mr-2 h-4 w-4" />
+              Export
+            </Button>
+            <Button size="sm" onClick={() => showPreview("Add Supplier")}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Supplier
+            </Button>
+          </div>
+        </header>
 
-        <TableViewTabs title={isZh ? "已保存视图" : "Saved Views"} tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        <TableViewTabs title="Saved Views" tabs={viewTabs} value={viewKey} onChange={setViewKey} />
 
         <CompactStatStrip
           items={[
-            { label: isZh ? "Total Suppliers" : "Total Suppliers", value: pageData.stats.totalSuppliers },
-            { label: isZh ? "Active" : "Active", value: pageData.stats.activeSuppliers, tone: "success" },
-            { label: isZh ? "Contract Expiring" : "Contract Expiring", value: contracts.filter((item) => item.status === "review").length, tone: "warning" },
-            { label: isZh ? "Risk / Issues" : "Risk / Issues", value: issues.length, tone: "danger" },
+            { label: "Total Suppliers", value: pageData.stats.totalSuppliers },
+            { label: "Active", value: pageData.stats.activeSuppliers, tone: "success" },
+            { label: "Contract Expiring", value: contracts.filter((item) => item.status === "review").length, tone: "warning" },
+            { label: "Risk / Issues", value: issues.length, tone: "danger" },
           ]}
         />
 
         <TableActionBar
-          searchPlaceholder={isZh ? "搜索供应商名称 / 编码..." : "Search supplier name / code..."}
+          searchPlaceholder="Search supplier name / code..."
           selectedCount={selectedRowIds.size}
-          bulkActionLabel={isZh ? "创建 PR 预览" : "Create PR Preview"}
+          bulkActionLabel="Create PR Preview"
           bulkActionKey="supplier.create_pr_preview"
           density={density}
           onDensityChange={setDensity}
           onClearSelection={() => setSelectedRowIds(new Set())}
-          columns={["Supplier Code", "Supplier Name", "Category", "Region", "Contact", "Lead Time", "Contract Status", "Rating", "Risk"]}
+          columns={["Supplier Code", "Supplier Name", "Category", "Region", "Contact", "Lead Time", "Contract Status", "Last Order", "Open Issues", "Rating", "Risk"]}
           sortOptions={["Supplier Name", "Lead Time", "Open Issues", "Rating"]}
-          advancedFilters={[
-            { title: "Supplier", items: ["Category", "Region", "Contract Status", "Rating", "Risk", "Status", "Lead Time"] },
-          ]}
+          advancedFilters={[{ title: "Supplier", items: ["Category", "Region", "Contract Status", "Rating", "Risk", "Status", "Lead Time"] }]}
           filters={
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "分类: 全部" : "Category: All"}</Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "区域: 全部" : "Region: All"}</Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "合同: 全部" : "Contract: All"}</Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "评级: 全部" : "Rating: All"}</Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "风险: 关注" : "Risk: Watch"}</Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "状态: 活跃" : "Status: Active"}</Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-primary border-primary/30 bg-primary/5">{isZh ? "更多筛选" : "More Filters"}</Badge>
+              {[
+                "Category: All",
+                "Region: All",
+                "Contract: All",
+                "Rating: All",
+                "Risk: Watch",
+                "Status: Active",
+              ].map((item) => (
+                <Badge key={item} variant="outline" className="h-7 px-2 font-normal border-dashed">{item}</Badge>
+              ))}
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-primary border-primary/30 bg-primary/5">More Filters</Badge>
             </div>
           }
         />
 
-        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_18.5rem]">
-          <div className="space-y-3">
-            <ModuleSection title={isZh ? "供应商主数据列表" : "Supplier Master List"} className="p-3">
-              <MultidimensionalTable
-                columns={columns}
-                rows={filteredSuppliers}
-                rowIdKey="supplierId"
-                selectedRowIds={selectedRowIds}
-                onToggleRow={toggleRow}
-                onToggleAll={toggleAll}
-                selectedRecordId={focusedSupplier?.supplierId}
-                onRowFocus={setFocusedSupplierId}
-                pageLabel={isZh ? "显示 1–50 / 共 126" : "Showing 1–50 of 126"}
-                rowsPerPageLabel={isZh ? "每页 50 / 100 / 200" : "Rows per page 50 / 100 / 200"}
-                density={density}
-              />
-            </ModuleSection>
-          </div>
+        <div className="rounded-lg border border-border/60 bg-secondary/10 px-3 py-2 text-xs text-muted-foreground">{previewMessage}</div>
 
-          <div className="xl:sticky xl:top-4 self-start">
-            <RecordDetailPanel
-              title={isZh ? "选中供应商" : "Selected Supplier"}
-              subtitle={focusedSupplier ? `${focusedSupplier.name} / ${focusedSupplier.supplierCode}` : "-"}
-              fields={[
-                { label: isZh ? "联系人" : "Contact", value: focusedContact?.name ?? "-" },
-                { label: isZh ? "分类" : "Category", value: focusedSupplier?.category ?? "-" },
-                { label: isZh ? "区域" : "Region", value: focusedSupplier?.serviceRegion ?? "-" },
-                { label: isZh ? "交期" : "Lead Time", value: focusedSupplier ? `${focusedSupplier.leadTimeDays}d` : "-" },
-                { label: isZh ? "合同" : "Contract", value: focusedContract?.status ?? "-" },
-                { label: isZh ? "最近下单" : "Last Order", value: linkedOrders[0]?.effectiveFrom ?? "-" },
-                { label: isZh ? "开放问题" : "Open Issues", value: focusedIssues.length },
-                { label: isZh ? "评分" : "Rating", value: focusedRating?.grade ?? "N/A" },
-              ]}
-              sections={[
-                {
-                  title: isZh ? "关联 PR / PO" : "Linked PR / PO",
-                  items: linkedOrders.map((order) => (
-                    <div key={order.quotationId}>
-                      <p className={moduleVisual.title}>{order.skuId}</p>
-                      <p className={moduleVisual.muted}>{order.effectiveFrom}</p>
+        {viewMode === "detail" ? (
+          <section className="grid gap-4 xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
+            <div className="rounded-xl border border-border bg-card">
+              <div className="flex items-center justify-between border-b border-border p-4">
+                <div>
+                  <h2 className="text-base font-semibold">Quick Supplier List</h2>
+                  <p className="mt-1 text-xs text-muted-foreground">Fixed 20-row speed list · Supplier Code and Supplier Name only.</p>
+                </div>
+              </div>
+              <div className="overflow-hidden px-3 pt-3">
+                <div className="grid h-10 grid-cols-[140px_minmax(170px,1fr)_42px] items-center rounded-t-lg border border-border bg-secondary/30 px-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  <div>Supplier Code</div>
+                  <div>Supplier Name</div>
+                  <div />
+                </div>
+                <div className="h-[760px] border-x border-border">
+                  {filteredSuppliers.map((item) => (
+                    <div key={item.supplierId} className={["grid h-[38px] grid-cols-[140px_minmax(170px,1fr)_42px] items-center border-b border-border px-3", focusedSupplier.supplierId === item.supplierId ? "bg-primary/12" : "hover:bg-secondary/30"].join(" ")}>
+                      <button type="button" className="truncate text-left font-semibold" onClick={() => setFocusedSupplierId(item.supplierId)}>{item.supplierCode}</button>
+                      <button type="button" className="truncate text-left" onClick={() => setFocusedSupplierId(item.supplierId)}>{item.name}</button>
+                      <Button type="button" variant="ghost" size="icon" className="h-7 w-7" onClick={() => openDetail(item.supplierId)} title="View Detail"><Eye className="h-4 w-4" /></Button>
                     </div>
-                  )),
-                },
-                {
-                  title: isZh ? "质量备注" : "Quality Notes",
-                  items: focusedIssues.slice(0, 3).map((issue) => (
-                    <div key={issue.issueId}>
-                      <p className={moduleVisual.title}>{issue.title[locale]}</p>
-                      <p className={moduleVisual.muted}>{issue.status}</p>
+                  ))}
+                  {emptyRows.map((_, index) => (
+                    <div key={`empty-${index}`} className="grid h-[38px] grid-cols-[140px_minmax(170px,1fr)_42px] items-center border-b border-border px-3 text-muted-foreground/35">
+                      <div>—</div><div>Empty row slot</div><div />
                     </div>
-                  )),
-                },
-                {
-                  title: isZh ? "Row Action Preview" : "Row Action Preview",
-                  items: rowActionPreview ? [<div key="row-preview">{rowActionPreview}</div>] : [],
-                },
-              ]}
-              actions={[
-                { label: isZh ? "查看供应商" : "View Supplier", controlKey: "table.export" },
-                { label: isZh ? "创建 PR 预览" : "Create PR Preview", controlKey: "supplier.create_pr_preview" },
-                { label: isZh ? "新增问题" : "Add Issue", controlKey: "table.export" },
-                { label: isZh ? "添加备注" : "Add Note", controlKey: "supplier.add_note_preview" },
-              ]}
-              statusLabel={focusedSupplier?.status}
+                  ))}
+                </div>
+                <div className="flex h-12 flex-wrap items-center justify-between gap-2 rounded-b-lg border border-border bg-secondary/10 px-3 text-xs text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-3"><span>Showing 1–20 of 126</span><span>Selected {selectedRowIds.size}</span><span>Rows per page 20 / 50 / 100</span><span>Page 1 of 7</span></div>
+                  <div className="flex items-center gap-2"><Button variant="outline" size="sm" className="h-8">Prev</Button><Button variant="outline" size="sm" className="h-8">Next</Button></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-border bg-card">
+              <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border p-4">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Supplier Detail Workspace</div>
+                  <h2 className="mt-2 text-2xl font-semibold">{focusedSupplier.name}</h2>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <Badge variant="secondary">{focusedSupplier.supplierCode}</Badge>
+                    <Badge variant="outline">{focusedSupplier.category}</Badge>
+                    <Badge variant="outline">{focusedSupplier.serviceRegion}</Badge>
+                    <Badge variant="outline">{focusedSupplier.status}</Badge>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setViewMode("grid")}><ArrowLeft className="mr-2 h-4 w-4" />Back to Grid</Button>
+              </div>
+              <div className="max-h-[calc(100vh-230px)] space-y-5 overflow-y-auto p-4">
+                <DetailSection title="Supplier Header">
+                  <FactRow label="Supplier Code" value={focusedSupplier.supplierCode} />
+                  <FactRow label="Supplier Name" value={focusedSupplier.name} />
+                  <FactRow label="Status" value={focusedSupplier.status} />
+                  <FactRow label="Risk" value={focusedIssues.length > 0 ? "watch" : "low"} />
+                  <FactRow label="Category" value={focusedSupplier.category} />
+                  <FactRow label="Region" value={focusedSupplier.serviceRegion} />
+                </DetailSection>
+                <DetailSection title="Contact & Account">
+                  <FactRow label="Contact Person" value={focusedContact?.name ?? "-"} />
+                  <FactRow label="Phone" value={focusedContact?.phone ?? "-"} />
+                  <FactRow label="Email" value={focusedContact?.email ?? "-"} />
+                  <FactRow label="Region" value={focusedSupplier.serviceRegion} />
+                  <FactRow label="Service Area" value={focusedSupplier.serviceRegion} />
+                  <FactRow label="Payment Terms" value="30 days" />
+                </DetailSection>
+                <DetailSection title="Contract">
+                  <FactRow label="Contract Status" value={focusedContract?.status ?? "-"} />
+                  <FactRow label="Contract No" value={focusedContract?.contractId ?? "-"} />
+                  <FactRow label="Start Date" value={focusedContract?.effectiveFrom ?? "-"} />
+                  <FactRow label="Expiry Date" value={focusedContract?.effectiveTo ?? "-"} />
+                  <FactRow label="Renewal Status" value={focusedContract?.status ?? "-"} />
+                  <FactRow label="Credit Terms" value="NET 30" />
+                </DetailSection>
+                <DetailSection title="Procurement Link">
+                  <FactRow label="Active PR" value={String(linkedOrders.length)} />
+                  <FactRow label="Active PO" value={String(linkedOrders.length)} />
+                  <FactRow label="Last Order" value={linkedOrders[0]?.effectiveFrom ?? "-"} />
+                  <FactRow label="Average Lead Time" value={`${focusedSupplier.leadTimeDays}d`} />
+                  <FactRow label="Delivery Reliability" value={focusedIssues.length > 0 ? "watch" : "stable"} />
+                </DetailSection>
+                <DetailSection title="Quality / Risk">
+                  <FactRow label="Open Issues" value={String(focusedIssues.length)} />
+                  <FactRow label="Late Dispatch" value={focusedIssues.some((item) => item.priority === "high" || item.priority === "critical") ? "yes" : "no"} />
+                  <FactRow label="Contract Dispute" value={focusedIssues.some((item) => item.status === "disputed") ? "yes" : "no"} />
+                  <FactRow label="Certification Review" value={focusedContract?.status === "review" ? "required" : "ok"} />
+                  <FactRow label="Rating" value={focusedRating?.grade ?? "N/A"} />
+                  <FactRow label="Risk Level" value={focusedIssues.length > 0 ? "watch" : "low"} />
+                </DetailSection>
+                <DetailSection title="Linked Records">
+                  <FactRow label="Linked PR" value={linkedOrders[0]?.quotationId ?? "-"} />
+                  <FactRow label="Linked PO" value={linkedOrders[0]?.quotationId ?? "-"} />
+                  <FactRow label="Linked Receiving" value="RCV-Preview" />
+                  <FactRow label="Linked Inventory SKU" value={linkedOrders[0]?.skuId ?? "-"} />
+                </DetailSection>
+                <section className="rounded-xl border border-border bg-secondary/10 p-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Preview Actions</div>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+                    {[
+                      "View Supplier",
+                      "Create PR Preview",
+                      "Add Issue",
+                      "Add Note",
+                      "View Purchase History",
+                    ].map((action) => (
+                      <Button key={action} variant="outline" size="sm" onClick={() => showPreview(action)}>{action}</Button>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+        ) : (
+          <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+            <MultidimensionalTable
+              columns={columns}
+              rows={filteredSuppliers}
+              rowIdKey="supplierId"
+              selectedRowIds={selectedRowIds}
+              onToggleRow={toggleRow}
+              onToggleAll={toggleAll}
+              selectedRecordId={focusedSupplier.supplierId}
+              onRowFocus={setFocusedSupplierId}
+              pageLabel="Showing 1–50 of 126"
+              rowsPerPageLabel="Rows per page 50 / 100 / 200"
+              density={density}
             />
-          </div>
-        </ModuleTwoColumn>
-      </ModulePageStack>
+
+            <aside className="rounded-xl border border-border bg-card p-4">
+              <div className="flex items-start justify-between gap-3 border-b border-border pb-4">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Selected Supplier</div>
+                  <h2 className="mt-2 text-lg font-semibold">{focusedSupplier.name}</h2>
+                  <p className="text-sm text-muted-foreground">{focusedSupplier.supplierCode}</p>
+                </div>
+                <Badge variant="outline">{focusedSupplier.status}</Badge>
+              </div>
+              <div className="mt-4 space-y-2">
+                <FactRow label="Category" value={focusedSupplier.category} />
+                <FactRow label="Region" value={focusedSupplier.serviceRegion} />
+                <FactRow label="Contact" value={focusedContact?.name ?? "-"} />
+                <FactRow label="Contract Status" value={focusedContract?.status ?? "-"} />
+                <FactRow label="Open Issues" value={String(focusedIssues.length)} />
+                <FactRow label="Rating" value={focusedRating?.grade ?? "N/A"} />
+              </div>
+              <div className="mt-4 grid gap-2">
+                <Button onClick={() => setViewMode("detail")}><Eye className="mr-2 h-4 w-4" />View Detail</Button>
+                <Button variant="outline" onClick={() => showPreview("Create PR Preview")}>Create PR Preview</Button>
+              </div>
+            </aside>
+          </section>
+        )}
+      </div>
     </ErpShell>
   );
 }

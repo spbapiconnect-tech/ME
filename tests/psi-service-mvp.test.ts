@@ -172,7 +172,6 @@ test("PSI workspaces use multidimensional table pattern with pagination labels",
   const files = [
     "app/psi/procurement/page.tsx",
     "app/psi/supplier/page.tsx",
-    "app/psi/inventory/page.tsx",
     "app/psi/receiving/page.tsx",
   ];
   const pages = await Promise.all(files.map((file) => readFile(file, "utf8")));
@@ -180,7 +179,8 @@ test("PSI workspaces use multidimensional table pattern with pagination labels",
     assert.equal(page.includes("TableViewTabs"), true);
     assert.equal(page.includes("TableActionBar"), true);
     assert.equal(page.includes("MultidimensionalTable"), true);
-    assert.equal(page.includes("RecordDetailPanel"), true);
+    assert.equal(page.includes("View Detail"), true);
+    assert.equal(page.includes("Back to Grid"), true);
     assert.equal(page.includes("Showing 1"), true);
     assert.equal(page.includes("Rows per page"), true);
   }

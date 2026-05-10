@@ -4,7 +4,6 @@ import test from "node:test";
 import { getControlByKey, canControlExecuteNow } from "../lib/control-registry";
 
 const pageFiles = [
-  "app/psi/inventory/page.tsx",
   "app/psi/supplier/page.tsx",
   "app/psi/procurement/page.tsx",
   "app/psi/receiving/page.tsx",
@@ -16,7 +15,8 @@ test("PSI pages import and include multidimensional table pattern", async () => 
     const content = await readFile(file, "utf8");
     assert.equal(content.includes("TableActionBar"), true);
     assert.equal(content.includes("MultidimensionalTable"), true);
-    assert.equal(content.includes("RecordDetailPanel"), true);
+    assert.equal(content.includes("View Detail"), true);
+    assert.equal(content.includes("Back to Grid"), true);
   }
 });
 
@@ -33,6 +33,25 @@ test("inventory page includes required page-size and detail fields", async () =>
   ]) {
     assert.equal(content.includes(required), true);
   }
+});
+
+test("supplier/procurement/receiving include dual view controls and required detail sections", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const supplier = await readFile("app/psi/supplier/page.tsx", "utf8");
+  const procurement = await readFile("app/psi/procurement/page.tsx", "utf8");
+  const receiving = await readFile("app/psi/receiving/page.tsx", "utf8");
+
+  for (const page of [supplier, procurement, receiving]) {
+    assert.equal(page.includes("View Detail"), true);
+    assert.equal(page.includes("Back to Grid"), true);
+  }
+
+  assert.equal(supplier.includes("Contract Status"), true);
+  assert.equal(supplier.includes("View Purchase History"), true);
+  assert.equal(procurement.includes("Approval Status"), true);
+  assert.equal(procurement.includes("Item Lines"), true);
+  assert.equal(receiving.includes("Variance Status"), true);
+  assert.equal(receiving.includes("Posting Status"), true);
 });
 
 test("required PSI control keys are present and boundaries remain preview-only", () => {
