@@ -489,24 +489,3 @@ textarea:focus:not(:focus-visible) {
   min-width: 100%;
 }
 
-
-/* ME data-grid checkbox rollback
-   The previous action-column patch also touched the first checkbox column.
-   First column must stay compact; only the final action column should be fixed. */
-.me-grid-action-header:first-child,
-.me-grid-action-cell:first-child {
-  width: auto !important;
-  min-width: 0 !important;
-  max-width: none !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-.me-grid-action-cell:first-child button {
-  width: 20px !important;
-  height: 20px !important;
-  min-width: 20px !important;
-  padding: 0 !important;
-  border-radius: 6px !important;
-}
-
