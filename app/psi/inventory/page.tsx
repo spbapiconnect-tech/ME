@@ -16,7 +16,6 @@ import { useEffect, useMemo, useState } from "react";
 import type { PsiInventoryWorkspacePageData } from "@/lib/page-data/psi";
 import { cn } from "@/lib/utils";
 import { Plus, FileDown, MoreHorizontal } from "lucide-react";
-import { restaurantFormulas } from "@/config/restaurant-formulas";
 
 export default function PsiInventoryRoute() {
   const [data, setData] = useState<PsiInventoryWorkspacePageData | null>(null);
@@ -34,15 +33,12 @@ export default function PsiInventoryRoute() {
   const skus = useMemo(() => pageData?.skus ?? [], [pageData]);
   const movements = useMemo(() => pageData?.stockMovements ?? [], [pageData]);
   const suggestions = useMemo(() => pageData?.replenishmentSuggestions ?? [], [pageData]);
-  const lowStockSkus = skus.filter((item) => {
-    const stock = pageData?.storeStocks.find((stockItem) => stockItem.skuId === item.skuId);
-    return (stock?.availableQty.value ?? 0) < item.safetyStock;
-  });
   const inventoryIssues = useMemo(() => pageData?.issues ?? [], [pageData]);
 
-  const formulaPreviewLabels = restaurantFormulas
-    .filter((formula) => ["stock-risk-score", "reorder-suggestion"].includes(formula.key))
-    .map((formula) => (isZh ? formula.label.zh : formula.label.en));
+  const lowStockSkus = useMemo(
+    () => skus.filter((item) => (pageData?.storeStocks.find((stockItem) => stockItem.skuId === item.skuId)?.availableQty.value ?? 0) < item.safetyStock),
+    [pageData, skus]
+  );
 
   const viewTabs = useMemo(
     () => [
@@ -50,9 +46,12 @@ export default function PsiInventoryRoute() {
       { key: "low", label: isZh ? "低库存" : "Low Stock", count: lowStockSkus.length },
       { key: "expiry", label: isZh ? "效期预警" : "Expiry Watch", count: 2 },
       { key: "reorder", label: isZh ? "需补货" : "Reorder Needed", count: suggestions.length },
+      { key: "nomove", label: isZh ? "无移动" : "No Movement", count: skus.filter((item) => !movements.some((mov) => mov.skuId === item.skuId)).length },
       { key: "variance", label: isZh ? "移动差异" : "Movement Variance", count: inventoryIssues.length },
+      { key: "branch", label: isZh ? "按分支" : "By Branch", count: new Set((pageData?.storeStocks ?? []).map((item) => item.warehouseId)).size },
+      { key: "storage", label: isZh ? "按存储" : "By Storage", count: new Set((pageData?.warehouses ?? []).map((item) => item.type)).size },
     ],
-    [inventoryIssues.length, isZh, lowStockSkus.length, skus.length, suggestions.length]
+    [inventoryIssues.length, isZh, lowStockSkus.length, movements, pageData?.storeStocks, pageData?.warehouses, skus, suggestions.length]
   );
 
   const filteredSkus = useMemo(() => {
@@ -63,17 +62,27 @@ export default function PsiInventoryRoute() {
         return skus.slice(0, 2);
       case "reorder":
         return skus.filter((item) => suggestions.some((suggestion) => suggestion.skuId === item.skuId));
+      case "nomove":
+        return skus.filter((item) => !movements.some((mov) => mov.skuId === item.skuId));
       case "variance":
         return skus.filter((item) => inventoryIssues.some((issue) => issue.skuId === item.skuId));
+      case "branch":
+        return skus.filter((item) => (pageData?.storeStocks.find((stock) => stock.skuId === item.skuId)?.warehouseId ?? "").includes("WH"));
+      case "storage":
+        return skus.filter((item) => {
+          const warehouseId = pageData?.storeStocks.find((stock) => stock.skuId === item.skuId)?.warehouseId;
+          return warehouseId ? pageData?.warehouses.find((wh) => wh.warehouseId === warehouseId)?.type === "warehouse" : false;
+        });
       default:
         return skus;
     }
-  }, [inventoryIssues, lowStockSkus, skus, suggestions, viewKey]);
+  }, [inventoryIssues, lowStockSkus, movements, pageData?.storeStocks, pageData?.warehouses, skus, suggestions, viewKey]);
 
   const focusedSku = useMemo(() => {
     if (!filteredSkus.length) return null;
     return filteredSkus.find((item) => item.skuId === focusedSkuId) ?? filteredSkus[0];
   }, [filteredSkus, focusedSkuId]);
+
   const focusedStock = focusedSku ? pageData?.storeStocks.find((item) => item.skuId === focusedSku.skuId) : null;
   const focusedWarehouse = focusedStock ? pageData?.warehouses.find((item) => item.warehouseId === focusedStock.warehouseId) : null;
   const focusedMovement = focusedSku ? movements.filter((item) => item.skuId === focusedSku.skuId).slice(0, 3) : [];
@@ -82,18 +91,18 @@ export default function PsiInventoryRoute() {
 
   const columns: MultiDimColumn<(typeof filteredSkus)[number]>[] = [
     { key: "sku", label: "SKU", width: "120px", render: (row) => <p className={moduleVisual.title}>{row.skuCode}</p> },
-    { key: "item", label: isZh ? "Item Name" : "Item Name", width: "1.5fr", render: (row) => <p className={moduleVisual.title}>{row.productName}</p> },
+    { key: "item", label: isZh ? "Item Name" : "Item Name", width: "1.4fr", render: (row) => <p className={moduleVisual.title}>{row.productName}</p> },
     { key: "category", label: isZh ? "Category" : "Category", width: "100px", render: (row) => <p className={moduleVisual.body}>{pageData?.products.find((item) => item.productId === row.productId)?.category ?? "-"}</p> },
     { key: "branch", label: isZh ? "Branch" : "Branch", width: "100px", render: (row) => <p className={moduleVisual.body}>{pageData?.warehouses.find((item) => item.warehouseId === pageData?.storeStocks.find((stock) => stock.skuId === row.skuId)?.warehouseId)?.warehouseCode ?? "-"}</p> },
-    { key: "storage", label: isZh ? "Storage" : "Storage", width: "90px", render: (row) => <p className={moduleVisual.body}>{pageData?.warehouses.find((item) => item.warehouseId === pageData?.storeStocks.find((stock) => stock.skuId === row.skuId)?.warehouseId)?.type ?? "-"}</p> },
-    { key: "current", label: isZh ? "Current Stock" : "Current Stock", width: "110px", render: (row) => <p className={cn(moduleVisual.title, ((pageData?.storeStocks.find((item) => item.skuId === row.skuId)?.availableQty.value ?? 0) < row.safetyStock) && "text-destructive")}>{pageData?.storeStocks.find((item) => item.skuId === row.skuId)?.availableQty.value ?? 0}</p> },
+    { key: "storage", label: isZh ? "Storage" : "Storage", width: "95px", render: (row) => <p className={moduleVisual.body}>{pageData?.warehouses.find((item) => item.warehouseId === pageData?.storeStocks.find((stock) => stock.skuId === row.skuId)?.warehouseId)?.type ?? "-"}</p> },
+    { key: "current", label: isZh ? "Current Stock" : "Current Stock", width: "110px", render: (row) => <p className={cn(moduleVisual.title, (pageData?.storeStocks.find((item) => item.skuId === row.skuId)?.availableQty.value ?? 0) < row.safetyStock && "text-destructive")}>{pageData?.storeStocks.find((item) => item.skuId === row.skuId)?.availableQty.value ?? 0}</p> },
     { key: "uom", label: "UOM", width: "75px", render: (row) => <p className={moduleVisual.body}>{row.unit}</p> },
     { key: "safety", label: isZh ? "Safety Stock" : "Safety Stock", width: "95px", render: (row) => <p className={moduleVisual.body}>{row.safetyStock}</p> },
     { key: "coverage", label: isZh ? "Coverage Days" : "Coverage Days", width: "95px", render: (row) => <p className={moduleVisual.body}>{(pageData?.storeStocks.find((item) => item.skuId === row.skuId)?.availableQty.value ?? 0) < row.safetyStock ? "0.8d" : "12.5d"}</p> },
-    { key: "movement", label: isZh ? "Last Movement" : "Last Movement", width: "120px", render: (row) => <p className={moduleVisual.body}>{movements.find((item) => item.skuId === row.skuId)?.movementAt.split("T")[0] ?? "-"}</p> },
     { key: "expiry", label: isZh ? "Expiry Status" : "Expiry Status", width: "110px", render: () => <TableFieldChip label={isZh ? "正常" : "Normal"} tone="success" /> },
-    { key: "reorder", label: isZh ? "Reorder Status" : "Reorder Status", width: "110px", render: (row) => <TableFieldChip label={suggestions.some((item) => item.skuId === row.skuId) ? (isZh ? "建议补货" : "Suggested") : (isZh ? "稳定" : "Stable")} tone={suggestions.some((item) => item.skuId === row.skuId) ? "warning" : "muted"} /> },
     { key: "supplier", label: isZh ? "Supplier" : "Supplier", width: "100px", render: () => <p className={moduleVisual.body}>-</p> },
+    { key: "movement", label: isZh ? "Last Movement" : "Last Movement", width: "120px", render: (row) => <p className={moduleVisual.body}>{movements.find((item) => item.skuId === row.skuId)?.movementAt.split("T")[0] ?? "-"}</p> },
+    { key: "reorder", label: isZh ? "Reorder Status" : "Reorder Status", width: "110px", render: (row) => <TableFieldChip label={suggestions.some((item) => item.skuId === row.skuId) ? (isZh ? "建议补货" : "Suggested") : (isZh ? "稳定" : "Stable")} tone={suggestions.some((item) => item.skuId === row.skuId) ? "warning" : "muted"} /> },
     {
       key: "action",
       label: isZh ? "Action" : "Action",
@@ -132,16 +141,12 @@ export default function PsiInventoryRoute() {
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "库存" : "Inventory"]}
           title={isZh ? "ME PSI 库存" : "ME PSI Inventory"}
-          subtitle={
-            isZh
-              ? "库存品项列表、库存流动、效期观察与补货判断。"
-              : "Stock item list, stock movement, expiry watch, and reorder review."
-          }
+          subtitle={isZh ? "SKU 库存矩阵与补货判断。" : "SKU stock matrix and replenishment workspace."}
           actions={
             <div className="flex items-center gap-2">
               <Button size="sm" variant="outline" className="hidden md:inline-flex">
                 <FileDown className="mr-2 h-4 w-4" />
-                {isZh ? "导出记录" : "Export Records"}
+                {isZh ? "导出记录" : "Export"}
               </Button>
               <Button size="sm">
                 <Plus className="mr-2 h-4 w-4" />
@@ -151,14 +156,14 @@ export default function PsiInventoryRoute() {
           }
         />
 
-        <TableViewTabs tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        <TableViewTabs title={isZh ? "已保存视图" : "Saved Views"} tabs={viewTabs} value={viewKey} onChange={setViewKey} />
 
         <CompactStatStrip
           items={[
-            { label: isZh ? "Total SKU" : "Total SKU", value: pageData?.stats.totalSkus ?? 0 },
+            { label: isZh ? "Total SKU" : "Total SKU", value: pageData.stats.totalSkus },
             { label: isZh ? "Low Stock" : "Low Stock", value: lowStockSkus.length, tone: "danger" },
-            { label: isZh ? "Expiry Watch" : "Expiry Watch", value: 2, tone: "warning" },
             { label: isZh ? "Reorder Needed" : "Reorder Needed", value: suggestions.length, tone: "warning" },
+            { label: isZh ? "Movement Variance" : "Movement Variance", value: inventoryIssues.length, tone: "warning" },
           ]}
         />
 
@@ -167,28 +172,21 @@ export default function PsiInventoryRoute() {
           selectedCount={selectedRowIds.size}
           filters={
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
-                {isZh ? "门店: 全部" : "Branch: All"}
-              </Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
-                {isZh ? "存储: 全部" : "Storage: All"}
-              </Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
-                {isZh ? "供应商: 全部" : "Supplier: All"}
-              </Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-destructive border-destructive/30 bg-destructive/5">
-                {isZh ? "状态: 低库存" : "Status: Low Stock"}
-              </Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "分支: 全部" : "Branch: All"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "存储: 全部" : "Storage: All"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "分类: 全部" : "Category: All"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "供应商: 全部" : "Supplier: All"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "库存状态: 低库存" : "Stock: Low"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "效期: 本周" : "Expiry: This Week"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "覆盖天数: < 3d" : "Coverage: < 3d"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-primary border-primary/30 bg-primary/5">{isZh ? "更多筛选" : "More Filters"}</Badge>
             </div>
           }
         />
 
-        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_21rem]">
           <div className="space-y-3">
-            <ModuleSection
-              title={isZh ? "库存品项列表" : "Inventory Item List"}
-              className="p-3"
-            >
+            <ModuleSection title={isZh ? "库存 SKU 矩阵" : "Inventory SKU Matrix"} className="p-3">
               <MultidimensionalTable
                 columns={columns}
                 rows={filteredSkus}
@@ -198,30 +196,10 @@ export default function PsiInventoryRoute() {
                 onToggleAll={toggleAll}
                 selectedRecordId={focusedSku?.skuId}
                 onRowFocus={setFocusedSkuId}
+                pageLabel={isZh ? "显示 1–100 / 共 872" : "Showing 1–100 of 872"}
+                rowsPerPageLabel={isZh ? "每页 50 / 100 / 200" : "Rows per page 50 / 100 / 200"}
+                minWidth="1500px"
               />
-            </ModuleSection>
-
-            <ModuleSection
-              title={isZh ? "库存变动记录" : "Stock Movement Log"}
-              className="p-3"
-            >
-              <div className="space-y-2">
-                {movements.slice(0, 10).map((mov) => {
-                  const sku = skus.find((item) => item.skuId === mov.skuId);
-                  return (
-                    <div key={mov.movementId} className="grid grid-cols-[150px_110px_minmax(0,1fr)_80px_80px_90px_1fr_80px] items-center gap-2 rounded-md border border-border/60 px-2.5 py-2 text-xs">
-                      <p className={moduleVisual.muted}>{new Date(mov.movementAt).toLocaleString()}</p>
-                      <p className={moduleVisual.body}>{sku?.skuCode ?? "-"}</p>
-                      <p className={moduleVisual.body}>{sku?.productName ?? "-"}</p>
-                      <TableFieldChip label={mov.movementType} tone="muted" />
-                      <p className={moduleVisual.body}>{mov.movementType === "inbound" ? mov.quantity.value : "-"}</p>
-                      <p className={moduleVisual.body}>{mov.movementType === "outbound" ? mov.quantity.value : "-"}</p>
-                      <p className={moduleVisual.body}>{mov.sourceRef.recordId}</p>
-                      <p className={moduleVisual.body}>System</p>
-                    </div>
-                  );
-                })}
-              </div>
             </ModuleSection>
           </div>
 
@@ -230,17 +208,18 @@ export default function PsiInventoryRoute() {
               title={isZh ? "选中 SKU" : "Selected SKU"}
               subtitle={focusedSku ? `${focusedSku.productName} / ${focusedSku.skuCode}` : "-"}
               fields={[
-                { label: isZh ? "分支/存储" : "Branch / Storage", value: focusedWarehouse ? `${focusedWarehouse.warehouseCode} / ${focusedWarehouse.type}` : "-" },
+                { label: isZh ? "分支 / 存储" : "Branch / Storage", value: focusedWarehouse ? `${focusedWarehouse.warehouseCode} / ${focusedWarehouse.type}` : "-" },
                 { label: isZh ? "当前库存" : "Current Stock", value: focusedStock ? `${focusedStock.availableQty.value} ${focusedStock.availableQty.unit}` : "-" },
                 { label: isZh ? "安全库存" : "Safety Stock", value: focusedSku?.safetyStock ?? "-" },
-                { label: isZh ? "覆盖天数" : "Coverage Days", value: focusedStock && focusedSku ? ((focusedStock.availableQty.value < focusedSku.safetyStock) ? "0.8d" : "12.5d") : "-" },
+                { label: isZh ? "覆盖天数" : "Coverage Days", value: focusedStock && focusedSku ? (focusedStock.availableQty.value < focusedSku.safetyStock ? "0.8d" : "12.5d") : "-" },
                 { label: isZh ? "效期批次" : "Expiry Batch", value: "-" },
                 { label: isZh ? "关联供应商" : "Linked Supplier", value: "-" },
                 { label: isZh ? "关联采购" : "Linked Procurement", value: focusedReorder?.sourceRef.recordId ?? "-" },
+                { label: isZh ? "补货建议" : "Reorder Suggestion", value: focusedReorder?.suggestedQty.value ? `${focusedReorder.suggestedQty.value} ${focusedReorder.suggestedQty.unit}` : "-" },
               ]}
               sections={[
                 {
-                  title: isZh ? "库存变动摘要" : "Movement Summary",
+                  title: isZh ? "最近移动" : "Recent Movement",
                   items: focusedMovement.map((item) => (
                     <div key={item.movementId}>
                       <p className={moduleVisual.title}>{item.movementType}</p>
@@ -249,16 +228,15 @@ export default function PsiInventoryRoute() {
                   )),
                 },
                 {
-                  title: isZh ? "公式预览（仅元数据）" : "Formula Preview (Metadata Only)",
+                  title: isZh ? "公式预览（元数据）" : "Formula Preview (Metadata)",
                   items: [
-                    <div key="formula-cov">{isZh ? "Coverage Days" : "Coverage Days"}</div>,
-                    <div key="formula-reorder">{isZh ? "Reorder Suggestion" : "Reorder Suggestion"}</div>,
-                    <div key="formula-risk">{isZh ? "Stock Risk" : "Stock Risk"}</div>,
-                    ...formulaPreviewLabels.map((label) => <div key={label}>{label}</div>),
+                    <div key="coverage">{isZh ? "Coverage Days" : "Coverage Days"}</div>,
+                    <div key="risk">{isZh ? "Stock Risk" : "Stock Risk"}</div>,
+                    <div key="reorder">{isZh ? "Reorder Suggestion" : "Reorder Suggestion"}</div>,
                   ],
                 },
                 {
-                  title: isZh ? "问题" : "Issues",
+                  title: isZh ? "关联问题" : "Linked Issues",
                   items: focusedSkuIssues.map((item) => (
                     <div key={item.issueId}>
                       <p className={moduleVisual.title}>{item.title[locale]}</p>
@@ -267,7 +245,12 @@ export default function PsiInventoryRoute() {
                   )),
                 },
               ]}
-              actionLabels={[isZh ? "查看品项" : "View Item", isZh ? "添加备注" : "Add Note", isZh ? "关联 PR" : "Link PR"]}
+              actionLabels={[
+                isZh ? "查看品项" : "View Item",
+                isZh ? "创建 PR 预览" : "Create PR Preview",
+                isZh ? "添加备注" : "Add Note",
+                isZh ? "盘点预览" : "Count Stock Preview",
+              ]}
             />
           </div>
         </ModuleTwoColumn>

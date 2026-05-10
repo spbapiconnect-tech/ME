@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export interface MultiDimColumn<T> {
@@ -21,6 +22,12 @@ export function MultidimensionalTable<T extends object>({
   selectedRecordId,
   onRowFocus,
   className,
+  minWidth = "1360px",
+  footer,
+  pageLabel,
+  totalCount,
+  rowsPerPageLabel,
+  showPagination = true,
 }: {
   columns: MultiDimColumn<T>[];
   rows: T[];
@@ -31,6 +38,12 @@ export function MultidimensionalTable<T extends object>({
   selectedRecordId?: string;
   onRowFocus?: (id: string) => void;
   className?: string;
+  minWidth?: string;
+  footer?: ReactNode;
+  pageLabel?: string;
+  totalCount?: number;
+  rowsPerPageLabel?: string;
+  showPagination?: boolean;
 }) {
   const allIds = rows.map((row) => String(row[rowIdKey]));
   const allChecked = allIds.length > 0 && allIds.every((id) => selectedRowIds.has(id));
@@ -39,9 +52,9 @@ export function MultidimensionalTable<T extends object>({
   return (
     <div className={cn("overflow-hidden rounded-lg border border-border/70 bg-card/70", className)}>
       <div className="overflow-x-auto">
-        <div className="min-w-[1200px]">
+        <div style={{ minWidth }}>
           <div
-            className="sticky top-0 z-10 grid items-center border-b border-border/80 bg-muted/80 px-3 py-2 backdrop-blur"
+            className="sticky top-0 z-10 grid items-center border-b border-border/80 bg-muted/85 px-3 py-2 backdrop-blur"
             style={{ gridTemplateColumns }}
           >
             <div className="flex justify-center">
@@ -57,7 +70,7 @@ export function MultidimensionalTable<T extends object>({
               </p>
             ))}
           </div>
-          <div className="max-h-[620px] overflow-y-auto">
+          <div className="max-h-[610px] overflow-y-auto">
             {rows.map((row) => {
               const id = String(row[rowIdKey]);
               const selected = selectedRowIds.has(id);
@@ -66,7 +79,7 @@ export function MultidimensionalTable<T extends object>({
                 <div
                   key={id}
                   className={cn(
-                    "grid items-center border-b border-border/70 px-3 py-2 transition-colors",
+                    "grid items-center border-b border-border/60 px-3 py-1.5 text-xs transition-colors",
                     focused ? "bg-primary/10" : "hover:bg-muted/30"
                   )}
                   style={{ gridTemplateColumns }}
@@ -78,7 +91,7 @@ export function MultidimensionalTable<T extends object>({
                     <button
                       key={column.key}
                       type="button"
-                      className="truncate text-left"
+                      className="truncate py-1 text-left"
                       onClick={() => onRowFocus?.(id)}
                     >
                       {column.render(row)}
@@ -90,6 +103,23 @@ export function MultidimensionalTable<T extends object>({
           </div>
         </div>
       </div>
+      {showPagination ? (
+        <div className="flex flex-col gap-2 border-t border-border/70 bg-muted/25 px-3 py-2 text-xs md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
+            <span>{pageLabel ?? `Showing 1-${Math.max(rows.length, 1)} of ${totalCount ?? rows.length}`}</span>
+            <span>{rowsPerPageLabel ?? "Rows per page: 50 / 100 / 200"}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+              Prev
+            </Button>
+            <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+              Next
+            </Button>
+          </div>
+        </div>
+      ) : null}
+      {footer ? <div className="border-t border-border/60 px-3 py-2">{footer}</div> : null}
     </div>
   );
 }

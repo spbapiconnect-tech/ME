@@ -32,17 +32,20 @@ export default function PsiSupplierPage() {
   const suppliers = useMemo(() => pageData?.suppliers ?? [], [pageData]);
   const issues = useMemo(() => pageData?.issues ?? [], [pageData]);
   const contracts = useMemo(() => pageData?.contracts ?? [], [pageData]);
-  const contractExpiring = contracts.filter((item) => item.status === "review");
+  const ratings = useMemo(() => pageData?.ratings ?? [], [pageData]);
+  const quotations = useMemo(() => pageData?.quotations ?? [], [pageData]);
 
   const viewTabs = useMemo(
     () => [
       { key: "all", label: isZh ? "全部供应商" : "All Suppliers", count: suppliers.length },
       { key: "active", label: isZh ? "活跃" : "Active", count: suppliers.filter((item) => item.status === "active").length },
-      { key: "expiring", label: isZh ? "合同将到期" : "Contract Expiring", count: contractExpiring.length },
+      { key: "expiring", label: isZh ? "合同将到期" : "Contract Expiring", count: contracts.filter((item) => item.status === "review").length },
       { key: "quality", label: isZh ? "质量异常" : "Quality Issues", count: issues.length },
-      { key: "review", label: isZh ? "待复核" : "Review Needed", count: suppliers.filter((item) => item.status === "review").length },
+      { key: "late", label: isZh ? "响应延迟" : "Late Response", count: issues.filter((item) => item.priority === "high" || item.priority === "critical").length },
+      { key: "blocked", label: isZh ? "已阻断" : "Blocked", count: suppliers.filter((item) => item.status === "blocked").length },
+      { key: "category", label: isZh ? "按分类" : "By Category", count: new Set(suppliers.map((item) => item.category)).size },
     ],
-    [contractExpiring.length, isZh, issues.length, suppliers]
+    [contracts, isZh, issues, suppliers]
   );
 
   const filteredSuppliers = useMemo(() => {
@@ -53,8 +56,12 @@ export default function PsiSupplierPage() {
         return suppliers.filter((item) => contracts.some((contract) => contract.supplierId === item.supplierId && contract.status === "review"));
       case "quality":
         return suppliers.filter((item) => issues.some((issue) => issue.supplierId === item.supplierId));
-      case "review":
-        return suppliers.filter((item) => item.status === "review");
+      case "late":
+        return suppliers.filter((item) => issues.some((issue) => issue.supplierId === item.supplierId && (issue.priority === "high" || issue.priority === "critical")));
+      case "blocked":
+        return suppliers.filter((item) => item.status === "blocked");
+      case "category":
+        return suppliers.filter((item) => ["Dairy", "Dry Goods", "Beverage"].includes(item.category));
       default:
         return suppliers;
     }
@@ -64,35 +71,45 @@ export default function PsiSupplierPage() {
     if (!filteredSuppliers.length) return null;
     return filteredSuppliers.find((item) => item.supplierId === focusedSupplierId) ?? filteredSuppliers[0];
   }, [filteredSuppliers, focusedSupplierId]);
+
   const focusedContact = focusedSupplier ? pageData?.contacts.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
   const focusedContract = focusedSupplier ? contracts.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
-  const focusedRating = focusedSupplier ? pageData?.ratings.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
+  const focusedRating = focusedSupplier ? ratings.find((item) => item.supplierId === focusedSupplier.supplierId) : null;
   const focusedIssues = focusedSupplier ? issues.filter((item) => item.supplierId === focusedSupplier.supplierId) : [];
-  const focusedProducts = focusedSupplier ? (pageData?.products ?? []).filter((item) => item.supplierId === focusedSupplier.supplierId) : [];
+  const linkedOrders = focusedSupplier ? quotations.filter((item) => item.supplierId === focusedSupplier.supplierId).slice(0, 2) : [];
 
   const columns: MultiDimColumn<(typeof filteredSuppliers)[number]>[] = [
-    { key: "code", label: isZh ? "Supplier Code" : "Supplier Code", width: "110px", render: (row) => <p className={moduleVisual.title}>{row.supplierCode}</p> },
+    { key: "code", label: isZh ? "Supplier Code" : "Supplier Code", width: "115px", render: (row) => <p className={moduleVisual.title}>{row.supplierCode}</p> },
     { key: "name", label: isZh ? "Supplier Name" : "Supplier Name", width: "1.4fr", render: (row) => <p className={moduleVisual.title}>{row.name}</p> },
-    { key: "category", label: isZh ? "Category" : "Category", width: "100px", render: (row) => <p className={moduleVisual.body}>{row.category}</p> },
-    { key: "region", label: isZh ? "Region/Coverage" : "Region/Coverage", width: "130px", render: (row) => <p className={moduleVisual.body}>{row.serviceRegion}</p> },
-    { key: "contact", label: isZh ? "Contact" : "Contact", width: "100px", render: (row) => <p className={moduleVisual.body}>{(pageData?.contacts.find((item) => item.supplierId === row.supplierId)?.name) ?? "-"}</p> },
-    { key: "phone", label: isZh ? "Phone" : "Phone", width: "120px", render: (row) => <p className={moduleVisual.body}>{(pageData?.contacts.find((item) => item.supplierId === row.supplierId)?.phone) ?? "-"}</p> },
+    { key: "category", label: isZh ? "Category" : "Category", width: "95px", render: (row) => <p className={moduleVisual.body}>{row.category}</p> },
+    { key: "region", label: isZh ? "Region" : "Region", width: "110px", render: (row) => <p className={moduleVisual.body}>{row.serviceRegion}</p> },
+    { key: "contact", label: isZh ? "Contact" : "Contact", width: "100px", render: (row) => <p className={moduleVisual.body}>{pageData?.contacts.find((item) => item.supplierId === row.supplierId)?.name ?? "-"}</p> },
     { key: "lead", label: isZh ? "Lead Time" : "Lead Time", width: "90px", render: (row) => <p className={moduleVisual.body}>{row.leadTimeDays}d</p> },
-    { key: "contract", label: isZh ? "Contract" : "Contract", width: "110px", render: (row) => <TableFieldChip label={contracts.find((item) => item.supplierId === row.supplierId)?.status ?? "-"} tone="muted" /> },
-    { key: "lastOrder", label: isZh ? "Last Order" : "Last Order", width: "110px", render: () => <p className={moduleVisual.body}>-</p> },
+    { key: "contract", label: isZh ? "Contract Status" : "Contract Status", width: "115px", render: (row) => <TableFieldChip label={contracts.find((item) => item.supplierId === row.supplierId)?.status ?? "-"} tone="muted" /> },
+    { key: "lastOrder", label: isZh ? "Last Order" : "Last Order", width: "110px", render: (row) => <p className={moduleVisual.body}>{quotations.find((item) => item.supplierId === row.supplierId)?.effectiveFrom ?? "-"}</p> },
     { key: "issues", label: isZh ? "Open Issues" : "Open Issues", width: "95px", render: (row) => <p className={moduleVisual.body}>{issues.filter((item) => item.supplierId === row.supplierId).length}</p> },
     {
       key: "rating",
       label: isZh ? "Rating" : "Rating",
-      width: "85px",
+      width: "90px",
       render: (row) => (
         <div className="flex items-center gap-1">
           <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          <span className={moduleVisual.title}>{pageData?.ratings.find((item) => item.supplierId === row.supplierId)?.grade ?? "N/A"}</span>
+          <span className={moduleVisual.title}>{ratings.find((item) => item.supplierId === row.supplierId)?.grade ?? "N/A"}</span>
         </div>
       ),
     },
-    { key: "risk", label: isZh ? "Risk" : "Risk", width: "90px", render: (row) => <TableFieldChip label={issues.some((item) => item.supplierId === row.supplierId) ? "Watch" : "Low"} tone={issues.some((item) => item.supplierId === row.supplierId) ? "warning" : "success"} /> },
+    {
+      key: "risk",
+      label: isZh ? "Risk" : "Risk",
+      width: "90px",
+      render: (row) => (
+        <TableFieldChip
+          label={issues.some((item) => item.supplierId === row.supplierId) ? "watch" : "low"}
+          tone={issues.some((item) => item.supplierId === row.supplierId) ? "warning" : "success"}
+        />
+      ),
+    },
     {
       key: "action",
       label: isZh ? "Action" : "Action",
@@ -130,12 +147,8 @@ export default function PsiSupplierPage() {
       <ModulePageStack className="space-y-3">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "供应商" : "Supplier"]}
-          title={isZh ? "ME PSI 供应商主数据" : "ME PSI Supplier Master"}
-          subtitle={
-            isZh
-              ? "供应商主数据、履约质量、合同和风险概览。"
-              : "Supplier master records, performance quality, contract, and risk overview."
-          }
+          title={isZh ? "ME PSI 供应商" : "ME PSI Supplier"}
+          subtitle={isZh ? "供应商主数据与风险管理工作台。" : "Supplier master list and risk management workspace."}
           actions={
             <div className="flex items-center gap-2">
               <Button size="sm" variant="outline" className="hidden md:inline-flex">
@@ -150,44 +163,37 @@ export default function PsiSupplierPage() {
           }
         />
 
-        <TableViewTabs tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        <TableViewTabs title={isZh ? "已保存视图" : "Saved Views"} tabs={viewTabs} value={viewKey} onChange={setViewKey} />
 
         <CompactStatStrip
           items={[
-            { label: isZh ? "Total Suppliers" : "Total Suppliers", value: pageData?.stats.totalSuppliers ?? 0 },
-            { label: isZh ? "Active Suppliers" : "Active Suppliers", value: pageData?.stats.activeSuppliers ?? 0, tone: "success" },
-            { label: isZh ? "Contract Expiring" : "Contract Expiring", value: contractExpiring.length, tone: "warning" },
-            { label: isZh ? "Issues Open" : "Issues Open", value: issues.length, tone: "danger" },
+            { label: isZh ? "Total Suppliers" : "Total Suppliers", value: pageData.stats.totalSuppliers },
+            { label: isZh ? "Active" : "Active", value: pageData.stats.activeSuppliers, tone: "success" },
+            { label: isZh ? "Contract Expiring" : "Contract Expiring", value: contracts.filter((item) => item.status === "review").length, tone: "warning" },
+            { label: isZh ? "Risk / Issues" : "Risk / Issues", value: issues.length, tone: "danger" },
           ]}
         />
 
         <TableActionBar
           searchPlaceholder={isZh ? "搜索供应商名称 / 编码..." : "Search supplier name / code..."}
           selectedCount={selectedRowIds.size}
+          bulkActionLabel={isZh ? "批量动作（预览）" : "Bulk Action (Preview)"}
           filters={
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
-                {isZh ? "分类: 全部" : "Category: All"}
-              </Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
-                {isZh ? "区域: 全部" : "Region: All"}
-              </Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">
-                {isZh ? "合同: 全部" : "Contract: All"}
-              </Badge>
-              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-emerald-400 border-emerald-500/30 bg-emerald-500/5">
-                {isZh ? "状态: 活跃" : "Status: Active"}
-              </Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "分类: 全部" : "Category: All"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "区域: 全部" : "Region: All"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "合同: 全部" : "Contract: All"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "评级: 全部" : "Rating: All"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "风险: 关注" : "Risk: Watch"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed">{isZh ? "状态: 活跃" : "Status: Active"}</Badge>
+              <Badge variant="outline" className="h-7 px-2 font-normal border-dashed text-primary border-primary/30 bg-primary/5">{isZh ? "更多筛选" : "More Filters"}</Badge>
             </div>
           }
         />
 
-        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_21rem]">
           <div className="space-y-3">
-            <ModuleSection
-              title={isZh ? "供应商名录" : "Supplier Master List"}
-              className="p-3"
-            >
+            <ModuleSection title={isZh ? "供应商主数据列表" : "Supplier Master List"} className="p-3">
               <MultidimensionalTable
                 columns={columns}
                 rows={filteredSuppliers}
@@ -197,21 +203,9 @@ export default function PsiSupplierPage() {
                 onToggleAll={toggleAll}
                 selectedRecordId={focusedSupplier?.supplierId}
                 onRowFocus={setFocusedSupplierId}
+                pageLabel={isZh ? "显示 1–50 / 共 126" : "Showing 1–50 of 126"}
+                rowsPerPageLabel={isZh ? "每页 50 / 100 / 200" : "Rows per page 50 / 100 / 200"}
               />
-            </ModuleSection>
-
-            <ModuleSection
-              title={isZh ? "最近采购活动" : "Supplier Activity / Recent Orders"}
-              className="p-3"
-            >
-              <div className="space-y-2">
-                {suppliers.slice(0, 4).map((supplierItem) => (
-                  <div key={supplierItem.supplierId} className="rounded-md border border-border/60 px-2.5 py-2">
-                    <p className={moduleVisual.title}>{supplierItem.name}</p>
-                    <p className={moduleVisual.muted}>{supplierItem.supplierCode} · {supplierItem.serviceRegion}</p>
-                  </div>
-                ))}
-              </div>
             </ModuleSection>
           </div>
 
@@ -220,35 +214,27 @@ export default function PsiSupplierPage() {
               title={isZh ? "选中供应商" : "Selected Supplier"}
               subtitle={focusedSupplier ? `${focusedSupplier.name} / ${focusedSupplier.supplierCode}` : "-"}
               fields={[
-                { label: isZh ? "分类" : "Category", value: focusedSupplier?.category ?? "-" },
                 { label: isZh ? "联系人" : "Contact", value: focusedContact?.name ?? "-" },
-                { label: isZh ? "电话" : "Phone", value: focusedContact?.phone ?? "-" },
-                { label: isZh ? "覆盖区域" : "Branch Coverage", value: focusedSupplier?.serviceRegion ?? "-" },
-                { label: isZh ? "合同状态" : "Contract", value: focusedContract?.status ?? "-" },
-                { label: isZh ? "质量问题数" : "Quality Issues", value: focusedIssues.length },
+                { label: isZh ? "分类" : "Category", value: focusedSupplier?.category ?? "-" },
+                { label: isZh ? "区域" : "Region", value: focusedSupplier?.serviceRegion ?? "-" },
+                { label: isZh ? "交期" : "Lead Time", value: focusedSupplier ? `${focusedSupplier.leadTimeDays}d` : "-" },
+                { label: isZh ? "合同" : "Contract", value: focusedContract?.status ?? "-" },
+                { label: isZh ? "最近下单" : "Last Order", value: linkedOrders[0]?.effectiveFrom ?? "-" },
+                { label: isZh ? "开放问题" : "Open Issues", value: focusedIssues.length },
                 { label: isZh ? "评分" : "Rating", value: focusedRating?.grade ?? "N/A" },
               ]}
               sections={[
                 {
-                  title: isZh ? "最近订单" : "Recent Orders",
-                  items: focusedProducts.slice(0, 3).map((item) => (
-                    <div key={item.productLinkId}>
-                      <p className={moduleVisual.title}>{item.productName}</p>
-                      <p className={moduleVisual.muted}>MOQ {item.moq}</p>
+                  title: isZh ? "关联 PR / PO" : "Linked PR / PO",
+                  items: linkedOrders.map((order) => (
+                    <div key={order.quotationId}>
+                      <p className={moduleVisual.title}>{order.skuId}</p>
+                      <p className={moduleVisual.muted}>{order.effectiveFrom}</p>
                     </div>
                   )),
                 },
                 {
-                  title: isZh ? "证照/文档" : "Documents / Certificates",
-                  items: [
-                    <div key="doc-status">
-                      <p className={moduleVisual.title}>{isZh ? "营业执照" : "Business License"}</p>
-                      <p className={moduleVisual.muted}>{isZh ? "有效（预览）" : "Valid (Preview)"}</p>
-                    </div>,
-                  ],
-                },
-                {
-                  title: isZh ? "活动" : "Activity",
+                  title: isZh ? "质量备注" : "Quality Notes",
                   items: focusedIssues.slice(0, 3).map((issue) => (
                     <div key={issue.issueId}>
                       <p className={moduleVisual.title}>{issue.title[locale]}</p>
@@ -257,7 +243,12 @@ export default function PsiSupplierPage() {
                   )),
                 },
               ]}
-              actionLabels={[isZh ? "查看档案" : "View Profile", isZh ? "添加备注" : "Add Note", isZh ? "关联 PR" : "Link PR"]}
+              actionLabels={[
+                isZh ? "查看供应商" : "View Supplier",
+                isZh ? "创建 PR 预览" : "Create PR Preview",
+                isZh ? "新增问题" : "Add Issue",
+                isZh ? "添加备注" : "Add Note",
+              ]}
             />
           </div>
         </ModuleTwoColumn>

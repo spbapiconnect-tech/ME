@@ -93,6 +93,7 @@ test("psi routes import without crashing", async () => {
     import("../app/psi/procurement/page"),
     import("../app/psi/supplier/page"),
     import("../app/psi/inventory/page"),
+    import("../app/psi/receiving/page"),
   ]);
 
   for (const mod of modules) {
@@ -117,6 +118,73 @@ test("no PSI service/repository/helper contains fetch or axios", async () => {
   const content = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
   assert.equal(content.includes("fetch("), false);
   assert.equal(content.includes("axios"), false);
+});
+
+test("PSI workspace files contain no storage/api/db/write execution calls", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const files = [
+    "app/psi/procurement/page.tsx",
+    "app/psi/supplier/page.tsx",
+    "app/psi/inventory/page.tsx",
+    "app/psi/receiving/page.tsx",
+    "components/operations/multidimensional-table.tsx",
+    "components/operations/table-action-bar.tsx",
+    "components/operations/table-view-tabs.tsx",
+    "components/operations/record-detail-panel.tsx",
+  ];
+  const content = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
+  for (const forbidden of [
+    "fetch(",
+    "axios",
+    "localStorage.",
+    "sessionStorage.",
+    "PrismaClient",
+    "supabase",
+    "stockPost(",
+    "approve(",
+    "executeWorkflow(",
+    "sendNotification(",
+  ]) {
+    assert.equal(content.includes(forbidden), false);
+  }
+});
+
+test("PSI workspaces use multidimensional table pattern with pagination labels", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const files = [
+    "app/psi/procurement/page.tsx",
+    "app/psi/supplier/page.tsx",
+    "app/psi/inventory/page.tsx",
+    "app/psi/receiving/page.tsx",
+  ];
+  const pages = await Promise.all(files.map((file) => readFile(file, "utf8")));
+  for (const page of pages) {
+    assert.equal(page.includes("TableViewTabs"), true);
+    assert.equal(page.includes("TableActionBar"), true);
+    assert.equal(page.includes("MultidimensionalTable"), true);
+    assert.equal(page.includes("RecordDetailPanel"), true);
+    assert.equal(page.includes("Showing 1"), true);
+    assert.equal(page.includes("Rows per page 50 / 100 / 200"), true);
+  }
+});
+
+test(".write_test is not referenced in PSI workspaces/components", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const files = [
+    "app/psi/page.tsx",
+    "app/psi/procurement/page.tsx",
+    "app/psi/supplier/page.tsx",
+    "app/psi/inventory/page.tsx",
+    "app/psi/receiving/page.tsx",
+    "components/psi/psi-home-page.tsx",
+    "components/operations/multidimensional-table.tsx",
+    "components/operations/table-action-bar.tsx",
+    "components/operations/table-view-tabs.tsx",
+    "components/operations/table-field-chip.tsx",
+    "components/operations/record-detail-panel.tsx",
+  ];
+  const content = (await Promise.all(files.map((file) => readFile(file, "utf8")))).join("\n");
+  assert.equal(content.includes(".write_test"), false);
 });
 
 test("no forbidden legacy brand names in PSI files/docs/components", async () => {
