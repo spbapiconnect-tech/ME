@@ -433,3 +433,59 @@ textarea:focus:not(:focus-visible) {
 }
 
 /* PSI procurement detail UI polish removed */
+
+
+/* ME data-grid final action column rules
+   Action columns should behave like a fixed utility rail, not a data field. */
+.me-grid-action-cell,
+.me-grid-action-header,
+[data-grid-action="true"] {
+  width: 56px !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  text-align: center !important;
+  justify-content: center !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+}
+
+.me-grid-action-cell button,
+[data-grid-action="true"] button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.me-grid-nowrap,
+[data-grid-nowrap="true"] {
+  white-space: nowrap !important;
+}
+
+.me-grid-money,
+[data-grid-money="true"] {
+  min-width: 112px !important;
+  white-space: nowrap !important;
+}
+
+.me-grid-status,
+[data-grid-status="true"] {
+  min-width: 104px !important;
+  white-space: nowrap !important;
+}
+
+.me-grid-table-shell {
+  overflow-x: auto;
+}
+
+.me-grid-table-shell table,
+.me-grid-table-shell [role="table"] {
+  width: max-content;
+  min-width: 100%;
+}
+

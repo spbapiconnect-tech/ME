@@ -280,14 +280,14 @@ export default function ReceivingPage() {
                 <section className="space-y-2">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Receiving Lines</div>
                   <div className="overflow-hidden rounded-lg border border-border">
-                    <div className="grid grid-cols-[110px_minmax(180px,1fr)_90px_90px_70px_90px_130px] bg-secondary/30 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    <div className="grid grid-cols-[110px_minmax(180px,1fr)_90px_90px_70px_90px_56px] bg-secondary/30 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                       <div>SKU</div><div>Item Name</div><div>Expected Qty</div><div>Received Qty</div><div>UOM</div><div>Variance</div><div>Batch / Expiry</div>
                     </div>
                     {focusedReceiving.lines.map((line) => {
                       const poLine = focusedOrder?.lines.find((item) => item.skuId === line.skuId);
                       const diff = line.receivedQty.value - (poLine?.orderedQty.value ?? 0);
                       return (
-                        <div key={line.lineId} className="grid grid-cols-[110px_minmax(180px,1fr)_90px_90px_70px_90px_130px] border-t border-border px-3 py-2 text-sm">
+                        <div key={line.lineId} className="grid grid-cols-[110px_minmax(180px,1fr)_90px_90px_70px_90px_56px] border-t border-border px-3 py-2 text-sm">
                           <div>{line.skuId}</div><div className="truncate">{line.skuId}</div><div>{poLine?.orderedQty.value ?? 0}</div><div>{line.receivedQty.value}</div><div>{line.receivedQty.unit}</div><div>{diff}</div><div>-</div>
                         </div>
                       );

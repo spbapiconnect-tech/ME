@@ -292,11 +292,11 @@ export default function PsiProcurementPage() {
                 <section className="space-y-2">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Item Lines</div>
                   <div className="overflow-hidden rounded-lg border border-border">
-                    <div className="grid grid-cols-[110px_minmax(200px,1fr)_80px_70px_110px_110px] bg-secondary/30 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    <div className="grid grid-cols-[110px_minmax(200px,1fr)_80px_70px_110px_56px] bg-secondary/30 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                       <div>SKU</div><div>Item Name</div><div>Qty</div><div>UOM</div><div>Unit Price</div><div>Amount</div>
                     </div>
                     {focusedRequest.lines.map((line) => (
-                      <div key={line.lineId} className="grid grid-cols-[110px_minmax(200px,1fr)_80px_70px_110px_110px] border-t border-border px-3 py-2 text-sm">
+                      <div key={line.lineId} className="grid grid-cols-[110px_minmax(200px,1fr)_80px_70px_110px_56px] border-t border-border px-3 py-2 text-sm">
                         <div>{line.skuId}</div><div className="truncate">{line.productName}</div><div>{line.requestedQty.value}</div><div>{line.requestedQty.unit}</div><div>-</div><div>-</div>
                       </div>
                     ))}
