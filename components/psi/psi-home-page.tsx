@@ -84,8 +84,8 @@ export function PsiHomePage() {
           >
             <div className="overflow-hidden rounded-xl border border-border bg-card">
               <div className="overflow-x-auto">
-                <div className="max-h-[420px] min-w-[1120px] overflow-y-auto">
-                  <div className="sticky top-0 z-10 grid grid-cols-[1.15fr_1fr_1fr_1.15fr_1.15fr_1fr_0.9fr] border-b border-border bg-muted/80 px-4 py-3 backdrop-blur">
+                <div className="max-h-[460px] min-w-[980px] overflow-y-auto xl:min-w-0">
+                  <div className="sticky top-0 z-10 grid grid-cols-[1.35fr_0.95fr_0.95fr_1.1fr_1.1fr_1.15fr_0.8fr] border-b border-border bg-muted/80 px-4 py-3 backdrop-blur">
                     {[
                       "SKU / ITEM",
                       isZh ? "库存水位" : "STOCK LEVEL",
@@ -103,7 +103,7 @@ export function PsiHomePage() {
                     <Link
                       key={row.sku}
                       href={row.href}
-                      className="grid grid-cols-[1.15fr_1fr_1fr_1.15fr_1.15fr_1fr_0.9fr] items-center border-b border-border/70 px-4 py-4 transition hover:bg-muted/30 last:border-b-0"
+                      className="grid grid-cols-[1.35fr_0.95fr_0.95fr_1.1fr_1.1fr_1.15fr_0.8fr] items-center border-b border-border/70 px-4 py-4 transition hover:bg-muted/30 last:border-b-0"
                     >
                       <div>
                         <p className={psiVisual.title}>{row.sku}</p>
