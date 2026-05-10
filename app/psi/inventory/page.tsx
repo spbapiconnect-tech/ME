@@ -427,7 +427,7 @@ function QuickList({
                 }}
                 className={[
                   "grid h-[38px] cursor-pointer grid-cols-[42px_110px_minmax(160px,1fr)_42px] items-center border-b border-border text-sm transition",
-                  active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
+                  active ? "me-inventory-row-active bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                 ].join(" ")}
               >
                 <div className="me-inventory-sticky-check flex justify-center">
@@ -451,7 +451,7 @@ function QuickList({
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7"
+                    className="me-inventory-action-button"
                     onClick={(event) => {
                       event.stopPropagation();
                       onOpenDetail(item.sku);

@@ -593,3 +593,87 @@ textarea:focus:not(:focus-visible) {
   padding: 0 !important;
 }
 
+
+
+/* ME multidimensional grid sticky header + final action rail fix
+   Scope: data-grid only. Do not touch page layout or right detail panel. */
+.me-inventory-grid-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 100%;
+  scrollbar-gutter: stable;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.me-inventory-grid-wide {
+  width: max-content;
+  min-width: 1320px;
+}
+
+/* Keep table header aligned and sticky while scrolling. */
+.me-inventory-grid-wide > .grid:first-child {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Final Action column: fixed utility rail, not a data column. */
+.me-inventory-grid-wide > .grid > :last-child {
+  position: sticky !important;
+  right: 0 !important;
+  z-index: 35 !important;
+  width: 56px !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: hsl(var(--card)) !important;
+  box-shadow: -1px 0 0 hsl(var(--border)) !important;
+}
+
+/* Header final cell should not show clipped ACTION text. */
+.me-inventory-grid-wide > .grid:first-child > :last-child {
+  color: transparent !important;
+  overflow: hidden !important;
+}
+
+.me-inventory-grid-wide > .grid:first-child > :last-child::after {
+  content: "VIEW";
+  color: hsl(var(--muted-foreground));
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+/* Selected row active state must also paint sticky action rail. */
+.me-inventory-row-active > :last-child {
+  background: hsl(var(--primary) / 0.12) !important;
+}
+
+/* Action icon button fixed size. */
+.me-inventory-grid-wide > .grid > :last-child button,
+.me-inventory-action-button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  padding: 0 !important;
+}
+
+/* First checkbox column must not inherit action rail sizing. */
+.me-inventory-grid-wide > .grid > :first-child {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.me-inventory-grid-wide > .grid > :first-child button {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  padding: 0 !important;
+}
+
