@@ -88,7 +88,7 @@ test("ErpShell keeps desktop sidebar and main content structure", async () => {
 
   assert.equal(shell.includes("hidden min-h-screen md:flex"), true);
   assert.equal(shell.includes("min-w-0 flex-1 flex-col"), true);
-  assert.equal(shell.includes("<ErpTopbar isSidebarVisible={isSidebarVisible}"), true);
+  assert.equal(shell.includes("<ErpTopbar />"), true);
   assert.equal(shell.includes("md:hidden"), true);
   assert.equal(shell.includes("<ErpMobileBottomNav />"), true);
 });

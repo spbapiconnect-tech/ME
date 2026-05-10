@@ -20,6 +20,7 @@ export function TableActionBar({
   bulkActionLabel?: string;
 }) {
   const hasSelection = selectedCount > 0;
+  // Controls here are presentation-only and mapped in the project control registry contract.
 
   return (
     <div className={cn("rounded-lg border border-border/70 bg-card/70 p-2", className)}>
