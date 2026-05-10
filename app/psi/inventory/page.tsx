@@ -4,8 +4,6 @@ import { useMemo, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  Boxes,
-  ClipboardList,
   Eye,
   FileText,
   PackageSearch,
@@ -868,23 +866,6 @@ export default function InventoryPage() {
           </section>
         )}
 
-        <section className="grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-border bg-card p-4">
-            <Boxes className="h-5 w-5 text-primary" />
-            <div className="mt-3 text-sm font-semibold">Stock Movement Preview</div>
-            <p className="mt-1 text-xs text-muted-foreground">Movement history remains UI-only until stock posting is connected.</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <ClipboardList className="h-5 w-5 text-primary" />
-            <div className="mt-3 text-sm font-semibold">Formula Metadata</div>
-            <p className="mt-1 text-xs text-muted-foreground">Coverage Days, Stock Risk, and Reorder Suggestion are display metadata only.</p>
-          </div>
-          <div className="rounded-xl border border-border bg-card p-4">
-            <FileText className="h-5 w-5 text-primary" />
-            <div className="mt-3 text-sm font-semibold">Control Boundary</div>
-            <p className="mt-1 text-xs text-muted-foreground">No API, database, stock posting, formula, or brain execution is connected.</p>
-          </div>
-        </section>
       </div>
     </ErpShell>
   );
