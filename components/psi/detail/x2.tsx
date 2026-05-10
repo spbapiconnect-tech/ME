@@ -104,7 +104,7 @@ export function PsiWorkspaceLayoutV072({
 
   return (
     <ErpShell activeHref={detailBasePath}>
-      <div className={psiVisual.pageStack}>
+      <div className={`${psiVisual.pageStack} psi-procurement-scope`}>
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", moduleLabel]}
           title={pageTitle}

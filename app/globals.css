@@ -431,3 +431,64 @@ textarea:focus:not(:focus-visible) {
 [data-me-mobile-tabs="true"]::-webkit-scrollbar {
   display: none;
 }
+
+/* PSI procurement scoped visual alignment
+   Keeps the old procurement detail structure, but forces it into the ME ERP dark visual system.
+   Scope prevents this from affecting other pages. */
+.psi-procurement-scope .bg-white,
+.psi-procurement-scope .bg-white\/95,
+.psi-procurement-scope .bg-slate-50,
+.psi-procurement-scope .bg-slate-50\/90,
+.psi-procurement-scope .bg-slate-100,
+.psi-procurement-scope .bg-gray-100,
+.psi-procurement-scope .bg-gray-200 {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.psi-procurement-scope .text-slate-950,
+.psi-procurement-scope .text-slate-900,
+.psi-procurement-scope .text-slate-800,
+.psi-procurement-scope .text-gray-950,
+.psi-procurement-scope .text-gray-900 {
+  color: hsl(var(--foreground)) !important;
+}
+
+.psi-procurement-scope .text-slate-700,
+.psi-procurement-scope .text-slate-600,
+.psi-procurement-scope .text-slate-500,
+.psi-procurement-scope .text-gray-700,
+.psi-procurement-scope .text-gray-600,
+.psi-procurement-scope .text-gray-500 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.psi-procurement-scope .border-slate-200,
+.psi-procurement-scope .border-slate-200\/80,
+.psi-procurement-scope .border-gray-200,
+.psi-procurement-scope .border-gray-300 {
+  border-color: hsl(var(--border)) !important;
+}
+
+.psi-procurement-scope [class*="shadow-"] {
+  box-shadow: none !important;
+}
+
+.psi-procurement-scope table,
+.psi-procurement-scope thead,
+.psi-procurement-scope tbody,
+.psi-procurement-scope tr,
+.psi-procurement-scope td,
+.psi-procurement-scope th {
+  background-color: transparent !important;
+  color: inherit;
+}
+
+.psi-procurement-scope a {
+  color: hsl(var(--primary));
+}
+
+.psi-procurement-scope .rounded-\[20px\],
+.psi-procurement-scope .rounded-\[24px\] {
+  border-color: hsl(var(--border)) !important;
+}
