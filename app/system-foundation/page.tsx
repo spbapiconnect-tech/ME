@@ -1,5 +1,8 @@
-import { SystemFoundationPage } from "@/components/business";
+"use client";
 
-export default function SystemFoundationRoute() {
-  return <SystemFoundationPage />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["system-foundation"]} />;
 }

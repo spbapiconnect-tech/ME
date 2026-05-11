@@ -1,5 +1,8 @@
-import { NotificationsPage } from "@/components/notifications";
+"use client";
 
-export default function NotificationsRoute() {
-  return <NotificationsPage />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["notifications"]} />;
 }

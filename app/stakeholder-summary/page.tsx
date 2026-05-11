@@ -1,6 +1,8 @@
-import { StakeholderSummaryPage } from "@/components/stakeholder-summary";
-import { getStakeholderSummaryPageData } from "@/lib/stakeholder-summary";
+"use client";
 
-export default function StakeholderSummaryRoute() {
-  return <StakeholderSummaryPage data={getStakeholderSummaryPageData()} />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["stakeholder"]} />;
 }

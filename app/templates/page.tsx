@@ -1,5 +1,8 @@
-import { TemplateDemo } from "@/components/layout/template-demo";
+"use client";
 
-export default function TemplatesPage() {
-  return <TemplateDemo />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["templates"]} />;
 }

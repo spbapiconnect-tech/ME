@@ -1,5 +1,8 @@
-import { ActionContractsPage } from "@/components/actions/action-contracts-page"
+"use client";
 
-export default function ActionContractsRoute() {
-  return <ActionContractsPage />
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["action-contracts"]} />;
 }

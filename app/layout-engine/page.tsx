@@ -1,5 +1,8 @@
-import { LayoutEnginePage } from "@/components/layout-engine/layout-engine-page";
+"use client";
 
-export default function LayoutEngineRoute() {
-  return <LayoutEnginePage />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["layout-engine"]} />;
 }

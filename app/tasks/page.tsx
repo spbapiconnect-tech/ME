@@ -1,8 +1,8 @@
-import { TaskEnginePage } from "@/components/tasks/task-engine-page";
-import { getTasksPageData } from "@/lib/page-data";
+"use client";
 
-export default async function TasksPage() {
-  const pageData = await getTasksPageData();
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
 
-  return <TaskEnginePage tasks={pageData.tasks} dataError={pageData.error} />;
+export default function Page() {
+  return <ModulePageShell config={modulePages["tasks"]} />;
 }

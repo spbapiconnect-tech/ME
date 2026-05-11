@@ -1,5 +1,8 @@
-import { RulesPage } from "@/components/rules";
+"use client";
 
-export default function RulesRoute() {
-  return <RulesPage />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["rules"]} />;
 }

@@ -1,7 +1,8 @@
-import { ReportWidgetsPage } from "@/components/reports";
-import { getPsiReportDashboardPageData } from "@/lib/page-data/psi";
+"use client";
 
-export default async function ReportsRoute() {
-  const psiDashboard = await getPsiReportDashboardPageData();
-  return <ReportWidgetsPage psiDashboardData={psiDashboard.dashboardData} />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["reports"]} />;
 }

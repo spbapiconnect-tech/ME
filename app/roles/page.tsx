@@ -1,6 +1,8 @@
-import { RoleWorkspacePage } from "@/components/roles";
-import { getRoleProfiles } from "@/lib/role-workspace";
+"use client";
 
-export default function RolesPage() {
-  return <RoleWorkspacePage roles={getRoleProfiles()} />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["roles"]} />;
 }

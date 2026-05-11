@@ -1,5 +1,8 @@
-import { DisplaySettingsPage } from "@/components/display-settings";
+"use client";
 
-export default function DisplaySettingsRoute() {
-  return <DisplaySettingsPage />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["display-settings"]} />;
 }

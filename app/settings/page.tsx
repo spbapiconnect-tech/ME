@@ -1,14 +1,8 @@
-import { notFound } from "next/navigation";
+"use client";
 
-import { RestaurantModulePage } from "@/components/operations";
-import { getRestaurantModuleByKey } from "@/lib/restaurant-modules";
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
 
-export default function SettingsPage() {
-  const moduleItem = getRestaurantModuleByKey("settings");
-
-  if (!moduleItem?.preview) {
-    notFound();
-  }
-
-  return <RestaurantModulePage module={moduleItem} />;
+export default function Page() {
+  return <ModulePageShell config={modulePages["settings"]} />;
 }

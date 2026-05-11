@@ -1,5 +1,8 @@
-import { AccessControlPage } from "@/components/access"
+"use client";
 
-export default function AccessControlRoute() {
-  return <AccessControlPage />
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["access"]} />;
 }

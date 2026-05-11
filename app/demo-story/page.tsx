@@ -1,6 +1,8 @@
-import { DemoStoryPage } from "@/components/demo-story";
-import { getDemoStoryPageData } from "@/lib/demo-story";
+"use client";
 
-export default function DemoStoryRoute() {
-  return <DemoStoryPage data={getDemoStoryPageData()} />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["demo-story"]} />;
 }

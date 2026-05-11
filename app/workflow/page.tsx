@@ -1,5 +1,8 @@
-import { WorkflowPage } from "@/components/workflow";
+"use client";
 
-export default function WorkflowRoute() {
-  return <WorkflowPage />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["workflow"]} />;
 }

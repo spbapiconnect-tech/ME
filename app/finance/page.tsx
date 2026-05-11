@@ -1,14 +1,8 @@
-import { notFound } from "next/navigation";
+"use client";
 
-import { RestaurantModulePage } from "@/components/operations/restaurant-module-page";
-import { getRestaurantModuleByKey } from "@/lib/restaurant-modules";
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
 
-export default function FinancePage() {
-  const moduleItem = getRestaurantModuleByKey("finance");
-
-  if (!moduleItem?.preview) {
-    notFound();
-  }
-
-  return <RestaurantModulePage module={moduleItem} />;
+export default function Page() {
+  return <ModulePageShell config={modulePages["finance"]} />;
 }

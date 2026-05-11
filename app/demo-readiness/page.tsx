@@ -1,6 +1,8 @@
-import { DemoReadinessPage } from "@/components/demo-readiness";
-import { getDemoReadinessPageData } from "@/lib/demo-readiness";
+"use client";
 
-export default function DemoReadinessRoute() {
-  return <DemoReadinessPage data={getDemoReadinessPageData()} />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["demo-readiness"]} />;
 }

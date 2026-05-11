@@ -1,6 +1,8 @@
-import { DemoModePage } from "@/components/demo-mode";
-import { getDemoModePageData } from "@/lib/demo-mode";
+"use client";
 
-export default function DemoModeRoute() {
-  return <DemoModePage data={getDemoModePageData()} />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["demo-mode"]} />;
 }

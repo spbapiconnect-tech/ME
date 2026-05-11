@@ -1,5 +1,8 @@
-import { BranchErpPage } from "@/components/branches/branch-erp-page";
+"use client";
 
-export default function BranchesPage() {
-  return <BranchErpPage />;
+import { ModulePageShell } from "@/components/module/module-page-shell";
+import { modulePages } from "@/components/module/module-pages";
+
+export default function Page() {
+  return <ModulePageShell config={modulePages["branches"]} />;
 }
