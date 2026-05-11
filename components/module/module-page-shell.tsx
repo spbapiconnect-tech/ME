@@ -17,6 +17,9 @@ export type ModuleRow = {
   status: string;
   meta: string;
   owner?: string;
+  detailItems?: Array<{ label: string; value: string }>;
+  nextAction?: string;
+  detailNote?: string;
 };
 type ModuleTableRow = ModuleRow & Record<string, unknown>;
 
@@ -35,6 +38,7 @@ export type ModulePageConfig = {
   searchPlaceholder: string;
   tableTitle: string;
   detailTitle?: string;
+  detailActionLabel?: string;
   rows: ModuleRow[];
 };
 
@@ -137,10 +141,24 @@ export function ModulePageShell({ config }: { config: ModulePageConfig }) {
               <CardHeader><CardTitle className="text-sm">{config.detailTitle}</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div><p className="font-medium">{selected?.title}</p><p className="text-sm text-muted-foreground">{selected?.subtitle}</p></div>
-                <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Status</span><Badge variant={statusVariant(selected?.status || "")}>{selected?.status}</Badge></div>
-                <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Owner</span><span>{selected?.owner || "System"}</span></div>
-                <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Updated</span><span>{selected?.meta}</span></div>
-                <Button variant="outline" size="sm" className="w-full">Open Detail</Button>
+                {selected?.detailItems?.length ? (
+                  <div className="space-y-2.5">
+                    {selected.detailItems.map((item) => (
+                      <div key={`${selected.id}-${item.label}`} className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">{item.label}</span>
+                        <span className="font-medium text-foreground">{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Status</span><Badge variant={statusVariant(selected?.status || "")}>{selected?.status}</Badge></div>
+                    <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Owner</span><span>{selected?.owner || "System"}</span></div>
+                    <div className="flex items-center justify-between text-sm"><span className="text-muted-foreground">Updated</span><span>{selected?.meta}</span></div>
+                  </>
+                )}
+                {selected?.detailNote ? <p className="rounded-lg border bg-muted/30 p-2.5 text-xs text-muted-foreground">{selected.detailNote}</p> : null}
+                <Button variant="outline" size="sm" className="w-full">{selected?.nextAction || config.detailActionLabel || "Open Detail"}</Button>
               </CardContent>
             </Card>
           ) : null}

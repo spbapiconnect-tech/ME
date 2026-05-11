@@ -9,15 +9,25 @@ import { Button } from "@/components/ui/button";
 import {
   AlertCircle,
   BarChart3,
+  Bell,
+  BookOpen,
+  Building2,
   CalendarDays,
+  CalendarRange,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ClipboardCheck,
   ClipboardList,
+  FileText,
   History,
   LayoutDashboard,
   LayoutGrid,
   ListTodo,
+  Package,
+  Receipt,
+  ScrollText,
+  SlidersHorizontal,
   PanelLeftOpen,
   Settings,
   ShieldCheck,
@@ -25,6 +35,7 @@ import {
   Truck,
   Users,
   Warehouse,
+  Workflow,
 } from "lucide-react";
 
 type SidebarItem = {
@@ -52,8 +63,10 @@ const sidebarGroups: SidebarGroup[] = [
     items: [
       { key: "branches", label: "Branches", href: "/branches", icon: Store },
       { key: "inspection", label: "Inspection", href: "/inspection", icon: ClipboardList },
-      { key: "issues", label: "Issues", href: "/issues", icon: AlertCircle },
+      { key: "issues", label: "Issue Center", href: "/issues", icon: AlertCircle },
       { key: "tasks", label: "Tasks", href: "/tasks", icon: ListTodo },
+      { key: "expiry", label: "Expiry Control", href: "/expiry", icon: ClipboardCheck },
+      { key: "sop", label: "SOP Library", href: "/sop", icon: BookOpen },
     ],
   },
   {
@@ -74,6 +87,7 @@ const sidebarGroups: SidebarGroup[] = [
       { key: "staff", label: "Staff", href: "/staff", icon: Users },
       { key: "schedule", label: "Schedule", href: "/schedule", icon: CalendarDays },
       { key: "training", label: "Training", href: "/training", icon: ClipboardList },
+      { key: "roles", label: "Roles", href: "/roles", icon: ShieldCheck },
     ],
   },
   {
@@ -81,7 +95,10 @@ const sidebarGroups: SidebarGroup[] = [
     label: "Business",
     items: [
       { key: "reports", label: "Reports", href: "/reports", icon: BarChart3 },
-      { key: "roles", label: "Roles & Permission", href: "/roles", icon: ShieldCheck },
+      { key: "pos-report", label: "POS Report", href: "/reports/pos", icon: CalendarRange },
+      { key: "finance", label: "Finance", href: "/finance", icon: Receipt },
+      { key: "packages", label: "Packages", href: "/packages", icon: Package },
+      { key: "stakeholder", label: "Stakeholder Summary", href: "/stakeholder-summary", icon: Building2 },
     ],
   },
   {
@@ -89,7 +106,13 @@ const sidebarGroups: SidebarGroup[] = [
     label: "System",
     items: [
       { key: "settings", label: "Settings", href: "/settings", icon: Settings },
-      { key: "modules", label: "All Modules", href: "/modules", icon: LayoutGrid },
+      { key: "access-control", label: "Access Control", href: "/access-control", icon: ShieldCheck },
+      { key: "rules", label: "Rules", href: "/rules", icon: SlidersHorizontal },
+      { key: "notifications", label: "Notifications", href: "/notifications", icon: Bell },
+      { key: "integration", label: "Integrations", href: "/integration", icon: LayoutGrid },
+      { key: "workflow", label: "Workflow", href: "/workflow", icon: Workflow },
+      { key: "templates", label: "Templates", href: "/templates", icon: FileText },
+      { key: "audit-trail", label: "Audit Trail", href: "/audit-trail", icon: ScrollText },
     ],
   },
 ];

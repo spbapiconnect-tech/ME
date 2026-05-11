@@ -30,7 +30,50 @@ export const modulePages: Record<string, ModulePageConfig> = {
       ["KLCC Opening Checklist", "KLCC Branch", "Pending Review", "12 min ago", "Nadia"],
       ["Kitchen Hygiene Audit", "Setia Alam", "Failed", "31 min ago", "Rafiq"],
       ["Closing Stock Verification", "Bangsar South", "Completed", "1 hour ago", "Irene"],
-    ]),
+    ]).map((row, idx) => {
+      const detailByRow = [
+        {
+          detailItems: [
+            { label: "Checklist Name", value: "Opening Hygiene Checklist" },
+            { label: "Branch", value: "KLCC Branch" },
+            { label: "Score", value: "86%" },
+            { label: "Failed Items", value: "2" },
+            { label: "Inspector", value: "Nadia" },
+            { label: "Review Status", value: "Pending Review" },
+            { label: "Last Checked", value: "Today 09:12" },
+          ],
+          nextAction: "Submit Review",
+          detailNote: "Next action: confirm corrective checks before lunch peak.",
+        },
+        {
+          detailItems: [
+            { label: "Checklist Name", value: "Kitchen Hygiene Audit" },
+            { label: "Branch", value: "Setia Alam" },
+            { label: "Score", value: "74%" },
+            { label: "Failed Items", value: "4" },
+            { label: "Inspector", value: "Rafiq" },
+            { label: "Review Status", value: "Failed" },
+            { label: "Last Checked", value: "Today 08:53" },
+          ],
+          nextAction: "Open Corrective Task",
+          detailNote: "Next action: assign sanitation follow-up to shift supervisor.",
+        },
+        {
+          detailItems: [
+            { label: "Checklist Name", value: "Closing Stock Verification" },
+            { label: "Branch", value: "Bangsar South" },
+            { label: "Score", value: "95%" },
+            { label: "Failed Items", value: "0" },
+            { label: "Inspector", value: "Irene" },
+            { label: "Review Status", value: "Completed" },
+            { label: "Last Checked", value: "Yesterday 22:05" },
+          ],
+          nextAction: "Archive Record",
+          detailNote: "Next action: archive and sync to daily branch report.",
+        },
+      ];
+      return { ...row, ...detailByRow[idx] };
+    }),
   },
   issues: {
     title: "Issue Center",
@@ -50,7 +93,47 @@ export const modulePages: Record<string, ModulePageConfig> = {
       ["Cold Storage Temperature Spike", "Johor Bahru Branch", "Critical", "8 min ago", "Ops Lead"],
       ["POS Printer Offline", "KL Sentral Branch", "In Review", "22 min ago", "IT Support"],
       ["Supplier Delivery Delay", "Petaling Jaya Branch", "Open", "45 min ago", "Branch Manager"],
-    ]),
+    ]).map((row, idx) => {
+      const detailByRow = [
+        {
+          detailItems: [
+            { label: "Issue Title", value: "Cold Storage Temperature Spike" },
+            { label: "Severity", value: "Critical" },
+            { label: "Branch", value: "Johor Bahru Branch" },
+            { label: "Owner", value: "Ops Lead" },
+            { label: "Status", value: "Open" },
+            { label: "Reported Time", value: "Today 10:08" },
+          ],
+          nextAction: "Escalate Incident",
+          detailNote: "Timeline: alert triggered, technician dispatched, product isolation in progress.",
+        },
+        {
+          detailItems: [
+            { label: "Issue Title", value: "POS Printer Offline" },
+            { label: "Severity", value: "High" },
+            { label: "Branch", value: "KL Sentral Branch" },
+            { label: "Owner", value: "IT Support" },
+            { label: "Status", value: "In Review" },
+            { label: "Reported Time", value: "Today 09:54" },
+          ],
+          nextAction: "Approve Temporary Workaround",
+          detailNote: "Timeline: failover to backup counter, driver reinstall pending.",
+        },
+        {
+          detailItems: [
+            { label: "Issue Title", value: "Supplier Delivery Delay" },
+            { label: "Severity", value: "Medium" },
+            { label: "Branch", value: "Petaling Jaya Branch" },
+            { label: "Owner", value: "Branch Manager" },
+            { label: "Status", value: "Open" },
+            { label: "Reported Time", value: "Today 09:31" },
+          ],
+          nextAction: "Confirm Revised ETA",
+          detailNote: "Timeline: supplier acknowledged delay; fallback stock transfer suggested.",
+        },
+      ];
+      return { ...row, ...detailByRow[idx] };
+    }),
   },
   tasks: {
     title: "Tasks",
@@ -70,7 +153,50 @@ export const modulePages: Record<string, ModulePageConfig> = {
       ["Check freezer gasket condition", "Subang Branch", "Due Today", "Today 16:30", "Amir"],
       ["Verify incoming produce batch", "Cheras Branch", "Open", "Today 17:00", "Farah"],
       ["Resolve handwash sink leak", "Damansara Branch", "Overdue", "Yesterday", "Maintenance"],
-    ]),
+    ]).map((row, idx) => {
+      const detailByRow = [
+        {
+          detailItems: [
+            { label: "Task Title", value: "Check freezer gasket condition" },
+            { label: "Branch", value: "Subang Branch" },
+            { label: "Owner", value: "Amir" },
+            { label: "Due Time", value: "Today 16:30" },
+            { label: "Priority", value: "High" },
+            { label: "Checklist / Progress", value: "6 of 8 checks done" },
+            { label: "Completion Status", value: "In Progress" },
+          ],
+          nextAction: "Complete Remaining Checks",
+          detailNote: "Next step: verify seal integrity and upload photo evidence.",
+        },
+        {
+          detailItems: [
+            { label: "Task Title", value: "Verify incoming produce batch" },
+            { label: "Branch", value: "Cheras Branch" },
+            { label: "Owner", value: "Farah" },
+            { label: "Due Time", value: "Today 17:00" },
+            { label: "Priority", value: "Medium" },
+            { label: "Checklist / Progress", value: "2 of 5 checks done" },
+            { label: "Completion Status", value: "Open" },
+          ],
+          nextAction: "Continue Batch Validation",
+          detailNote: "Next step: complete quality sampling and sign receiving log.",
+        },
+        {
+          detailItems: [
+            { label: "Task Title", value: "Resolve handwash sink leak" },
+            { label: "Branch", value: "Damansara Branch" },
+            { label: "Owner", value: "Maintenance" },
+            { label: "Due Time", value: "Yesterday 18:00" },
+            { label: "Priority", value: "Critical" },
+            { label: "Checklist / Progress", value: "1 of 4 checks done" },
+            { label: "Completion Status", value: "Overdue" },
+          ],
+          nextAction: "Escalate Vendor Callout",
+          detailNote: "Next step: submit emergency fix approval and update ETA.",
+        },
+      ];
+      return { ...row, ...detailByRow[idx] };
+    }),
   },
   expiry: {
     title: "Expiry Control",
@@ -90,7 +216,50 @@ export const modulePages: Record<string, ModulePageConfig> = {
       ["Fresh Milk 2L", "Batch M23019 · Chiller A", "Expiring Today", "Today", "Storekeeper"],
       ["Chicken Fillet", "Batch C44102 · Freezer 2", "3 Days", "12 May", "Kitchen Lead"],
       ["Yogurt Cup", "Batch Y88310 · Front Cooler", "Expired", "10 May", "Supervisor"],
-    ]),
+    ]).map((row, idx) => {
+      const detailByRow = [
+        {
+          detailItems: [
+            { label: "Product / Item", value: "Fresh Milk 2L" },
+            { label: "Batch", value: "M23019" },
+            { label: "Storage", value: "Chiller A" },
+            { label: "Expiry Date", value: "May 11, 2026" },
+            { label: "Remaining Days", value: "0 days" },
+            { label: "Checked By", value: "Storekeeper" },
+            { label: "Action Required", value: "Use or transfer by noon" },
+            { label: "Disposal / Check Status", value: "Pending final check" },
+          ],
+          nextAction: "Confirm Disposition",
+        },
+        {
+          detailItems: [
+            { label: "Product / Item", value: "Chicken Fillet" },
+            { label: "Batch", value: "C44102" },
+            { label: "Storage", value: "Freezer 2" },
+            { label: "Expiry Date", value: "May 12, 2026" },
+            { label: "Remaining Days", value: "3 days" },
+            { label: "Checked By", value: "Kitchen Lead" },
+            { label: "Action Required", value: "Rotate into prep plan" },
+            { label: "Disposal / Check Status", value: "Checked today" },
+          ],
+          nextAction: "Add To Prep Priority",
+        },
+        {
+          detailItems: [
+            { label: "Product / Item", value: "Yogurt Cup" },
+            { label: "Batch", value: "Y88310" },
+            { label: "Storage", value: "Front Cooler" },
+            { label: "Expiry Date", value: "May 10, 2026" },
+            { label: "Remaining Days", value: "-1 day" },
+            { label: "Checked By", value: "Supervisor" },
+            { label: "Action Required", value: "Dispose and record waste" },
+            { label: "Disposal / Check Status", value: "Awaiting sign-off" },
+          ],
+          nextAction: "Complete Disposal Log",
+        },
+      ];
+      return { ...row, ...detailByRow[idx] };
+    }),
   },
   sop: {
     title: "SOP Library",
@@ -110,7 +279,47 @@ export const modulePages: Record<string, ModulePageConfig> = {
       ["Daily Opening Procedure", "Kitchen · v3.2", "Active", "Updated 2 days ago", "Operations"],
       ["Food Allergy Handling", "Service · v1.9", "Need Review", "Updated 9 days ago", "QA"],
       ["Incident Escalation", "Safety · v2.1", "Active", "Updated 14 days ago", "Risk Team"],
-    ]),
+    ]).map((row, idx) => {
+      const detailByRow = [
+        {
+          detailItems: [
+            { label: "SOP Title", value: "Daily Opening Procedure" },
+            { label: "Category", value: "Kitchen" },
+            { label: "Version", value: "v3.2" },
+            { label: "Owner", value: "Operations" },
+            { label: "Linked Training", value: "Opening Shift Basics" },
+            { label: "Review Due", value: "June 15, 2026" },
+            { label: "Last Updated", value: "2 days ago" },
+          ],
+          nextAction: "Open SOP",
+        },
+        {
+          detailItems: [
+            { label: "SOP Title", value: "Food Allergy Handling" },
+            { label: "Category", value: "Service" },
+            { label: "Version", value: "v1.9" },
+            { label: "Owner", value: "QA" },
+            { label: "Linked Training", value: "Allergen Response Training" },
+            { label: "Review Due", value: "May 20, 2026" },
+            { label: "Last Updated", value: "9 days ago" },
+          ],
+          nextAction: "Open SOP",
+        },
+        {
+          detailItems: [
+            { label: "SOP Title", value: "Incident Escalation" },
+            { label: "Category", value: "Safety" },
+            { label: "Version", value: "v2.1" },
+            { label: "Owner", value: "Risk Team" },
+            { label: "Linked Training", value: "Incident Escalation Drill" },
+            { label: "Review Due", value: "July 1, 2026" },
+            { label: "Last Updated", value: "14 days ago" },
+          ],
+          nextAction: "Open SOP",
+        },
+      ];
+      return { ...row, ...detailByRow[idx] };
+    }),
   },
   staff: {
     title: "Staff",
@@ -271,7 +480,47 @@ export const modulePages: Record<string, ModulePageConfig> = {
       ["KLCC", "Central Region", "Active", "Updated 12 min ago", "Nadia"],
       ["Penang Gurney", "North Region", "Need Attention", "Updated 34 min ago", "Azman"],
       ["Johor Bahru", "South Region", "Open", "Updated 1 hour ago", "Suresh"],
-    ]),
+    ]).map((row, idx) => {
+      const detailByRow = [
+        {
+          detailItems: [
+            { label: "Branch Status", value: "Active" },
+            { label: "Manager", value: "Nadia" },
+            { label: "Today Sales", value: "MYR 28,750" },
+            { label: "Open Tasks", value: "5" },
+            { label: "Stock Alerts", value: "2" },
+            { label: "Inspection Score", value: "94%" },
+            { label: "Last Sync / Last Activity", value: "Synced 4 min ago" },
+          ],
+          nextAction: "Open Branch Detail",
+        },
+        {
+          detailItems: [
+            { label: "Branch Status", value: "Need Attention" },
+            { label: "Manager", value: "Azman" },
+            { label: "Today Sales", value: "MYR 19,320" },
+            { label: "Open Tasks", value: "7" },
+            { label: "Stock Alerts", value: "3" },
+            { label: "Inspection Score", value: "87%" },
+            { label: "Last Sync / Last Activity", value: "Synced 12 min ago" },
+          ],
+          nextAction: "Open Branch Detail",
+        },
+        {
+          detailItems: [
+            { label: "Branch Status", value: "Open" },
+            { label: "Manager", value: "Suresh" },
+            { label: "Today Sales", value: "MYR 24,610" },
+            { label: "Open Tasks", value: "4" },
+            { label: "Stock Alerts", value: "1" },
+            { label: "Inspection Score", value: "91%" },
+            { label: "Last Sync / Last Activity", value: "Synced 7 min ago" },
+          ],
+          nextAction: "Open Branch Detail",
+        },
+      ];
+      return { ...row, ...detailByRow[idx] };
+    }),
   },
   packages: {
     title: "Packages",
