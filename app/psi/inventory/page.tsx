@@ -667,6 +667,7 @@ function GridSummaryDetail({
 }
 
 export default function InventoryPage() {
+  const inventoryGridColumns = "52px 104px 210px 110px 90px 96px 124px 70px 92px 100px 126px 128px 72px";
   const [viewMode, setViewMode] = useState<"grid" | "detail">("grid");
   const [selectedSku, setSelectedSku] = useState("SKU-1001");
   const [selectedRows, setSelectedRows] = useState<string[]>(["SKU-1001"]);
@@ -820,19 +821,22 @@ export default function InventoryPage() {
                 }}
                 className="overflow-x-auto p-3"
               >
-                <div className="min-w-[1280px]">
-                  <div className="grid h-9 grid-cols-[52px_104px_210px_110px_90px_96px_124px_70px_92px_100px_126px_128px_52px] items-center rounded-t-lg border border-border bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground [&>div]:border-r [&>div]:border-border/45 [&>div:last-child]:border-r-0">
+                <div className="w-max min-w-[1374px] overflow-hidden rounded-lg border border-border">
+                  <div
+                    className="grid h-9 items-center bg-secondary/30 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground [&>div]:h-full [&>div]:border-r [&>div]:border-border/45 [&>div]:px-3 [&>div]:flex [&>div]:items-center [&>div:last-child]:border-r-0"
+                    style={{ gridTemplateColumns: inventoryGridColumns }}
+                  >
                     {["", "SKU", "Item Name", "Category", "Branch", "Storage", "Current Stock", "UOM", "Safety", "Coverage", "Supplier", "Unit Cost", ""].map((head, index) => (
                       <div
                         key={`${head}-${index}`}
-                        className={index === 12 ? "flex items-center justify-center border-l border-border/45 px-0" : "px-3"}
+                        className={index === 12 ? "justify-center px-0 text-center" : index === 0 ? "justify-center px-0" : "justify-start"}
                       >
                         {index === 12 ? "Action" : head}
                       </div>
                     ))}
                   </div>
 
-                  <div className="min-h-[760px] border-x border-border">
+                  <div className="min-h-[760px]">
                     {inventoryItems.map((item) => {
                       const active = selectedSku === item.sku;
                       const checked = selectedRows.includes(item.sku);
@@ -847,11 +851,12 @@ export default function InventoryPage() {
                             if (event.key === "Enter" || event.key === " ") selectRow(item.sku);
                           }}
                           className={[
-                            "grid h-9 cursor-pointer grid-cols-[52px_104px_210px_110px_90px_96px_124px_70px_92px_100px_126px_128px_52px] items-center border-b border-border text-xs transition [&>div]:border-r [&>div]:border-border/45 [&>div:last-child]:border-r-0",
+                            "grid h-9 cursor-pointer items-center border-b border-border text-xs transition [&>div]:h-full [&>div]:border-r [&>div]:border-border/45 [&>div]:px-3 [&>div]:flex [&>div]:items-center [&>div:last-child]:border-r-0",
                             active ? "bg-primary/12 text-foreground" : "hover:bg-secondary/30",
                           ].join(" ")}
+                          style={{ gridTemplateColumns: inventoryGridColumns }}
                         >
-                          <div className="flex items-center justify-center border-l border-border/45 px-0">
+                          <div className="justify-center px-0">
                             <button
                               type="button"
                               aria-label={`Select ${item.sku}`}
@@ -865,18 +870,18 @@ export default function InventoryPage() {
                               ].join(" ")}
                             />
                           </div>
-                          <div className="px-3 font-semibold text-foreground">{item.sku}</div>
-                          <div className="truncate px-3 font-medium">{item.itemName}</div>
-                          <div className="px-3 text-muted-foreground">{item.category}</div>
-                          <div className="px-3 text-muted-foreground">{item.branch}</div>
-                          <div className="px-3 text-muted-foreground">{item.storage}</div>
-                          <div className={["px-3 font-semibold", item.risk === "high" ? "text-destructive" : "text-foreground"].join(" ")}>{item.currentStock}</div>
-                          <div className="px-3 text-muted-foreground">{item.stockUom}</div>
-                          <div className="px-3 text-muted-foreground">{item.safetyStock}</div>
-                          <div className="px-3 text-muted-foreground">{item.coverageDays}</div>
-                          <div className="truncate px-3 text-muted-foreground">{item.primarySupplier}</div>
-                          <div className="whitespace-nowrap px-3 text-muted-foreground">{item.unitCost}</div>
-                          <div className="flex items-center justify-center px-0">
+                          <div className="justify-start font-semibold text-foreground">{item.sku}</div>
+                          <div className="justify-start truncate font-medium">{item.itemName}</div>
+                          <div className="justify-start text-muted-foreground">{item.category}</div>
+                          <div className="justify-start text-muted-foreground">{item.branch}</div>
+                          <div className="justify-start text-muted-foreground">{item.storage}</div>
+                          <div className={["justify-start font-semibold", item.risk === "high" ? "text-destructive" : "text-foreground"].join(" ")}>{item.currentStock}</div>
+                          <div className="justify-start text-muted-foreground">{item.stockUom}</div>
+                          <div className="justify-start text-muted-foreground">{item.safetyStock}</div>
+                          <div className="justify-start text-muted-foreground">{item.coverageDays}</div>
+                          <div className="justify-start truncate text-muted-foreground">{item.primarySupplier}</div>
+                          <div className="justify-start whitespace-nowrap text-muted-foreground">{item.unitCost}</div>
+                          <div className="justify-center px-0">
                             <Button
                               type="button"
                               variant="ghost"
@@ -896,7 +901,7 @@ export default function InventoryPage() {
                     })}
                   </div>
 
-                  <div className="flex h-11 flex-wrap items-center justify-between gap-2 rounded-b-lg border border-t-0 border-border bg-secondary/10 px-3 text-xs text-muted-foreground">
+                  <div className="flex h-11 flex-wrap items-center justify-between gap-2 border-t border-border bg-secondary/10 px-3 text-xs text-muted-foreground">
                     <div className="flex flex-wrap items-center gap-3">
                       <span>Showing 1–20 of 872</span>
                       <span>Selected {selectedRows.length}</span>
