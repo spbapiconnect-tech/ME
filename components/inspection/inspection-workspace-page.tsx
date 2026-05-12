@@ -437,46 +437,149 @@ export function InspectionWorkspacePage() {
 
           <Card className="min-h-[620px]">
             <CardHeader>
-              <CardTitle className="text-base">Execution Signals</CardTitle>
-              <p className="text-sm text-muted-foreground">Outlet execution items that should trigger inspection review.</p>
+              <CardTitle className="text-base">Run Inspection</CardTitle>
+              <p className="text-sm text-muted-foreground">Work through the selected checklist, review linked execution proof, and capture failed items.</p>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {!signals.length ? (
-                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-                  No outlet execution signals need inspection yet. Overdue tasks, missing proof, or linked incidents will appear here.
+            <CardContent className="space-y-4">
+              {!selectedInspection || !reviewSummary ? (
+                <div className="space-y-3">
+                  <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                    Select an inspection from the queue, or start from an outlet execution signal.
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="text-sm font-semibold">Execution Signals</div>
+                    {!signals.length ? (
+                      <div className="rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
+                        No outlet execution signals need inspection yet.
+                      </div>
+                    ) : signals.slice(0, 4).map((signal) => (
+                      <div key={signal.id} className={cn("rounded-xl border p-3", selectedSignalId === signal.id ? "border-primary bg-primary/5" : "border-border")}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-medium">{signal.taskTitle}</p>
+                            <p className="text-xs text-muted-foreground">{signal.branchName}</p>
+                          </div>
+                          <Badge variant={statusTone(signal.status)}>{signal.status}</Badge>
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">{signal.reason}</div>
+                        <div className="mt-3 flex gap-2">
+                          <Button size="sm" onClick={() => openSignalInspection(signal)}>Inspect This</Button>
+                          <Button variant="outline" size="sm" onClick={() => setSelectedSignalId(signal.id)}>Select</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ) : null}
-              {signals.map((signal) => (
-                <div key={signal.id} className={cn("rounded-xl border p-3", selectedSignalId === signal.id ? "border-primary bg-primary/5" : "border-border")}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium">{signal.taskTitle}</p>
-                      <p className="text-xs text-muted-foreground">{signal.branchName}</p>
+              ) : (
+                <>
+                  <div className="rounded-xl border bg-muted/20 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Selected Inspection</p>
+                        <h2 className="text-lg font-semibold">{selectedInspection.title}</h2>
+                        <p className="text-sm text-muted-foreground">{reviewSummary.branch} · {reviewSummary.inspectionType}</p>
+                      </div>
+                      <Badge variant={statusTone(selectedInspection.status)}>{selectedInspection.status}</Badge>
                     </div>
-                    <Badge variant={statusTone(signal.status)}>{signal.status}</Badge>
+                    <div className="mt-4 grid gap-2 text-sm md:grid-cols-2">
+                      <div className="rounded-lg border bg-background px-3 py-2">
+                        <div className="text-muted-foreground">Checklist</div>
+                        <div className="font-medium">{reviewSummary.checklist}</div>
+                      </div>
+                      <div className="rounded-lg border bg-background px-3 py-2">
+                        <div className="text-muted-foreground">Source</div>
+                        <div className="font-medium">{detailValue(selectedInspection, "Source") || "Manual Inspection"}</div>
+                      </div>
+                      <div className="rounded-lg border bg-background px-3 py-2">
+                        <div className="text-muted-foreground">Linked Execution</div>
+                        <div className="font-medium">{reviewSummary.linkedExecutionTask}</div>
+                      </div>
+                      <div className="rounded-lg border bg-background px-3 py-2">
+                        <div className="text-muted-foreground">Required New Photo</div>
+                        <div className="font-medium">{reviewSummary.requiredNewPhotoProof}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="mt-3 grid gap-1 text-xs text-muted-foreground">
-                    <div className="flex justify-between"><span>Reason</span><span>{signal.reason}</span></div>
-                    <div className="flex justify-between"><span>Due</span><span>{signal.dueAt || "Not set"}</span></div>
-                    <div className="flex justify-between"><span>Photo Proof</span><span>{signal.photoProofStatus}</span></div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold">Checklist Runner</p>
+                        <p className="text-xs text-muted-foreground">Run the review, record failed items, then create incident or corrective action.</p>
+                      </div>
+                      <Badge variant="outline">Score {reviewSummary.score}</Badge>
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div className="rounded-xl border p-3">
+                        <div className="text-xs text-muted-foreground">Review Status</div>
+                        <div className="mt-1 font-semibold">{reviewSummary.reviewStatus}</div>
+                      </div>
+                      <div className="rounded-xl border p-3">
+                        <div className="text-xs text-muted-foreground">Failed Items</div>
+                        <div className="mt-1 font-semibold">{reviewSummary.failedItems}</div>
+                      </div>
+                      <div className="rounded-xl border p-3">
+                        <div className="text-xs text-muted-foreground">Corrective Action</div>
+                        <div className="mt-1 font-semibold">{reviewSummary.correctiveActionStatus}</div>
+                      </div>
+                    </div>
+
+                    {!failedItems.length ? (
+                      <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                        No failed item captured yet. Click Run Inspection Review to add failed checklist items, severity, comment, photo requirement, and corrective action requirement.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {failedItems.map((item, index) => (
+                          <div key={item.id} className="rounded-xl border p-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <div className="text-xs font-medium uppercase text-muted-foreground">Failed Item {index + 1}</div>
+                                <p className="font-medium">{item.label}</p>
+                                <p className="text-sm text-muted-foreground">{item.comment || "No comment recorded."}</p>
+                              </div>
+                              <Badge variant={statusTone(item.severity)}>{item.severity}</Badge>
+                            </div>
+                            <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                              {item.photoRequired ? <span className="rounded-md border px-2 py-1">Photo required</span> : null}
+                              {item.shouldCreateIncident ? <span className="rounded-md border px-2 py-1">Incident suggested</span> : null}
+                              {item.correctiveActionRequired ? <span className="rounded-md border px-2 py-1">Corrective action required</span> : null}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="grid gap-2 md:grid-cols-2">
+                      <Button onClick={openReviewDialog}>
+                        <CheckCircle2 className="h-4 w-4" />
+                        Run Inspection Review
+                      </Button>
+                      <Button variant="outline" onClick={createCorrectiveAction}>
+                        <Camera className="h-4 w-4" />
+                        Push Corrective Action
+                      </Button>
+                    </div>
                   </div>
-                  <div className="mt-3 flex gap-2">
-                    <Button size="sm" onClick={() => openSignalInspection(signal)}>
-                      Inspect This Execution
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setSelectedSignalId(signal.id)}>
-                      Select
-                    </Button>
+
+                  <div className="space-y-2">
+                    <div className="text-sm font-semibold">Linked Navigation</div>
+                    <div className="flex flex-wrap gap-2">
+                      {detailValue(selectedInspection, "Linked Outlet Execution ID") ? <Button variant="outline" size="sm" onClick={() => router.push(`/tasks?taskId=${detailValue(selectedInspection, "Linked Outlet Execution ID")}`)}>Open Linked Task</Button> : null}
+                      {splitList(detailValue(selectedInspection, "Linked Incident IDs"))[0] ? <Button variant="outline" size="sm" onClick={() => router.push(`/issues?incidentId=${splitList(detailValue(selectedInspection, "Linked Incident IDs"))[0]}`)}>Open Incident</Button> : null}
+                    </div>
                   </div>
-                </div>
-              ))}
+                </>
+              )}
             </CardContent>
           </Card>
 
           <Card className="min-h-[620px]">
             <CardHeader>
-              <CardTitle className="text-base">Inspection Review Detail</CardTitle>
-              <p className="text-sm text-muted-foreground">Review checklist result, linked incident, corrective action, and new photo proof requirement.</p>
+              <CardTitle className="text-base">Failed Items / Actions</CardTitle>
+              <p className="text-sm text-muted-foreground">Convert failed inspection points into incident records, corrective actions, and rework proof requirements.</p>
             </CardHeader>
             <CardContent className="space-y-4">
               {!selectedInspection || !reviewSummary ? (
