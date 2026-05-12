@@ -1,7 +1,10 @@
-"use client";
-
+import { Suspense } from "react";
 import { InspectionWorkspacePage } from "@/components/inspection/inspection-workspace-page";
 
 export default function Page() {
-  return <InspectionWorkspacePage />;
+  return (
+    <Suspense fallback={null}>
+      <InspectionWorkspacePage />
+    </Suspense>
+  );
 }

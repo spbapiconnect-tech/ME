@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, CheckCheck, ClipboardList, Clock3, FileSearch, Plus, RefreshCw, ShieldAlert, Target, Upload } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
 import { Badge } from "@/components/ui/badge";
@@ -108,18 +109,20 @@ export function OutletExecutionCommandCenter() {
   const createRecordWithPayload = useMeRuntimeStore((state) => state.createRecordWithPayload);
   const updateRecord = useMeRuntimeStore((state) => state.updateRecord);
   const logAction = useMeRuntimeStore((state) => state.logAction);
+  const updateTaskProofAccepted = useMeRuntimeStore((state) => state.updateTaskProofAccepted);
+  const updateTaskProofRejected = useMeRuntimeStore((state) => state.updateTaskProofRejected);
   const syncStatus = useMeRuntimeStore((state) => state.syncStatus);
   const syncMessage = useMeRuntimeStore((state) => state.lastSyncMessage);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const taskRows = getRows("tasks", []);
   const branchRows = getRows("branches", []);
   const incidentRows = getRows("issues", []);
   const inspectionRows = getRows("inspection", []);
-  const expiryRows = getRows("expiry", []);
-
   const [selectedDate, setSelectedDate] = useState(todayIso());
   const [calendarAnchor, setCalendarAnchor] = useState(new Date());
-  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(taskRows[0]?.id);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<TaskFormMode>("new");
   const [form, setForm] = useState<TaskForm>({
@@ -158,7 +161,37 @@ export function OutletExecutionCommandCenter() {
   const slaSummary = useMemo(() => getExecutionSlaSummary(taskRows), [taskRows]);
   const days = useMemo(() => monthDays(calendarAnchor), [calendarAnchor]);
 
-  const selectedTask = taskRows.find((row) => row.id === selectedTaskId) ?? dailyPlan.tasks[0]?.row ?? reviewQueue[0]?.row ?? taskRows[0];
+  const requestedTaskId = useMemo(() => {
+    const taskId = searchParams.get("taskId");
+    if (taskId && taskRows.some((row) => row.id === taskId)) return taskId;
+    const branchId = searchParams.get("branchId");
+    if (branchId) {
+      const branch = branchRows.find((row) => row.id === branchId)?.title;
+      const linked = branch ? taskRows.find((row) => detailValue(row, "Branch") === branch || detailValue(row, "Outlets").includes(branch)) : undefined;
+      if (linked) return linked.id;
+    }
+    const incidentId = searchParams.get("incidentId");
+    if (incidentId) {
+      const linked = taskRows.find((row) => detailValue(row, "Linked Incident ID") === incidentId);
+      if (linked) return linked.id;
+    }
+    const inspectionId = searchParams.get("inspectionId");
+    if (inspectionId) {
+      const linked = taskRows.find((row) => detailValue(row, "Linked Inspection ID") === inspectionId);
+      if (linked) return linked.id;
+    }
+    const fefoId = searchParams.get("fefoId");
+    if (fefoId) {
+      const linked = taskRows.find((row) => detailValue(row, "Linked FEFO / Waste ID") === fefoId);
+      if (linked) return linked.id;
+    }
+    return undefined;
+  }, [searchParams, taskRows, branchRows]);
+  const selectedTask = taskRows.find((row) => row.id === selectedTaskId)
+    ?? taskRows.find((row) => row.id === requestedTaskId)
+    ?? dailyPlan.tasks[0]?.row
+    ?? reviewQueue[0]?.row
+    ?? taskRows[0];
   const detail = useMemo(() => getExecutionDetail(selectedTask), [selectedTask]);
   const nextActions = useMemo(() => getExecutionNextActions(selectedTask), [selectedTask]);
   const branchOptions = useMemo(() => branchRows.map((row) => row.title), [branchRows]);
@@ -325,93 +358,14 @@ export function OutletExecutionCommandCenter() {
 
   async function acceptProof() {
     if (!selectedTask) return;
-    let nextDetails = selectedTask.detailItems ?? [];
-    nextDetails = upsertDetail(nextDetails, "Photo Proof Status", "Accepted");
-    nextDetails = upsertDetail(nextDetails, "Manager Review Status", "Accepted");
-    nextDetails = upsertDetail(nextDetails, "Reviewed At", new Date().toISOString());
-    await patchTask(selectedTask.id, { status: "Completed", detailItems: nextDetails, nextAction: "Close linked review" });
+    await updateTaskProofAccepted(selectedTask.id);
     await logAction("tasks", "accept-proof", `Accepted proof for ${selectedTask.title}`);
-
-    const linkedIncidentId = detailValue(selectedTask, "Linked Incident ID");
-    if (linkedIncidentId) {
-      const incident = incidentRows.find((row) => row.id === linkedIncidentId);
-      if (incident) {
-        let incidentDetails = incident.detailItems ?? [];
-        incidentDetails = upsertDetail(incidentDetails, "Linked Corrective Actions", selectedTask.title);
-        incidentDetails = upsertDetail(incidentDetails, "Review Status", "Pending Review");
-        incidentDetails = upsertDetail(incidentDetails, "Resolution Evidence", "Corrective action proof accepted." );
-        await updateRecord("issues", incident.id, { status: "Pending Review", detailItems: incidentDetails, nextAction: "Resolve incident after final review" });
-      }
-    }
-
-    const linkedInspectionId = detailValue(selectedTask, "Linked Inspection ID");
-    if (linkedInspectionId) {
-      const inspection = inspectionRows.find((row) => row.id === linkedInspectionId);
-      if (inspection) {
-        let inspectionDetails = inspection.detailItems ?? [];
-        inspectionDetails = upsertDetail(inspectionDetails, "Required New Photo Proof", "Accepted");
-        inspectionDetails = upsertDetail(inspectionDetails, "Corrective Action Status", "Completed");
-        await updateRecord("inspection", inspection.id, { detailItems: inspectionDetails, nextAction: "Close inspection review" });
-      }
-    }
-
-    const linkedFefoId = detailValue(selectedTask, "Linked FEFO / Waste ID");
-    if (linkedFefoId) {
-      const fefo = expiryRows.find((row) => row.id === linkedFefoId);
-      if (fefo) {
-        let fefoDetails = fefo.detailItems ?? [];
-        fefoDetails = upsertDetail(fefoDetails, "Photo Proof Status", "Accepted");
-        fefoDetails = upsertDetail(fefoDetails, "Manager Review Status", "Accepted");
-        fefoDetails = upsertDetail(fefoDetails, "Linked Outlet Execution", selectedTask.title);
-        fefoDetails = upsertDetail(fefoDetails, "Linked Outlet Execution ID", selectedTask.id);
-        const nextStatus =
-          selectedTask.title.toLowerCase().includes("dispose") ||
-          detailValue(selectedTask, "Completion Standard").toLowerCase().includes("disposed quantity")
-            ? "Reviewed"
-            : fefo.status;
-        await updateRecord("expiry", fefo.id, {
-          status: nextStatus,
-          detailItems: fefoDetails,
-          nextAction: nextStatus === "Reviewed" ? "Close FEFO review" : "Monitor next expiry action",
-        });
-      }
-    }
   }
 
   async function rejectProof() {
     if (!selectedTask) return;
-    let nextDetails = selectedTask.detailItems ?? [];
-    nextDetails = upsertDetail(nextDetails, "Photo Proof Status", "Recheck Required");
-    nextDetails = upsertDetail(nextDetails, "Manager Review Status", "Rejected");
-    nextDetails = upsertDetail(nextDetails, "Manager Review Comment", "Proof rejected. Rework and upload new evidence." );
-    await patchTask(selectedTask.id, { status: "Rework Required", detailItems: nextDetails, nextAction: "Upload new proof" });
+    await updateTaskProofRejected(selectedTask.id);
     await logAction("tasks", "reject-proof", `Rejected proof for ${selectedTask.title}`);
-
-    const linkedInspectionId = detailValue(selectedTask, "Linked Inspection ID");
-    if (linkedInspectionId) {
-      const inspection = inspectionRows.find((row) => row.id === linkedInspectionId);
-      if (inspection) {
-        let inspectionDetails = inspection.detailItems ?? [];
-        inspectionDetails = upsertDetail(inspectionDetails, "Required New Photo Proof", "Rejected");
-        inspectionDetails = upsertDetail(inspectionDetails, "Corrective Action Status", "Rework Required");
-        await updateRecord("inspection", inspection.id, { detailItems: inspectionDetails, nextAction: "Request new proof" });
-      }
-    }
-
-    const linkedFefoId = detailValue(selectedTask, "Linked FEFO / Waste ID");
-    if (linkedFefoId) {
-      const fefo = expiryRows.find((row) => row.id === linkedFefoId);
-      if (fefo) {
-        let fefoDetails = fefo.detailItems ?? [];
-        fefoDetails = upsertDetail(fefoDetails, "Photo Proof Status", "Rejected");
-        fefoDetails = upsertDetail(fefoDetails, "Manager Review Status", "Rejected");
-        fefoDetails = upsertDetail(fefoDetails, "Action Required", "Yes");
-        await updateRecord("expiry", fefo.id, {
-          detailItems: fefoDetails,
-          nextAction: "Upload new FEFO / disposal proof",
-        });
-      }
-    }
   }
 
   async function completeCorrectiveAction() {
@@ -591,6 +545,11 @@ export function OutletExecutionCommandCenter() {
                     ].map(([label, value]) => (
                       <div key={label} className="flex items-center justify-between gap-3"><span className="text-muted-foreground">{label}</span><span className="text-right font-medium">{value}</span></div>
                     ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {detail.linkedIncidentId ? <Button variant="outline" size="sm" onClick={() => router.push(`/issues?incidentId=${detail.linkedIncidentId}`)}>Open Incident</Button> : null}
+                    {detail.linkedInspectionId ? <Button variant="outline" size="sm" onClick={() => router.push(`/inspection?inspectionId=${detail.linkedInspectionId}`)}>Open Inspection</Button> : null}
+                    {detail.linkedFefoWasteId ? <Button variant="outline" size="sm" onClick={() => router.push(`/expiry?fefoId=${detail.linkedFefoWasteId}`)}>Open FEFO</Button> : null}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant={getTaskStatusTone(detail.status)}>{detail.status}</Badge>

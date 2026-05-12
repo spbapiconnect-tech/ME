@@ -291,4 +291,62 @@ export const storeOperationRules: StoreOperationRule[] = [
         : { matched: false, reason: "Opening clear" };
     },
   },
+  {
+    id: "sop-need-review",
+    moduleId: "sop-training",
+    description: "Move effective SOP into need review when review due date has passed.",
+    run: (record, context) => {
+      const status = String((record as { status?: string }).status ?? "");
+      const reviewDueDate = String((record as { reviewDueDate?: string }).reviewDueDate ?? "");
+      return status === "Effective" && reviewDueDate && new Date(reviewDueDate).getTime() < new Date(context.now).getTime()
+        ? { matched: true, nextStatus: "Need Review", suggestedAction: "Publish updated version", reason: "Review due date passed" }
+        : { matched: false, reason: "Review not due" };
+    },
+  },
+  {
+    id: "sop-obsolete-block-template",
+    moduleId: "sop-training",
+    description: "Obsolete SOP should not generate templates.",
+    run: (record) => {
+      const status = String((record as { status?: string }).status ?? "");
+      return status === "Obsolete"
+        ? { matched: true, suggestedAction: "Stop template generation", reason: "SOP obsolete", metadata: { templateGenerationBlocked: "Yes" } }
+        : { matched: false, reason: "SOP active" };
+    },
+  },
+  {
+    id: "sop-ack-training-missing",
+    moduleId: "sop-training",
+    description: "Suggest training assignment when acknowledgement is required but no training exists.",
+    run: (record) => {
+      const acknowledgementRequired = Boolean((record as { acknowledgementRequired?: boolean }).acknowledgementRequired);
+      const trainingTaskCount = Number((record as { trainingTaskCount?: number }).trainingTaskCount ?? 0);
+      return acknowledgementRequired && trainingTaskCount === 0
+        ? { matched: true, suggestedAction: "Assign training", reason: "Acknowledgement required but no training task" }
+        : { matched: false, reason: "Training in place or not required" };
+    },
+  },
+  {
+    id: "sop-checklist-template-missing",
+    moduleId: "sop-training",
+    description: "Suggest checklist template generation when missing.",
+    run: (record) => {
+      const linkedChecklist = String((record as { linkedChecklistTemplateIds?: string }).linkedChecklistTemplateIds ?? "");
+      return !linkedChecklist
+        ? { matched: true, suggestedAction: "Create checklist template", reason: "Checklist template missing" }
+        : { matched: false, reason: "Checklist linked" };
+    },
+  },
+  {
+    id: "sop-risk-rule-review",
+    moduleId: "sop-training",
+    description: "Suggest checklist rule review when SOP has risk points.",
+    run: (record) => {
+      const riskPointsCount = Number((record as { riskPointsCount?: number }).riskPointsCount ?? 0);
+      const failedItemRule = String((record as { failedItemRule?: string }).failedItemRule ?? "");
+      return riskPointsCount > 0 && !failedItemRule
+        ? { matched: true, suggestedAction: "Review checklist rules", reason: "Risk points exist without failed-item rule" }
+        : { matched: false, reason: "Risk rules complete" };
+    },
+  },
 ];

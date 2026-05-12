@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { CalendarClock, ClipboardCheck, Plus } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
 import { Badge } from "@/components/ui/badge";
@@ -82,6 +83,8 @@ const readinessStates = ["Ready", "Partial", "Blocked"];
 const proofOptions = ["Required", "Not Required"];
 
 export function BranchControlPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
   const getRows = useMeRuntimeStore((state) => state.getRows);
   const createRecordWithPayload = useMeRuntimeStore((state) => state.createRecordWithPayload);
@@ -94,7 +97,7 @@ export function BranchControlPage() {
   const incidentRows = getRows("issues", []);
   const fefoRows = getRows("expiry", []);
 
-  const [selectedBranchId, setSelectedBranchId] = useState<string | undefined>(branchRows[0]?.id);
+  const [selectedBranchId, setSelectedBranchId] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("register");
   const [form, setForm] = useState<BranchForm>({
@@ -140,7 +143,14 @@ export function BranchControlPage() {
   const healthBoard = useMemo(() => getBranchHealthBoard(branchRows, taskRows, inspectionRows, incidentRows, fefoRows), [branchRows, taskRows, inspectionRows, incidentRows, fefoRows]);
   const todayOperation = useMemo(() => branchRows.map((branch) => getTodayOperationSummary(branch, taskRows, inspectionRows, incidentRows, fefoRows)), [branchRows, taskRows, inspectionRows, incidentRows, fefoRows]);
   const attentionQueue = useMemo(() => getBranchAttentionQueue(branchRows, taskRows, inspectionRows, incidentRows, fefoRows), [branchRows, taskRows, inspectionRows, incidentRows, fefoRows]);
-  const selectedBranch = branchRows.find((row) => row.id === selectedBranchId) ?? healthBoard[0]?.row ?? branchRows[0];
+  const requestedBranchId = useMemo(() => {
+    const branchId = searchParams.get("branchId");
+    return branchId && branchRows.some((row) => row.id === branchId) ? branchId : undefined;
+  }, [searchParams, branchRows]);
+  const selectedBranch = branchRows.find((row) => row.id === selectedBranchId)
+    ?? branchRows.find((row) => row.id === requestedBranchId)
+    ?? healthBoard[0]?.row
+    ?? branchRows[0];
   const branchDetail = useMemo(() => getBranchDetail(selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows), [selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows]);
   const nextActions = useMemo(() => selectedBranch ? getBranchNextActions(selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows) : [], [selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows]);
 
@@ -496,10 +506,10 @@ export function BranchControlPage() {
                       <div>
                         <div className="mb-2 text-sm font-medium">Linked Records</div>
                         <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div className="rounded-md border px-3 py-2">Tasks: {branchDetail.linkedTasks.length}</div>
-                          <div className="rounded-md border px-3 py-2">Inspections: {branchDetail.linkedInspections.length}</div>
-                          <div className="rounded-md border px-3 py-2">Incidents: {branchDetail.linkedIncidents.length}</div>
-                          <div className="rounded-md border px-3 py-2">FEFO: {branchDetail.linkedFefoRecords.length}</div>
+                          <button type="button" onClick={() => router.push(`/tasks?branchId=${selectedBranch?.id ?? ""}`)} className="rounded-md border px-3 py-2 text-left">Tasks: {branchDetail.linkedTasks.length}</button>
+                          <button type="button" onClick={() => router.push(`/inspection?branchId=${selectedBranch?.id ?? ""}`)} className="rounded-md border px-3 py-2 text-left">Inspections: {branchDetail.linkedInspections.length}</button>
+                          <button type="button" onClick={() => router.push(`/issues?branchId=${selectedBranch?.id ?? ""}`)} className="rounded-md border px-3 py-2 text-left">Incidents: {branchDetail.linkedIncidents.length}</button>
+                          <button type="button" onClick={() => router.push(`/expiry?branchId=${selectedBranch?.id ?? ""}`)} className="rounded-md border px-3 py-2 text-left">FEFO: {branchDetail.linkedFefoRecords.length}</button>
                         </div>
                       </div>
 
@@ -507,10 +517,10 @@ export function BranchControlPage() {
                         <div className="mb-2 text-sm font-medium">Next Actions</div>
                         <div className="space-y-2 text-sm">
                           {nextActions.length ? nextActions.map((action) => (
-                            <div key={action.actionId} className="rounded-md border px-3 py-2">
+                            <button key={action.actionId} type="button" onClick={() => router.push(action.route + (action.linkedRecordId ? `?${action.sourceModule === "Outlet Execution" ? "taskId" : action.sourceModule === "Store Inspection" ? "inspectionId" : action.sourceModule === "Incident Center" ? "incidentId" : "fefoId"}=${action.linkedRecordId}` : ""))} className="w-full rounded-md border px-3 py-2 text-left">
                               <div className="font-medium">{action.label}</div>
                               <div className="text-muted-foreground">{action.sourceModule} · {action.severity}</div>
-                            </div>
+                            </button>
                           )) : <p className="text-muted-foreground">This branch has no execution, inspection, incident, or FEFO records yet.</p>}
                         </div>
                       </div>

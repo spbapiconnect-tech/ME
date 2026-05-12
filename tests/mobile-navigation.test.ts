@@ -20,7 +20,7 @@ test("mobile ERP navigation components import without crashing", async () => {
 test("mobile bottom nav uses the required five-slot pattern", () => {
   assert.equal(erpMobileBottomNavItems.length, 4);
 
-  const keys = erpMobileBottomNavItems.map((item) => item.key);
+  const keys = erpMobileBottomNavItems.map((item) => item.key) as string[];
   for (const required of ["dashboard", "operations", "psi", "workforce"]) {
     assert.equal(keys.includes(required), true);
   }

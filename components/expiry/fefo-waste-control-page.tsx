@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRightLeft, Camera, ClipboardCheck, PackagePlus, ShieldAlert, Target, Trash2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +45,10 @@ function upsertDetail(items: Array<{ label: string; value: string }> | undefined
   return next;
 }
 
+function detailValue(row: { detailItems?: Array<{ label: string; value: string }> }, label: string) {
+  return row.detailItems?.find((item) => item.label === label)?.value ?? "";
+}
+
 type ModalMode = "register" | "daily-check" | "action" | "disposal";
 
 type FefoForm = {
@@ -81,6 +86,8 @@ const roleTargets = ["Outlet Manager", "Kitchen", "Store Supervisor", "Operation
 const wasteReasons = Array.from(productExpiryMaster.wasteReason).length ? Array.from(productExpiryMaster.wasteReason) : ["Expired", "Damaged", "Unknown Batch", "Label Missing", "Quality Issue"];
 
 export function FefoWasteControlPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
   const getRows = useMeRuntimeStore((state) => state.getRows);
   const createRecordWithPayload = useMeRuntimeStore((state) => state.createRecordWithPayload);
@@ -92,7 +99,7 @@ export function FefoWasteControlPage() {
   const fefoRows = getRows("expiry", []);
   const branchRows = getRows("branches", []);
 
-  const [selectedBatchId, setSelectedBatchId] = useState<string | undefined>(fefoRows[0]?.id);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("register");
   const [form, setForm] = useState<FefoForm>({
@@ -136,7 +143,27 @@ export function FefoWasteControlPage() {
   const reviewQueue = useMemo(() => getExpiryReviewQueue(fefoRows), [fefoRows]);
   const branchRisk = useMemo(() => getBranchExpiryRiskSummary(fefoRows), [fefoRows]);
   const wasteReasonSummary = useMemo(() => getWasteReasonSummary(fefoRows), [fefoRows]);
-  const selectedBatch = fefoRows.find((row) => row.id === selectedBatchId) ?? useFirstQueue[0]?.row ?? wasteQueue[0]?.row ?? fefoRows[0];
+  const requestedBatchId = useMemo(() => {
+    const fefoId = searchParams.get("fefoId");
+    if (fefoId && fefoRows.some((row) => row.id === fefoId)) return fefoId;
+    const taskId = searchParams.get("taskId");
+    if (taskId) {
+      const linked = fefoRows.find((row) => detailValue(row, "Linked Outlet Execution ID") === taskId);
+      if (linked) return linked.id;
+    }
+    const branchId = searchParams.get("branchId");
+    if (branchId) {
+      const branch = branchRows.find((row) => row.id === branchId)?.title;
+      const linked = branch ? fefoRows.find((row) => detailValue(row, "Branch") === branch) : undefined;
+      if (linked) return linked.id;
+    }
+    return undefined;
+  }, [searchParams, fefoRows, branchRows]);
+  const selectedBatch = fefoRows.find((row) => row.id === selectedBatchId)
+    ?? fefoRows.find((row) => row.id === requestedBatchId)
+    ?? useFirstQueue[0]?.row
+    ?? wasteQueue[0]?.row
+    ?? fefoRows[0];
   const detail = useMemo(() => getBatchDetail(selectedBatch), [selectedBatch]);
   const nextActions = useMemo(() => getFefoNextActions(selectedBatch), [selectedBatch]);
   const branchOptions = useMemo(() => branchRows.map((row) => row.title), [branchRows]);
@@ -441,6 +468,14 @@ export function FefoWasteControlPage() {
                       ["Proof", detail.photoProofStatus],
                       ["Waste Reason", detail.wasteReason || "Not recorded"],
                     ].map(([label, value]) => <div key={label} className="flex items-center justify-between gap-3"><span className="text-muted-foreground">{label}</span><span className="text-right font-medium">{value}</span></div>)}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {detail.linkedOutletExecutionId ? <Button variant="outline" size="sm" onClick={() => router.push(`/tasks?taskId=${detail.linkedOutletExecutionId}`)}>Open Task</Button> : null}
+                    {detail.linkedIncidentId ? <Button variant="outline" size="sm" onClick={() => router.push(`/issues?incidentId=${detail.linkedIncidentId}`)}>Open Incident</Button> : null}
+                    {detail.branch ? <Button variant="outline" size="sm" onClick={() => {
+                      const branchId = branchRows.find((row) => row.title === detail.branch)?.id;
+                      router.push(branchId ? `/branches?branchId=${branchId}` : "/branches");
+                    }}>Open Branch</Button> : null}
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant={getFefoPriorityTone(detail.fefoPriority)}>{detail.fefoPriority}</Badge>

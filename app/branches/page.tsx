@@ -1,7 +1,10 @@
-"use client";
-
+import { Suspense } from "react";
 import { BranchControlPage } from "@/components/branches/branch-control-page";
 
 export default function Page() {
-  return <BranchControlPage />;
+  return (
+    <Suspense fallback={null}>
+      <BranchControlPage />
+    </Suspense>
+  );
 }

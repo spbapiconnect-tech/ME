@@ -49,11 +49,65 @@ export function createChecklistFromSop(sop: ModuleRow) {
   };
 }
 
+export function createChecklistTemplateFromSop(sop: ModuleRow) {
+  return {
+    id: `CHK-${sop.id}`,
+    title: `Checklist: ${sop.title}`,
+    processArea: sop.detailItems?.find((item) => item.label === "Process Area")?.value || "Operations",
+    targetRole: sop.detailItems?.find((item) => item.label === "Target Role")?.value || "",
+    linkedSopId: sop.id,
+  };
+}
+
+export function createInspectionTemplateFromSop(sop: ModuleRow) {
+  return {
+    id: `INSP-${sop.id}`,
+    title: `Inspection Template: ${sop.title}`,
+    processArea: sop.detailItems?.find((item) => item.label === "Process Area")?.value || "Operations",
+    scoringRule: "100-point checklist",
+    autoIssueSuggestion: "Yes",
+    linkedSopId: sop.id,
+  };
+}
+
+export function createTaskTemplateFromSop(sop: ModuleRow) {
+  return {
+    id: `TASKTPL-${sop.id}`,
+    title: `Task Template: ${sop.title}`,
+    taskType: "Daily Operation",
+    completionStandard: `Execute SOP ${sop.title} and confirm all required steps.`,
+    repeatRule: "Once",
+    linkedSopId: sop.id,
+  };
+}
+
 export function createTrainingTaskFromSop(sop: ModuleRow) {
   return {
     title: `Training Acknowledgement: ${sop.title}`,
     source: sop.id,
+    linkedSopId: sop.id,
+    taskType: "Training Acknowledgement",
+    completionStandard: `Read and acknowledge SOP version ${sop.detailItems?.find((item) => item.label === "Version")?.value || "current"}.`,
+    photoProofRequired: false,
     linkedModule: "outlet-execution",
+  };
+}
+
+export function publishNewSopVersion(sop: ModuleRow, version: string) {
+  return {
+    title: sop.title,
+    source: sop.id,
+    nextVersion: version,
+    previousVersionId: sop.id,
+    linkedModule: "sop-training",
+  };
+}
+
+export function supersedeOldSopVersion(sop: ModuleRow, replacementVersionId: string) {
+  return {
+    source: sop.id,
+    replacementVersionId,
+    linkedModule: "sop-training",
   };
 }
 

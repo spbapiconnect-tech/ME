@@ -9,6 +9,7 @@ import {
   getRealDataMappingPageData,
   getUiDataBlocks,
 } from "../lib/real-data-mapping";
+import type { MeUiSurfaceKey } from "../types/real-data-mapping";
 
 test("real data mapping page imports without crashing", async () => {
   const [route, page, surfaceCard, entityCard, apiCard, migrationCard] = await Promise.all([
@@ -40,7 +41,7 @@ test("helper returns page data", () => {
 
 test("required surfaces exist", () => {
   const surfaces = new Set(getUiDataBlocks().map((block) => block.surface));
-  for (const surface of ["dashboard", "psi-procurement", "psi-supplier", "psi-inventory", "branch-workspace", "reports", "roles"]) {
+  for (const surface of ["dashboard", "psi-procurement", "psi-supplier", "psi-inventory", "branch-workspace", "reports", "roles"] as MeUiSurfaceKey[]) {
     assert.equal(surfaces.has(surface), true);
   }
 });

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ArrowUpRight, CheckCheck, ClipboardList, Flag, ShieldAlert, Siren, Target } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +14,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { issueMasterData } from "@/lib/master-data/issue";
-import { taskMasterData } from "@/lib/master-data/task";
 import { runStoreOperationRules } from "@/lib/rules/rule-runner";
 import {
   getIncidentDueAtBySeverity,
@@ -27,16 +27,11 @@ import {
   getLinkedCorrectiveActions,
   type IncidentSourceSignal,
 } from "@/lib/store-operations/incident-workspace";
-import { createTaskFromIncident } from "@/lib/store-operations/store-operation-links";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
 
 function detailValue(row: { detailItems?: Array<{ label: string; value: string }> }, label: string) {
   return row.detailItems?.find((item) => item.label === label)?.value ?? "";
-}
-
-function splitList(value: string) {
-  return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
 function upsertDetail(items: Array<{ label: string; value: string }> | undefined, label: string, value: string) {
@@ -74,11 +69,15 @@ const impactAreaOptions = Array.from(issueMasterData.impactArea).length ? Array.
 const escalationLevels = ["None", "Supervisor", "Manager", "HQ", "Critical"];
 
 export function IncidentCenterPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
   const getRows = useMeRuntimeStore((state) => state.getRows);
   const createRecordWithPayload = useMeRuntimeStore((state) => state.createRecordWithPayload);
   const updateRecord = useMeRuntimeStore((state) => state.updateRecord);
   const logAction = useMeRuntimeStore((state) => state.logAction);
+  const createTaskFromIncident = useMeRuntimeStore((state) => state.createTaskFromIncident);
+  const transitionIncidentStatus = useMeRuntimeStore((state) => state.transitionIncidentStatus);
   const syncStatus = useMeRuntimeStore((state) => state.syncStatus);
   const syncMessage = useMeRuntimeStore((state) => state.lastSyncMessage);
 
@@ -88,7 +87,7 @@ export function IncidentCenterPage() {
   const expiryRows = getRows("expiry", []);
   const branchRows = getRows("branches", []);
 
-  const [selectedIncidentId, setSelectedIncidentId] = useState<string | undefined>(incidentRows[0]?.id);
+  const [selectedIncidentId, setSelectedIncidentId] = useState<string | undefined>();
   const [selectedSignalId, setSelectedSignalId] = useState<string | undefined>();
   const [activeFilter, setActiveFilter] = useState("New");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -135,7 +134,31 @@ export function IncidentCenterPage() {
     });
   }, [activeFilter, queue]);
 
-  const selectedIncident = incidentRows.find((row) => row.id === selectedIncidentId) ?? filteredQueue[0] ?? queue[0];
+  const requestedIncidentId = useMemo(() => {
+    const incidentId = searchParams.get("incidentId");
+    if (incidentId && incidentRows.some((row) => row.id === incidentId)) return incidentId;
+    const inspectionId = searchParams.get("inspectionId");
+    if (inspectionId) {
+      const linked = incidentRows.find((row) => detailValue(row, "Linked Inspection ID") === inspectionId);
+      if (linked) return linked.id;
+    }
+    const taskId = searchParams.get("taskId");
+    if (taskId) {
+      const linked = incidentRows.find((row) => detailValue(row, "Linked Outlet Execution ID") === taskId || detailValue(row, "Linked Corrective Action IDs").includes(taskId));
+      if (linked) return linked.id;
+    }
+    const branchId = searchParams.get("branchId");
+    if (branchId) {
+      const branch = branchRows.find((row) => row.id === branchId)?.title;
+      const linked = branch ? incidentRows.find((row) => detailValue(row, "Branch") === branch) : undefined;
+      if (linked) return linked.id;
+    }
+    return undefined;
+  }, [searchParams, incidentRows, branchRows]);
+  const selectedIncident = incidentRows.find((row) => row.id === selectedIncidentId)
+    ?? incidentRows.find((row) => row.id === requestedIncidentId)
+    ?? filteredQueue[0]
+    ?? queue[0];
   const reviewSummary = useMemo(() => getIncidentReviewSummary(selectedIncident), [selectedIncident]);
   const nextActions = useMemo(() => getIncidentNextActions(selectedIncident), [selectedIncident]);
   const correctiveActions = useMemo(() => getLinkedCorrectiveActions(selectedIncident, taskRows), [selectedIncident, taskRows]);
@@ -222,7 +245,7 @@ export function IncidentCenterPage() {
         { label: "Resolution Evidence", value: "" },
         { label: "Linked Inspection", value: inspectionRows.find((row) => row.id === form.linkedInspectionId)?.title || "" },
         { label: "Linked Inspection ID", value: form.linkedInspectionId },
-        { label: "Linked Failed Item ID", value: form.linkedInspectionFailedItemId },
+        { label: "Linked Inspection Failed Item ID", value: form.linkedInspectionFailedItemId },
         { label: "Linked Outlet Execution", value: taskRows.find((row) => row.id === form.linkedOutletExecutionId)?.title || "" },
         { label: "Linked Outlet Execution ID", value: form.linkedOutletExecutionId },
         { label: "Linked FEFO / Waste ID", value: form.linkedFefoWasteId },
@@ -243,50 +266,10 @@ export function IncidentCenterPage() {
 
   async function createCorrectiveActionForIncident(incident = selectedIncident) {
     if (!incident) return;
-    const seed = createTaskFromIncident(incident, {
-      linkedInspectionId: detailValue(incident, "Linked Inspection ID") || undefined,
-      dueAt: detailValue(incident, "Due Time") || undefined,
-      photoProofRequired: true,
-    });
-    const branch = detailValue(incident, "Branch") || incident.subtitle;
-    const created = await createRecordWithPayload("tasks", {
-      title: seed.title,
-      subtitle: `${branch} · corrective action`,
-      status: "Scheduled",
-      owner: "Outlet Execution",
-      detailItems: [
-        { label: "Task Type", value: Array.from(taskMasterData.taskType)[0] || "Corrective Action" },
-        { label: "Outlets", value: branch },
-        { label: "Completed Outlets", value: "" },
-        { label: "Photo Proofs", value: "" },
-        { label: "Due Date", value: (seed.dueAt || "").slice(0, 10) },
-        { label: "Due Time", value: (seed.dueAt || "").slice(11, 16) },
-        { label: "Time Trigger", value: "After Incident" },
-        { label: "Repeat Rule", value: Array.from(taskMasterData.repeatRule)[0] || "Once" },
-        { label: "Photo Required", value: seed.photoProofRequired ? "Required" : "Optional" },
-        { label: "Completion Standard", value: seed.completionStandard },
-        { label: "Linked Incident", value: incident.title },
-        { label: "Linked Incident ID", value: incident.id },
-        { label: "Linked Inspection", value: detailValue(incident, "Linked Inspection") },
-        { label: "Inspection Source", value: detailValue(incident, "Linked Inspection") },
-      ],
-      detailNote: "Corrective action created from incident center. Outlet must rework and upload photo proof.",
-      nextAction: "Submit photo proof",
-    });
-
-    const actionIds = splitList(detailValue(incident, "Linked Corrective Action IDs"));
-    const actionTitles = splitList(detailValue(incident, "Linked Corrective Actions"));
-    actionIds.push(created.id);
-    actionTitles.push(created.title);
-    let nextDetails = incident.detailItems ?? [];
-    nextDetails = upsertDetail(nextDetails, "Linked Corrective Action IDs", actionIds.join(", "));
-    nextDetails = upsertDetail(nextDetails, "Linked Corrective Actions", actionTitles.join(", "));
-    await updateRecord("issues", incident.id, {
-      status: incident.status === "New" ? "Assigned" : incident.status,
-      detailItems: nextDetails,
-      nextAction: "Review corrective action submission",
-    });
-    await logAction("issues", "create-corrective-action", `Created corrective action ${created.title} from ${incident.title}`);
+    const created = await createTaskFromIncident(incident.id);
+    if (created) {
+      await logAction("issues", "create-corrective-action", `Created corrective action ${created.title} from ${incident.title}`);
+    }
   }
 
   async function markContained() {
@@ -318,22 +301,19 @@ export function IncidentCenterPage() {
 
   async function markPendingReview() {
     if (!selectedIncident) return;
-    await updateRecord("issues", selectedIncident.id, { status: "Pending Review", nextAction: "Resolve after manager review" });
+    await transitionIncidentStatus(selectedIncident.id, "Pending Review");
     await logAction("issues", "pending-review", `Marked pending review ${selectedIncident.title}`);
   }
 
   async function resolveIncident() {
     if (!selectedIncident) return;
-    let nextDetails = selectedIncident.detailItems ?? [];
-    nextDetails = upsertDetail(nextDetails, "Resolution Evidence", "Manager verified corrective action and accepted proof." );
-    nextDetails = upsertDetail(nextDetails, "Review Status", "Resolved" );
-    await updateRecord("issues", selectedIncident.id, { status: "Resolved", detailItems: nextDetails, nextAction: "Reopen if issue recurs" });
+    await transitionIncidentStatus(selectedIncident.id, "Resolved", "Manager verified corrective action and accepted proof.");
     await logAction("issues", "resolve-incident", `Resolved incident ${selectedIncident.title}`);
   }
 
   async function reopenIncident() {
     if (!selectedIncident) return;
-    await updateRecord("issues", selectedIncident.id, { status: "Reopened", nextAction: "Review repeated failure" });
+    await transitionIncidentStatus(selectedIncident.id, "Reopened");
     await logAction("issues", "reopen-incident", `Reopened incident ${selectedIncident.title}`);
   }
 
@@ -492,6 +472,11 @@ export function IncidentCenterPage() {
                       </div>
                     ))}
                   </div>
+                  <div className="flex flex-wrap gap-2">
+                    {detailValue(selectedIncident, "Linked Inspection ID") ? <Button variant="outline" size="sm" onClick={() => router.push(`/inspection?inspectionId=${detailValue(selectedIncident, "Linked Inspection ID")}`)}>Open Inspection</Button> : null}
+                    {detailValue(selectedIncident, "Linked Outlet Execution ID") ? <Button variant="outline" size="sm" onClick={() => router.push(`/tasks?taskId=${detailValue(selectedIncident, "Linked Outlet Execution ID")}`)}>Open Task</Button> : null}
+                    {detailValue(selectedIncident, "Linked FEFO / Waste ID") ? <Button variant="outline" size="sm" onClick={() => router.push(`/expiry?fefoId=${detailValue(selectedIncident, "Linked FEFO / Waste ID")}`)}>Open FEFO</Button> : null}
+                  </div>
 
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm font-medium"><Flag className="h-4 w-4 text-primary" />Next Actions</div>
@@ -506,7 +491,7 @@ export function IncidentCenterPage() {
                       <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No corrective action created yet.</div>
                     ) : (
                       correctiveActions.map((action) => (
-                        <div key={action.id} className="rounded-lg border p-3">
+                        <button key={action.id} type="button" onClick={() => router.push(`/tasks?taskId=${action.id}&incidentId=${selectedIncident.id}`)} className="w-full rounded-lg border p-3 text-left">
                           <div className="flex items-start justify-between gap-3">
                             <div>
                               <p className="font-medium">{action.title}</p>
@@ -514,7 +499,7 @@ export function IncidentCenterPage() {
                             </div>
                             <Badge variant={getIncidentStatusTone(action.status)}>{action.status}</Badge>
                           </div>
-                        </div>
+                        </button>
                       ))
                     )}
                   </div>

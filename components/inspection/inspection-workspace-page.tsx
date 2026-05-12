@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Camera, CheckCircle2, ClipboardList, FileWarning, Link2, ListChecks, Plus, ShieldAlert } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +27,6 @@ import {
   type InspectionFailedItemView,
   type InspectionSignal,
 } from "@/lib/store-operations/inspection-workspace";
-import { createIncidentFromInspectionFailure, createTaskFromIncident } from "@/lib/store-operations/store-operation-links";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
 
@@ -84,11 +84,15 @@ const sourceOptions = ["Manual Inspection", "From Outlet Execution", "From Incid
 const reviewStatuses = ["Pending Review", "Passed", "Failed", "Recheck Required"];
 
 export function InspectionWorkspacePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
   const getRows = useMeRuntimeStore((state) => state.getRows);
   const createRecordWithPayload = useMeRuntimeStore((state) => state.createRecordWithPayload);
   const updateRecord = useMeRuntimeStore((state) => state.updateRecord);
   const logAction = useMeRuntimeStore((state) => state.logAction);
+  const createIncidentFromInspectionFailure = useMeRuntimeStore((state) => state.createIncidentFromInspectionFailure);
+  const createTaskFromIncident = useMeRuntimeStore((state) => state.createTaskFromIncident);
   const syncStatus = useMeRuntimeStore((state) => state.syncStatus);
   const syncMessage = useMeRuntimeStore((state) => state.lastSyncMessage);
 
@@ -97,7 +101,7 @@ export function InspectionWorkspacePage() {
   const issueRows = getRows("issues", []);
   const branchRows = getRows("branches", []);
 
-  const [selectedInspectionId, setSelectedInspectionId] = useState<string | undefined>(inspectionRows[0]?.id);
+  const [selectedInspectionId, setSelectedInspectionId] = useState<string | undefined>();
   const [activeFilter, setActiveFilter] = useState("Pending Review");
   const [inspectionDialogOpen, setInspectionDialogOpen] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
@@ -149,7 +153,26 @@ export function InspectionWorkspacePage() {
     });
   }, [activeFilter, queue]);
 
-  const selectedInspection = inspectionRows.find((row) => row.id === selectedInspectionId) ?? filteredQueue[0] ?? queue[0];
+  const requestedInspectionId = useMemo(() => {
+    const inspectionId = searchParams.get("inspectionId");
+    if (inspectionId && inspectionRows.some((row) => row.id === inspectionId)) return inspectionId;
+    const taskId = searchParams.get("taskId");
+    if (taskId) {
+      const linked = inspectionRows.find((row) => detailValue(row, "Linked Outlet Execution ID") === taskId);
+      if (linked) return linked.id;
+    }
+    const branchId = searchParams.get("branchId");
+    if (branchId) {
+      const branch = branchRows.find((row) => row.id === branchId)?.title;
+      const linked = branch ? inspectionRows.find((row) => detailValue(row, "Branch") === branch) : undefined;
+      if (linked) return linked.id;
+    }
+    return undefined;
+  }, [searchParams, inspectionRows, branchRows]);
+  const selectedInspection = inspectionRows.find((row) => row.id === selectedInspectionId)
+    ?? inspectionRows.find((row) => row.id === requestedInspectionId)
+    ?? filteredQueue[0]
+    ?? queue[0];
   const selectedSignal = signals.find((signal) => signal.id === selectedSignalId);
   const failedItems = useMemo(() => getFailedInspectionItems(selectedInspection), [selectedInspection]);
   const reviewSummary = useMemo(() => getInspectionReviewSummary(selectedInspection), [selectedInspection]);
@@ -294,90 +317,33 @@ export function InspectionWorkspacePage() {
 
   async function createIncident(item: InspectionFailedItemView) {
     if (!selectedInspection) return;
-    const incidentSeed = createIncidentFromInspectionFailure(selectedInspection, item);
-    const created = await createRecordWithPayload("issues", {
-      title: incidentSeed.title,
-      subtitle: `${reviewSummary?.branch || "Outlet"} · inspection failure`,
-      status: "New",
-      owner: "Incident Center",
-      detailItems: [
-        { label: "Branch", value: reviewSummary?.branch || "" },
-        { label: "Severity", value: incidentSeed.severity },
-        { label: "Category", value: Array.from(issueMasterData.issueCategory)[0] || "Store Inspection Failure" },
-        { label: "Impact Area", value: item.label },
-        { label: "Immediate Containment", value: item.comment || "Contain and verify outlet correction." },
-        { label: "Linked Inspection", value: selectedInspection.title },
-        { label: "Linked Inspection ID", value: selectedInspection.id },
-        { label: "Linked Failed Item ID", value: item.id },
-        { label: "Source", value: "inspection" },
-      ],
-      detailNote: item.comment || "Incident raised from failed inspection item.",
-      nextAction: "Create Corrective Action",
-    });
-
-    const incidentIds = splitList(detailValue(selectedInspection, "Linked Incident IDs"));
-    const incidentTitles = splitList(detailValue(selectedInspection, "Linked Incident Titles"));
-    incidentIds.push(created.id);
-    incidentTitles.push(created.title);
-    let nextDetails = selectedInspection.detailItems ?? [];
-    nextDetails = upsertDetail(nextDetails, "Linked Incident IDs", incidentIds.join(", "));
-    nextDetails = upsertDetail(nextDetails, "Linked Incident Titles", incidentTitles.join(", "));
-    await updateRecord("inspection", selectedInspection.id, {
-      status: "Issue Created",
-      detailItems: nextDetails,
-      nextAction: "Push corrective action",
-    });
-    await logAction("inspection", "create-incident", `Created incident ${created.title} from ${selectedInspection.title}`);
+    const created = await createIncidentFromInspectionFailure(selectedInspection.id, item.id);
+    if (created) {
+      await logAction("inspection", "create-incident", `Created incident ${created.title} from ${selectedInspection.title}`);
+    }
   }
 
   async function createCorrectiveAction() {
     if (!selectedInspection) return;
     const incidentId = splitList(detailValue(selectedInspection, "Linked Incident IDs"))[0];
     const incident = issueRows.find((row) => row.id === incidentId);
-    const seed = createTaskFromIncident(incident ?? selectedInspection, {
-      linkedInspectionId: selectedInspection.id,
-      dueAt: detailValue(selectedInspection, "Scheduled Time") || undefined,
-      photoProofRequired: detailValue(selectedInspection, "Required New Photo Proof") === "Yes",
-    });
-    const branch = reviewSummary?.branch || detailValue(selectedInspection, "Branch");
-    const created = await createRecordWithPayload("tasks", {
-      title: seed.title,
-      subtitle: `${branch} · corrective action`,
-      status: "Scheduled",
-      owner: "Outlet Execution",
-      detailItems: [
-        { label: "Task Type", value: Array.from(taskMasterData.taskType)[0] || "Corrective Action" },
-        { label: "Outlets", value: branch },
-        { label: "Completed Outlets", value: "" },
-        { label: "Photo Proofs", value: "" },
-        { label: "Due Date", value: (seed.dueAt || "").slice(0, 10) },
-        { label: "Due Time", value: (seed.dueAt || "").slice(11, 16) },
-        { label: "Time Trigger", value: "After Inspection Failure" },
-        { label: "Repeat Rule", value: Array.from(taskMasterData.repeatRule)[0] || "Once" },
-        { label: "Photo Required", value: seed.photoProofRequired ? "Required" : "Optional" },
-        { label: "Completion Standard", value: seed.completionStandard },
-        { label: "Linked Incident", value: incident?.title || "" },
-        { label: "Linked Incident ID", value: incident?.id || "" },
-        { label: "Linked Inspection", value: selectedInspection.title },
-        { label: "Inspection Source", value: selectedInspection.title },
-      ],
-      detailNote: "Corrective action created from store inspection. Outlet must upload new photo proof after rework.",
-      nextAction: "Submit new photo proof",
-    });
+    const created = incident?.id ? await createTaskFromIncident(incident.id) : null;
 
-    const actionIds = splitList(detailValue(selectedInspection, "Linked Corrective Action IDs"));
-    const actionTitles = splitList(detailValue(selectedInspection, "Linked Corrective Actions"));
-    actionIds.push(created.id);
-    actionTitles.push(created.title);
-    let nextDetails = selectedInspection.detailItems ?? [];
-    nextDetails = upsertDetail(nextDetails, "Linked Corrective Action IDs", actionIds.join(", "));
-    nextDetails = upsertDetail(nextDetails, "Linked Corrective Actions", actionTitles.join(", "));
-    nextDetails = upsertDetail(nextDetails, "Corrective Action Status", created.status);
-    await updateRecord("inspection", selectedInspection.id, {
-      detailItems: nextDetails,
-      nextAction: "Review outlet rework proof",
-    });
-    await logAction("inspection", "create-corrective-action", `Created corrective action ${created.title} from ${selectedInspection.title}`);
+    if (created) {
+      const actionIds = splitList(detailValue(selectedInspection, "Linked Corrective Action IDs"));
+      const actionTitles = splitList(detailValue(selectedInspection, "Linked Corrective Actions"));
+      actionIds.push(created.id);
+      actionTitles.push(created.title);
+      let nextDetails = selectedInspection.detailItems ?? [];
+      nextDetails = upsertDetail(nextDetails, "Linked Corrective Action IDs", actionIds.join(", "));
+      nextDetails = upsertDetail(nextDetails, "Linked Corrective Actions", actionTitles.join(", "));
+      nextDetails = upsertDetail(nextDetails, "Corrective Action Status", created.status);
+      await updateRecord("inspection", selectedInspection.id, {
+        detailItems: nextDetails,
+        nextAction: "Review outlet rework proof",
+      });
+      await logAction("inspection", "create-corrective-action", `Created corrective action ${created.title} from ${selectedInspection.title}`);
+    }
   }
 
   return (
@@ -541,6 +507,10 @@ export function InspectionWorkspacePage() {
                         <span className="text-right font-medium">{value}</span>
                       </div>
                     ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {detailValue(selectedInspection, "Linked Outlet Execution ID") ? <Button variant="outline" size="sm" onClick={() => router.push(`/tasks?taskId=${detailValue(selectedInspection, "Linked Outlet Execution ID")}`)}>Open Linked Task</Button> : null}
+                    {splitList(detailValue(selectedInspection, "Linked Incident IDs"))[0] ? <Button variant="outline" size="sm" onClick={() => router.push(`/issues?incidentId=${splitList(detailValue(selectedInspection, "Linked Incident IDs"))[0]}`)}>Open Incident</Button> : null}
                   </div>
 
                   <div className="space-y-2">

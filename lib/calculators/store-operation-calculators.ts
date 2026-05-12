@@ -363,3 +363,59 @@ export function calculateSopTrainingCompletion(rows: ModuleRow[]) {
   const effective = rows.filter((row) => row.status === "Effective").length;
   return Math.round(ratio(effective, rows.length) * 100);
 }
+
+export function calculateEffectiveSopCount(rows: ModuleRow[]) {
+  return rows.filter((row) => row.status === "Effective").length;
+}
+
+export function calculateSopNeedReviewCount(rows: ModuleRow[]) {
+  return rows.filter((row) => row.status === "Need Review").length;
+}
+
+export function calculateSopDraftReviewCount(rows: ModuleRow[]) {
+  return rows.filter((row) => ["Draft", "Review", "Approved"].includes(row.status)).length;
+}
+
+export function calculateTrainingPendingCount(tasks: ModuleRow[]) {
+  return tasks.filter((row) => detailValue(row, "Task Type") === "Training Acknowledgement" && !["Completed"].includes(row.status)).length;
+}
+
+export function calculateTrainingOverdueCount(tasks: ModuleRow[]) {
+  return tasks.filter((row) => detailValue(row, "Task Type") === "Training Acknowledgement" && row.status === "Overdue").length;
+}
+
+export function calculateTrainingAcknowledgedCount(tasks: ModuleRow[]) {
+  return tasks.filter((row) => detailValue(row, "Task Type") === "Training Acknowledgement" && row.status === "Completed").length;
+}
+
+export function calculateChecklistLinkedCount(rows: ModuleRow[]) {
+  return rows.filter((row) => detailValue(row, "Linked Checklist Template IDs")).length;
+}
+
+export function calculateTemplatesGeneratedCount(rows: ModuleRow[]) {
+  return rows.filter((row) =>
+    detailValue(row, "Linked Checklist Template IDs")
+    || detailValue(row, "Linked Inspection Template IDs")
+    || detailValue(row, "Linked Task Template IDs"),
+  ).length;
+}
+
+export function calculateSopTrainingCompletionRate(tasks: ModuleRow[]) {
+  const trainingTasks = tasks.filter((row) => detailValue(row, "Task Type") === "Training Acknowledgement");
+  if (!trainingTasks.length) return 0;
+  return Math.round((trainingTasks.filter((row) => row.status === "Completed").length / trainingTasks.length) * 100);
+}
+
+export function calculateSopGovernanceRiskScore(rows: ModuleRow[], tasks: ModuleRow[]) {
+  if (!rows.length) return 0;
+  const needReview = calculateSopNeedReviewCount(rows);
+  const draftReview = calculateSopDraftReviewCount(rows);
+  const overdueTraining = calculateTrainingOverdueCount(tasks);
+  const missingTemplates = rows.filter((row) => !detailValue(row, "Linked Checklist Template IDs")).length;
+  return Math.max(0, Math.min(100, Math.round(
+    ratio(needReview, rows.length) * 35
+    + ratio(draftReview, rows.length) * 20
+    + Math.min(20, overdueTraining * 5)
+    + ratio(missingTemplates, rows.length) * 25,
+  )));
+}

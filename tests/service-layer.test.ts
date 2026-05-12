@@ -18,7 +18,8 @@ test("procurement service returns mock DataResult", async () => {
 
   if (result.ok) {
     assert.equal(result.meta.source, "mock");
-    assert.equal(result.data.moduleCode, "procurement");
+    const data = result.data as DemoModuleData;
+    assert.equal(data.moduleCode, "procurement");
   }
 });
 
@@ -112,7 +113,8 @@ test("services resolve repositories through the provider indirection", async () 
   assert.equal(result.ok, true);
 
   if (result.ok) {
-    assert.equal(result.data.scenario.en, "stub");
+    const data = result.data as DemoModuleData;
+    assert.equal(data.scenario.en, "stub");
   }
 
   resetRepositoryProvider();
