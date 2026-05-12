@@ -95,6 +95,76 @@ export function getTemplateGeneratorQueue(sops: ModuleRow[]) {
     }));
 }
 
+
+function buildSopPages(sop: ModuleRow) {
+  const pageConfigs = [
+    {
+      id: `${sop.id}-page-1`,
+      pageNo: 1,
+      title: detailValue(sop, "SOP Page 1 Title"),
+      description: detailValue(sop, "SOP Page 1 Description"),
+      steps: detailValue(sop, "SOP Page 1 Steps"),
+      imageUrl: detailValue(sop, "SOP Page 1 Image URL"),
+    },
+    {
+      id: `${sop.id}-page-2`,
+      pageNo: 2,
+      title: detailValue(sop, "SOP Page 2 Title"),
+      description: detailValue(sop, "SOP Page 2 Description"),
+      steps: detailValue(sop, "SOP Page 2 Steps"),
+      imageUrl: detailValue(sop, "SOP Page 2 Image URL"),
+    },
+  ];
+
+  const pages = pageConfigs
+    .filter((page) => page.title || page.description || page.steps || page.imageUrl)
+    .map((page) => ({
+      id: page.id,
+      pageNo: page.pageNo,
+      title: page.title || `Page ${page.pageNo}`,
+      description: page.description,
+      imageUrl: page.imageUrl,
+      steps: page.steps
+        .split("\n")
+        .map((line, index) => line.trim())
+        .filter(Boolean)
+        .map((line, index) => ({
+          id: `${page.id}-step-${index + 1}`,
+          stepNo: index + 1,
+          title: `Step ${index + 1}`,
+          instruction: line,
+          required: true,
+        })),
+    }));
+
+  if (!pages.length) {
+    const fallbackSteps = detailValue(sop, "SOP Steps")
+      .split("\n")
+      .map((line, index) => line.trim())
+      .filter(Boolean)
+      .map((line, index) => ({
+        id: `${sop.id}-fallback-step-${index + 1}`,
+        stepNo: index + 1,
+        title: `Step ${index + 1}`,
+        instruction: line,
+        required: true,
+      }));
+
+    if (fallbackSteps.length) {
+      pages.push({
+        id: `${sop.id}-page-1`,
+        pageNo: 1,
+        title: "Page 1 · SOP Steps",
+        description: "Generated from fallback SOP steps.",
+        imageUrl: "",
+        steps: fallbackSteps,
+      });
+    }
+  }
+
+  return pages;
+}
+
 export function getSopNextActions(sop?: ModuleRow) {
   if (!sop) return [];
   const actions = ["Review SOP lifecycle and assignment"]; 
@@ -124,6 +194,10 @@ export function getSopDetail(sop?: ModuleRow) {
     targetBranch: detailValue(sop, "Target Branch") || "All Branches",
     acknowledgementRequired: detailValue(sop, "Acknowledgement Required") || "No",
     acknowledgementStatus: detailValue(sop, "Acknowledgement Status") || "Not Required",
+    employeeReadMode: detailValue(sop, "Employee Read Mode") || "Page View",
+    contentSourceType: detailValue(sop, "Content Source Type") || "builder",
+    pdfUrl: detailValue(sop, "PDF URL"),
+    pages: buildSopPages(sop),
     riskPoints: splitList(detailValue(sop, "Risk Points")),
     steps: detailValue(sop, "SOP Steps").split("\n").map((item) => item.trim()).filter(Boolean),
     linkedChecklist: splitList(detailValue(sop, "Linked Checklist Template IDs")),

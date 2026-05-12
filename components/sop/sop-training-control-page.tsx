@@ -67,6 +67,17 @@ type SopForm = {
   steps: string;
   riskPoints: string;
   notes: string;
+  contentSourceType: string;
+  employeeReadMode: string;
+  page1Title: string;
+  page1Description: string;
+  page1Steps: string;
+  page1ImageUrl: string;
+  page2Title: string;
+  page2Description: string;
+  page2Steps: string;
+  page2ImageUrl: string;
+  pdfUrl: string;
   existingSopId: string;
   newVersion: string;
   changeSummary: string;
@@ -118,6 +129,17 @@ export function SopTrainingControlPage() {
     steps: "",
     riskPoints: "",
     notes: "",
+    contentSourceType: "builder",
+    employeeReadMode: "Page View",
+    page1Title: "Page 1 · Standard Overview",
+    page1Description: "",
+    page1Steps: "",
+    page1ImageUrl: "",
+    page2Title: "Page 2 · Execution Steps",
+    page2Description: "",
+    page2Steps: "",
+    page2ImageUrl: "",
+    pdfUrl: "",
     existingSopId: "",
     newVersion: "v1.1",
     changeSummary: "",
@@ -200,6 +222,17 @@ export function SopTrainingControlPage() {
         { label: "Assigned Training IDs", value: "" },
         { label: "SOP Steps", value: form.steps },
         { label: "Risk Points", value: form.riskPoints },
+        { label: "Content Source Type", value: form.contentSourceType },
+        { label: "Employee Read Mode", value: form.employeeReadMode },
+        { label: "SOP Page 1 Title", value: form.page1Title },
+        { label: "SOP Page 1 Description", value: form.page1Description },
+        { label: "SOP Page 1 Steps", value: form.page1Steps },
+        { label: "SOP Page 1 Image URL", value: form.page1ImageUrl },
+        { label: "SOP Page 2 Title", value: form.page2Title },
+        { label: "SOP Page 2 Description", value: form.page2Description },
+        { label: "SOP Page 2 Steps", value: form.page2Steps },
+        { label: "SOP Page 2 Image URL", value: form.page2ImageUrl },
+        { label: "PDF URL", value: form.pdfUrl },
       ],
       detailNote: form.notes || "Controlled SOP created. Generate templates and assign training before rollout.",
       nextAction,
@@ -431,6 +464,58 @@ export function SopTrainingControlPage() {
                         {!detail.riskPoints.length ? <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No risk points captured.</div> : detail.riskPoints.map((item) => <div key={item} className="rounded-lg border px-3 py-2 text-sm">{item}</div>)}
                       </div>
                       <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-sm font-semibold">Employee Reading Preview</div>
+                          <Badge variant="outline">{detail.employeeReadMode}</Badge>
+                        </div>
+                        {!detail.pages.length ? (
+                          <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">Add Page 1 and Page 2 to turn this SOP into staff reading content.</div>
+                        ) : (
+                          <div className="space-y-3">
+                            {detail.pages.map((page) => (
+                              <div key={page.id} className="rounded-xl border p-3">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <div className="text-xs font-medium uppercase text-muted-foreground">Page {page.pageNo}</div>
+                                    <div className="font-medium">{page.title}</div>
+                                    {page.description ? <div className="text-sm text-muted-foreground">{page.description}</div> : null}
+                                  </div>
+                                  {page.imageUrl ? <Badge variant="secondary">Image</Badge> : <Badge variant="outline">No Image</Badge>}
+                                </div>
+                                {page.imageUrl ? (
+                                  <div className="mt-3 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Image placeholder: {page.imageUrl}</div>
+                                ) : null}
+                                <div className="mt-3 space-y-2">
+                                  {(page.steps || []).length ? page.steps.map((step) => (
+                                    <div key={step.id} className="rounded-lg bg-muted/40 px-3 py-2 text-sm">
+                                      <span className="font-medium">Step {step.stepNo}: {step.title}</span>
+                                      <div className="text-muted-foreground">{step.instruction}</div>
+                                    </div>
+                                  )) : <div className="rounded-lg border border-dashed p-2 text-sm text-muted-foreground">No steps added for this page.</div>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {detail.pdfUrl ? (
+                          <div className="rounded-lg border px-3 py-2 text-sm">
+                            <div className="font-medium">PDF Attachment</div>
+                            <div className="break-all text-muted-foreground">{detail.pdfUrl}</div>
+                          </div>
+                        ) : (
+                          <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No PDF attached. You can still use Page View content.</div>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="text-sm font-semibold">Assignment Target</div>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div className="rounded-lg border px-3 py-2"><span className="text-muted-foreground">Outlet</span><div className="font-medium">{detail.targetBranch}</div></div>
+                          <div className="rounded-lg border px-3 py-2"><span className="text-muted-foreground">Role</span><div className="font-medium">{detail.targetRole}</div></div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
                         <div className="text-sm font-semibold">Linked Templates</div>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div className="rounded-lg border px-3 py-2">Checklist: {detail.linkedChecklist.length}</div>
@@ -486,7 +571,22 @@ export function SopTrainingControlPage() {
                 <div className="space-y-1.5"><Label>Effective Date</Label><Input type="date" value={form.effectiveDate} onChange={(e) => setForm((p) => ({ ...p, effectiveDate: e.target.value }))} /></div>
                 <div className="space-y-1.5"><Label>Review Cycle</Label><Select value={form.reviewCycle} onValueChange={(value) => setForm((p) => ({ ...p, reviewCycle: value }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{reviewCycleOptions.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
                 <div className="space-y-1.5"><Label>Review Due Date</Label><Input type="date" value={form.reviewDueDate} onChange={(e) => setForm((p) => ({ ...p, reviewDueDate: e.target.value }))} /></div>
-                <div className="space-y-1.5 md:col-span-2"><Label>SOP Steps</Label><Textarea rows={4} value={form.steps} onChange={(e) => setForm((p) => ({ ...p, steps: e.target.value }))} /></div>
+                <div className="space-y-1.5"><Label>Content Source</Label><Select value={form.contentSourceType} onValueChange={(value) => setForm((p) => ({ ...p, contentSourceType: value }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["builder", "pdf", "external-link"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
+                <div className="space-y-1.5"><Label>Employee Read Mode</Label><Select value={form.employeeReadMode} onValueChange={(value) => setForm((p) => ({ ...p, employeeReadMode: value }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["Page View", "Checklist View", "PDF View"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
+
+                <div className="space-y-1.5 md:col-span-2"><Label>Page 1 Title</Label><Input value={form.page1Title} onChange={(e) => setForm((p) => ({ ...p, page1Title: e.target.value }))} /></div>
+                <div className="space-y-1.5 md:col-span-2"><Label>Page 1 Description</Label><Textarea rows={2} value={form.page1Description} onChange={(e) => setForm((p) => ({ ...p, page1Description: e.target.value }))} /></div>
+                <div className="space-y-1.5 md:col-span-2"><Label>Page 1 Steps, one per line</Label><Textarea rows={4} value={form.page1Steps} onChange={(e) => setForm((p) => ({ ...p, page1Steps: e.target.value }))} placeholder={"Step 1 instruction\nStep 2 instruction"} /></div>
+                <div className="space-y-1.5 md:col-span-2"><Label>Page 1 Image URL / File Name Placeholder</Label><Input value={form.page1ImageUrl} onChange={(e) => setForm((p) => ({ ...p, page1ImageUrl: e.target.value }))} /></div>
+
+                <div className="space-y-1.5 md:col-span-2"><Label>Page 2 Title</Label><Input value={form.page2Title} onChange={(e) => setForm((p) => ({ ...p, page2Title: e.target.value }))} /></div>
+                <div className="space-y-1.5 md:col-span-2"><Label>Page 2 Description</Label><Textarea rows={2} value={form.page2Description} onChange={(e) => setForm((p) => ({ ...p, page2Description: e.target.value }))} /></div>
+                <div className="space-y-1.5 md:col-span-2"><Label>Page 2 Steps, one per line</Label><Textarea rows={4} value={form.page2Steps} onChange={(e) => setForm((p) => ({ ...p, page2Steps: e.target.value }))} placeholder={"Step 1 instruction\nStep 2 instruction"} /></div>
+                <div className="space-y-1.5 md:col-span-2"><Label>Page 2 Image URL / File Name Placeholder</Label><Input value={form.page2ImageUrl} onChange={(e) => setForm((p) => ({ ...p, page2ImageUrl: e.target.value }))} /></div>
+
+                <div className="space-y-1.5 md:col-span-2"><Label>PDF URL / File Name Placeholder</Label><Input value={form.pdfUrl} onChange={(e) => setForm((p) => ({ ...p, pdfUrl: e.target.value }))} /></div>
+
+                <div className="space-y-1.5 md:col-span-2"><Label>Fallback SOP Steps</Label><Textarea rows={4} value={form.steps} onChange={(e) => setForm((p) => ({ ...p, steps: e.target.value }))} /></div>
                 <div className="space-y-1.5 md:col-span-2"><Label>Risk Points</Label><Textarea rows={3} value={form.riskPoints} onChange={(e) => setForm((p) => ({ ...p, riskPoints: e.target.value }))} /></div>
                 <div className="space-y-1.5 md:col-span-2"><Label>Notes</Label><Textarea rows={3} value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} /></div>
               </div>

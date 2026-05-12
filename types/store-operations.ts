@@ -68,6 +68,84 @@ export type StoreOperationModule = {
   linkedModules: string[];
 };
 
+
+export type SopContentSourceType = "builder" | "pdf" | "external-link";
+
+export type SopEmployeeReadMode = "Page View" | "Checklist View" | "PDF View";
+
+export type SopAcknowledgementStatus =
+  | "Assigned"
+  | "Viewed"
+  | "Acknowledged"
+  | "Overdue"
+  | "Failed";
+
+export type TaskInstructionMode = "Simple" | "Step By Step" | "Linked SOP";
+
+export type TaskStepProofStatus =
+  | "Not Required"
+  | "Required"
+  | "Missing"
+  | "Submitted"
+  | "Accepted"
+  | "Rejected";
+
+export type SopStep = {
+  id: string;
+  stepNo: number;
+  title: string;
+  instruction: string;
+  imageUrl?: string;
+  imageProofId?: string;
+  warning?: string;
+  required?: boolean;
+};
+
+export type SopContentPage = {
+  id: string;
+  pageNo: number;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  imageProofId?: string;
+  body?: string;
+  steps?: SopStep[];
+};
+
+export type SopAssignmentTarget = {
+  branchIds: string[];
+  roleIds: string[];
+  staffIds?: string[];
+  dueAt?: string;
+  requiresAcknowledgement?: boolean;
+};
+
+export type SopAcknowledgement = {
+  id: string;
+  sopId: string;
+  branchId?: string;
+  staffId?: string;
+  roleId?: string;
+  status: SopAcknowledgementStatus;
+  assignedAt: string;
+  viewedAt?: string;
+  acknowledgedAt?: string;
+};
+
+export type TaskInstructionStep = {
+  id: string;
+  stepNo: number;
+  title: string;
+  instruction: string;
+  imageUrl?: string;
+  imageProofId?: string;
+  linkedSopPageId?: string;
+  proofRequired?: boolean;
+  proofStatus?: TaskStepProofStatus;
+  proofUrls?: string[];
+  completed?: boolean;
+};
+
 type BaseOperationRecord = {
   id: string;
   status: StoreOperationStatusFlow;
@@ -138,7 +216,13 @@ export type OutletExecutionRecord = BaseOperationRecord & {
   linkedFefoWasteId?: string;
   escalationLevel?: "None" | "Supervisor" | "Manager" | "HQ" | "Critical";
   slaStatus?: "On Track" | "Due Soon" | "Overdue" | "Breached";
+  instructionMode?: TaskInstructionMode;
+  instructionSteps?: TaskInstructionStep[];
+  linkedSopId?: string;
+  linkedSopPageIds?: string[];
   targetBranchIds: string[];
+  targetRoleIds?: string[];
+  targetStaffIds?: string[];
   proofType?: string;
 };
 
@@ -262,6 +346,13 @@ export type SopTrainingRecord = BaseOperationRecord & {
   riskPoints?: string[];
   steps?: string[];
   attachments?: string[];
+  contentSourceType?: SopContentSourceType;
+  employeeReadMode?: SopEmployeeReadMode;
+  pages?: SopContentPage[];
+  pdfUrl?: string;
+  pdfProofId?: string;
+  assignmentTarget?: SopAssignmentTarget;
+  acknowledgements?: SopAcknowledgement[];
   previousVersionId?: string;
   replacementVersionId?: string;
   obsoleteReason?: string;
