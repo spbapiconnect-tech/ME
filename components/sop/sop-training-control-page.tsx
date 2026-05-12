@@ -263,6 +263,8 @@ function renderBlock(block: SopPreviewBlock) {
   }
 
   const steps = block.steps || [];
+  const activeBuilderPageId = selectedPageId || pages[0]?.id || "";
+
   return (
     <div className="space-y-2 rounded-xl border p-3 text-sm">
       <div className="font-medium">{block.title || "Step By Step"}</div>
@@ -329,14 +331,7 @@ export function SopTrainingControlPage() {
   useEffect(() => {
     hydrateFromFoundation();
   }, [hydrateFromFoundation]);
-
-  useEffect(() => {
-    if (!selectedPageId && pages[0]?.id) {
-      setSelectedPageId(pages[0].id);
-    }
-  }, [pages, selectedPageId]);
-
-  const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
+const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   const governance = useMemo(() => getSopGovernanceSummary(sopRows, taskRows), [sopRows, taskRows]);
   const controlBoard = useMemo(() => getSopControlBoard(sopRows), [sopRows]);
   const trainingQueue = useMemo(() => getTrainingAcknowledgementQueue(sopRows, taskRows), [sopRows, taskRows]);
