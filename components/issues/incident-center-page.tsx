@@ -403,42 +403,139 @@ export function IncidentCenterPage() {
 
           <Card className="min-h-[640px]">
             <CardHeader>
-              <CardTitle className="text-base">Source Signals</CardTitle>
-              <p className="text-sm text-muted-foreground">Candidates from inspection failures, outlet execution, and FEFO alerts.</p>
+              <CardTitle className="text-base">Incident Timeline</CardTitle>
+              <p className="text-sm text-muted-foreground">Follow the incident from report, containment, corrective action, review, and resolution.</p>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {!signals.length ? (
-                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-                  No incident source signals yet. Failed inspection items, overdue execution, rejected proof, or FEFO exceptions will appear here.
+            <CardContent className="space-y-4">
+              {!selectedIncident || !reviewSummary ? (
+                <div className="space-y-3">
+                  <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                    Select an incident from the queue, or create one from a source signal.
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="text-sm font-semibold">Source Signals</div>
+                    {!signals.length ? (
+                      <div className="rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
+                        No incident source signals yet. Failed inspection items, overdue execution, rejected proof, or FEFO exceptions will appear here.
+                      </div>
+                    ) : signals.slice(0, 4).map((signal) => (
+                      <div key={signal.id} className={cn("rounded-xl border p-3", selectedSignalId === signal.id ? "border-primary bg-primary/5" : "border-border")}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="font-medium">{signal.title}</p>
+                            <p className="text-xs text-muted-foreground">{signal.branch}</p>
+                          </div>
+                          <Badge variant={getIncidentStatusTone(signal.severity)}>{signal.severity}</Badge>
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">{signal.sourceType} · {signal.reason}</div>
+                        <div className="mt-3 flex gap-2">
+                          <Button size="sm" onClick={() => openSignalIncident(signal)}>Create Incident</Button>
+                          <Button variant="outline" size="sm" onClick={() => setSelectedSignalId(signal.id)}>Select</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ) : null}
-              {signals.map((signal) => (
-                <div key={signal.id} className={cn("rounded-xl border p-3", selectedSignalId === signal.id ? "border-primary bg-primary/5" : "border-border")}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium">{signal.title}</p>
-                      <p className="text-xs text-muted-foreground">{signal.branch}</p>
+              ) : (
+                <>
+                  <div className="rounded-xl border bg-muted/20 p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Selected Incident</p>
+                        <h2 className="text-lg font-semibold">{selectedIncident.title}</h2>
+                        <p className="text-sm text-muted-foreground">{reviewSummary.branch} · {reviewSummary.source}</p>
+                      </div>
+                      <Badge variant={getIncidentStatusTone(reviewSummary.severity)}>{reviewSummary.severity}</Badge>
                     </div>
-                    <Badge variant={getIncidentStatusTone(signal.severity)}>{signal.severity}</Badge>
+                    <div className="mt-4 grid gap-2 text-sm md:grid-cols-2">
+                      <div className="rounded-lg border bg-background px-3 py-2">
+                        <div className="text-muted-foreground">SLA</div>
+                        <div className="font-medium">{reviewSummary.slaStatus}</div>
+                      </div>
+                      <div className="rounded-lg border bg-background px-3 py-2">
+                        <div className="text-muted-foreground">Escalation</div>
+                        <div className="font-medium">{reviewSummary.escalationLevel}</div>
+                      </div>
+                      <div className="rounded-lg border bg-background px-3 py-2">
+                        <div className="text-muted-foreground">Owner</div>
+                        <div className="font-medium">{reviewSummary.owner}</div>
+                      </div>
+                      <div className="rounded-lg border bg-background px-3 py-2">
+                        <div className="text-muted-foreground">Review</div>
+                        <div className="font-medium">{reviewSummary.reviewStatus}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="mt-3 grid gap-1 text-xs text-muted-foreground">
-                    <div className="flex justify-between"><span>Source</span><span>{signal.sourceType}</span></div>
-                    <div className="flex justify-between"><span>Reason</span><span>{signal.reason}</span></div>
-                    <div className="flex justify-between"><span>Due</span><span>{signal.dueAt || "Set by SLA"}</span></div>
+
+                  <div className="space-y-3">
+                    {[
+                      {
+                        label: "Reported",
+                        value: detailValue(selectedIncident, "Reported Time") || "Not recorded",
+                        active: true,
+                      },
+                      {
+                        label: "Contained",
+                        value: reviewSummary.containment || "Containment not applied",
+                        active: selectedIncident.status === "Contained" || Boolean(detailValue(selectedIncident, "Immediate Containment")),
+                      },
+                      {
+                        label: "Owner Assigned",
+                        value: reviewSummary.owner || "No owner assigned",
+                        active: Boolean(reviewSummary.owner),
+                      },
+                      {
+                        label: "Corrective Action",
+                        value: reviewSummary.linkedCorrectiveAction || "Not created",
+                        active: Boolean(reviewSummary.linkedCorrectiveAction && reviewSummary.linkedCorrectiveAction !== "Not linked"),
+                      },
+                      {
+                        label: "Pending Review",
+                        value: reviewSummary.reviewStatus || "Pending Review",
+                        active: selectedIncident.status === "Pending Review" || reviewSummary.reviewStatus === "Pending Review",
+                      },
+                      {
+                        label: "Resolved",
+                        value: reviewSummary.resolutionEvidence || "Resolution not verified",
+                        active: selectedIncident.status === "Resolved",
+                      },
+                    ].map((step, index) => (
+                      <div key={step.label} className="flex gap-3">
+                        <div className="flex flex-col items-center">
+                          <div className={cn("flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold", step.active ? "border-primary bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>{index + 1}</div>
+                          {index < 5 ? <div className="h-full min-h-8 w-px bg-border" /> : null}
+                        </div>
+                        <div className="flex-1 rounded-xl border p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-medium">{step.label}</p>
+                              <p className="text-sm text-muted-foreground">{step.value}</p>
+                            </div>
+                            <Badge variant={step.active ? "secondary" : "outline"}>{step.active ? "Active" : "Waiting"}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="mt-3 flex gap-2">
-                    <Button size="sm" onClick={() => openSignalIncident(signal)}>Create Incident</Button>
-                    <Button variant="outline" size="sm" onClick={() => setSelectedSignalId(signal.id)}>Select</Button>
+
+                  <div className="space-y-2">
+                    <div className="text-sm font-semibold">Linked Navigation</div>
+                    <div className="flex flex-wrap gap-2">
+                      {detailValue(selectedIncident, "Linked Inspection ID") ? <Button variant="outline" size="sm" onClick={() => router.push(`/inspection?inspectionId=${detailValue(selectedIncident, "Linked Inspection ID")}`)}>Open Inspection</Button> : null}
+                      {detailValue(selectedIncident, "Linked Outlet Execution ID") ? <Button variant="outline" size="sm" onClick={() => router.push(`/tasks?taskId=${detailValue(selectedIncident, "Linked Outlet Execution ID")}`)}>Open Task</Button> : null}
+                      {detailValue(selectedIncident, "Linked FEFO / Waste ID") ? <Button variant="outline" size="sm" onClick={() => router.push(`/expiry?fefoId=${detailValue(selectedIncident, "Linked FEFO / Waste ID")}`)}>Open FEFO</Button> : null}
+                    </div>
                   </div>
-                </div>
-              ))}
+                </>
+              )}
             </CardContent>
           </Card>
 
           <Card className="min-h-[640px]">
             <CardHeader>
-              <CardTitle className="text-base">Incident Detail</CardTitle>
-              <p className="text-sm text-muted-foreground">Containment, SLA, escalation, corrective action, and resolution evidence.</p>
+              <CardTitle className="text-base">Action Panel</CardTitle>
+              <p className="text-sm text-muted-foreground">Take containment, assignment, escalation, corrective action, review, and resolution actions.</p>
             </CardHeader>
             <CardContent className="space-y-4">
               {!selectedIncident || !reviewSummary ? (
