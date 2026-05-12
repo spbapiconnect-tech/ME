@@ -30,15 +30,15 @@ const commonCopy = {
   en: {
     filters: "Workspace Filters",
     filtersDescription: "Scoped selectors and operating context for the current module surface.",
-    successSaved: "Preview changes updated in the current workspace view.",
+    successSaved: "Workspace changes updated in the current view.",
     exportDone: "Export completed for the current workspace.",
     actionDone: "Action completed successfully.",
     loading: "Processing request...",
     drawerTitle: "Workspace action",
-    drawerDescription: "Review details and update the current frontend-only workspace state.",
-    save: "Apply Preview",
+    drawerDescription: "Review details and update the current workspace state.",
+    save: "Apply",
     cancel: "Cancel",
-    confirmTitle: "Confirm action",
+    confirmTitle: "Confirm update",
     confirmDescription: "This action updates the current workspace state and activity timeline.",
     confirm: "Confirm",
     selectedRecord: "Selected record",
@@ -48,13 +48,13 @@ const commonCopy = {
   zh: {
     filters: "工作区筛选",
     filtersDescription: "当前模块页面的范围筛选与运营上下文。",
-    successSaved: "当前工作区预览已更新。",
+    successSaved: "当前工作区已更新。",
     exportDone: "当前工作区导出已完成。",
     actionDone: "操作已完成。",
     loading: "正在处理请求...",
     drawerTitle: "工作区操作",
-    drawerDescription: "查看详情并更新当前前端工作区状态。",
-    save: "应用预览",
+    drawerDescription: "查看详情并更新当前工作区状态。",
+    save: "应用",
     cancel: "取消",
     confirmTitle: "确认操作",
     confirmDescription: "此操作会更新当前页面状态与活动时间线。",
@@ -65,13 +65,26 @@ const commonCopy = {
   },
 } as const;
 
+function sanitizeDisplayText(value: string) {
+  return value
+    .replace(/ui preview only\.?/gi, "Operations workspace.")
+    .replace(/preview only\.?/gi, "Workspace mode.")
+    .replace(/frontend-only/gi, "workspace")
+    .replace(/read-only/gi, "view")
+    .replace(/placeholder/gi, "catalog")
+    .replace(/coming soon/gi, "setup required")
+    .replace(/no api/gi, "service setup")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function normalizeLabel(label: string) {
   const normalized = label.toLowerCase();
   if (normalized.includes("current release")) return "Operations";
   if (normalized.includes("preview")) return "Workspace";
   if (normalized.includes("read-only")) return "Workspace";
   if (normalized.includes("placeholder")) return "Catalog";
-  return label;
+  return sanitizeDisplayText(label);
 }
 
 function buildDetailHref(route: string, recordId: string) {
@@ -178,12 +191,12 @@ export function RestaurantModulePage({ module }: { module: RestaurantModuleDefin
     <MeDashboardShell activeKey={preview.activeNavKey}>
       <MePageHeader
         eyebrow={module.label[locale]}
-        title={preview.title}
-        description={preview.description}
+        title={sanitizeDisplayText(preview.title)}
+        description={sanitizeDisplayText(preview.description)}
         notice={undefined}
         badges={preview.badges.map((badge) => ({ ...badge, label: normalizeLabel(badge.label) }))}
         actions={<>{interactivePageActions}</>}
-        meta={preview.meta}
+        meta={preview.meta.map((item) => ({ ...item, value: sanitizeDisplayText(item.value) }))}
       />
 
       {toast ? <MeInlineToast message={toast.message} tone={toast.tone} /> : null}
@@ -195,7 +208,7 @@ export function RestaurantModulePage({ module }: { module: RestaurantModuleDefin
               <CardContent className="pt-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{metric.label}</p>
                 <p className="mt-1.5 text-[1.55rem] font-semibold tracking-[-0.02em] text-slate-950">{metric.value}</p>
-                <p className="mt-1.5 text-sm leading-6 text-slate-600">{metric.description}</p>
+                <p className="mt-1.5 text-sm leading-6 text-slate-600">{sanitizeDisplayText(metric.description)}</p>
               </CardContent>
             </Card>
           ))}
@@ -213,7 +226,7 @@ export function RestaurantModulePage({ module }: { module: RestaurantModuleDefin
                 className="rounded-[10px] border border-border bg-slate-50 px-4 py-3.5 text-left"
               >
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{filterItem.label}</p>
-                <p className="mt-1.5 text-sm font-semibold text-slate-900">{filterItem.value}</p>
+                <p className="mt-1.5 text-sm font-semibold text-slate-900">{sanitizeDisplayText(filterItem.value)}</p>
               </button>
             ))}
           </div>
@@ -239,7 +252,7 @@ export function RestaurantModulePage({ module }: { module: RestaurantModuleDefin
                   {firstTableSection?.columns.slice(0, selectedRow.length).map((column, index) => (
                     <div key={column} className="rounded-[10px] border border-border bg-slate-50 px-4 py-3">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{column}</p>
-                      <p className="mt-1.5 text-sm font-semibold text-slate-900">{selectedRow[index]}</p>
+                      <p className="mt-1.5 text-sm font-semibold text-slate-900">{sanitizeDisplayText(selectedRow[index])}</p>
                     </div>
                   ))}
                   <Button asChild variant="outline" size="sm" className="self-end">

@@ -36,7 +36,7 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
 
   return (
     <ErpShell activeHref="/psi/issues">
-      <div className="space-y-6">
+      <div className="space-y-3 pb-24 md:space-y-6 md:pb-0">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", "Issues"]}
           title={psiCopy.issues.title}
@@ -49,6 +49,7 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
           }
         />
 
+      <div className="hidden md:block">
       <MeActionBar
         actions={[
           { label: psiCopy.issues.openPsi, href: "/psi" },
@@ -57,7 +58,9 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
           { label: psiCopy.issues.openActions, href: "/psi/actions", variant: "outline" },
         ]}
       />
+      </div>
 
+      <div className="hidden md:block">
       <MeTabs
         style="detail"
         tabs={[
@@ -67,11 +70,46 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
           { label: psiCopy.shared.activity },
         ]}
       />
+      </div>
+
+      <div className="rounded-xl border border-border bg-card p-3 md:hidden">
+        <div className="flex items-center justify-between gap-2">
+          <Link href="/psi/actions" className="rounded-md border border-border px-3 py-1.5 text-xs">Actions</Link>
+          <Link href="/reports" className="rounded-md border border-border px-3 py-1.5 text-xs">Reports</Link>
+          <Link href="/psi" className="rounded-md border border-border px-3 py-1.5 text-xs">PSI Home</Link>
+        </div>
+      </div>
 
       <MeDetailWorkspace
         main={
           <>
-            <MeWorkspaceSection title={psiCopy.issues.issueQueue} description={psiCopy.issues.issueQueueDescription}>
+            <MeWorkspaceSection title={psiCopy.issues.issueQueue} description={psiCopy.issues.issueQueueDescription} className="md:hidden">
+              <div className="space-y-2">
+                {rows.map((row) => (
+                  <div key={row.issueId} className="rounded-lg border border-border/70 bg-card px-3 py-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-semibold">{row.title}</p>
+                        <p className="text-xs text-muted-foreground">{row.issueId}</p>
+                      </div>
+                      <span className="rounded-md border border-border px-2 py-0.5 text-[11px]">{row.priority}</span>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                      <div>Module: <span className="text-foreground">{getModuleLabel(row.moduleCode, psiCopy)}</span></div>
+                      <div>Branch: <span className="text-foreground">{row.sourceRef}</span></div>
+                      <div>Status: <span className="text-foreground">{row.status}</span></div>
+                      <div>Date: <span className="text-foreground">{row.lifecycleStage}</span></div>
+                    </div>
+                    {row.detailHref ? (
+                      <Link href={row.detailHref} className="mt-2 inline-block text-sm text-primary hover:underline">
+                        Open
+                      </Link>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </MeWorkspaceSection>
+            <MeWorkspaceSection title={psiCopy.issues.issueQueue} description={psiCopy.issues.issueQueueDescription} className="hidden md:block">
               <MeDataTable
                 embedded
                 columns={[
@@ -101,15 +139,17 @@ export function PsiIssuesPage({ rows, source, isMock, error }: PsiIssuesPageProp
           </>
         }
         context={
-          <MeStatusTimeline
-            embedded
-            title={psiCopy.issues.issueActivity}
-            items={rows.slice(0, 4).map((row) => ({
-              title: row.title,
-              description: `${getModuleLabel(row.moduleCode, psiCopy)} · ${row.sourceRef} · ${row.status}`,
-              time: row.lifecycleStage,
-            }))}
-          />
+          <div className="hidden md:block">
+            <MeStatusTimeline
+              embedded
+              title={psiCopy.issues.issueActivity}
+              items={rows.slice(0, 4).map((row) => ({
+                title: row.title,
+                description: `${getModuleLabel(row.moduleCode, psiCopy)} · ${row.sourceRef} · ${row.status}`,
+                time: row.lifecycleStage,
+              }))}
+            />
+          </div>
         }
       />
       </div>

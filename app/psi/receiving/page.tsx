@@ -5,6 +5,8 @@ import { ArrowLeft, Eye, FileDown, Plus } from "lucide-react";
 import { ErpShell } from "@/components/erp/erp-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CompactStatStrip } from "@/components/operations/compact-stat-strip";
 import { MultidimensionalTable, type MultiDimColumn } from "@/components/operations/multidimensional-table";
 import { TableActionBar } from "@/components/operations/table-action-bar";
@@ -38,6 +40,17 @@ export default function ReceivingPage() {
   const [focusedReceivingId, setFocusedReceivingId] = useState<string | null>(null);
   const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("compact");
   const [previewMessage, setPreviewMessage] = useState("Ready.");
+  const [editingReceiving, setEditingReceiving] = useState(false);
+  const [receivingForm, setReceivingForm] = useState({
+    grnNo: "",
+    poNo: "",
+    supplier: "",
+    branch: "",
+    receivedDate: "",
+    itemsCount: "",
+    variance: "",
+    status: "",
+  });
 
   useEffect(() => {
     getPsiProcurementWorkspacePageData().then(setData);
@@ -87,6 +100,21 @@ export default function ReceivingPage() {
 
   const focusedOrder = focusedReceiving ? orders.find((item) => item.orderId === focusedReceiving.orderId) : null;
   const focusedIssues = focusedReceiving ? issues.filter((item) => item.orderId === focusedReceiving.orderId) : [];
+  const loadReceivingForm = (receivingId: string) => {
+    const record = receiving.find((item) => item.receivingId === receivingId);
+    if (!record) return;
+    const order = orders.find((item) => item.orderId === record.orderId);
+    setReceivingForm({
+      grnNo: record.receivingNo,
+      poNo: order?.orderNo ?? record.orderId,
+      supplier: record.supplierId,
+      branch: record.warehouseId,
+      receivedDate: record.receivedAt.split("T")[0],
+      itemsCount: String(record.lines.length),
+      variance: record.status === "disputed" ? "found" : "none",
+      status: record.status,
+    });
+  };
   const emptyRows = Array.from({ length: Math.max(0, 20 - filteredReceiving.length) });
 
   const openDetail = (id: string) => {
@@ -95,7 +123,7 @@ export default function ReceivingPage() {
     setViewMode("detail");
   };
 
-  const showPreview = (label: string) => setPreviewMessage(`${label} preview only.`);
+  const showPreview = (label: string) => setPreviewMessage(`${label} opened.`);
 
   const columns: MultiDimColumn<(typeof filteredReceiving)[number]>[] = [
     { key: "grn", label: "GRN No", width: "120px", render: (row) => <p className="font-semibold">{row.receivingNo}</p> },
@@ -142,24 +170,45 @@ export default function ReceivingPage() {
 
   return (
     <ErpShell activeHref="/psi/receiving">
-      <div className="space-y-4">
+      <div className="space-y-4 pb-24 md:pb-0">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-xs text-muted-foreground">ME / PSI / Receiving</div>
-            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">ME PSI Receiving</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{viewMode === "grid" ? "Normal View: wide GRN / receiving grid with compact selected GRN summary." : "Detail View: 40% quick GRN list and 60% full receiving detail."}</p>
+            <div className="hidden text-xs text-muted-foreground md:block">ME / PSI / Receiving</div>
+            <h1 className="mt-1 text-lg font-semibold tracking-tight text-foreground md:mt-3 md:text-2xl">ME PSI Receiving</h1>
+            <p className="mt-1 hidden text-sm text-muted-foreground md:block">{viewMode === "grid" ? "Normal View: wide GRN / receiving grid with compact selected GRN summary." : "Detail View: 40% quick GRN list and 60% full receiving detail."}</p>
           </div>
           <div className="flex items-center gap-2">
             {viewMode === "detail" ? (
-              <Button variant="outline" size="sm" onClick={() => setViewMode("grid")}><ArrowLeft className="mr-2 h-4 w-4" />Back to Grid</Button>
+              <Button variant="outline" size="sm" onClick={() => setViewMode("grid")}><ArrowLeft className="mr-2 h-4 w-4" />Back to List</Button>
             ) : null}
-            <Button variant="outline" size="sm" onClick={() => showPreview("Export")}><FileDown className="mr-2 h-4 w-4" />Export</Button>
-            <Button size="sm" onClick={() => showPreview("New Receiving")}><Plus className="mr-2 h-4 w-4" />New Receiving</Button>
+            <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => showPreview("Export")}><FileDown className="mr-2 h-4 w-4" />Export</Button>
+            <Button size="sm" onClick={() => {
+              setEditingReceiving(true);
+              setReceivingForm({ grnNo: "", poNo: "", supplier: "", branch: "", receivedDate: "", itemsCount: "", variance: "", status: "pending" });
+            }}><Plus className="mr-2 h-4 w-4" />New Receiving</Button>
           </div>
         </header>
 
-        <TableViewTabs title="Saved Views" tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        <div className="md:hidden rounded-xl border border-border bg-card p-3 space-y-2">
+          <div className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground flex items-center">
+            Search GRN / PO no...
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {["All", "Awaiting", "Variance", "Pending"].map((chip) => (
+              <Badge key={chip} variant="outline" className="text-xs">{chip}</Badge>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => showPreview("Sort")}>Sort</Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => showPreview("More Filters")}>Filters</Button>
+          </div>
+        </div>
 
+        <div className="hidden md:block">
+          <TableViewTabs title="Saved Views" tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        </div>
+
+        <div className="hidden md:block">
         <CompactStatStrip
           items={[
             { label: "Awaiting Arrival", value: Math.max(orders.length - receiving.length, 0), tone: "warning" },
@@ -168,7 +217,9 @@ export default function ReceivingPage() {
             { label: "Pending Posting", value: receiving.filter((item) => item.status === "pending").length, tone: "warning" },
           ]}
         />
+        </div>
 
+        <div className="hidden md:block">
         <TableActionBar
           searchPlaceholder="Search GRN / PO no..."
           selectedCount={selectedRowIds.size}
@@ -196,11 +247,79 @@ export default function ReceivingPage() {
             </div>
           }
         />
+        </div>
 
-        <div className="rounded-lg border border-border/60 bg-secondary/10 px-3 py-2 text-xs text-muted-foreground">{previewMessage}</div>
+        <div className="hidden md:block rounded-lg border border-border/60 bg-secondary/10 px-3 py-2 text-xs text-muted-foreground">{previewMessage}</div>
+
+        {editingReceiving ? (
+          <section className="rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold">Receiving / GRN File</h2>
+              <Button variant="outline" size="sm" onClick={() => setEditingReceiving(false)}>Close</Button>
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {[
+                ["GRN/RCV Number", "grnNo"],
+                ["PO Number", "poNo"],
+                ["Supplier", "supplier"],
+                ["Branch", "branch"],
+                ["Received Date", "receivedDate"],
+                ["Items Count", "itemsCount"],
+                ["Variance", "variance"],
+                ["Status", "status"],
+              ].map(([label, key]) => (
+                <div key={key} className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">{label}</Label>
+                  <Input value={receivingForm[key as keyof typeof receivingForm]} onChange={(event) => setReceivingForm((prev) => ({ ...prev, [key]: event.target.value }))} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Button size="sm" onClick={() => { setPreviewMessage("Receiving file updated."); setEditingReceiving(false); }}>Save</Button>
+              <Button size="sm" variant="outline" onClick={() => setEditingReceiving(false)}>Cancel</Button>
+            </div>
+          </section>
+        ) : null}
 
         {viewMode === "detail" ? (
-          <section className="grid gap-4 xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
+          <>
+          <section className="space-y-3 md:hidden">
+            <div className="rounded-xl border border-border bg-card p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">Selected GRN</p>
+                  <h2 className="text-lg font-semibold">{focusedReceiving.receivingNo}</h2>
+                  <p className="text-xs text-muted-foreground">{focusedOrder?.orderNo ?? focusedReceiving.orderId}</p>
+                </div>
+                <Badge variant="outline">{focusedReceiving.status}</Badge>
+              </div>
+              <div className="mt-3 space-y-4">
+                <DetailSection title="GRN Header">
+                  <FactRow label="GRN No" value={focusedReceiving.receivingNo} />
+                  <FactRow label="PO No" value={focusedOrder?.orderNo ?? focusedReceiving.orderId} />
+                  <FactRow label="Status" value={focusedReceiving.status} />
+                  <FactRow label="Supplier" value={focusedReceiving.supplierId} />
+                  <FactRow label="Branch" value={focusedReceiving.warehouseId} />
+                  <FactRow label="Warehouse" value={focusedReceiving.warehouseId} />
+                </DetailSection>
+                <DetailSection title="Receiving / Variance">
+                  <FactRow label="Received Date" value={focusedReceiving.receivedAt.split("T")[0]} />
+                  <FactRow label="Received By" value={focusedReceiving.audit.updatedBy ?? focusedReceiving.audit.createdBy ?? "-"} />
+                  <FactRow label="Items Count" value={String(focusedReceiving.lines.length)} />
+                  <FactRow label="Variance Status" value={focusedReceiving.status === "disputed" ? "found" : "none"} />
+                  <FactRow label="Inspection" value={focusedReceiving.status === "review" ? "required" : "ok"} />
+                  <FactRow label="Posting Status" value={focusedReceiving.status} />
+                </DetailSection>
+                <DetailSection title="Linked Records">
+                  <FactRow label="Linked PO" value={focusedOrder?.orderNo ?? focusedReceiving.orderId} />
+                  <FactRow label="Linked Inventory Movement" value={focusedReceiving.lines[0]?.skuId ?? "-"} />
+                  <FactRow label="Linked Issue" value={focusedIssues[0]?.issueId ?? "-"} />
+                </DetailSection>
+              </div>
+              <Button size="sm" className="mt-3 w-full" onClick={() => showPreview("View GRN")}>View GRN</Button>
+            </div>
+          </section>
+          <section className="hidden gap-4 md:grid xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
             <div className="rounded-xl border border-border bg-card">
               <div className="flex items-center justify-between border-b border-border p-4">
                 <div>
@@ -261,7 +380,7 @@ export default function ReceivingPage() {
                   <FactRow label="Checked By" value={focusedReceiving.audit.updatedBy ?? "-"} />
                   <FactRow label="Quality Result" value={focusedReceiving.status === "disputed" ? "watch" : "pass"} />
                   <FactRow label="Damage / Missing" value={focusedReceiving.status === "disputed" ? "yes" : "no"} />
-                  <FactRow label="Photo Attachment Preview" value="available" />
+                  <FactRow label="Photo Attachment" value="available" />
                 </DetailSection>
                 <DetailSection title="Variance">
                   <FactRow label="Variance Status" value={focusedReceiving.status === "disputed" ? "found" : "none"} />
@@ -275,7 +394,7 @@ export default function ReceivingPage() {
                   <FactRow label="Posting Status" value={focusedReceiving.status} />
                   <FactRow label="Stock Movement Link" value={focusedReceiving.lines[0]?.skuId ?? "-"} />
                   <FactRow label="Posting Block Reason" value={focusedReceiving.status === "pending" ? "pending review" : "-"} />
-                  <FactRow label="Posting Preview" value="available" />
+                  <FactRow label="Posting" value="available" />
                 </DetailSection>
                 <section className="space-y-2">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Receiving Lines</div>
@@ -301,9 +420,9 @@ export default function ReceivingPage() {
                   <FactRow label="Linked Issue" value={focusedIssues[0]?.issueId ?? "-"} />
                 </DetailSection>
                 <section className="rounded-xl border border-border bg-secondary/10 p-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Preview Actions</div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Actions</div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-                    {["View GRN", "Review Variance", "Post Stock Preview", "Attach Document", "Add Note"].map((action) => (
+                    {["View GRN", "Review Receiving", "Post Stock", "Attach Document", "Add Note"].map((action) => (
                       <Button key={action} variant="outline" size="sm" onClick={() => showPreview(action)}>{action}</Button>
                     ))}
                   </div>
@@ -311,8 +430,40 @@ export default function ReceivingPage() {
               </div>
             </div>
           </section>
+          </>
         ) : (
-          <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <>
+          <section className="space-y-3 md:hidden">
+            {filteredReceiving.map((row) => {
+              const order = orders.find((item) => item.orderId === row.orderId);
+              const active = focusedReceiving.receivingId === row.receivingId;
+              return (
+                <div key={row.receivingId} className={["rounded-xl border p-3", active ? "border-primary/50 bg-primary/10" : "border-border bg-card"].join(" ")}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold">{row.receivingNo}</p>
+                      <p className="text-xs text-muted-foreground">{order?.orderNo ?? row.orderId} · {row.supplierId}</p>
+                    </div>
+                    <Badge variant="outline">{row.status}</Badge>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div>Branch: <span className="text-foreground">{row.warehouseId}</span></div>
+                    <div>Received: <span className="text-foreground">{row.receivedAt.split("T")[0]}</span></div>
+                    <div>Items: <span className="text-foreground">{row.lines.length}</span></div>
+                    <div>Variance: <span className="text-foreground">{row.status === "disputed" ? "found" : "none"}</span></div>
+                  </div>
+                  <Button size="sm" variant="outline" className="mt-3 w-full" onClick={() => openDetail(row.receivingId)}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    View
+                  </Button>
+                  <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => { setFocusedReceivingId(row.receivingId); loadReceivingForm(row.receivingId); setEditingReceiving(true); }}>
+                    Review
+                  </Button>
+                </div>
+              );
+            })}
+          </section>
+          <section className="hidden gap-4 md:grid xl:grid-cols-[minmax(0,1fr)_320px]">
             <MultidimensionalTable
               columns={columns}
               rows={filteredReceiving}
@@ -346,10 +497,12 @@ export default function ReceivingPage() {
               </div>
               <div className="mt-4 grid gap-2">
                 <Button onClick={() => setViewMode("detail")}><Eye className="mr-2 h-4 w-4" />View Detail</Button>
-                <Button variant="outline" onClick={() => showPreview("Review Variance")}>Review Variance</Button>
+                <Button variant="outline" onClick={() => { loadReceivingForm(focusedReceiving.receivingId); setEditingReceiving(true); }}>Review Receiving</Button>
+                <Button variant="outline" onClick={() => showPreview("Review Receiving")}>Review Receiving</Button>
               </div>
             </aside>
           </section>
+          </>
         )}
       </div>
     </ErpShell>

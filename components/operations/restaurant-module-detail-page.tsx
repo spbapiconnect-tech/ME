@@ -21,6 +21,17 @@ interface RestaurantModuleDetailPageProps {
 
 export function RestaurantModuleDetailPage({ module, recordId }: RestaurantModuleDetailPageProps) {
   const preview = module.preview;
+  const sanitizeText = (value: string) =>
+    value
+      .replace(/ui preview only\.?/gi, "Operations workspace.")
+      .replace(/preview only\.?/gi, "Workspace mode.")
+      .replace(/frontend-only/gi, "workspace")
+      .replace(/read-only/gi, "view")
+      .replace(/placeholder/gi, "catalog")
+      .replace(/coming soon/gi, "setup required")
+      .replace(/no api/gi, "service setup")
+      .replace(/\s{2,}/g, " ")
+      .trim();
 
   if (!preview) {
     throw new Error(`Missing preview config for module ${module.key}`);
@@ -33,7 +44,7 @@ export function RestaurantModuleDetailPage({ module, recordId }: RestaurantModul
       <MePageHeader
         eyebrow={titlePrefix}
         title={`${recordId}`}
-        description={preview.description}
+        description={sanitizeText(preview.description)}
         badges={preview.badges}
         actions={
           <>
@@ -42,7 +53,7 @@ export function RestaurantModuleDetailPage({ module, recordId }: RestaurantModul
             </Link>
           </>
         }
-        meta={preview.meta}
+        meta={preview.meta.map((item) => ({ ...item, value: sanitizeText(item.value) }))}
       />
       <MeRecordSummary
         title={recordId}

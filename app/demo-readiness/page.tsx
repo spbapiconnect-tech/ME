@@ -4,5 +4,5 @@ import { ModulePageShell } from "@/components/module/module-page-shell";
 import { modulePages } from "@/components/module/module-pages";
 
 export default function Page() {
-  return <ModulePageShell config={modulePages["demo-readiness"]} />;
+  return <ModulePageShell moduleKey="demo-readiness" config={modulePages["demo-readiness"]} />;
 }

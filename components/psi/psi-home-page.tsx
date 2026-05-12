@@ -20,7 +20,7 @@ export function PsiHomePage() {
 
   return (
     <ErpShell activeHref="/psi">
-      <ModulePageStack className="space-y-3">
+      <ModulePageStack className="space-y-3 pb-24 md:pb-0">
         <ErpPageHeader
           breadcrumbs={["ME", "PSI", isZh ? "指挥中心" : "Command Center"]}
           title={isZh ? "PSI 指挥中心" : "PSI Command Center"}
@@ -37,7 +37,47 @@ export function PsiHomePage() {
           }
         />
 
-        <ModuleTwoColumn className="xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <ModuleSection title={isZh ? "模块入口" : "PSI Modules"} description={isZh ? "采购、供应商、库存与收货流程控制。" : "Procurement, Supplier, Inventory, and Receiving workflow control."} className="p-3 md:hidden">
+          <div className="grid gap-2">
+            {[
+              { title: "Procurement", desc: "PR / PO queue and approval control", href: "/psi/procurement", count: pageData.snapshot[0]?.value ?? "-" },
+              { title: "Supplier", desc: "Supplier master and risk watch", href: "/psi/supplier", count: pageData.snapshot[1]?.value ?? "-" },
+              { title: "Inventory", desc: "SKU stock and reorder view", href: "/psi/inventory", count: pageData.snapshot[2]?.value ?? "-" },
+              { title: "Receiving", desc: "GRN and variance check", href: "/psi/receiving", count: pageData.snapshot[3]?.value ?? "-" },
+            ].map((item) => (
+              <Link key={item.href} href={item.href} className="rounded-md border border-border/60 bg-card px-3 py-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2">
+                    <span className="mt-1 inline-block h-2 w-2 rounded-full bg-primary" />
+                    <div>
+                    <p className={moduleVisual.title}>{item.title}</p>
+                    <p className={moduleVisual.muted}>{item.desc}</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="text-xs">{item.count}</Badge>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </ModuleSection>
+
+        <ModuleSection title={isZh ? "支持工具" : "Support Tools"} className="p-3 md:hidden">
+          <div className="grid gap-2">
+            {[
+              { title: "Actions", href: "/psi/actions", count: "2" },
+              { title: "Issues", href: "/psi/issues", count: String(pageData.activity.length) },
+            ].map((item) => (
+              <Link key={item.href} href={item.href} className="rounded-md border border-border/60 bg-card px-3 py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className={moduleVisual.title}>{item.title}</p>
+                  <Badge variant="outline" className="text-xs">{item.count}</Badge>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </ModuleSection>
+
+        <ModuleTwoColumn className="hidden xl:grid-cols-[minmax(0,1fr)_21rem] md:grid">
           <div className="space-y-3">
             <ModuleSection title={isZh ? "PSI Workflow Overview" : "PSI Workflow Overview"} className="p-3">
               <div className="flex flex-wrap items-center gap-2">

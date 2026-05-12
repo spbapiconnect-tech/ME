@@ -1,7 +1,7 @@
 import type { RepositoryMode, RepositoryProvider } from "./contracts";
 import { createMockRepositoryProvider } from "./mock";
 
-let mode: RepositoryMode = "mock";
+let mode: RepositoryMode = "local";
 let provider: RepositoryProvider | null = null;
 
 export function getRepositoryMode() {
@@ -21,7 +21,7 @@ export function setRepositoryProviderForTests(next: RepositoryProvider) {
 }
 
 export function resetRepositoryProvider() {
-  mode = "mock";
+  mode = "local";
   provider = null;
 }
 

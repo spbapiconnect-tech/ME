@@ -4,5 +4,5 @@ import { ModulePageShell } from "@/components/module/module-page-shell";
 import { modulePages } from "@/components/module/module-pages";
 
 export default function Page() {
-  return <ModulePageShell config={modulePages["display-settings"]} />;
+  return <ModulePageShell moduleKey="display-settings" config={modulePages["display-settings"]} />;
 }

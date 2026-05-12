@@ -4,7 +4,7 @@ import type { TaskRecord } from "@/types/task";
 
 import type { DataResult, ListQuery } from "../data";
 
-export type RepositoryMode = "mock";
+export type RepositoryMode = "local";
 
 export interface PsiQueryParams {
   search?: string;

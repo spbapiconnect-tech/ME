@@ -147,16 +147,16 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
   ];
 
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-3 py-4 pb-24 md:gap-6 md:px-4 md:py-8 md:pb-8">
       <Card>
         <CardHeader>
           <CardTitle>{psiCopy.actions.title}</CardTitle>
-          <CardDescription>{psiCopy.actions.description}</CardDescription>
-          <CardDescription>{psiCopy.actions.notice}</CardDescription>
+          <CardDescription className="hidden md:block">{psiCopy.actions.description}</CardDescription>
+          <CardDescription className="hidden md:block">{psiCopy.actions.notice}</CardDescription>
         </CardHeader>
       </Card>
 
-      <Card size="sm">
+      <Card size="sm" className="hidden md:block">
         <CardHeader>
           <CardTitle className="text-sm">{psiCopy.actions.statsTitle}</CardTitle>
         </CardHeader>
@@ -169,7 +169,7 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
         </CardContent>
       </Card>
 
-      <Card size="sm">
+      <Card size="sm" className="hidden md:block">
         <CardHeader>
           <CardTitle className="text-sm">{psiCopy.actions.filters}</CardTitle>
         </CardHeader>
@@ -228,8 +228,25 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
         </CardContent>
       </Card>
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <Card size="sm">
+      <Card size="sm" className="md:hidden">
+        <CardContent className="space-y-2 p-3">
+          <div className="h-10 rounded-lg border border-border px-3 text-sm text-muted-foreground flex items-center">
+            Search action key / title...
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {["All", "Procurement", "Inventory", "Issue"].map((chip) => (
+              <span key={chip} className="rounded-md border border-border px-2 py-1 text-xs">{chip}</span>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <button type="button" className="rounded-md border border-border px-3 py-1.5 text-xs">Sort</button>
+            <button type="button" className="rounded-md border border-border px-3 py-1.5 text-xs">Filters</button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <section className="hidden gap-4 lg:grid-cols-2 md:grid">
+        <Card size="sm" className="hidden md:block">
           <CardHeader>
             <CardTitle className="text-sm">{psiCopy.actions.actionDrafts}</CardTitle>
           </CardHeader>
@@ -248,6 +265,35 @@ export function PsiActionsPage({ actions }: PsiActionsPageProps) {
           {selectedAction ? <PsiActionPreviewCard action={selectedAction} locale={currentLocale} /> : null}
           {selectedAction ? <PsiActionSourceCard action={selectedAction} locale={currentLocale} /> : null}
         </div>
+      </section>
+
+      <section className="grid gap-3 md:hidden">
+        {filteredActions.map((item) => (
+          <Card key={item.key} size="sm">
+            <CardContent className="space-y-2 p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-sm font-semibold">{item.title[currentLocale]}</p>
+                  <p className="text-xs text-muted-foreground">{item.key}</p>
+                </div>
+                <span className="rounded-md border border-border px-2 py-0.5 text-[11px]">{optionLabel(item.status, psiCopy)}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>Owner: <span className="text-foreground">{item.source.moduleCode}</span></div>
+                <div>Priority: <span className="text-foreground">{item.requirement.humanReviewRequired ? "high" : "normal"}</span></div>
+                <div>Status: <span className="text-foreground">{item.status}</span></div>
+                <div>Due: <span className="text-foreground">-</span></div>
+              </div>
+              <button
+                type="button"
+                className="w-full rounded-md border border-border px-3 py-2 text-sm"
+                onClick={() => setSelectedKey(item.key)}
+              >
+                Open
+              </button>
+            </CardContent>
+          </Card>
+        ))}
       </section>
     </main>
   );

@@ -5,6 +5,8 @@ import { ArrowLeft, Eye, FileDown, Plus, Star } from "lucide-react";
 import { ErpShell } from "@/components/erp/erp-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { TableActionBar } from "@/components/operations/table-action-bar";
 import { TableFieldChip } from "@/components/operations/table-field-chip";
 import { TableViewTabs } from "@/components/operations/table-view-tabs";
@@ -38,6 +40,20 @@ export default function PsiSupplierPage() {
   const [focusedSupplierId, setFocusedSupplierId] = useState<string | null>(null);
   const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("compact");
   const [previewMessage, setPreviewMessage] = useState("Ready.");
+  const [editingSupplier, setEditingSupplier] = useState(false);
+  const [supplierForm, setSupplierForm] = useState({
+    supplierCode: "",
+    supplierName: "",
+    category: "",
+    contactPerson: "",
+    phone: "",
+    email: "",
+    region: "",
+    leadTime: "",
+    paymentTerm: "NET 30",
+    status: "",
+    rating: "",
+  });
 
   useEffect(() => {
     getPsiSupplierWorkspacePageData().then(setData);
@@ -93,6 +109,26 @@ export default function PsiSupplierPage() {
   const focusedIssues = focusedSupplier ? issues.filter((item) => item.supplierId === focusedSupplier.supplierId) : [];
   const linkedOrders = focusedSupplier ? quotations.filter((item) => item.supplierId === focusedSupplier.supplierId).slice(0, 3) : [];
 
+  const loadSupplierForm = (supplierId: string) => {
+    const supplier = suppliers.find((item) => item.supplierId === supplierId);
+    if (!supplier) return;
+    const contact = pageData?.contacts.find((item) => item.supplierId === supplierId);
+    const rating = ratings.find((item) => item.supplierId === supplierId);
+    setSupplierForm({
+      supplierCode: supplier.supplierCode,
+      supplierName: supplier.name,
+      category: supplier.category,
+      contactPerson: contact?.name ?? "",
+      phone: contact?.phone ?? "",
+      email: contact?.email ?? "",
+      region: supplier.serviceRegion,
+      leadTime: `${supplier.leadTimeDays}`,
+      paymentTerm: "NET 30",
+      status: supplier.status,
+      rating: rating?.grade ?? "",
+    });
+  };
+
   const emptyRows = Array.from({ length: Math.max(0, 20 - filteredSuppliers.length) });
 
   const openDetail = (id: string) => {
@@ -101,7 +137,7 @@ export default function PsiSupplierPage() {
     setViewMode("detail");
   };
 
-  const showPreview = (label: string) => setPreviewMessage(`${label} preview only.`);
+  const showPreview = (label: string) => setPreviewMessage(`${label} opened.`);
 
   const columns: MultiDimColumn<(typeof filteredSuppliers)[number]>[] = [
     { key: "code", label: "Supplier Code", width: "120px", render: (row) => <p className="font-semibold">{row.supplierCode}</p> },
@@ -149,33 +185,66 @@ export default function PsiSupplierPage() {
 
   return (
     <ErpShell activeHref="/psi/supplier">
-      <div className="space-y-4">
+      <div className="space-y-4 pb-24 md:pb-0">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-xs text-muted-foreground">ME / PSI / Supplier</div>
-            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">ME PSI Supplier</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{viewMode === "grid" ? "Normal View: wide supplier master grid with compact selected supplier summary." : "Detail View: 40% quick supplier list and 60% full supplier detail."}</p>
+            <div className="hidden text-xs text-muted-foreground md:block">ME / PSI / Supplier</div>
+            <h1 className="mt-1 text-lg font-semibold tracking-tight text-foreground md:mt-3 md:text-2xl">ME PSI Supplier</h1>
+            <p className="mt-1 hidden text-sm text-muted-foreground md:block">{viewMode === "grid" ? "Normal View: wide supplier master grid with compact selected supplier summary." : "Detail View: 40% quick supplier list and 60% full supplier detail."}</p>
           </div>
           <div className="flex items-center gap-2">
             {viewMode === "detail" ? (
               <Button variant="outline" size="sm" onClick={() => setViewMode("grid")}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Grid
+                Back to List
               </Button>
             ) : null}
-            <Button variant="outline" size="sm" onClick={() => showPreview("Export")}> 
+            <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => showPreview("Export")}> 
               <FileDown className="mr-2 h-4 w-4" />
               Export
             </Button>
-            <Button size="sm" onClick={() => showPreview("Add Supplier")}>
+            <Button size="sm" onClick={() => {
+              setEditingSupplier(true);
+              setSupplierForm({
+                supplierCode: "",
+                supplierName: "",
+                category: "",
+                contactPerson: "",
+                phone: "",
+                email: "",
+                region: "",
+                leadTime: "",
+                paymentTerm: "NET 30",
+                status: "active",
+                rating: "",
+              });
+            }}>
               <Plus className="mr-2 h-4 w-4" />
               Add Supplier
             </Button>
           </div>
         </header>
 
-        <TableViewTabs title="Saved Views" tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        <div className="md:hidden rounded-xl border border-border bg-card p-3 space-y-2">
+          <div className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground flex items-center">
+            Search supplier name / code...
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {["All", "Active", "Expiring", "Risk"].map((chip) => (
+              <Badge key={chip} variant="outline" className="text-xs">{chip}</Badge>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => showPreview("Sort")}>Sort</Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => showPreview("More Filters")}>Filters</Button>
+          </div>
+        </div>
 
+        <div className="hidden md:block">
+          <TableViewTabs title="Saved Views" tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        </div>
+
+        <div className="hidden md:block">
         <CompactStatStrip
           items={[
             { label: "Total Suppliers", value: pageData.stats.totalSuppliers },
@@ -184,11 +253,13 @@ export default function PsiSupplierPage() {
             { label: "Risk / Issues", value: issues.length, tone: "danger" },
           ]}
         />
+        </div>
 
+        <div className="hidden md:block">
         <TableActionBar
           searchPlaceholder="Search supplier name / code..."
           selectedCount={selectedRowIds.size}
-          bulkActionLabel="Create PR Preview"
+          bulkActionLabel="Create PR"
           bulkActionKey="supplier.create_pr_preview"
           density={density}
           onDensityChange={setDensity}
@@ -212,11 +283,88 @@ export default function PsiSupplierPage() {
             </div>
           }
         />
+        </div>
 
-        <div className="rounded-lg border border-border/60 bg-secondary/10 px-3 py-2 text-xs text-muted-foreground">{previewMessage}</div>
+        <div className="hidden md:block rounded-lg border border-border/60 bg-secondary/10 px-3 py-2 text-xs text-muted-foreground">{previewMessage}</div>
+
+        {editingSupplier ? (
+          <section className="rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold">Supplier File</h2>
+              <Button variant="outline" size="sm" onClick={() => setEditingSupplier(false)}>Close</Button>
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {[
+                ["Supplier Code", "supplierCode"],
+                ["Supplier Name", "supplierName"],
+                ["Category", "category"],
+                ["Contact Person", "contactPerson"],
+                ["Phone", "phone"],
+                ["Email", "email"],
+                ["Region", "region"],
+                ["Lead Time (days)", "leadTime"],
+                ["Payment Term", "paymentTerm"],
+                ["Status", "status"],
+                ["Rating", "rating"],
+              ].map(([label, key]) => (
+                <div key={key} className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">{label}</Label>
+                  <Input
+                    value={supplierForm[key as keyof typeof supplierForm]}
+                    onChange={(event) => setSupplierForm((prev) => ({ ...prev, [key]: event.target.value }))}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Button size="sm" onClick={() => { setPreviewMessage("Supplier file updated."); setEditingSupplier(false); }}>Save</Button>
+              <Button size="sm" variant="outline" onClick={() => setEditingSupplier(false)}>Cancel</Button>
+            </div>
+          </section>
+        ) : null}
 
         {viewMode === "detail" ? (
-          <section className="grid gap-4 xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
+          <>
+          <section className="space-y-3 md:hidden">
+            <div className="rounded-xl border border-border bg-card p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">Selected Supplier</p>
+                  <h2 className="text-lg font-semibold">{focusedSupplier.name}</h2>
+                  <p className="text-xs text-muted-foreground">{focusedSupplier.supplierCode}</p>
+                </div>
+                <Badge variant="outline">{focusedSupplier.status}</Badge>
+              </div>
+              <div className="mt-3 space-y-4">
+                <DetailSection title="Supplier Header">
+                  <FactRow label="Supplier Code" value={focusedSupplier.supplierCode} />
+                  <FactRow label="Supplier Name" value={focusedSupplier.name} />
+                  <FactRow label="Status" value={focusedSupplier.status} />
+                  <FactRow label="Category" value={focusedSupplier.category} />
+                  <FactRow label="Region" value={focusedSupplier.serviceRegion} />
+                  <FactRow label="Risk" value={focusedIssues.length > 0 ? "watch" : "low"} />
+                </DetailSection>
+                <DetailSection title="Contact & Contract">
+                  <FactRow label="Contact Person" value={focusedContact?.name ?? "-"} />
+                  <FactRow label="Phone" value={focusedContact?.phone ?? "-"} />
+                  <FactRow label="Email" value={focusedContact?.email ?? "-"} />
+                  <FactRow label="Contract Status" value={focusedContract?.status ?? "-"} />
+                  <FactRow label="Contract No" value={focusedContract?.contractId ?? "-"} />
+                  <FactRow label="Expiry Date" value={focusedContract?.effectiveTo ?? "-"} />
+                </DetailSection>
+                <DetailSection title="Procurement / Quality">
+                  <FactRow label="Open Issues" value={String(focusedIssues.length)} />
+                  <FactRow label="Rating" value={focusedRating?.grade ?? "N/A"} />
+                  <FactRow label="Lead Time" value={`${focusedSupplier.leadTimeDays}d`} />
+                  <FactRow label="Last Order" value={linkedOrders[0]?.effectiveFrom ?? "-"} />
+                  <FactRow label="Linked PR" value={linkedOrders[0]?.quotationId ?? "-"} />
+                  <FactRow label="Linked Inventory SKU" value={linkedOrders[0]?.skuId ?? "-"} />
+                </DetailSection>
+              </div>
+              <Button size="sm" className="mt-3 w-full" onClick={() => showPreview("View Supplier")}>View Supplier</Button>
+            </div>
+          </section>
+          <section className="hidden gap-4 md:grid xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
             <div className="rounded-xl border border-border bg-card">
               <div className="flex items-center justify-between border-b border-border p-4">
                 <div>
@@ -308,15 +456,15 @@ export default function PsiSupplierPage() {
                 <DetailSection title="Linked Records">
                   <FactRow label="Linked PR" value={linkedOrders[0]?.quotationId ?? "-"} />
                   <FactRow label="Linked PO" value={linkedOrders[0]?.quotationId ?? "-"} />
-                  <FactRow label="Linked Receiving" value="RCV-Preview" />
+                  <FactRow label="Linked Receiving" value="RCV-1001" />
                   <FactRow label="Linked Inventory SKU" value={linkedOrders[0]?.skuId ?? "-"} />
                 </DetailSection>
                 <section className="rounded-xl border border-border bg-secondary/10 p-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Preview Actions</div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Actions</div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
                     {[
                       "View Supplier",
-                      "Create PR Preview",
+                      "Create PR",
                       "Add Issue",
                       "Add Note",
                       "View Purchase History",
@@ -328,8 +476,41 @@ export default function PsiSupplierPage() {
               </div>
             </div>
           </section>
+          </>
         ) : (
-          <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <>
+          <section className="space-y-3 md:hidden">
+            {filteredSuppliers.map((row) => {
+              const active = focusedSupplier.supplierId === row.supplierId;
+              const contact = pageData.contacts.find((item) => item.supplierId === row.supplierId);
+              const rating = ratings.find((item) => item.supplierId === row.supplierId);
+              return (
+                <div key={row.supplierId} className={["rounded-xl border p-3", active ? "border-primary/50 bg-primary/10" : "border-border bg-card"].join(" ")}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold">{row.name}</p>
+                      <p className="text-xs text-muted-foreground">{row.supplierCode} · {row.category}</p>
+                    </div>
+                    <Badge variant="outline">{row.status}</Badge>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div>Region: <span className="text-foreground">{row.serviceRegion}</span></div>
+                    <div>Contact: <span className="text-foreground">{contact?.name ?? "-"}</span></div>
+                    <div>Lead Time: <span className="text-foreground">{row.leadTimeDays}d</span></div>
+                    <div>Rating: <span className="text-foreground">{rating?.grade ?? "N/A"}</span></div>
+                  </div>
+                  <Button size="sm" variant="outline" className="mt-3 w-full" onClick={() => openDetail(row.supplierId)}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    View
+                  </Button>
+                  <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => { setFocusedSupplierId(row.supplierId); loadSupplierForm(row.supplierId); setEditingSupplier(true); }}>
+                    Edit
+                  </Button>
+                </div>
+              );
+            })}
+          </section>
+          <section className="hidden gap-4 md:grid xl:grid-cols-[minmax(0,1fr)_320px]">
             <MultidimensionalTable
               columns={columns}
               rows={filteredSuppliers}
@@ -363,10 +544,12 @@ export default function PsiSupplierPage() {
               </div>
               <div className="mt-4 grid gap-2">
                 <Button onClick={() => setViewMode("detail")}><Eye className="mr-2 h-4 w-4" />View Detail</Button>
-                <Button variant="outline" onClick={() => showPreview("Create PR Preview")}>Create PR Preview</Button>
+                <Button variant="outline" onClick={() => { loadSupplierForm(focusedSupplier.supplierId); setEditingSupplier(true); }}>Edit Supplier</Button>
+                <Button variant="outline" onClick={() => showPreview("Create PR")}>Create PR</Button>
               </div>
             </aside>
           </section>
+          </>
         )}
       </div>
     </ErpShell>

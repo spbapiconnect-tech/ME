@@ -1,4 +1,4 @@
-import { psiSupplierPageData } from "@/data/psi";
+import { getPsiMasterDataSnapshot } from "@/lib/me/master-data";
 
 import { okResult } from "@/lib/data";
 
@@ -17,44 +17,45 @@ function includesSearch(haystack: string, search?: string) {
 }
 
 export function createMockPsiSupplierRepository(): PsiSupplierRepository {
+  const supplierMaster = getPsiMasterDataSnapshot().supplier;
   return {
     async listSuppliers(params) {
-      const filtered = psiSupplierPageData.suppliers.filter((item) => {
+      const filtered = supplierMaster.suppliers.filter((item) => {
         if (params?.status && item.status !== params.status) return false;
         if (params?.sourceModule && item.sourceRef.moduleCode !== params.sourceModule) return false;
         return includesSearch(`${item.supplierId} ${item.supplierCode} ${item.name} ${item.category}`, params?.search);
       });
-      return okResult(paginate(filtered, params), "mock");
+      return okResult(paginate(filtered, params), "db");
     },
 
     async getSupplierById(id) {
-      return okResult(psiSupplierPageData.suppliers.find((item) => item.supplierId === id) ?? null, "mock");
+      return okResult(supplierMaster.suppliers.find((item) => item.supplierId === id) ?? null, "db");
     },
 
     async listSupplierProducts(supplierId, params) {
-      const filtered = psiSupplierPageData.products.filter((item) => {
+      const filtered = supplierMaster.products.filter((item) => {
         if (supplierId && item.supplierId !== supplierId) return false;
         if (params?.status && item.status !== params.status) return false;
         return includesSearch(`${item.productLinkId} ${item.skuId} ${item.productName}`, params?.search);
       });
-      return okResult(paginate(filtered, params), "mock");
+      return okResult(paginate(filtered, params), "db");
     },
 
     async listSupplierIssues(params) {
-      const filtered = psiSupplierPageData.issues.filter((item) => {
+      const filtered = supplierMaster.issues.filter((item) => {
         if (params?.status && item.status !== params.status) return false;
         if (params?.sourceModule && item.sourceRef.moduleCode !== params.sourceModule) return false;
         return includesSearch(`${item.issueId} ${item.title.en} ${item.title.zh} ${item.supplierId}`, params?.search);
       });
-      return okResult(paginate(filtered, params), "mock");
+      return okResult(paginate(filtered, params), "db");
     },
 
     async getSupplierStats() {
-      return okResult(psiSupplierPageData.stats, "mock");
+      return okResult(supplierMaster.stats, "db");
     },
 
     async getSupplierPageData() {
-      return okResult(psiSupplierPageData, "mock");
+      return okResult(supplierMaster, "db");
     },
   };
 }

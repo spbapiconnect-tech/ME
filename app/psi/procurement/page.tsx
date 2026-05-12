@@ -5,6 +5,8 @@ import { ArrowLeft, Eye, FileDown, Plus } from "lucide-react";
 import { ErpShell } from "@/components/erp/erp-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { CompactStatStrip } from "@/components/operations/compact-stat-strip";
 import { MultidimensionalTable, type MultiDimColumn } from "@/components/operations/multidimensional-table";
 import { TableActionBar } from "@/components/operations/table-action-bar";
@@ -38,6 +40,18 @@ export default function PsiProcurementPage() {
   const [focusedRequestId, setFocusedRequestId] = useState<string | null>(null);
   const [density, setDensity] = useState<"compact" | "standard" | "comfortable">("compact");
   const [previewMessage, setPreviewMessage] = useState("Ready.");
+  const [editingRequest, setEditingRequest] = useState(false);
+  const [requestForm, setRequestForm] = useState({
+    prNo: "",
+    poNo: "",
+    branch: "",
+    supplier: "",
+    requester: "",
+    needBy: "",
+    status: "",
+    totalAmount: "",
+    itemsSummary: "",
+  });
 
   useEffect(() => {
     getPsiProcurementWorkspacePageData().then(setData);
@@ -95,6 +109,22 @@ export default function PsiProcurementPage() {
   const linkedOrder = focusedRequest ? orders.find((item) => item.requestId === focusedRequest.requestId) : null;
   const linkedReceiving = linkedOrder ? receivingRecords.find((item) => item.orderId === linkedOrder.orderId) : null;
   const linkedIssues = focusedRequest ? issues.filter((item) => item.requestId === focusedRequest.requestId) : [];
+  const loadRequestForm = (requestId: string) => {
+    const request = requests.find((item) => item.requestId === requestId);
+    if (!request) return;
+    const order = orders.find((item) => item.requestId === requestId);
+    setRequestForm({
+      prNo: request.requestNo,
+      poNo: order?.orderNo ?? "",
+      branch: request.storeId,
+      supplier: request.supplierId || "",
+      requester: request.audit.createdBy ?? "",
+      needBy: request.neededBy || "",
+      status: request.status,
+      totalAmount: String(request.totalAmount.amount),
+      itemsSummary: `${request.lines.length} items`,
+    });
+  };
 
   const emptyRows = Array.from({ length: Math.max(0, 20 - filteredRequests.length) });
 
@@ -104,7 +134,7 @@ export default function PsiProcurementPage() {
     setViewMode("detail");
   };
 
-  const showPreview = (label: string) => setPreviewMessage(`${label} preview only.`);
+  const showPreview = (label: string) => setPreviewMessage(`${label} opened.`);
 
   const columns: MultiDimColumn<(typeof filteredRequests)[number]>[] = [
     { key: "requestNo", label: "PR No", width: "120px", render: (row) => <p className="font-semibold">{row.requestNo}</p> },
@@ -152,24 +182,45 @@ export default function PsiProcurementPage() {
 
   return (
     <ErpShell activeHref="/psi/procurement">
-      <div className="space-y-4">
+      <div className="space-y-4 pb-24 md:pb-0">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-xs text-muted-foreground">ME / PSI / Procurement</div>
-            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">ME PSI Procurement</h1>
-            <p className="mt-1 text-sm text-muted-foreground">{viewMode === "grid" ? "Normal View: wide PR / PO operations grid with compact selected summary." : "Detail View: 40% quick request list and 60% full procurement detail."}</p>
+            <div className="hidden text-xs text-muted-foreground md:block">ME / PSI / Procurement</div>
+            <h1 className="mt-1 text-lg font-semibold tracking-tight text-foreground md:mt-3 md:text-2xl">ME PSI Procurement</h1>
+            <p className="mt-1 hidden text-sm text-muted-foreground md:block">{viewMode === "grid" ? "Normal View: wide PR / PO operations grid with compact selected summary." : "Detail View: 40% quick request list and 60% full procurement detail."}</p>
           </div>
           <div className="flex items-center gap-2">
             {viewMode === "detail" ? (
-              <Button variant="outline" size="sm" onClick={() => setViewMode("grid")}><ArrowLeft className="mr-2 h-4 w-4" />Back to Grid</Button>
+              <Button variant="outline" size="sm" onClick={() => setViewMode("grid")}><ArrowLeft className="mr-2 h-4 w-4" />Back to List</Button>
             ) : null}
-            <Button variant="outline" size="sm" onClick={() => showPreview("Export")}><FileDown className="mr-2 h-4 w-4" />Export</Button>
-            <Button size="sm" onClick={() => showPreview("Create PR")}><Plus className="mr-2 h-4 w-4" />Create PR</Button>
+            <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => showPreview("Export")}><FileDown className="mr-2 h-4 w-4" />Export</Button>
+            <Button size="sm" onClick={() => {
+              setEditingRequest(true);
+              setRequestForm({ prNo: "", poNo: "", branch: "", supplier: "", requester: "", needBy: "", status: "draft", totalAmount: "", itemsSummary: "" });
+            }}><Plus className="mr-2 h-4 w-4" />Create PR</Button>
           </div>
         </header>
 
-        <TableViewTabs title="Saved Views" tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        <div className="md:hidden rounded-xl border border-border bg-card p-3 space-y-2">
+          <div className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground flex items-center">
+            Search PR / PO no...
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {["All", "Pending", "PO Issued", "Receiving"].map((chip) => (
+              <Badge key={chip} variant="outline" className="text-xs">{chip}</Badge>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => showPreview("Sort")}>Sort</Button>
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => showPreview("More Filters")}>Filters</Button>
+          </div>
+        </div>
 
+        <div className="hidden md:block">
+          <TableViewTabs title="Saved Views" tabs={viewTabs} value={viewKey} onChange={setViewKey} />
+        </div>
+
+        <div className="hidden md:block">
         <CompactStatStrip
           items={[
             { label: "PR Open", value: pageData.stats.totalRequests },
@@ -178,11 +229,13 @@ export default function PsiProcurementPage() {
             { label: "Receiving Pending", value: orders.filter((item) => !receivingRecords.some((record) => record.orderId === item.orderId)).length, tone: "danger" },
           ]}
         />
+        </div>
 
+        <div className="hidden md:block">
         <TableActionBar
           searchPlaceholder="Search PR / PO no..."
           selectedCount={selectedRowIds.size}
-          bulkActionLabel="Approve Preview"
+          bulkActionLabel="Approve"
           bulkActionKey="procurement.approve_preview"
           density={density}
           onDensityChange={setDensity}
@@ -207,11 +260,84 @@ export default function PsiProcurementPage() {
             </div>
           }
         />
+        </div>
 
-        <div className="rounded-lg border border-border/60 bg-secondary/10 px-3 py-2 text-xs text-muted-foreground">{previewMessage}</div>
+        <div className="hidden md:block rounded-lg border border-border/60 bg-secondary/10 px-3 py-2 text-xs text-muted-foreground">{previewMessage}</div>
+
+        {editingRequest ? (
+          <section className="rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold">Purchase Request File</h2>
+              <Button variant="outline" size="sm" onClick={() => setEditingRequest(false)}>Close</Button>
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {[
+                ["PR Number", "prNo"],
+                ["PO Number", "poNo"],
+                ["Branch", "branch"],
+                ["Supplier", "supplier"],
+                ["Requester", "requester"],
+                ["Need By", "needBy"],
+                ["Status", "status"],
+                ["Total Amount", "totalAmount"],
+                ["Items Summary", "itemsSummary"],
+              ].map(([label, key]) => (
+                <div key={key} className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">{label}</Label>
+                  <Input value={requestForm[key as keyof typeof requestForm]} onChange={(event) => setRequestForm((prev) => ({ ...prev, [key]: event.target.value }))} />
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Button size="sm" onClick={() => { setPreviewMessage("PR file updated."); setEditingRequest(false); }}>Save</Button>
+              <Button size="sm" variant="outline" onClick={() => setEditingRequest(false)}>Cancel</Button>
+            </div>
+          </section>
+        ) : null}
 
         {viewMode === "detail" ? (
-          <section className="grid gap-4 xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
+          <>
+          <section className="space-y-3 md:hidden">
+            <div className="rounded-xl border border-border bg-card p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">Selected PR / PO</p>
+                  <h2 className="text-lg font-semibold">{focusedRequest.requestNo}</h2>
+                  <p className="text-xs text-muted-foreground">{linkedOrder?.orderNo ?? "No PO"}</p>
+                </div>
+                <Badge variant="outline">{focusedRequest.status}</Badge>
+              </div>
+              <div className="mt-3 space-y-4">
+                <DetailSection title="PR / PO Header">
+                  <FactRow label="PR No" value={focusedRequest.requestNo} />
+                  <FactRow label="PO No" value={linkedOrder?.orderNo ?? "-"} />
+                  <FactRow label="Status" value={focusedRequest.status} />
+                  <FactRow label="Branch" value={focusedRequest.storeId} />
+                  <FactRow label="Requester" value={focusedRequest.audit.createdBy ?? "-"} />
+                  <FactRow label="Supplier" value={focusedRequest.supplierId || "-"} />
+                </DetailSection>
+                <DetailSection title="Request Details">
+                  <FactRow label="Items" value={String(focusedRequest.lines.length)} />
+                  <FactRow label="Total Amount" value={`${focusedRequest.totalAmount.amount} ${focusedRequest.totalAmount.currency}`} />
+                  <FactRow label="Need By" value={focusedRequest.neededBy || "-"} />
+                  <FactRow label="Request Date" value={focusedRequest.audit.createdAt.split("T")[0]} />
+                </DetailSection>
+                <DetailSection title="Approval / Receiving">
+                  <FactRow label="Approval Status" value={focusedRequest.status} />
+                  <FactRow label="PO Status" value={linkedOrder?.status ?? "-"} />
+                  <FactRow label="Supplier Confirm" value={linkedIssues.some((item) => item.status === "pending") ? "pending" : "confirmed"} />
+                  <FactRow label="Receiving Status" value={linkedReceiving?.status ?? "pending"} />
+                  <FactRow label="Linked GRN" value={linkedReceiving?.receivingNo ?? "-"} />
+                  <FactRow label="Issue Link" value={linkedIssues[0]?.issueId ?? "-"} />
+                </DetailSection>
+              </div>
+              <div className="mt-3 grid gap-2">
+                <Button size="sm" onClick={() => showPreview("View PR")}>View PR</Button>
+                <Button size="sm" variant="outline" onClick={() => showPreview("Approve")}>Approve</Button>
+              </div>
+            </div>
+          </section>
+          <section className="hidden gap-4 md:grid xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
             <div className="rounded-xl border border-border bg-card">
               <div className="flex items-center justify-between border-b border-border p-4">
                 <div>
@@ -273,7 +399,7 @@ export default function PsiProcurementPage() {
                   <FactRow label="Approver" value="-" />
                   <FactRow label="Approval Time" value="-" />
                   <FactRow label="Rejection Reason" value="-" />
-                  <FactRow label="Approval Preview" value="Available" />
+                  <FactRow label="Approval" value="Ready" />
                 </DetailSection>
                 <DetailSection title="PO / Supplier Confirmation">
                   <FactRow label="PO Status" value={linkedOrder?.status ?? "-"} />
@@ -310,9 +436,9 @@ export default function PsiProcurementPage() {
                   <FactRow label="Linked Task" value="TASK-Preview" />
                 </DetailSection>
                 <section className="rounded-xl border border-border bg-secondary/10 p-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Preview Actions</div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Actions</div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-                    {["View PR", "Approve Preview", "Issue PO Preview", "Link Receiving Preview", "Add Note"].map((action) => (
+                    {["View PR", "Approve", "Issue PO", "Link Receiving", "Add Note"].map((action) => (
                       <Button key={action} variant="outline" size="sm" onClick={() => showPreview(action)}>{action}</Button>
                     ))}
                   </div>
@@ -320,8 +446,40 @@ export default function PsiProcurementPage() {
               </div>
             </div>
           </section>
+          </>
         ) : (
-          <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <>
+          <section className="space-y-3 md:hidden">
+            {filteredRequests.map((row) => {
+              const po = orders.find((item) => item.requestId === row.requestId);
+              const active = focusedRequest.requestId === row.requestId;
+              return (
+                <div key={row.requestId} className={["rounded-xl border p-3", active ? "border-primary/50 bg-primary/10" : "border-border bg-card"].join(" ")}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold">{row.requestNo}</p>
+                      <p className="text-xs text-muted-foreground">{po?.orderNo ?? "No PO"} · {row.storeId}</p>
+                    </div>
+                    <Badge variant="outline">{row.status}</Badge>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div>Supplier: <span className="text-foreground">{row.supplierId || "-"}</span></div>
+                    <div>Requester: <span className="text-foreground">{row.audit.createdBy || "-"}</span></div>
+                    <div>Amount: <span className="text-foreground">{row.totalAmount.amount}</span></div>
+                    <div>Need By: <span className="text-foreground">{row.neededBy || "-"}</span></div>
+                  </div>
+                  <Button size="sm" variant="outline" className="mt-3 w-full" onClick={() => openDetail(row.requestId)}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    View
+                  </Button>
+                  <Button size="sm" variant="outline" className="mt-2 w-full" onClick={() => { setFocusedRequestId(row.requestId); loadRequestForm(row.requestId); setEditingRequest(true); }}>
+                    Review
+                  </Button>
+                </div>
+              );
+            })}
+          </section>
+          <section className="hidden gap-4 md:grid xl:grid-cols-[minmax(0,1fr)_320px]">
             <MultidimensionalTable
               columns={columns}
               rows={filteredRequests}
@@ -355,10 +513,12 @@ export default function PsiProcurementPage() {
               </div>
               <div className="mt-4 grid gap-2">
                 <Button onClick={() => setViewMode("detail")}><Eye className="mr-2 h-4 w-4" />View Detail</Button>
-                <Button variant="outline" onClick={() => showPreview("Approve Preview")}>Approve Preview</Button>
+                <Button variant="outline" onClick={() => { loadRequestForm(focusedRequest.requestId); setEditingRequest(true); }}>Review PR</Button>
+                <Button variant="outline" onClick={() => showPreview("Approve")}>Approve</Button>
               </div>
             </aside>
           </section>
+          </>
         )}
       </div>
     </ErpShell>

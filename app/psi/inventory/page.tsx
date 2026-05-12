@@ -13,6 +13,8 @@ import {
 import { ErpShell } from "@/components/erp/erp-shell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type InventoryItem = {
   sku: string;
@@ -605,9 +607,9 @@ function FullItemDetail({
         </DetailSection>
 
         <section className="rounded-xl border border-border bg-secondary/10 p-3">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Preview Actions</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Actions</div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-            {["View Item", "Create PR Preview", "Count Stock Preview", "Add Note", "View BOM Usage"].map((action) => (
+            {["View Item", "Create PR", "Count Stock", "Add Note", "View BOM Usage"].map((action) => (
               <Button key={action} variant="outline" size="sm" onClick={() => onPreview(action)}>
                 {action}
               </Button>
@@ -650,7 +652,7 @@ function GridSummaryDetail({
       </div>
 
       <div className="mt-4 rounded-lg border border-border bg-secondary/10 p-3 text-sm text-muted-foreground">
-        <div className="font-medium text-foreground">Preview Notice</div>
+        <div className="font-medium text-foreground">Record Notice</div>
         <div className="mt-1">Full item master data opens in Detail View. No API/database/write executed.</div>
       </div>
 
@@ -659,8 +661,9 @@ function GridSummaryDetail({
           <Eye className="mr-2 h-4 w-4" />
           View Detail
         </Button>
-        <Button variant="outline" onClick={() => onPreview("Create PR Preview")}>Create PR Preview</Button>
-        <Button variant="outline" onClick={() => onPreview("Count Stock Preview")}>Count Stock Preview</Button>
+        <Button variant="outline" onClick={() => onPreview("Edit Product")}>Edit Product</Button>
+        <Button variant="outline" onClick={() => onPreview("Create PR")}>Create PR</Button>
+        <Button variant="outline" onClick={() => onPreview("Count Stock")}>Count Stock</Button>
       </div>
     </aside>
   );
@@ -671,13 +674,51 @@ export default function InventoryPage() {
   const [viewMode, setViewMode] = useState<"grid" | "detail">("grid");
   const [selectedSku, setSelectedSku] = useState("SKU-1001");
   const [selectedRows, setSelectedRows] = useState<string[]>(["SKU-1001"]);
-  const [previewMessage, setPreviewMessage] = useState("Selected 0 · Export selected · Add note · Review / Link / View · Clear selection");
+  const [previewMessage, setPreviewMessage] = useState("Inventory workspace ready.");
+  const [editingSku, setEditingSku] = useState(false);
+  const [skuForm, setSkuForm] = useState({
+    sku: "SKU-1001",
+    itemName: "Fresh Milk 1L",
+    category: "Dairy",
+    branch: "ST-001",
+    storage: "store",
+    supplier: "SUP-Dairy",
+    currentStock: "18 pcs",
+    safetyStock: "60",
+    reorderPoint: "60",
+    purchaseUom: "carton",
+    stockUom: "pcs",
+    unitCost: "36.40 MYR",
+    status: "active",
+    lastPurchaseDate: "2026-05-01",
+    linkedSupplier: "SUP-1001",
+  });
   const gridScrollRef = useRef<HTMLDivElement | null>(null);
 
   const selectedItem = useMemo(
     () => inventoryItems.find((item) => item.sku === selectedSku) || inventoryItems[0],
     [selectedSku]
   );
+
+  const loadSkuForm = (item: InventoryItem) => {
+    setSkuForm({
+      sku: item.sku,
+      itemName: item.itemName,
+      category: item.category,
+      branch: item.branch,
+      storage: item.storage,
+      supplier: item.primarySupplier,
+      currentStock: item.currentStock,
+      safetyStock: item.safetyStock,
+      reorderPoint: item.reorderPoint,
+      purchaseUom: item.purchaseUom,
+      stockUom: item.stockUom,
+      unitCost: item.unitCost,
+      status: item.status,
+      lastPurchaseDate: item.lastPurchaseDate,
+      linkedSupplier: item.linkedSupplier,
+    });
+  };
 
   useLayoutEffect(() => {
     if (viewMode !== "grid") return;
@@ -715,21 +756,21 @@ export default function InventoryPage() {
     setSelectedSku(sku);
     setSelectedRows([sku]);
     setViewMode("detail");
-    setPreviewMessage(`Detail View opened for ${sku}. UI-only, no route write executed.`);
+    setPreviewMessage(`Detail opened for ${sku}.`);
   };
 
   const showPreview = (label: string) => {
-    setPreviewMessage(`${label} preview only. No API, database, stock posting, formula, brain, or write executed.`);
+    setPreviewMessage(`${label} opened.`);
   };
 
   return (
     <ErpShell activeHref="/psi/inventory">
-      <div className="space-y-4">
+      <div className="space-y-4 pb-24 md:pb-0">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <div className="text-xs text-muted-foreground">ME / PSI / Inventory</div>
-            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">ME PSI Inventory</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <div className="hidden text-xs text-muted-foreground md:block">ME / PSI / Inventory</div>
+            <h1 className="mt-1 text-lg font-semibold tracking-tight text-foreground md:mt-3 md:text-2xl">ME PSI Inventory</h1>
+            <p className="mt-1 hidden text-sm text-muted-foreground md:block">
               {viewMode === "grid"
                 ? "Normal View: wide inventory data grid with compact selected SKU summary."
                 : "Detail View: 40% quick SKU list and 60% full item master detail."}
@@ -740,21 +781,40 @@ export default function InventoryPage() {
             {viewMode === "detail" ? (
               <Button variant="outline" size="sm" onClick={() => setViewMode("grid")}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Grid
+                Back to List
               </Button>
             ) : null}
-            <Button variant="outline" size="sm" onClick={() => showPreview("Export")}>
+            <Button variant="outline" size="sm" className="hidden md:inline-flex" onClick={() => showPreview("Export")}>
               <FileText className="mr-2 h-4 w-4" />
               Export
             </Button>
-            <Button size="sm" onClick={() => showPreview("Add SKU")}>
+            <Button size="sm" onClick={() => {
+              setEditingSku(true);
+              setSkuForm({
+                sku: "",
+                itemName: "",
+                category: "",
+                branch: "",
+                storage: "",
+                supplier: "",
+                currentStock: "",
+                safetyStock: "",
+                reorderPoint: "",
+                purchaseUom: "",
+                stockUom: "",
+                unitCost: "",
+                status: "active",
+                lastPurchaseDate: "",
+                linkedSupplier: "",
+              });
+            }}>
               <Plus className="mr-2 h-4 w-4" />
               Add SKU
             </Button>
           </div>
         </header>
 
-        <section className="rounded-xl border border-border bg-card p-3">
+        <section className="hidden rounded-xl border border-border bg-card p-3 md:block">
           <div className="flex flex-wrap items-center gap-2 text-xs">
             <Badge variant="secondary" className="bg-primary/10 text-primary">All SKU 8</Badge>
             <Badge variant="outline">Low Stock 7</Badge>
@@ -767,7 +827,27 @@ export default function InventoryPage() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-border bg-card p-3">
+        <section className="rounded-xl border border-border bg-card p-3 md:hidden">
+          <div className="space-y-2">
+            <div className="flex h-10 w-full items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground">
+              <Search className="h-4 w-4" />
+              Search SKU / item name...
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {["All SKU", "Low Stock", "Expiring", "Reorder"].map((item, idx) => (
+                <Badge key={item} variant={idx === 0 ? "secondary" : "outline"} className={idx === 0 ? "bg-primary/10 text-primary" : ""}>
+                  {item}
+                </Badge>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => showPreview("Sort")}>Sort</Button>
+              <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => showPreview("More Filters")}>More Filters</Button>
+            </div>
+          </div>
+        </section>
+
+        <section className="hidden rounded-xl border border-border bg-card p-3 md:block">
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex h-10 min-w-[260px] items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground">
               <Search className="h-4 w-4" />
@@ -789,8 +869,88 @@ export default function InventoryPage() {
           </div>
         </section>
 
+        {editingSku ? (
+          <section className="rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-semibold">Product / SKU File</h2>
+              <Button variant="outline" size="sm" onClick={() => setEditingSku(false)}>Close</Button>
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {[
+                ["SKU Code", "sku"],
+                ["Product Name", "itemName"],
+                ["Category", "category"],
+                ["Branch", "branch"],
+                ["Storage", "storage"],
+                ["Supplier", "supplier"],
+                ["Current Stock", "currentStock"],
+                ["Safety Stock", "safetyStock"],
+                ["Reorder Point", "reorderPoint"],
+                ["Purchase UOM", "purchaseUom"],
+                ["Usage UOM", "stockUom"],
+                ["Unit Cost", "unitCost"],
+                ["Status", "status"],
+                ["Last Purchase Date", "lastPurchaseDate"],
+                ["Linked Supplier", "linkedSupplier"],
+              ].map(([label, key]) => (
+                <div key={key} className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">{label}</Label>
+                  <Input
+                    value={skuForm[key as keyof typeof skuForm]}
+                    onChange={(event) => setSkuForm((prev) => ({ ...prev, [key]: event.target.value }))}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Button size="sm" onClick={() => { setPreviewMessage("Product file updated."); setEditingSku(false); }}>Save</Button>
+              <Button size="sm" variant="outline" onClick={() => setEditingSku(false)}>Cancel</Button>
+            </div>
+          </section>
+        ) : null}
+
         {viewMode === "detail" ? (
-          <section className="grid gap-4 xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
+          <>
+          <section className="space-y-3 md:hidden">
+            <div className="rounded-xl border border-border bg-card p-3">
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">Selected SKU</p>
+                  <h2 className="text-lg font-semibold">{selectedItem.itemName}</h2>
+                  <p className="text-xs text-muted-foreground">{selectedItem.sku}</p>
+                </div>
+                <Badge variant={selectedItem.risk === "high" ? "destructive" : "outline"}>{selectedItem.risk}</Badge>
+              </div>
+              <div className="mt-3 space-y-4">
+                <DetailSection title="Stock Snapshot">
+                  <FactRow label="Current Stock" value={selectedItem.currentStock} />
+                  <FactRow label="Safety Stock" value={selectedItem.safetyStock} />
+                  <FactRow label="Reorder Point" value={selectedItem.reorderPoint} />
+                  <FactRow label="Reorder Suggestion" value={selectedItem.reorderSuggestion} />
+                  <FactRow label="Coverage Days" value={selectedItem.coverageDays} />
+                  <FactRow label="Stock Risk" value={selectedItem.risk} />
+                </DetailSection>
+                <DetailSection title="Supplier & Purchase">
+                  <FactRow label="Primary Supplier" value={selectedItem.primarySupplier} />
+                  <FactRow label="Supplier Code" value={selectedItem.supplierCode} />
+                  <FactRow label="Purchase UOM" value={selectedItem.purchaseUom} />
+                  <FactRow label="Unit Cost" value={selectedItem.unitCost} />
+                  <FactRow label="Last Purchase Date" value={selectedItem.lastPurchaseDate} />
+                  <FactRow label="Lead Time" value={selectedItem.leadTime} />
+                </DetailSection>
+                <DetailSection title="Usage / Linkage">
+                  <FactRow label="BOM Usage" value={selectedItem.bomUsage} />
+                  <FactRow label="Branch" value={selectedItem.branch} />
+                  <FactRow label="Storage" value={selectedItem.storage} />
+                  <FactRow label="Linked PR" value={selectedItem.linkedPr} />
+                  <FactRow label="Linked PO" value={selectedItem.linkedPo} />
+                  <FactRow label="Linked Receiving / GRN" value={selectedItem.linkedReceiving} />
+                </DetailSection>
+              </div>
+              <Button size="sm" className="mt-3 w-full" onClick={() => showPreview("View Item")}>View Item</Button>
+            </div>
+          </section>
+          <section className="hidden gap-4 md:grid xl:grid-cols-[minmax(360px,0.4fr)_minmax(620px,0.6fr)]">
             <QuickList
               selectedSku={selectedSku}
               selectedRows={selectedRows}
@@ -800,8 +960,44 @@ export default function InventoryPage() {
             />
             <FullItemDetail item={selectedItem} onBack={() => setViewMode("grid")} onPreview={showPreview} />
           </section>
+          </>
         ) : (
-          <section className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <>
+          <section className="space-y-3 md:hidden">
+            {inventoryItems.map((item) => {
+              const active = selectedSku === item.sku;
+              return (
+                <div key={item.sku} className={["rounded-xl border p-3", active ? "border-primary/50 bg-primary/10" : "border-border bg-card"].join(" ")}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold">{item.itemName}</p>
+                      <p className="text-xs text-muted-foreground">{item.sku} · {item.category}</p>
+                    </div>
+                    <Badge variant={item.risk === "high" ? "destructive" : "outline"}>{item.risk}</Badge>
+                  </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                    <div>Stock: <span className="text-foreground">{item.currentStock}</span></div>
+                    <div>Unit Cost: <span className="text-foreground">{item.unitCost}</span></div>
+                    <div>Branch: <span className="text-foreground">{item.branch}</span></div>
+                    <div>Supplier: <span className="text-foreground">{item.primarySupplier}</span></div>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <Button size="sm" variant="outline" className="flex-1" onClick={() => selectRow(item.sku)}>
+                      Select
+                    </Button>
+                    <Button size="sm" variant="outline" className="flex-1" onClick={() => { selectRow(item.sku); loadSkuForm(item); setEditingSku(true); }}>
+                      Edit
+                    </Button>
+                    <Button size="sm" className="flex-1" onClick={() => openDetail(item.sku)}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      View
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+          <section className="hidden gap-4 md:grid xl:grid-cols-[minmax(0,1fr)_320px]">
             <div className="rounded-xl border border-border bg-card">
               <div className="flex items-center justify-between border-b border-border p-4">
                 <div>
@@ -923,6 +1119,7 @@ export default function InventoryPage() {
               onPreview={showPreview}
             />
           </section>
+          </>
         )}
 
       </div>
