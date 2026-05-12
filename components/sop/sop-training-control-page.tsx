@@ -57,6 +57,7 @@ import {
   type SopPreviewContent,
   type SopPreviewPage,
 } from "@/lib/store-operations/sop-training-workspace";
+import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { uploadAssetLabel, serializeUploadAsset, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
@@ -223,7 +224,7 @@ function renderBlock(block: SopPreviewBlock) {
     return (
       <div className="rounded-xl border bg-muted/30 p-3 text-sm">
         <div className="mb-2 flex items-center gap-2 font-medium"><ImageIcon className="h-4 w-4" />Image</div>
-        <div className="break-all text-muted-foreground">{uploadAssetLabel(block.imageUrl) || "Media placeholder not set."}</div>
+        <div className="break-all text-muted-foreground">{block.imageUrl ? <UploadAssetPreview value={block.imageUrl} compact /> : "Media placeholder not set."}</div>
       </div>
     );
   }
@@ -232,7 +233,7 @@ function renderBlock(block: SopPreviewBlock) {
     return (
       <div className="rounded-xl border bg-muted/30 p-3 text-sm">
         <div className="mb-2 flex items-center gap-2 font-medium"><FileText className="h-4 w-4" />PDF</div>
-        <div className="break-all text-muted-foreground">{uploadAssetLabel(block.pdfUrl) || "PDF placeholder not set."}</div>
+        <div className="break-all text-muted-foreground">{block.pdfUrl ? <UploadAssetPreview value={block.pdfUrl} compact /> : "PDF placeholder not set."}</div>
       </div>
     );
   }
@@ -719,7 +720,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                         <div key={page.id} className="rounded-2xl border bg-background p-3">
                           <div className="text-xs font-medium uppercase text-muted-foreground">Page {page.pageNo}</div>
                           <div className="font-semibold">{page.title}</div>
-                          {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
+                          {page.coverImageUrl ? <UploadAssetPreview value={page.coverImageUrl} label="Cover Media" compact /> : null}
                           <div className="mt-3 space-y-3">
                             {page.blocks.map((block) => <div key={block.id}>{renderBlock(block)}</div>)}
                           </div>
@@ -880,7 +881,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                             </div>
                             <Badge variant="secondary">{page.blocks.length} Blocks</Badge>
                           </div>
-                          {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover media: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
+                          {page.coverImageUrl ? <UploadAssetPreview value={page.coverImageUrl} label="Cover Media" compact /> : null}
                           <div className="mt-3 space-y-3">
                             {page.blocks.map((block) => <div key={block.id}>{renderBlock(block)}</div>)}
                           </div>

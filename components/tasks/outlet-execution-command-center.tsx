@@ -31,6 +31,7 @@ import {
   getReviewQueue,
   getTaskStatusTone,
 } from "@/lib/store-operations/outlet-execution-workspace";
+import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { serializeUploadAsset, uploadAssetLabel, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
@@ -765,7 +766,7 @@ export function OutletExecutionCommandCenter() {
                                   <Badge variant={step.proofRequired ? "secondary" : "outline"}>{step.proofRequired ? "Proof Required" : "No Proof"}</Badge>
                                 </div>
                                 <div className="mt-2 whitespace-pre-wrap text-muted-foreground">{step.instruction || "No instruction."}</div>
-                                {step.imageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Image: {uploadAssetLabel(step.imageUrl)}</div> : null}
+                                {step.imageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Media: {uploadAssetLabel(step.imageUrl)}</div> : null}
                               </div>
                             ))}
                           </div>
@@ -936,7 +937,12 @@ export function OutletExecutionCommandCenter() {
                               const asset = await uploadLocalPreviewAsset(event.target.files?.[0], "task");
                               updateInstructionStep(step.id, { imageUrl: serializeUploadAsset(asset) });
                             }} />
-                            {step.imageUrl ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(step.imageUrl)}</div> : null}</div>
+                            {step.imageUrl ? (
+                              <div className="space-y-2">
+                                <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(step.imageUrl)}</div>
+                                <UploadAssetPreview value={step.imageUrl} compact />
+                              </div>
+                            ) : null}</div>
                         </div>
                       </div>
                     ))}

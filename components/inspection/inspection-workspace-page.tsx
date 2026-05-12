@@ -27,6 +27,7 @@ import {
   type InspectionFailedItemView,
   type InspectionSignal,
 } from "@/lib/store-operations/inspection-workspace";
+import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { serializeUploadAsset, uploadAssetLabel, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
@@ -893,8 +894,11 @@ export function InspectionWorkspacePage() {
                         }}
                       />
                       {item.photoUrls?.[0] ? (
-                        <div className="text-xs text-muted-foreground">
-                          Selected: {uploadAssetLabel(item.photoUrls[0])}
+                        <div className="space-y-2">
+                          <div className="text-xs text-muted-foreground">
+                            Selected: {uploadAssetLabel(item.photoUrls[0])}
+                          </div>
+                          <UploadAssetPreview value={item.photoUrls[0]} compact />
                         </div>
                       ) : null}
                     </div>

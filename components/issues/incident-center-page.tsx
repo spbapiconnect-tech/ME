@@ -27,6 +27,7 @@ import {
   getLinkedCorrectiveActions,
   type IncidentSourceSignal,
 } from "@/lib/store-operations/incident-workspace";
+import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { serializeUploadAsset, uploadAssetLabel, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
@@ -699,7 +700,12 @@ export function IncidentCenterPage() {
                   const asset = await uploadLocalPreviewAsset(event.target.files?.[0], "incident");
                   setForm((current) => ({ ...current, evidenceAsset: serializeUploadAsset(asset) }));
                 }} />
-                {form.evidenceAsset ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(form.evidenceAsset)}</div> : null}
+                {form.evidenceAsset ? (
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(form.evidenceAsset)}</div>
+                    <UploadAssetPreview value={form.evidenceAsset} compact />
+                  </div>
+                ) : null}
               </div>
               <div className="space-y-1.5">
                 <Label>Due Time</Label>
