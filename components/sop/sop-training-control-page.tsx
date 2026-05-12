@@ -264,8 +264,6 @@ function renderBlock(block: SopPreviewBlock) {
 
   const steps = block.steps || [];
 
-  const activeBuilderPageId = selectedPageId || pages[0]?.id || "";
-
   return (
     <div className="space-y-2 rounded-xl border p-3 text-sm">
       <div className="font-medium">{block.title || "Step By Step"}</div>
@@ -539,6 +537,8 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   }
 
   const createPreview = serializeContent(form.employeeReadMode, pages);
+
+  const activeBuilderPageId = selectedPageId || pages[0]?.id || "";
 
   return (
     <ErpShell>
