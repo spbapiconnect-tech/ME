@@ -536,7 +536,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     return (
       <ErpShell>
         <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
-          <div className="shrink-0 border-b bg-background px-5 py-4">
+          <div className="shrink-0 border-b bg-background px-5 py-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-sm text-muted-foreground">SOP & Training</div>
@@ -552,16 +552,16 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/20 px-4 py-3">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/10 px-3 py-2">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="font-semibold">SOP Content Builder</div>
                   <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">{activeBuilderPageLabel}</span>
                 </div>
-                <div className="text-sm text-muted-foreground">Add pages and blocks while editing. New blocks are added to the selected page.</div>
+                <div className="text-xs text-muted-foreground">Add blocks to the selected SOP page.</div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={() => {
+                <Button variant="outline" size="sm" className="h-8" onClick={() => {
                   const nextPage = newPage(pages.length + 1);
                   setPages((current) => [...current, nextPage]);
                   setSelectedPageId(nextPage.id);
@@ -569,7 +569,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                 {activeBuilderPageId ? (
                   <>
                     {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
-                      <Button key={type} type="button" variant="outline" size="sm" onClick={() => addBlock(activeBuilderPageId, type)}>+ {type}</Button>
+                      <Button key={type} type="button" variant="outline" size="sm" className="h-8" onClick={() => addBlock(activeBuilderPageId, type)}>+ {type}</Button>
                     ))}
                   </>
                 ) : null}
@@ -614,13 +614,13 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                     <Card
                       key={page.id}
                       onClick={() => setSelectedPageId(page.id)}
-                      className={cn("border-primary/10 transition-colors", activeBuilderPageId === page.id ? "border-primary bg-primary/5" : "")}
+                      className={cn("transition-colors", activeBuilderPageId === page.id ? "border-primary/50 bg-primary/[0.03]" : "border-border")}
                     >
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <CardTitle className="text-base">Page {pageIndex + 1}</CardTitle>
-                            {activeBuilderPageId === page.id ? <span className="rounded-full border border-primary/40 px-2 py-0.5 text-xs text-primary">Selected</span> : null}
+                            {activeBuilderPageId === page.id ? <span className="rounded-full border border-primary/30 bg-primary/5 px-2 py-0.5 text-xs text-primary">Selected</span> : null}
                           </div>
                           <Button variant="ghost" size="sm" onClick={(event) => {
                             event.stopPropagation();
@@ -701,26 +701,33 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
               </div>
 
               <div className="min-h-0 overflow-y-auto border-l bg-muted/10 p-5">
-                <Card className="sticky top-0">
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between gap-3 text-base">
-                      <span>Live Employee Preview</span>
-                      <Badge variant="outline">{createPreview.pages.length} Pages</Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {createPreview.pages.map((page) => (
-                      <div key={page.id} className="rounded-xl border p-3">
-                        <div className="text-xs font-medium uppercase text-muted-foreground">Page {page.pageNo}</div>
-                        <div className="font-semibold">{page.title}</div>
-                        {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
-                        <div className="mt-3 space-y-3">
-                          {page.blocks.map((block) => <div key={block.id}>{renderBlock(block)}</div>)}
+                <div className="sticky top-0 mx-auto max-w-[360px]">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-sm font-semibold">Live Employee Preview</div>
+                      <div className="text-xs text-muted-foreground">Phone reading mode</div>
+                    </div>
+                    <Badge variant="outline">{createPreview.pages.length} Pages</Badge>
+                  </div>
+
+                  <div className="rounded-[2rem] border bg-background p-3 shadow-sm">
+                    <div className="mb-3 flex items-center justify-center">
+                      <div className="h-1.5 w-16 rounded-full bg-muted" />
+                    </div>
+                    <div className="max-h-[calc(100vh-250px)] space-y-3 overflow-y-auto rounded-[1.5rem] border bg-muted/10 p-3">
+                      {createPreview.pages.map((page) => (
+                        <div key={page.id} className="rounded-2xl border bg-background p-3">
+                          <div className="text-xs font-medium uppercase text-muted-foreground">Page {page.pageNo}</div>
+                          <div className="font-semibold">{page.title}</div>
+                          {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
+                          <div className="mt-3 space-y-3">
+                            {page.blocks.map((block) => <div key={block.id}>{renderBlock(block)}</div>)}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
