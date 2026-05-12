@@ -506,10 +506,10 @@ export function IncidentCenterPage() {
                         active: selectedIncident.status === "Resolved",
                       },
                     ].map((step, index) => (
-                      <div key={step.label} className="relative flex gap-3">
-                        <div className="relative flex w-10 shrink-0 justify-center">
-                          {index < 5 ? <div className="absolute left-1/2 top-1/2 h-full min-h-12 w-px -translate-x-1/2 bg-border" /> : null}
-                          <div className={cn("relative mt-8 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border text-xs font-semibold", step.active ? "border-primary bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>{index + 1}</div>
+                      <div key={step.label} className="flex gap-3">
+                        <div className="flex flex-col items-center">
+                          <div className={cn("flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold", step.active ? "border-primary bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>{index + 1}</div>
+                          {index < 5 ? <div className="h-full min-h-8 w-px bg-border" /> : null}
                         </div>
                         <div className="flex-1 rounded-xl border p-3">
                           <div className="flex items-start justify-between gap-3">
