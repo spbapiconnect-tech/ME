@@ -553,7 +553,7 @@ export function InspectionWorkspacePage() {
                             </div>
                             <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                               {item.photoRequired ? <span className="rounded-md border px-2 py-1">Photo required</span> : null}
-                            {item.photoUrls?.[0] ? <span className="rounded-md border px-2 py-1">Photo: {uploadAssetLabel(item.photoUrls[0])}</span> : null}
+                            {item.photoUrls?.[0] ? <span className="rounded-md border px-2 py-1">Photo / Video: {uploadAssetLabel(item.photoUrls[0])}</span> : null}
                               {item.shouldCreateIncident ? <span className="rounded-md border px-2 py-1">Incident suggested</span> : null}
                               {item.correctiveActionRequired ? <span className="rounded-md border px-2 py-1">Corrective action required</span> : null}
                             </div>
@@ -647,7 +647,7 @@ export function InspectionWorkspacePage() {
                           </div>
                           <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                             {item.photoRequired ? <span className="rounded-md border px-2 py-1">Photo required</span> : null}
-                            {item.photoUrls?.[0] ? <span className="rounded-md border px-2 py-1">Photo: {uploadAssetLabel(item.photoUrls[0])}</span> : null}
+                            {item.photoUrls?.[0] ? <span className="rounded-md border px-2 py-1">Photo / Video: {uploadAssetLabel(item.photoUrls[0])}</span> : null}
                             {item.shouldCreateIncident ? <span className="rounded-md border px-2 py-1">Incident suggested</span> : null}
                             {item.correctiveActionRequired ? <span className="rounded-md border px-2 py-1">Corrective action required</span> : null}
                           </div>
@@ -883,10 +883,10 @@ export function InspectionWorkspacePage() {
                       <Badge variant={statusTone(item.severity)}>{item.severity}</Badge>
                     </div>
                     <div className="mt-3 space-y-1.5">
-                      <Label>Failed Item Photo</Label>
+                      <Label>Failed Item Photo / Video</Label>
                       <Input
                         type="file"
-                        accept="image/*"
+                        accept="image/*,video/*"
                         onChange={async (event) => {
                           const asset = await uploadLocalPreviewAsset(event.target.files?.[0], "inspection");
                           updateDraftFailedItemPhoto(item.id, serializeUploadAsset(asset));

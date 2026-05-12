@@ -109,7 +109,7 @@ function renderLinkedSopBlock(block: TaskLinkedSopBlock) {
     return (
       <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
         <div className="font-medium">Image</div>
-        <div className="break-all text-muted-foreground">{block.imageUrl || "Image placeholder not set."}</div>
+        <div className="break-all text-muted-foreground">{block.imageUrl || "Media placeholder not set."}</div>
       </div>
     );
   }
@@ -846,7 +846,7 @@ export function OutletExecutionCommandCenter() {
                     <Button variant="outline" onClick={startTask}><Clock3 className="h-4 w-4" />Start Execution</Button>
                     <Label className="inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-md border px-3 text-sm">
                       <Upload className="h-4 w-4" />Upload New Proof
-                      <Input className="hidden" type="file" accept="image/*" onChange={(event) => uploadProof(event.target.files?.[0]?.name ?? "")} />
+                      <Input className="hidden" type="file" accept="image/*,video/*" onChange={(event) => uploadProof(event.target.files?.[0]?.name ?? "")} />
                     </Label>
                     <Button variant="outline" onClick={submitForReview}><ClipboardList className="h-4 w-4" />Submit For Review</Button>
                     <Button variant="outline" onClick={acceptProof}><CheckCheck className="h-4 w-4" />Accept Proof</Button>
@@ -932,7 +932,7 @@ export function OutletExecutionCommandCenter() {
                           <div className="space-y-1.5"><Label>Step Title</Label><Input value={step.title} onChange={(event) => updateInstructionStep(step.id, { title: event.target.value })} /></div>
                           <div className="space-y-1.5"><Label>Proof Required</Label><Select value={step.proofRequired} onValueChange={(value) => updateInstructionStep(step.id, { proofRequired: value as "Required" | "Not Required" })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Required">Required</SelectItem><SelectItem value="Not Required">Not Required</SelectItem></SelectContent></Select></div>
                           <div className="space-y-1.5 md:col-span-2"><Label>Instruction</Label><Textarea rows={4} value={step.instruction} onChange={(event) => updateInstructionStep(step.id, { instruction: event.target.value })} placeholder="Explain exactly what outlet staff should do in this step." /></div>
-                          <div className="space-y-1.5 md:col-span-2"><Label>Image URL / File Name Placeholder</Label><Input type="file" accept="image/*" onChange={async (event) => {
+                          <div className="space-y-1.5 md:col-span-2"><Label>Image URL / File Name Placeholder</Label><Input type="file" accept="image/*,video/*" onChange={async (event) => {
                               const asset = await uploadLocalPreviewAsset(event.target.files?.[0], "task");
                               updateInstructionStep(step.id, { imageUrl: serializeUploadAsset(asset) });
                             }} />
