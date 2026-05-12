@@ -720,7 +720,7 @@ export function SopTrainingControlPage() {
           className={cn(
             dialogMode === "create"
               ? builderFullscreen
-                ? "fixed inset-x-0 top-[72px] bottom-0 z-50 flex w-[calc(100vw-180px)] max-w-none translate-x-[90px] translate-y-0 flex-col overflow-hidden rounded-none border-l p-0"
+                ? "fixed left-[180px] right-0 top-[56px] bottom-0 z-50 flex max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-l p-0"
                 : "flex h-[90vh] w-[96vw] max-w-[1680px] flex-col overflow-hidden p-0"
               : "max-h-[90vh] overflow-y-auto sm:max-w-[760px]",
           )}
@@ -742,7 +742,7 @@ export function SopTrainingControlPage() {
               {dialogMode === "create" ? (
                 <Button type="button" variant="outline" size="sm" onClick={() => setBuilderFullscreen((current) => !current)}>
                   <Maximize2 className="h-4 w-4" />
-                  {builderFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                  {builderFullscreen ? "Exit Workspace" : "Workspace"}
                 </Button>
               ) : null}
             </div>
@@ -780,8 +780,9 @@ export function SopTrainingControlPage() {
               </div>
 
               <div className="grid min-h-0 gap-0 xl:grid-cols-[minmax(0,1fr)_460px]">
-                <div className="min-h-0 space-y-4 overflow-y-auto p-5">
-                  <div className="flex items-center justify-between">
+                <div className="relative min-h-0 space-y-4 overflow-y-auto p-5">
+                  <div className="sticky top-0 z-20 -mx-5 -mt-5 mb-4 border-b bg-background/95 px-5 py-3 backdrop-blur">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <div className="font-semibold">SOP Content Builder</div>
                     <div className="text-sm text-muted-foreground">Add unlimited pages and blocks. Step lists accept one instruction per line.</div>
