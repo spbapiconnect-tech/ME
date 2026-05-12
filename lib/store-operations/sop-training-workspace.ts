@@ -70,7 +70,7 @@ function parseSopContent(row: ModuleRow | undefined): SopPreviewContent {
 
   const fallbackSteps = detailValue(row, "SOP Steps")
     .split("\n")
-    .map((line, index) => line.trim())
+    .map((line) => line.trim())
     .filter(Boolean)
     .map((line, index) => ({
       id: `${row.id}-fallback-step-${index + 1}`,

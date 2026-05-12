@@ -71,16 +71,12 @@ export type StoreOperationModule = {
 
 export type SopContentSourceType = "builder" | "pdf" | "external-link";
 
-export type SopEmployeeReadMode = "Page View" | "Checklist View" | "PDF View";
-
 export type SopAcknowledgementStatus =
   | "Assigned"
   | "Viewed"
   | "Acknowledged"
   | "Overdue"
   | "Failed";
-
-export type TaskInstructionMode = "Simple" | "Step By Step" | "Linked SOP";
 
 export type TaskStepProofStatus =
   | "Not Required"

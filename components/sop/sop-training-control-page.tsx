@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  BookOpen,
   ClipboardList,
   FileText,
   GraduationCap,
@@ -181,7 +180,7 @@ function serializeContent(mode: SopForm["employeeReadMode"], pages: BuilderPage[
           .filter(Boolean),
         steps: block.stepsText
           .split("\n")
-          .map((line, index) => line.trim())
+          .map((line) => line.trim())
           .filter(Boolean)
           .map((line, index) => ({
             id: `${block.id}-step-${index + 1}`,
