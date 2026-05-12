@@ -696,7 +696,14 @@ export function SopTrainingControlPage() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[980px]">
+        <DialogContent
+          className={cn(
+            "max-h-[92vh]",
+            dialogMode === "create"
+              ? "w-[96vw] max-w-[1680px] overflow-hidden p-0"
+              : "overflow-y-auto sm:max-w-[760px]",
+          )}
+        >
           <DialogHeader>
             <DialogTitle>{dialogMode === "create" ? "Create SOP" : dialogMode === "publish" ? "Publish Version" : dialogMode === "training" ? "Assign Training" : "Create Templates"}</DialogTitle>
             <DialogDescription>
@@ -711,8 +718,12 @@ export function SopTrainingControlPage() {
           </DialogHeader>
 
           {dialogMode === "create" ? (
-            <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
-              <div className="space-y-3">
+            <div className="grid max-h-[82vh] gap-0 overflow-hidden lg:grid-cols-[340px_minmax(0,1fr)]">
+              <div className="space-y-3 overflow-y-auto border-r bg-muted/20 p-5">
+                <div>
+                  <div className="text-sm font-semibold">SOP Setup</div>
+                  <div className="text-xs text-muted-foreground">Define owner, outlet, role, version, and governance before building pages.</div>
+                </div>
                 <div className="space-y-1.5"><Label>SOP Title</Label><Input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5"><Label>Document Code</Label><Input value={form.documentCode} onChange={(e) => setForm((p) => ({ ...p, documentCode: e.target.value }))} /></div>
@@ -737,8 +748,9 @@ export function SopTrainingControlPage() {
                 <div className="space-y-1.5"><Label>Notes</Label><Textarea rows={3} value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} /></div>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
+              <div className="grid min-h-0 gap-0 xl:grid-cols-[minmax(0,1fr)_460px]">
+                <div className="min-h-0 space-y-4 overflow-y-auto p-5">
+                  <div className="flex items-center justify-between">
                   <div>
                     <div className="font-semibold">SOP Content Builder</div>
                     <div className="text-sm text-muted-foreground">Add unlimited pages and blocks. Step lists accept one instruction per line.</div>
@@ -748,7 +760,7 @@ export function SopTrainingControlPage() {
 
                 <div className="space-y-4">
                   {pages.map((page, pageIndex) => (
-                    <Card key={page.id}>
+                    <Card key={page.id} className="border-primary/10">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between gap-3">
                           <CardTitle className="text-base">Page {pageIndex + 1}</CardTitle>
@@ -767,7 +779,7 @@ export function SopTrainingControlPage() {
 
                         <div className="space-y-3">
                           {page.blocks.map((block) => (
-                            <div key={block.id} className="rounded-xl border p-3">
+                            <div key={block.id} className="rounded-xl border bg-background p-4">
                               <div className="mb-3 flex items-center justify-between gap-3">
                                 <Select value={block.type} onValueChange={(value) => updateBlock(page.id, block.id, { type: value as BlockType })}>
                                   <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
@@ -792,11 +804,11 @@ export function SopTrainingControlPage() {
                                 ) : null}
 
                                 {block.type === "step-list" ? (
-                                  <div className="space-y-1.5"><Label>Steps, one instruction per line</Label><Textarea rows={5} value={block.stepsText} onChange={(e) => updateBlock(page.id, block.id, { stepsText: e.target.value })} placeholder={"Wash hands\\nPrepare equipment\\nTake photo proof"} /></div>
+                                  <div className="space-y-1.5"><Label>Steps, one instruction per line</Label><Textarea rows={7} value={block.stepsText} onChange={(e) => updateBlock(page.id, block.id, { stepsText: e.target.value })} placeholder={"Wash hands\\nPrepare equipment\\nTake photo proof"} /></div>
                                 ) : null}
 
                                 {block.type === "checklist" ? (
-                                  <div className="space-y-1.5"><Label>Checklist Items, one per line</Label><Textarea rows={4} value={block.checklistText} onChange={(e) => updateBlock(page.id, block.id, { checklistText: e.target.value })} /></div>
+                                  <div className="space-y-1.5"><Label>Checklist Items, one per line</Label><Textarea rows={6} value={block.checklistText} onChange={(e) => updateBlock(page.id, block.id, { checklistText: e.target.value })} /></div>
                                 ) : null}
                               </div>
                             </div>
@@ -807,8 +819,16 @@ export function SopTrainingControlPage() {
                   ))}
                 </div>
 
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Live Employee Preview</CardTitle></CardHeader>
+                </div>
+
+                <div className="min-h-0 overflow-y-auto border-l bg-muted/10 p-5">
+                <Card className="sticky top-0">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between gap-3 text-base">
+                      <span>Live Employee Preview</span>
+                      <Badge variant="outline">{createPreview.pages.length} Pages</Badge>
+                    </CardTitle>
+                  </CardHeader>
                   <CardContent className="space-y-3">
                     {createPreview.pages.map((page) => (
                       <div key={page.id} className="rounded-xl border p-3">
@@ -822,6 +842,7 @@ export function SopTrainingControlPage() {
                     ))}
                   </CardContent>
                 </Card>
+                </div>
               </div>
             </div>
           ) : null}
