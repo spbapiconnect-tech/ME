@@ -731,7 +731,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
           className={cn(
             dialogMode === "create"
               ? builderFullscreen
-                ? "fixed left-[180px] right-0 top-[56px] bottom-0 z-50 flex max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-l p-0"
+                ? "workspace-dialog-content fixed left-[180px] right-0 top-[56px] bottom-0 z-50 flex max-w-none translate-x-0 translate-y-0 flex-col overflow-hidden rounded-none border-l bg-background p-0 shadow-none"
                 : "flex h-[90vh] w-[96vw] max-w-[1680px] flex-col overflow-hidden p-0"
               : "max-h-[90vh] overflow-y-auto sm:max-w-[760px]",
           )}
@@ -792,7 +792,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
 
               <div className="grid min-h-0 gap-0 xl:grid-cols-[minmax(0,1fr)_460px]">
                 <div className="min-h-0 space-y-4 overflow-y-auto p-5">
-                  <div className="sticky top-0 z-20 -mx-5 -mt-5 mb-4 border-b bg-background/95 px-5 py-3 backdrop-blur">
+                  <div className="sticky top-0 z-30 -mx-5 mb-4 border-b bg-background px-5 py-4 shadow-sm">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
