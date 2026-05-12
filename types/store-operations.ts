@@ -146,6 +146,97 @@ export type TaskInstructionStep = {
   completed?: boolean;
 };
 
+
+export type SopBlockType =
+  | "heading"
+  | "text"
+  | "image"
+  | "step-list"
+  | "warning"
+  | "pdf"
+  | "checklist";
+
+export type SopEmployeeReadMode = "Interactive Book" | "Checklist View" | "PDF View" | "Mixed";
+
+export type SopContentStep = {
+  id: string;
+  title?: string;
+  instruction: string;
+  imageUrl?: string;
+  proofRequired?: boolean;
+  required?: boolean;
+};
+
+export type SopContentBlock = {
+  id: string;
+  type: SopBlockType;
+  title?: string;
+  body?: string;
+  imageUrl?: string;
+  pdfUrl?: string;
+  checklistItems?: string[];
+  steps?: SopContentStep[];
+  warningLevel?: "Info" | "Warning" | "Critical";
+};
+
+export type SopContentPage = {
+  id: string;
+  pageNo: number;
+  title: string;
+  coverImageUrl?: string;
+  blocks: SopContentBlock[];
+};
+
+export type SopContent = {
+  mode: SopEmployeeReadMode;
+  pages: SopContentPage[];
+};
+
+export type SopAssignmentTarget = {
+  branchIds: string[];
+  roleIds: string[];
+  staffIds?: string[];
+  dueAt?: string;
+  requiresAcknowledgement?: boolean;
+};
+
+export type SopAcknowledgementStatus = "Assigned" | "Viewed" | "Acknowledged" | "Overdue" | "Failed";
+
+export type SopAcknowledgement = {
+  id: string;
+  sopId: string;
+  branchId?: string;
+  staffId?: string;
+  roleId?: string;
+  status: SopAcknowledgementStatus;
+  assignedAt: string;
+  viewedAt?: string;
+  acknowledgedAt?: string;
+};
+
+export type TaskInstructionMode = "Simple" | "Step By Step" | "Linked SOP";
+
+export type TaskStepProofStatus =
+  | "Not Required"
+  | "Required"
+  | "Missing"
+  | "Submitted"
+  | "Accepted"
+  | "Rejected";
+
+export type TaskInstructionStep = {
+  id: string;
+  stepNo: number;
+  title: string;
+  instruction: string;
+  imageUrl?: string;
+  linkedSopPageId?: string;
+  proofRequired?: boolean;
+  proofStatus?: TaskStepProofStatus;
+  proofUrls?: string[];
+  completed?: boolean;
+};
+
 type BaseOperationRecord = {
   id: string;
   status: StoreOperationStatusFlow;

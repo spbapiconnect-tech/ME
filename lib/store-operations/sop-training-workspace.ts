@@ -11,12 +11,93 @@ import {
   calculateTrainingPendingCount,
 } from "@/lib/calculators/store-operation-calculators";
 
+export type SopPreviewStep = {
+  id: string;
+  title?: string;
+  instruction: string;
+  imageUrl?: string;
+  proofRequired?: boolean;
+};
+
+export type SopPreviewBlock = {
+  id: string;
+  type: "heading" | "text" | "image" | "step-list" | "warning" | "pdf" | "checklist";
+  title?: string;
+  body?: string;
+  imageUrl?: string;
+  pdfUrl?: string;
+  checklistItems?: string[];
+  steps?: SopPreviewStep[];
+  warningLevel?: "Info" | "Warning" | "Critical";
+};
+
+export type SopPreviewPage = {
+  id: string;
+  pageNo: number;
+  title: string;
+  coverImageUrl?: string;
+  blocks: SopPreviewBlock[];
+};
+
+export type SopPreviewContent = {
+  mode: "Interactive Book" | "Checklist View" | "PDF View" | "Mixed";
+  pages: SopPreviewPage[];
+};
+
 function detailValue(row: ModuleRow, label: string) {
   return row.detailItems?.find((item) => item.label === label)?.value ?? "";
 }
 
 function splitList(value: string) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
+}
+
+function parseSopContent(row: ModuleRow | undefined): SopPreviewContent {
+  if (!row) return { mode: "Interactive Book", pages: [] };
+
+  const raw = detailValue(row, "SOP Content JSON");
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as SopPreviewContent;
+      return {
+        mode: parsed.mode || "Interactive Book",
+        pages: Array.isArray(parsed.pages) ? parsed.pages : [],
+      };
+    } catch {
+      // fallback below
+    }
+  }
+
+  const fallbackSteps = detailValue(row, "SOP Steps")
+    .split("\n")
+    .map((line, index) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => ({
+      id: `${row.id}-fallback-step-${index + 1}`,
+      title: `Step ${index + 1}`,
+      instruction: line,
+    }));
+
+  if (!fallbackSteps.length) return { mode: "Interactive Book", pages: [] };
+
+  return {
+    mode: "Interactive Book",
+    pages: [
+      {
+        id: `${row.id}-fallback-page-1`,
+        pageNo: 1,
+        title: "Page 1 · SOP Steps",
+        blocks: [
+          {
+            id: `${row.id}-fallback-block-1`,
+            type: "step-list",
+            title: "Execution Steps",
+            steps: fallbackSteps,
+          },
+        ],
+      },
+    ],
+  };
 }
 
 export function getSopLifecycleTone(status: string): "outline" | "secondary" | "destructive" {
@@ -95,79 +176,11 @@ export function getTemplateGeneratorQueue(sops: ModuleRow[]) {
     }));
 }
 
-
-function buildSopPages(sop: ModuleRow) {
-  const pageConfigs = [
-    {
-      id: `${sop.id}-page-1`,
-      pageNo: 1,
-      title: detailValue(sop, "SOP Page 1 Title"),
-      description: detailValue(sop, "SOP Page 1 Description"),
-      steps: detailValue(sop, "SOP Page 1 Steps"),
-      imageUrl: detailValue(sop, "SOP Page 1 Image URL"),
-    },
-    {
-      id: `${sop.id}-page-2`,
-      pageNo: 2,
-      title: detailValue(sop, "SOP Page 2 Title"),
-      description: detailValue(sop, "SOP Page 2 Description"),
-      steps: detailValue(sop, "SOP Page 2 Steps"),
-      imageUrl: detailValue(sop, "SOP Page 2 Image URL"),
-    },
-  ];
-
-  const pages = pageConfigs
-    .filter((page) => page.title || page.description || page.steps || page.imageUrl)
-    .map((page) => ({
-      id: page.id,
-      pageNo: page.pageNo,
-      title: page.title || `Page ${page.pageNo}`,
-      description: page.description,
-      imageUrl: page.imageUrl,
-      steps: page.steps
-        .split("\n")
-        .map((line, index) => line.trim())
-        .filter(Boolean)
-        .map((line, index) => ({
-          id: `${page.id}-step-${index + 1}`,
-          stepNo: index + 1,
-          title: `Step ${index + 1}`,
-          instruction: line,
-          required: true,
-        })),
-    }));
-
-  if (!pages.length) {
-    const fallbackSteps = detailValue(sop, "SOP Steps")
-      .split("\n")
-      .map((line, index) => line.trim())
-      .filter(Boolean)
-      .map((line, index) => ({
-        id: `${sop.id}-fallback-step-${index + 1}`,
-        stepNo: index + 1,
-        title: `Step ${index + 1}`,
-        instruction: line,
-        required: true,
-      }));
-
-    if (fallbackSteps.length) {
-      pages.push({
-        id: `${sop.id}-page-1`,
-        pageNo: 1,
-        title: "Page 1 · SOP Steps",
-        description: "Generated from fallback SOP steps.",
-        imageUrl: "",
-        steps: fallbackSteps,
-      });
-    }
-  }
-
-  return pages;
-}
-
 export function getSopNextActions(sop?: ModuleRow) {
   if (!sop) return [];
-  const actions = ["Review SOP lifecycle and assignment"]; 
+  const actions = ["Review SOP lifecycle and assignment"];
+  const content = parseSopContent(sop);
+  if (!content.pages.length) actions.push("Build employee reading pages");
   if (!detailValue(sop, "Linked Checklist Template IDs")) actions.push("Create checklist template");
   if (!detailValue(sop, "Linked Inspection Template IDs")) actions.push("Create inspection template");
   if (!detailValue(sop, "Linked Task Template IDs")) actions.push("Create task template");
@@ -178,6 +191,7 @@ export function getSopNextActions(sop?: ModuleRow) {
 
 export function getSopDetail(sop?: ModuleRow) {
   if (!sop) return null;
+  const content = parseSopContent(sop);
   return {
     row: sop,
     title: sop.title,
@@ -194,16 +208,13 @@ export function getSopDetail(sop?: ModuleRow) {
     targetBranch: detailValue(sop, "Target Branch") || "All Branches",
     acknowledgementRequired: detailValue(sop, "Acknowledgement Required") || "No",
     acknowledgementStatus: detailValue(sop, "Acknowledgement Status") || "Not Required",
-    employeeReadMode: detailValue(sop, "Employee Read Mode") || "Page View",
-    contentSourceType: detailValue(sop, "Content Source Type") || "builder",
-    pdfUrl: detailValue(sop, "PDF URL"),
-    pages: buildSopPages(sop),
     riskPoints: splitList(detailValue(sop, "Risk Points")),
     steps: detailValue(sop, "SOP Steps").split("\n").map((item) => item.trim()).filter(Boolean),
     linkedChecklist: splitList(detailValue(sop, "Linked Checklist Template IDs")),
     linkedInspection: splitList(detailValue(sop, "Linked Inspection Template IDs")),
     linkedTask: splitList(detailValue(sop, "Linked Task Template IDs")),
     linkedTraining: splitList(detailValue(sop, "Assigned Training IDs")),
+    content,
   };
 }
 
