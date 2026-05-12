@@ -296,6 +296,7 @@ export function SopTrainingControlPage() {
   const [dialogMode, setDialogMode] = useState<ModalMode>("create");
   const [builderFullscreen, setBuilderFullscreen] = useState(false);
   const [pages, setPages] = useState<BuilderPage[]>([newPage(1)]);
+  const [selectedPageId, setSelectedPageId] = useState<string>("");
   const [form, setForm] = useState<SopForm>({
     title: "",
     documentCode: "",
@@ -328,6 +329,12 @@ export function SopTrainingControlPage() {
   useEffect(() => {
     hydrateFromFoundation();
   }, [hydrateFromFoundation]);
+
+  useEffect(() => {
+    if (!selectedPageId && pages[0]?.id) {
+      setSelectedPageId(pages[0].id);
+    }
+  }, [pages, selectedPageId]);
 
   const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   const governance = useMemo(() => getSopGovernanceSummary(sopRows, taskRows), [sopRows, taskRows]);
@@ -383,7 +390,13 @@ export function SopTrainingControlPage() {
         targetBranch: detailValue(selectedSop, "Target Branch") || current.targetBranch,
       }));
     }
-    if (mode === "create" && !pages.length) setPages([newPage(1)]);
+    if (mode === "create" && !pages.length) {
+      const firstPage = newPage(1);
+      setPages([firstPage]);
+      setSelectedPageId(firstPage.id);
+    } else if (mode === "create" && pages.length && !selectedPageId) {
+      setSelectedPageId(pages[0].id);
+    }
     setBuilderFullscreen(false);
     setDialogMode(mode);
     setDialogOpen(true);
@@ -788,11 +801,15 @@ export function SopTrainingControlPage() {
                         <div className="text-sm text-muted-foreground">Add pages and blocks while editing without scrolling back to the top.</div>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <Button variant="outline" size="sm" onClick={() => setPages((current) => [...current, newPage(current.length + 1)])}><Plus className="h-4 w-4" />Add Page</Button>
-                        {pages[0] ? (
+                        <Button variant="outline" size="sm" onClick={() => {
+                          const nextPage = newPage(pages.length + 1);
+                          setPages((current) => [...current, nextPage]);
+                          setSelectedPageId(nextPage.id);
+                        }}><Plus className="h-4 w-4" />Add Page</Button>
+                        {activeBuilderPageId ? (
                           <>
                             {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
-                              <Button key={type} type="button" variant="outline" size="sm" onClick={() => addBlock(pages[0].id, type)}>+ {type}</Button>
+                              <Button key={type} type="button" variant="outline" size="sm" onClick={() => addBlock(activeBuilderPageId, type)}>+ {type}</Button>
                             ))}
                           </>
                         ) : null}
@@ -802,11 +819,22 @@ export function SopTrainingControlPage() {
 
                 <div className="space-y-4">
                   {pages.map((page, pageIndex) => (
-                    <Card key={page.id} className="border-primary/10">
+                    <Card
+                      key={page.id}
+                      onClick={() => setSelectedPageId(page.id)}
+                      className={cn("border-primary/10 transition-colors", activeBuilderPageId === page.id ? "border-primary bg-primary/5" : "")}
+                    >
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between gap-3">
                           <CardTitle className="text-base">Page {pageIndex + 1}</CardTitle>
-                          <Button variant="ghost" size="sm" onClick={() => setPages((current) => current.filter((item) => item.id !== page.id))} disabled={pages.length === 1}><Trash2 className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="sm" onClick={(event) => {
+                            event.stopPropagation();
+                            setPages((current) => {
+                              const next = current.filter((item) => item.id !== page.id);
+                              if (activeBuilderPageId === page.id) setSelectedPageId(next[0]?.id || "");
+                              return next;
+                            });
+                          }} disabled={pages.length === 1}><Trash2 className="h-4 w-4" /></Button>
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
