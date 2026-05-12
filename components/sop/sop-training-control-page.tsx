@@ -536,7 +536,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     return (
       <ErpShell>
         <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
-          <div className="shrink-0 border-b px-5 py-4">
+          <div className="shrink-0 border-b bg-background px-5 py-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-sm text-muted-foreground">SOP & Training</div>
@@ -549,6 +549,30 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                   await createSop();
                   setBuilderMode(false);
                 }}>Create SOP</Button>
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/20 px-4 py-3">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="font-semibold">SOP Content Builder</div>
+                  <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">{activeBuilderPageLabel}</span>
+                </div>
+                <div className="text-sm text-muted-foreground">Add pages and blocks while editing. New blocks are added to the selected page.</div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" onClick={() => {
+                  const nextPage = newPage(pages.length + 1);
+                  setPages((current) => [...current, nextPage]);
+                  setSelectedPageId(nextPage.id);
+                }}><Plus className="h-4 w-4" />Add Page</Button>
+                {activeBuilderPageId ? (
+                  <>
+                    {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
+                      <Button key={type} type="button" variant="outline" size="sm" onClick={() => addBlock(activeBuilderPageId, type)}>+ {type}</Button>
+                    ))}
+                  </>
+                ) : null}
               </div>
             </div>
           </div>
@@ -585,32 +609,6 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
 
             <div className="grid min-h-0 gap-0 xl:grid-cols-[minmax(0,1fr)_460px]">
               <div className="min-h-0 space-y-4 overflow-y-auto p-5">
-                <div className="sticky top-0 z-30 -mx-5 mb-4 border-b bg-background px-5 py-4 shadow-sm">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <div className="font-semibold">SOP Content Builder</div>
-                        <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">{activeBuilderPageLabel}</span>
-                      </div>
-                      <div className="text-sm text-muted-foreground">Add pages and blocks while editing without scrolling back to the top.</div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button variant="outline" size="sm" onClick={() => {
-                        const nextPage = newPage(pages.length + 1);
-                        setPages((current) => [...current, nextPage]);
-                        setSelectedPageId(nextPage.id);
-                      }}><Plus className="h-4 w-4" />Add Page</Button>
-                      {activeBuilderPageId ? (
-                        <>
-                          {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
-                            <Button key={type} type="button" variant="outline" size="sm" onClick={() => addBlock(activeBuilderPageId, type)}>+ {type}</Button>
-                          ))}
-                        </>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-
                 <div className="space-y-4">
                   {pages.map((page, pageIndex) => (
                     <Card
