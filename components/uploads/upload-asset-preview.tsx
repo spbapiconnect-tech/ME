@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { cn } from "@/lib/utils";
 import { parseUploadAsset, uploadAssetLabel } from "@/lib/uploads/upload-provider";
 
