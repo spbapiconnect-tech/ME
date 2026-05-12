@@ -82,8 +82,6 @@ export type SopStep = {
   required?: boolean;
 };
 
-export type SopContentPage = {
-  id: string;
   pageNo: number;
   title: string;
   description?: string;
@@ -93,16 +91,12 @@ export type SopContentPage = {
   steps?: SopStep[];
 };
 
-export type SopAssignmentTarget = {
-  branchIds: string[];
   roleIds: string[];
   staffIds?: string[];
   dueAt?: string;
   requiresAcknowledgement?: boolean;
 };
 
-export type SopAcknowledgement = {
-  id: string;
   sopId: string;
   branchId?: string;
   staffId?: string;
@@ -113,8 +107,6 @@ export type SopAcknowledgement = {
   acknowledgedAt?: string;
 };
 
-export type TaskInstructionStep = {
-  id: string;
   stepNo: number;
   title: string;
   instruction: string;
