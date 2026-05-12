@@ -781,13 +781,24 @@ export function SopTrainingControlPage() {
 
               <div className="grid min-h-0 gap-0 xl:grid-cols-[minmax(0,1fr)_460px]">
                 <div className="min-h-0 space-y-4 overflow-y-auto p-5">
-                  <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold">SOP Content Builder</div>
-                    <div className="text-sm text-muted-foreground">Add unlimited pages and blocks. Step lists accept one instruction per line.</div>
+                  <div className="sticky top-0 z-20 -mx-5 -mt-5 mb-4 border-b bg-background/95 px-5 py-3 backdrop-blur">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div>
+                        <div className="font-semibold">SOP Content Builder</div>
+                        <div className="text-sm text-muted-foreground">Add pages and blocks while editing without scrolling back to the top.</div>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" onClick={() => setPages((current) => [...current, newPage(current.length + 1)])}><Plus className="h-4 w-4" />Add Page</Button>
+                        {pages[0] ? (
+                          <>
+                            {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
+                              <Button key={type} type="button" variant="outline" size="sm" onClick={() => addBlock(pages[0].id, type)}>+ {type}</Button>
+                            ))}
+                          </>
+                        ) : null}
+                      </div>
+                    </div>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setPages((current) => [...current, newPage(current.length + 1)])}><Plus className="h-4 w-4" />Add Page</Button>
-                </div>
 
                 <div className="space-y-4">
                   {pages.map((page, pageIndex) => (
