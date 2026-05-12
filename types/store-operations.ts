@@ -71,21 +71,6 @@ export type StoreOperationModule = {
 
 export type SopContentSourceType = "builder" | "pdf" | "external-link";
 
-export type SopAcknowledgementStatus =
-  | "Assigned"
-  | "Viewed"
-  | "Acknowledged"
-  | "Overdue"
-  | "Failed";
-
-export type TaskStepProofStatus =
-  | "Not Required"
-  | "Required"
-  | "Missing"
-  | "Submitted"
-  | "Accepted"
-  | "Rejected";
-
 export type SopStep = {
   id: string;
   stepNo: number;
