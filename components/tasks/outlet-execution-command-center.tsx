@@ -186,6 +186,24 @@ function monthDays(anchor: Date) {
 
 type TaskFormMode = "new" | "corrective" | "recheck";
 
+type TaskInstructionBuilderStep = {
+  id: string;
+  title: string;
+  instruction: string;
+  imageUrl: string;
+  proofRequired: "Required" | "Not Required";
+};
+
+function newTaskInstructionStep(index: number): TaskInstructionBuilderStep {
+  return {
+    id: `task-step-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    title: `Step ${index}`,
+    instruction: "",
+    imageUrl: "",
+    proofRequired: "Not Required",
+  };
+}
+
 type TaskForm = {
   title: string;
   taskType: string;
@@ -235,6 +253,10 @@ export function OutletExecutionCommandCenter() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<TaskFormMode>("new");
+  const [instructionMode, setInstructionMode] = useState<"Simple" | "Step By Step" | "Linked SOP">("Simple");
+  const [instructionSteps, setInstructionSteps] = useState<TaskInstructionBuilderStep[]>([
+    newTaskInstructionStep(1),
+  ]);
   const [form, setForm] = useState<TaskForm>({
     title: "",
     taskType: "Daily Operation",
@@ -306,6 +328,18 @@ export function OutletExecutionCommandCenter() {
   const nextActions = useMemo(() => getExecutionNextActions(selectedTask), [selectedTask]);
   const branchOptions = useMemo(() => branchRows.map((row) => row.title), [branchRows]);
 
+  function updateInstructionStep(stepId: string, patch: Partial<TaskInstructionBuilderStep>) {
+    setInstructionSteps((current) => current.map((step) => step.id === stepId ? { ...step, ...patch } : step));
+  }
+
+  function addInstructionStep() {
+    setInstructionSteps((current) => [...current, newTaskInstructionStep(current.length + 1)]);
+  }
+
+  function removeInstructionStep(stepId: string) {
+    setInstructionSteps((current) => current.length <= 1 ? current : current.filter((step) => step.id !== stepId));
+  }
+
   function openNewTask() {
     setDialogMode("new");
     setForm((current) => ({
@@ -321,6 +355,8 @@ export function OutletExecutionCommandCenter() {
       requiredNewProof: "",
       rejectionInstruction: "",
     }));
+    setInstructionMode("Simple");
+    setInstructionSteps([newTaskInstructionStep(1)]);
     setDialogOpen(true);
   }
 
@@ -381,6 +417,22 @@ export function OutletExecutionCommandCenter() {
         { label: "Due At", value: dueAt },
         { label: "Repeat Rule", value: form.repeatRule },
         { label: "Completion Standard", value: form.completionStandard },
+        { label: "Instruction Mode", value: instructionMode },
+        {
+          label: "Task Instruction JSON",
+          value: JSON.stringify({
+            mode: instructionMode,
+            steps: instructionSteps.map((step, index) => ({
+              id: step.id,
+              stepNo: index + 1,
+              title: step.title || `Step ${index + 1}`,
+              instruction: step.instruction,
+              imageUrl: step.imageUrl,
+              proofRequired: step.proofRequired === "Required",
+              proofStatus: step.proofRequired === "Required" ? "Required" : "Not Required",
+            })).filter((step) => step.title || step.instruction || step.imageUrl),
+          }),
+        },
         { label: "Checklist Items", value: form.checklist },
         { label: "Photo Required", value: form.photoProofRequired },
         { label: "Photo Proof Status", value: form.photoProofRequired === "Required" ? "Missing" : "Not Required" },
@@ -672,6 +724,65 @@ export function OutletExecutionCommandCenter() {
                     const isTrainingTask = detail.taskType === "Training Acknowledgement" || Boolean(detailValue(detail.row, "Linked SOP ID")) || Boolean(linkedSopName);
 
                     if (!isTrainingTask) {
+                      const taskInstructionMode = detailValue(detail.row, "Instruction Mode") || "Simple";
+                      const rawTaskInstruction = detailValue(detail.row, "Task Instruction JSON");
+                      let taskSteps: Array<{
+                        id: string;
+                        stepNo: number;
+                        title: string;
+                        instruction: string;
+                        imageUrl?: string;
+                        proofRequired?: boolean;
+                        proofStatus?: string;
+                      }> = [];
+
+                      if (rawTaskInstruction) {
+                        try {
+                          const parsed = JSON.parse(rawTaskInstruction) as { steps?: typeof taskSteps };
+                          taskSteps = Array.isArray(parsed.steps) ? parsed.steps : [];
+                        } catch {
+                          taskSteps = [];
+                        }
+                      }
+
+                      if (taskInstructionMode === "Step By Step") {
+                        return (
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <p className="text-sm font-semibold">Task Step-by-Step Instructions</p>
+                              <Badge variant="outline">{taskSteps.length} Steps</Badge>
+                            </div>
+                            {!taskSteps.length ? (
+                              <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No step-by-step instructions were added for this task.</div>
+                            ) : taskSteps.map((step) => (
+                              <div key={step.id} className="rounded-xl border p-3 text-sm">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <div className="text-xs font-medium uppercase text-muted-foreground">Step {step.stepNo}</div>
+                                    <div className="font-semibold">{step.title}</div>
+                                  </div>
+                                  <Badge variant={step.proofRequired ? "secondary" : "outline"}>{step.proofRequired ? "Proof Required" : "No Proof"}</Badge>
+                                </div>
+                                <div className="mt-2 whitespace-pre-wrap text-muted-foreground">{step.instruction || "No instruction."}</div>
+                                {step.imageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Image: {step.imageUrl}</div> : null}
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      }
+
+                      if (taskInstructionMode === "Linked SOP") {
+                        return (
+                          <div className="space-y-2">
+                            <p className="text-sm font-semibold">Linked SOP Instruction</p>
+                            <div className="rounded-lg border px-3 py-2 text-sm">
+                              <div className="font-medium">{detailValue(detail.row, "Linked SOP") || "Linked SOP"}</div>
+                              <div className="text-muted-foreground">This task is intended to follow a linked SOP. Add SOP content through SOP & Training, then assign it as a training task for full employee preview.</div>
+                            </div>
+                          </div>
+                        );
+                      }
+
                       return (
                         <div className="space-y-2">
                           <p className="text-sm font-semibold">Task Instructions</p>
@@ -753,7 +864,12 @@ export function OutletExecutionCommandCenter() {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[860px]">
+        <DialogContent
+          className={cn(
+            "max-h-[90vh] overflow-y-auto",
+            dialogMode === "new" ? "w-[94vw] max-w-[1320px]" : "sm:max-w-[860px]",
+          )}
+        >
           <DialogHeader>
             <DialogTitle>{dialogMode === "corrective" ? "Create Corrective Action" : dialogMode === "recheck" ? "Request Photo Recheck" : "New Outlet Task"}</DialogTitle>
             <DialogDescription>
@@ -783,6 +899,51 @@ export function OutletExecutionCommandCenter() {
               <div className="space-y-1.5"><Label>Manager Note</Label><Textarea value={form.managerNote} onChange={(event) => setForm((current) => ({ ...current, managerNote: event.target.value }))} /></div>
               <div className="space-y-1.5"><Label>Linked SOP</Label><Input value={form.linkedSop} onChange={(event) => setForm((current) => ({ ...current, linkedSop: event.target.value }))} /></div>
             </div>
+
+            {dialogMode === "new" ? (
+              <div className="space-y-3 rounded-md border p-3">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <div className="text-sm font-semibold">Execution Instruction Builder</div>
+                    <div className="text-xs text-muted-foreground">Choose simple instruction, step-by-step execution, or linked SOP mode.</div>
+                  </div>
+                  <div className="w-full md:w-56">
+                    <Select value={instructionMode} onValueChange={(value) => setInstructionMode(value as "Simple" | "Step By Step" | "Linked SOP")}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Simple">Simple</SelectItem>
+                        <SelectItem value="Step By Step">Step By Step</SelectItem>
+                        <SelectItem value="Linked SOP">Linked SOP</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {instructionMode === "Step By Step" ? (
+                  <div className="space-y-3">
+                    {instructionSteps.map((step, index) => (
+                      <div key={step.id} className="rounded-xl border bg-background p-3">
+                        <div className="mb-3 flex items-center justify-between gap-3">
+                          <div className="text-sm font-medium">Step {index + 1}</div>
+                          <Button type="button" variant="ghost" size="sm" onClick={() => removeInstructionStep(step.id)} disabled={instructionSteps.length === 1}>Remove</Button>
+                        </div>
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <div className="space-y-1.5"><Label>Step Title</Label><Input value={step.title} onChange={(event) => updateInstructionStep(step.id, { title: event.target.value })} /></div>
+                          <div className="space-y-1.5"><Label>Proof Required</Label><Select value={step.proofRequired} onValueChange={(value) => updateInstructionStep(step.id, { proofRequired: value as "Required" | "Not Required" })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="Required">Required</SelectItem><SelectItem value="Not Required">Not Required</SelectItem></SelectContent></Select></div>
+                          <div className="space-y-1.5 md:col-span-2"><Label>Instruction</Label><Textarea rows={4} value={step.instruction} onChange={(event) => updateInstructionStep(step.id, { instruction: event.target.value })} placeholder="Explain exactly what outlet staff should do in this step." /></div>
+                          <div className="space-y-1.5 md:col-span-2"><Label>Image URL / File Name Placeholder</Label><Input value={step.imageUrl} onChange={(event) => updateInstructionStep(step.id, { imageUrl: event.target.value })} /></div>
+                        </div>
+                      </div>
+                    ))}
+                    <Button type="button" variant="outline" onClick={addInstructionStep}><Plus className="h-4 w-4" />Add Step</Button>
+                  </div>
+                ) : instructionMode === "Linked SOP" ? (
+                  <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">Enter the linked SOP name above. For full page-by-page SOP preview, assign the SOP from SOP & Training so the task receives SOP Content JSON.</div>
+                ) : (
+                  <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">Simple mode will use Completion Standard as the main staff instruction.</div>
+                )}
+              </div>
+            ) : null}
             {dialogMode !== "new" ? (
               <div className="grid gap-3 rounded-md border p-3 md:grid-cols-2">
                 <div className="space-y-1.5"><Label>Linked Incident</Label><Select value={form.linkedIncidentId || undefined} onValueChange={(value) => setForm((current) => ({ ...current, linkedIncidentId: value }))}><SelectTrigger><SelectValue placeholder="Select incident" /></SelectTrigger><SelectContent>{incidentRows.map((item) => <SelectItem key={item.id} value={item.id}>{item.title}</SelectItem>)}</SelectContent></Select></div>
