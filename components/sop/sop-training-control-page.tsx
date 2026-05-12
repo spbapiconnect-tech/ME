@@ -539,6 +539,8 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   const createPreview = serializeContent(form.employeeReadMode, pages);
 
   const activeBuilderPageId = selectedPageId || pages[0]?.id || "";
+  const activeBuilderPageIndex = Math.max(0, pages.findIndex((page) => page.id === activeBuilderPageId));
+  const activeBuilderPageLabel = activeBuilderPageId ? `Adding to Page ${activeBuilderPageIndex + 1}` : "Select a page";
 
   return (
     <ErpShell>
@@ -793,7 +795,10 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                   <div className="sticky top-0 z-20 -mx-5 -mt-5 mb-4 border-b bg-background/95 px-5 py-3 backdrop-blur">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <div className="font-semibold">SOP Content Builder</div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="font-semibold">SOP Content Builder</div>
+                          <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">{activeBuilderPageLabel}</span>
+                        </div>
                         <div className="text-sm text-muted-foreground">Add pages and blocks while editing without scrolling back to the top.</div>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -822,7 +827,10 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                     >
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between gap-3">
-                          <CardTitle className="text-base">Page {pageIndex + 1}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-base">Page {pageIndex + 1}</CardTitle>
+                            {activeBuilderPageId === page.id ? <span className="rounded-full border border-primary/40 px-2 py-0.5 text-xs text-primary">Selected</span> : null}
+                          </div>
                           <Button variant="ghost" size="sm" onClick={(event) => {
                             event.stopPropagation();
                             setPages((current) => {
