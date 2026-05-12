@@ -296,6 +296,7 @@ export function SopTrainingControlPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("create");
   const [builderFullscreen, setBuilderFullscreen] = useState(false);
+  const [builderMode, setBuilderMode] = useState(false);
   const [pages, setPages] = useState<BuilderPage[]>([newPage(1)]);
   const [selectedPageId, setSelectedPageId] = useState<string>("");
   const [form, setForm] = useState<SopForm>({
@@ -542,6 +543,205 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   const activeBuilderPageIndex = Math.max(0, pages.findIndex((page) => page.id === activeBuilderPageId));
   const activeBuilderPageLabel = activeBuilderPageId ? `Adding to Page ${activeBuilderPageIndex + 1}` : "Select a page";
 
+  if (builderMode) {
+    return (
+      <ErpShell>
+        <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
+          <div className="shrink-0 border-b px-5 py-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div className="text-sm text-muted-foreground">SOP & Training</div>
+                <h1 className="text-2xl font-semibold tracking-tight">Create SOP</h1>
+                <p className="text-sm text-muted-foreground">Build an employee-readable SOP with pages, images, step lists, PDF blocks, and checklist blocks.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => setBuilderMode(false)}>Back</Button>
+                <Button onClick={async () => {
+                  await createSop();
+                  setBuilderMode(false);
+                }}>Create SOP</Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[340px_minmax(0,1fr)]">
+            <div className="space-y-3 overflow-y-auto border-r bg-muted/20 p-5">
+              <div>
+                <div className="text-sm font-semibold">SOP Setup</div>
+                <div className="text-xs text-muted-foreground">Define owner, outlet, role, version, and governance before building pages.</div>
+              </div>
+              <div className="space-y-1.5"><Label>SOP Title</Label><Input value={form.title} onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))} /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5"><Label>Document Code</Label><Input value={form.documentCode} onChange={(e) => setForm((p) => ({ ...p, documentCode: e.target.value }))} /></div>
+                <div className="space-y-1.5"><Label>Version</Label><Input value={form.version} onChange={(e) => setForm((p) => ({ ...p, version: e.target.value }))} /></div>
+              </div>
+              <div className="space-y-1.5"><Label>Category</Label><Select value={form.category} onValueChange={(value) => setForm((p) => ({ ...p, category: value }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{categoryOptions.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
+              <div className="space-y-1.5"><Label>Process Area</Label><Select value={form.processArea} onValueChange={(value) => setForm((p) => ({ ...p, processArea: value }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{processAreaOptions.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
+              <div className="space-y-1.5"><Label>Employee Read Mode</Label><Select value={form.employeeReadMode} onValueChange={(value) => setForm((p) => ({ ...p, employeeReadMode: value as SopForm["employeeReadMode"] }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["Interactive Book", "Checklist View", "PDF View", "Mixed"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5"><Label>Owner</Label><Input value={form.processOwner} onChange={(e) => setForm((p) => ({ ...p, processOwner: e.target.value }))} /></div>
+                <div className="space-y-1.5"><Label>Approver</Label><Input value={form.approver} onChange={(e) => setForm((p) => ({ ...p, approver: e.target.value }))} /></div>
+              </div>
+              <div className="space-y-1.5"><Label>Target Outlet</Label><Select value={form.targetBranch || undefined} onValueChange={(value) => setForm((p) => ({ ...p, targetBranch: value }))}><SelectTrigger><SelectValue placeholder="Select outlet" /></SelectTrigger><SelectContent>{branchOptions.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
+              <div className="space-y-1.5"><Label>Target Role</Label><Input value={form.targetRole} onChange={(e) => setForm((p) => ({ ...p, targetRole: e.target.value }))} /></div>
+              <div className="space-y-1.5"><Label>Acknowledgement Required</Label><Select value={form.acknowledgementRequired} onValueChange={(value) => setForm((p) => ({ ...p, acknowledgementRequired: value }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["Yes", "No"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5"><Label>Effective Date</Label><Input type="date" value={form.effectiveDate} onChange={(e) => setForm((p) => ({ ...p, effectiveDate: e.target.value }))} /></div>
+                <div className="space-y-1.5"><Label>Review Due</Label><Input type="date" value={form.reviewDueDate} onChange={(e) => setForm((p) => ({ ...p, reviewDueDate: e.target.value }))} /></div>
+              </div>
+              <div className="space-y-1.5"><Label>Review Cycle</Label><Select value={form.reviewCycle} onValueChange={(value) => setForm((p) => ({ ...p, reviewCycle: value }))}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{reviewCycleOptions.map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}</SelectContent></Select></div>
+              <div className="space-y-1.5"><Label>Risk Points, comma separated</Label><Textarea rows={3} value={form.riskPoints} onChange={(e) => setForm((p) => ({ ...p, riskPoints: e.target.value }))} /></div>
+              <div className="space-y-1.5"><Label>Notes</Label><Textarea rows={3} value={form.notes} onChange={(e) => setForm((p) => ({ ...p, notes: e.target.value }))} /></div>
+            </div>
+
+            <div className="grid min-h-0 gap-0 xl:grid-cols-[minmax(0,1fr)_460px]">
+              <div className="min-h-0 space-y-4 overflow-y-auto p-5">
+                <div className="sticky top-0 z-30 -mx-5 mb-4 border-b bg-background px-5 py-4 shadow-sm">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <div className="font-semibold">SOP Content Builder</div>
+                        <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">{activeBuilderPageLabel}</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">Add pages and blocks while editing without scrolling back to the top.</div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={() => {
+                        const nextPage = newPage(pages.length + 1);
+                        setPages((current) => [...current, nextPage]);
+                        setSelectedPageId(nextPage.id);
+                      }}><Plus className="h-4 w-4" />Add Page</Button>
+                      {activeBuilderPageId ? (
+                        <>
+                          {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
+                            <Button key={type} type="button" variant="outline" size="sm" onClick={() => addBlock(activeBuilderPageId, type)}>+ {type}</Button>
+                          ))}
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {pages.map((page, pageIndex) => (
+                    <Card
+                      key={page.id}
+                      onClick={() => setSelectedPageId(page.id)}
+                      className={cn("border-primary/10 transition-colors", activeBuilderPageId === page.id ? "border-primary bg-primary/5" : "")}
+                    >
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-base">Page {pageIndex + 1}</CardTitle>
+                            {activeBuilderPageId === page.id ? <span className="rounded-full border border-primary/40 px-2 py-0.5 text-xs text-primary">Selected</span> : null}
+                          </div>
+                          <Button variant="ghost" size="sm" onClick={(event) => {
+                            event.stopPropagation();
+                            setPages((current) => {
+                              const next = current.filter((item) => item.id !== page.id);
+                              if (activeBuilderPageId === page.id) setSelectedPageId(next[0]?.id || "");
+                              return next;
+                            });
+                          }} disabled={pages.length === 1}><Trash2 className="h-4 w-4" /></Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="space-y-1.5"><Label>Page Title</Label><Input value={page.title} onChange={(e) => updatePage(page.id, { title: e.target.value })} /></div>
+                        <div className="space-y-1.5">
+                          <Label>Cover Image</Label>
+                          <Input type="file" accept="image/*" onChange={async (e) => {
+                            const asset = await uploadLocalPreviewAsset(e.target.files?.[0], "sop");
+                            updatePage(page.id, { coverImageUrl: serializeUploadAsset(asset) });
+                          }} />
+                          {page.coverImageUrl ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
+                        </div>
+
+                        <div className="space-y-3">
+                          {page.blocks.map((block) => (
+                            <div key={block.id} className="rounded-xl border bg-background p-4">
+                              <div className="mb-3 flex items-center justify-between gap-3">
+                                <Select value={block.type} onValueChange={(value) => updateBlock(page.id, block.id, { type: value as BlockType })}>
+                                  <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+                                  <SelectContent>{(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => <SelectItem key={type} value={type}>{type}</SelectItem>)}</SelectContent>
+                                </Select>
+                                <Button variant="ghost" size="sm" onClick={() => removeBlock(page.id, block.id)}><Trash2 className="h-4 w-4" /></Button>
+                              </div>
+
+                              <div className="grid gap-3">
+                                <div className="space-y-1.5"><Label>Block Title</Label><Input value={block.title} onChange={(e) => updateBlock(page.id, block.id, { title: e.target.value })} /></div>
+
+                                {["heading", "text", "warning"].includes(block.type) ? (
+                                  <div className="space-y-1.5"><Label>Content</Label><Textarea rows={3} value={block.body} onChange={(e) => updateBlock(page.id, block.id, { body: e.target.value })} /></div>
+                                ) : null}
+
+                                {block.type === "image" ? (
+                                  <div className="space-y-1.5">
+                                    <Label>Image Upload</Label>
+                                    <Input type="file" accept="image/*" onChange={async (e) => {
+                                      const asset = await uploadLocalPreviewAsset(e.target.files?.[0], "sop");
+                                      updateBlock(page.id, block.id, { imageUrl: serializeUploadAsset(asset) });
+                                    }} />
+                                    {block.imageUrl ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(block.imageUrl)}</div> : null}
+                                  </div>
+                                ) : null}
+
+                                {block.type === "pdf" ? (
+                                  <div className="space-y-1.5">
+                                    <Label>PDF Upload</Label>
+                                    <Input type="file" accept="application/pdf" onChange={async (e) => {
+                                      const asset = await uploadLocalPreviewAsset(e.target.files?.[0], "sop");
+                                      updateBlock(page.id, block.id, { pdfUrl: serializeUploadAsset(asset) });
+                                    }} />
+                                    {block.pdfUrl ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(block.pdfUrl)}</div> : null}
+                                  </div>
+                                ) : null}
+
+                                {block.type === "step-list" ? (
+                                  <div className="space-y-1.5"><Label>Steps, one instruction per line</Label><Textarea rows={7} value={block.stepsText} onChange={(e) => updateBlock(page.id, block.id, { stepsText: e.target.value })} placeholder={"Wash hands\nPrepare equipment\nTake photo proof"} /></div>
+                                ) : null}
+
+                                {block.type === "checklist" ? (
+                                  <div className="space-y-1.5"><Label>Checklist Items, one per line</Label><Textarea rows={6} value={block.checklistText} onChange={(e) => updateBlock(page.id, block.id, { checklistText: e.target.value })} /></div>
+                                ) : null}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              <div className="min-h-0 overflow-y-auto border-l bg-muted/10 p-5">
+                <Card className="sticky top-0">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between gap-3 text-base">
+                      <span>Live Employee Preview</span>
+                      <Badge variant="outline">{createPreview.pages.length} Pages</Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {createPreview.pages.map((page) => (
+                      <div key={page.id} className="rounded-xl border p-3">
+                        <div className="text-xs font-medium uppercase text-muted-foreground">Page {page.pageNo}</div>
+                        <div className="font-semibold">{page.title}</div>
+                        {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
+                        <div className="mt-3 space-y-3">
+                          {page.blocks.map((block) => <div key={block.id}>{renderBlock(block)}</div>)}
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ErpShell>
+    );
+  }
+
   return (
     <ErpShell>
       <div className="space-y-6 p-4 pb-24 md:p-6">
@@ -554,7 +754,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => openModal("create")}><Plus className="h-4 w-4" />Create SOP</Button>
+            <Button onClick={() => setBuilderMode(true)}><Plus className="h-4 w-4" />Create SOP</Button>
             <Button variant="outline" onClick={() => openModal("publish")} disabled={!selectedSop}><ScrollText className="h-4 w-4" />Publish Version</Button>
             <Button variant="outline" onClick={() => openModal("training")} disabled={!selectedSop}><GraduationCap className="h-4 w-4" />Assign Training</Button>
             <Button variant="outline" onClick={() => openModal("checklist")} disabled={!selectedSop}><ClipboardList className="h-4 w-4" />Create Templates</Button>
