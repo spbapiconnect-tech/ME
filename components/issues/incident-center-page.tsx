@@ -27,6 +27,7 @@ import {
   getLinkedCorrectiveActions,
   type IncidentSourceSignal,
 } from "@/lib/store-operations/incident-workspace";
+import { serializeUploadAsset, uploadAssetLabel, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
 
@@ -60,6 +61,7 @@ type IncidentForm = {
   linkedInspectionFailedItemId: string;
   linkedOutletExecutionId: string;
   linkedFefoWasteId: string;
+  evidenceAsset: string;
 };
 
 const sourceOptions = ["Manual Branch Report", "Store Inspection", "Outlet Execution", "FEFO / Waste Alert"];
@@ -109,6 +111,7 @@ export function IncidentCenterPage() {
     linkedInspectionFailedItemId: "",
     linkedOutletExecutionId: "",
     linkedFefoWasteId: "",
+    evidenceAsset: "",
   });
 
   useEffect(() => {
@@ -183,6 +186,7 @@ export function IncidentCenterPage() {
       linkedInspectionFailedItemId: "",
       linkedOutletExecutionId: "",
       linkedFefoWasteId: "",
+      evidenceAsset: "",
     });
     setDialogOpen(true);
   }
@@ -207,6 +211,7 @@ export function IncidentCenterPage() {
       linkedInspectionFailedItemId: signal.linkedInspectionFailedItemId || "",
       linkedOutletExecutionId: signal.linkedOutletExecutionId || "",
       linkedFefoWasteId: signal.linkedFefoWasteId || "",
+      evidenceAsset: "",
     });
     setDialogOpen(true);
   }
@@ -242,7 +247,7 @@ export function IncidentCenterPage() {
         { label: "SLA Status", value: slaStatus || getIncidentSlaSummary(undefined).status },
         { label: "Escalation Level", value: escalated || (form.severity === "Critical" ? "Critical" : "None") },
         { label: "Review Status", value: "Pending Review" },
-        { label: "Resolution Evidence", value: "" },
+        { label: "Resolution Evidence", value: form.evidenceAsset },
         { label: "Linked Inspection", value: inspectionRows.find((row) => row.id === form.linkedInspectionId)?.title || "" },
         { label: "Linked Inspection ID", value: form.linkedInspectionId },
         { label: "Linked Inspection Failed Item ID", value: form.linkedInspectionFailedItemId },
@@ -560,7 +565,7 @@ export function IncidentCenterPage() {
                       ["Linked Inspection", reviewSummary.linkedInspection],
                       ["Linked Execution", reviewSummary.linkedExecutionTask],
                       ["Corrective Action", reviewSummary.linkedCorrectiveAction],
-                      ["Resolution Evidence", reviewSummary.resolutionEvidence],
+                      ["Resolution Evidence", uploadAssetLabel(reviewSummary.resolutionEvidence)],
                       ["Review Status", reviewSummary.reviewStatus],
                     ].map(([label, value]) => (
                       <div key={label} className="flex items-center justify-between gap-3">
@@ -687,6 +692,14 @@ export function IncidentCenterPage() {
               <div className="space-y-1.5 md:col-span-2">
                 <Label>Next Action</Label>
                 <Textarea value={form.nextAction} onChange={(event) => setForm((current) => ({ ...current, nextAction: event.target.value }))} placeholder="Describe the expected review or follow-up step." />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label>Evidence Attachment</Label>
+                <Input type="file" accept="image/*,application/pdf" onChange={async (event) => {
+                  const asset = await uploadLocalPreviewAsset(event.target.files?.[0], "incident");
+                  setForm((current) => ({ ...current, evidenceAsset: serializeUploadAsset(asset) }));
+                }} />
+                {form.evidenceAsset ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(form.evidenceAsset)}</div> : null}
               </div>
               <div className="space-y-1.5">
                 <Label>Due Time</Label>

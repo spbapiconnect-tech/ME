@@ -27,6 +27,7 @@ import {
   type InspectionFailedItemView,
   type InspectionSignal,
 } from "@/lib/store-operations/inspection-workspace";
+import { serializeUploadAsset, uploadAssetLabel, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
 
@@ -261,6 +262,14 @@ export function InspectionWorkspacePage() {
       correctiveActionRequired: "Yes",
     });
     setReviewDialogOpen(true);
+  }
+
+  function updateDraftFailedItemPhoto(itemId: string, photoValue: string) {
+    setDraftFailedItems((current) => current.map((item) => (
+      item.id === itemId
+        ? { ...item, photoUrls: photoValue ? [photoValue] : [] }
+        : item
+    )));
   }
 
   function addDraftFailedItem() {
@@ -544,6 +553,7 @@ export function InspectionWorkspacePage() {
                             </div>
                             <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                               {item.photoRequired ? <span className="rounded-md border px-2 py-1">Photo required</span> : null}
+                            {item.photoUrls?.[0] ? <span className="rounded-md border px-2 py-1">Photo: {uploadAssetLabel(item.photoUrls[0])}</span> : null}
                               {item.shouldCreateIncident ? <span className="rounded-md border px-2 py-1">Incident suggested</span> : null}
                               {item.correctiveActionRequired ? <span className="rounded-md border px-2 py-1">Corrective action required</span> : null}
                             </div>
@@ -637,6 +647,7 @@ export function InspectionWorkspacePage() {
                           </div>
                           <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
                             {item.photoRequired ? <span className="rounded-md border px-2 py-1">Photo required</span> : null}
+                            {item.photoUrls?.[0] ? <span className="rounded-md border px-2 py-1">Photo: {uploadAssetLabel(item.photoUrls[0])}</span> : null}
                             {item.shouldCreateIncident ? <span className="rounded-md border px-2 py-1">Incident suggested</span> : null}
                             {item.correctiveActionRequired ? <span className="rounded-md border px-2 py-1">Corrective action required</span> : null}
                           </div>
