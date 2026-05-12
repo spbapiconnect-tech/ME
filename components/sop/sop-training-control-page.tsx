@@ -530,11 +530,11 @@ export function SopTrainingControlPage() {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-4">
           {kpis.map((kpi) => (
             <Card key={kpi.label}>
-              <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-muted-foreground">{kpi.label}</CardTitle></CardHeader>
-              <CardContent><div className="text-3xl font-semibold">{kpi.value}</div></CardContent>
+              <CardHeader className="px-3 pb-1 pt-3"><CardTitle className="text-[11px] font-medium text-muted-foreground md:text-xs">{kpi.label}</CardTitle></CardHeader>
+              <CardContent className="px-3 pb-3 pt-0"><div className="text-xl font-semibold md:text-2xl">{kpi.value}</div></CardContent>
             </Card>
           ))}
         </div>
@@ -698,13 +698,12 @@ export function SopTrainingControlPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent
           className={cn(
-            "max-h-[92vh]",
             dialogMode === "create"
-              ? "w-[96vw] max-w-[1680px] overflow-hidden p-0"
-              : "overflow-y-auto sm:max-w-[760px]",
+              ? "flex h-[90vh] w-[96vw] max-w-[1680px] flex-col overflow-hidden p-0"
+              : "max-h-[90vh] overflow-y-auto sm:max-w-[760px]",
           )}
         >
-          <DialogHeader>
+          <DialogHeader className={dialogMode === "create" ? "shrink-0 border-b px-5 py-4" : undefined}>
             <DialogTitle>{dialogMode === "create" ? "Create SOP" : dialogMode === "publish" ? "Publish Version" : dialogMode === "training" ? "Assign Training" : "Create Templates"}</DialogTitle>
             <DialogDescription>
               {dialogMode === "create"
@@ -718,7 +717,7 @@ export function SopTrainingControlPage() {
           </DialogHeader>
 
           {dialogMode === "create" ? (
-            <div className="grid max-h-[82vh] gap-0 overflow-hidden lg:grid-cols-[340px_minmax(0,1fr)]">
+            <div className="grid min-h-0 flex-1 gap-0 overflow-hidden lg:grid-cols-[340px_minmax(0,1fr)]">
               <div className="space-y-3 overflow-y-auto border-r bg-muted/20 p-5">
                 <div>
                   <div className="text-sm font-semibold">SOP Setup</div>
@@ -875,7 +874,7 @@ export function SopTrainingControlPage() {
             </div>
           ) : null}
 
-          <DialogFooter>
+          <DialogFooter className={dialogMode === "create" ? "shrink-0 border-t bg-background px-5 py-3" : undefined}>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleSubmit}>{dialogMode === "create" ? "Create SOP" : dialogMode === "publish" ? "Publish Version" : dialogMode === "training" ? "Assign Training" : "Create Templates"}</Button>
           </DialogFooter>

@@ -370,14 +370,14 @@ export function InspectionWorkspacePage() {
           </div>
         </header>
 
-        <section className="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <section className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
           {kpis.slice(0, 6).map((kpi) => (
             <Card key={kpi.label}>
-              <CardHeader className="pb-1">
-                <CardTitle className="text-xs font-medium text-muted-foreground">{kpi.label}</CardTitle>
+              <CardHeader className="px-3 pb-1 pt-3">
+                <CardTitle className="text-[11px] font-medium text-muted-foreground md:text-xs">{kpi.label}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-semibold">{kpi.value}</p>
+              <CardContent className="px-3 pb-3 pt-0">
+                <p className="text-xl font-semibold md:text-2xl">{kpi.value}</p>
               </CardContent>
             </Card>
           ))}
