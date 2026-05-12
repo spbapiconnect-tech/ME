@@ -844,12 +844,6 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                           {page.coverImageUrl ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
-                          {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
-                            <Button key={type} type="button" variant="outline" size="sm" onClick={() => addBlock(page.id, type)}>+ {type}</Button>
-                          ))}
-                        </div>
-
                         <div className="space-y-3">
                           {page.blocks.map((block) => (
                             <div key={block.id} className="rounded-xl border bg-background p-4">
