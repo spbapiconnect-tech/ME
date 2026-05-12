@@ -58,6 +58,7 @@ import {
   type SopPreviewContent,
   type SopPreviewPage,
 } from "@/lib/store-operations/sop-training-workspace";
+import { uploadAssetLabel, serializeUploadAsset, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
 
@@ -223,7 +224,7 @@ function renderBlock(block: SopPreviewBlock) {
     return (
       <div className="rounded-xl border bg-muted/30 p-3 text-sm">
         <div className="mb-2 flex items-center gap-2 font-medium"><ImageIcon className="h-4 w-4" />Image</div>
-        <div className="break-all text-muted-foreground">{block.imageUrl || "Image placeholder not set."}</div>
+        <div className="break-all text-muted-foreground">{uploadAssetLabel(block.imageUrl) || "Image placeholder not set."}</div>
       </div>
     );
   }
@@ -232,7 +233,7 @@ function renderBlock(block: SopPreviewBlock) {
     return (
       <div className="rounded-xl border bg-muted/30 p-3 text-sm">
         <div className="mb-2 flex items-center gap-2 font-medium"><FileText className="h-4 w-4" />PDF</div>
-        <div className="break-all text-muted-foreground">{block.pdfUrl || "PDF placeholder not set."}</div>
+        <div className="break-all text-muted-foreground">{uploadAssetLabel(block.pdfUrl) || "PDF placeholder not set."}</div>
       </div>
     );
   }
@@ -674,7 +675,7 @@ export function SopTrainingControlPage() {
                             </div>
                             <Badge variant="secondary">{page.blocks.length} Blocks</Badge>
                           </div>
-                          {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover image: {page.coverImageUrl}</div> : null}
+                          {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover image: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
                           <div className="mt-3 space-y-3">
                             {page.blocks.map((block) => <div key={block.id}>{renderBlock(block)}</div>)}
                           </div>
@@ -801,8 +802,11 @@ export function SopTrainingControlPage() {
                         <div className="space-y-1.5"><Label>Page Title</Label><Input value={page.title} onChange={(e) => updatePage(page.id, { title: e.target.value })} /></div>
                         <div className="space-y-1.5">
                           <Label>Cover Image</Label>
-                          <Input type="file" accept="image/*" onChange={(e) => updatePage(page.id, { coverImageUrl: e.target.files?.[0]?.name ?? "" })} />
-                          {page.coverImageUrl ? <div className="text-xs text-muted-foreground">Selected: {page.coverImageUrl}</div> : null}
+                          <Input type="file" accept="image/*" onChange={async (e) => {
+                            const asset = await uploadLocalPreviewAsset(e.target.files?.[0], "sop");
+                            updatePage(page.id, { coverImageUrl: serializeUploadAsset(asset) });
+                          }} />
+                          {page.coverImageUrl ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
                         </div>
 
                         <div className="flex flex-wrap gap-2">
@@ -832,16 +836,22 @@ export function SopTrainingControlPage() {
                                 {block.type === "image" ? (
                                   <div className="space-y-1.5">
                                     <Label>Image Upload</Label>
-                                    <Input type="file" accept="image/*" onChange={(e) => updateBlock(page.id, block.id, { imageUrl: e.target.files?.[0]?.name ?? "" })} />
-                                    {block.imageUrl ? <div className="text-xs text-muted-foreground">Selected: {block.imageUrl}</div> : null}
+                                    <Input type="file" accept="image/*" onChange={async (e) => {
+                                      const asset = await uploadLocalPreviewAsset(e.target.files?.[0], "sop");
+                                      updateBlock(page.id, block.id, { imageUrl: serializeUploadAsset(asset) });
+                                    }} />
+                                    {block.imageUrl ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(block.imageUrl)}</div> : null}
                                   </div>
                                 ) : null}
 
                                 {block.type === "pdf" ? (
                                   <div className="space-y-1.5">
                                     <Label>PDF Upload</Label>
-                                    <Input type="file" accept="application/pdf" onChange={(e) => updateBlock(page.id, block.id, { pdfUrl: e.target.files?.[0]?.name ?? "" })} />
-                                    {block.pdfUrl ? <div className="text-xs text-muted-foreground">Selected: {block.pdfUrl}</div> : null}
+                                    <Input type="file" accept="application/pdf" onChange={async (e) => {
+                                      const asset = await uploadLocalPreviewAsset(e.target.files?.[0], "sop");
+                                      updateBlock(page.id, block.id, { pdfUrl: serializeUploadAsset(asset) });
+                                    }} />
+                                    {block.pdfUrl ? <div className="text-xs text-muted-foreground">Selected: {uploadAssetLabel(block.pdfUrl)}</div> : null}
                                   </div>
                                 ) : null}
 
@@ -876,7 +886,7 @@ export function SopTrainingControlPage() {
                       <div key={page.id} className="rounded-xl border p-3">
                         <div className="text-xs font-medium uppercase text-muted-foreground">Page {page.pageNo}</div>
                         <div className="font-semibold">{page.title}</div>
-                        {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover: {page.coverImageUrl}</div> : null}
+                        {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover: {uploadAssetLabel(page.coverImageUrl)}</div> : null}
                         <div className="mt-3 space-y-3">
                           {page.blocks.map((block) => <div key={block.id}>{renderBlock(block)}</div>)}
                         </div>
