@@ -263,6 +263,7 @@ function renderBlock(block: SopPreviewBlock) {
   }
 
   const steps = block.steps || [];
+
   const activeBuilderPageId = selectedPageId || pages[0]?.id || "";
 
   return (
