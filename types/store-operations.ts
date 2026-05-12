@@ -68,57 +68,7 @@ export type StoreOperationModule = {
   linkedModules: string[];
 };
 
-
 export type SopContentSourceType = "builder" | "pdf" | "external-link";
-
-export type SopStep = {
-  id: string;
-  stepNo: number;
-  title: string;
-  instruction: string;
-  imageUrl?: string;
-  imageProofId?: string;
-  warning?: string;
-  required?: boolean;
-};
-
-  pageNo: number;
-  title: string;
-  description?: string;
-  imageUrl?: string;
-  imageProofId?: string;
-  body?: string;
-  steps?: SopStep[];
-};
-
-  roleIds: string[];
-  staffIds?: string[];
-  dueAt?: string;
-  requiresAcknowledgement?: boolean;
-};
-
-  sopId: string;
-  branchId?: string;
-  staffId?: string;
-  roleId?: string;
-  status: SopAcknowledgementStatus;
-  assignedAt: string;
-  viewedAt?: string;
-  acknowledgedAt?: string;
-};
-
-  stepNo: number;
-  title: string;
-  instruction: string;
-  imageUrl?: string;
-  imageProofId?: string;
-  linkedSopPageId?: string;
-  proofRequired?: boolean;
-  proofStatus?: TaskStepProofStatus;
-  proofUrls?: string[];
-  completed?: boolean;
-};
-
 
 export type SopBlockType =
   | "heading"
