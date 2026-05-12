@@ -882,6 +882,22 @@ export function InspectionWorkspacePage() {
                       </div>
                       <Badge variant={statusTone(item.severity)}>{item.severity}</Badge>
                     </div>
+                    <div className="mt-3 space-y-1.5">
+                      <Label>Failed Item Photo</Label>
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (event) => {
+                          const asset = await uploadLocalPreviewAsset(event.target.files?.[0], "inspection");
+                          updateDraftFailedItemPhoto(item.id, serializeUploadAsset(asset));
+                        }}
+                      />
+                      {item.photoUrls?.[0] ? (
+                        <div className="text-xs text-muted-foreground">
+                          Selected: {uploadAssetLabel(item.photoUrls[0])}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 ))
               )}
