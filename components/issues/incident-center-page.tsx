@@ -1,0 +1,630 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { AlertTriangle, ArrowUpRight, CheckCheck, ClipboardList, Flag, ShieldAlert, Siren, Target } from "lucide-react";
+
+import { ErpShell } from "@/components/erp";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { issueMasterData } from "@/lib/master-data/issue";
+import { taskMasterData } from "@/lib/master-data/task";
+import { runStoreOperationRules } from "@/lib/rules/rule-runner";
+import {
+  getIncidentDueAtBySeverity,
+  getIncidentKpis,
+  getIncidentNextActions,
+  getIncidentQueue,
+  getIncidentReviewSummary,
+  getIncidentSlaSummary,
+  getIncidentSourceSignals,
+  getIncidentStatusTone,
+  getLinkedCorrectiveActions,
+  type IncidentSourceSignal,
+} from "@/lib/store-operations/incident-workspace";
+import { createTaskFromIncident } from "@/lib/store-operations/store-operation-links";
+import { cn } from "@/lib/utils";
+import { useMeRuntimeStore } from "@/stores/me-runtime";
+
+function detailValue(row: { detailItems?: Array<{ label: string; value: string }> }, label: string) {
+  return row.detailItems?.find((item) => item.label === label)?.value ?? "";
+}
+
+function splitList(value: string) {
+  return value.split(",").map((item) => item.trim()).filter(Boolean);
+}
+
+function upsertDetail(items: Array<{ label: string; value: string }> | undefined, label: string, value: string) {
+  const next = [...(items ?? [])];
+  const index = next.findIndex((item) => item.label === label);
+  if (index >= 0) next[index] = { label, value };
+  else next.push({ label, value });
+  return next;
+}
+
+type IncidentForm = {
+  title: string;
+  branch: string;
+  source: string;
+  severity: string;
+  category: string;
+  impactArea: string;
+  reportedTime: string;
+  customerImpact: string;
+  immediateContainment: string;
+  nextAction: string;
+  owner: string;
+  dueTime: string;
+  createCorrectiveAction: string;
+  linkedInspectionId: string;
+  linkedInspectionFailedItemId: string;
+  linkedOutletExecutionId: string;
+  linkedFefoWasteId: string;
+};
+
+const sourceOptions = ["Manual Branch Report", "Store Inspection", "Outlet Execution", "FEFO / Waste Alert"];
+const categoryOptions = Array.from(issueMasterData.issueCategory).length ? Array.from(issueMasterData.issueCategory) : ["Store Inspection Failure", "Outlet Execution", "Food Safety", "Equipment", "Waste Control"];
+const severityOptions = Array.from(issueMasterData.severity).length ? Array.from(issueMasterData.severity) : ["Low", "Medium", "High", "Critical"];
+const impactAreaOptions = Array.from(issueMasterData.impactArea).length ? Array.from(issueMasterData.impactArea) : ["Kitchen", "Service", "Food Safety", "Storage", "Outlet Execution", "Waste Control"];
+const escalationLevels = ["None", "Supervisor", "Manager", "HQ", "Critical"];
+
+export function IncidentCenterPage() {
+  const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
+  const getRows = useMeRuntimeStore((state) => state.getRows);
+  const createRecordWithPayload = useMeRuntimeStore((state) => state.createRecordWithPayload);
+  const updateRecord = useMeRuntimeStore((state) => state.updateRecord);
+  const logAction = useMeRuntimeStore((state) => state.logAction);
+  const syncStatus = useMeRuntimeStore((state) => state.syncStatus);
+  const syncMessage = useMeRuntimeStore((state) => state.lastSyncMessage);
+
+  const incidentRows = getRows("issues", []);
+  const inspectionRows = getRows("inspection", []);
+  const taskRows = getRows("tasks", []);
+  const expiryRows = getRows("expiry", []);
+  const branchRows = getRows("branches", []);
+
+  const [selectedIncidentId, setSelectedIncidentId] = useState<string | undefined>(incidentRows[0]?.id);
+  const [selectedSignalId, setSelectedSignalId] = useState<string | undefined>();
+  const [activeFilter, setActiveFilter] = useState("New");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [form, setForm] = useState<IncidentForm>({
+    title: "",
+    branch: "",
+    source: "Manual Branch Report",
+    severity: "Medium",
+    category: categoryOptions[0],
+    impactArea: impactAreaOptions[0],
+    reportedTime: new Date().toISOString().slice(0, 16),
+    customerImpact: "Minor Delay",
+    immediateContainment: "",
+    nextAction: "",
+    owner: "Incident Center",
+    dueTime: getIncidentDueAtBySeverity("Medium"),
+    createCorrectiveAction: "No",
+    linkedInspectionId: "",
+    linkedInspectionFailedItemId: "",
+    linkedOutletExecutionId: "",
+    linkedFefoWasteId: "",
+  });
+
+  useEffect(() => {
+    hydrateFromFoundation();
+  }, [hydrateFromFoundation]);
+
+  const queue = useMemo(() => getIncidentQueue(incidentRows), [incidentRows]);
+  const signals = useMemo(() => getIncidentSourceSignals(inspectionRows, taskRows, expiryRows), [inspectionRows, taskRows, expiryRows]);
+  const kpis = useMemo(() => getIncidentKpis(incidentRows, taskRows), [incidentRows, taskRows]);
+  const branchOptions = useMemo(() => branchRows.map((row) => row.title), [branchRows]);
+
+  const filteredQueue = useMemo(() => {
+    if (!activeFilter) return queue;
+    return queue.filter((row) => {
+      const sla = getIncidentSlaSummary(row).status;
+      if (activeFilter === "Critical") return detailValue(row, "Severity") === "Critical";
+      if (activeFilter === "New") return row.status === "New";
+      if (activeFilter === "Contained") return row.status === "Contained";
+      if (activeFilter === "Overdue") return ["Overdue", "Breached"].includes(sla);
+      if (activeFilter === "Pending Review") return row.status === "Pending Review";
+      if (activeFilter === "Resolved") return row.status === "Resolved";
+      return true;
+    });
+  }, [activeFilter, queue]);
+
+  const selectedIncident = incidentRows.find((row) => row.id === selectedIncidentId) ?? filteredQueue[0] ?? queue[0];
+  const reviewSummary = useMemo(() => getIncidentReviewSummary(selectedIncident), [selectedIncident]);
+  const nextActions = useMemo(() => getIncidentNextActions(selectedIncident), [selectedIncident]);
+  const correctiveActions = useMemo(() => getLinkedCorrectiveActions(selectedIncident, taskRows), [selectedIncident, taskRows]);
+
+  function openManualIncident() {
+    setSelectedSignalId(undefined);
+    setForm({
+      title: "",
+      branch: "",
+      source: "Manual Branch Report",
+      severity: "Medium",
+      category: categoryOptions[0],
+      impactArea: impactAreaOptions[0],
+      reportedTime: new Date().toISOString().slice(0, 16),
+      customerImpact: "Minor Delay",
+      immediateContainment: "",
+      nextAction: "",
+      owner: "Incident Center",
+      dueTime: getIncidentDueAtBySeverity("Medium"),
+      createCorrectiveAction: "No",
+      linkedInspectionId: "",
+      linkedInspectionFailedItemId: "",
+      linkedOutletExecutionId: "",
+      linkedFefoWasteId: "",
+    });
+    setDialogOpen(true);
+  }
+
+  function openSignalIncident(signal: IncidentSourceSignal) {
+    setSelectedSignalId(signal.id);
+    setForm({
+      title: signal.title,
+      branch: signal.branch,
+      source: signal.sourceType === "inspection" ? "Store Inspection" : signal.sourceType === "outlet-execution" ? "Outlet Execution" : "FEFO / Waste Alert",
+      severity: signal.severity,
+      category: categoryOptions[0],
+      impactArea: impactAreaOptions[0],
+      reportedTime: new Date().toISOString().slice(0, 16),
+      customerImpact: signal.sourceType === "inspection" ? "Service Risk" : "Minor Delay",
+      immediateContainment: "",
+      nextAction: signal.sourceType === "inspection" ? "Create corrective action after manager review." : "Review source and assign owner.",
+      owner: "Incident Center",
+      dueTime: getIncidentDueAtBySeverity(signal.severity),
+      createCorrectiveAction: signal.sourceType === "inspection" ? "Yes" : "No",
+      linkedInspectionId: signal.linkedInspectionId || "",
+      linkedInspectionFailedItemId: signal.linkedInspectionFailedItemId || "",
+      linkedOutletExecutionId: signal.linkedOutletExecutionId || "",
+      linkedFefoWasteId: signal.linkedFefoWasteId || "",
+    });
+    setDialogOpen(true);
+  }
+
+  async function saveIncident() {
+    if (!form.title.trim() || !form.branch || !form.severity) return;
+    const ruleMatches = runStoreOperationRules("incident-center", {
+      severity: form.severity,
+      status: "New",
+      dueAt: form.dueTime,
+      immediateContainment: form.immediateContainment,
+    });
+    const escalated = ruleMatches.find((item) => item.result.metadata?.escalationLevel)?.result.metadata?.escalationLevel as string | undefined;
+    const slaStatus = ruleMatches.find((item) => item.result.metadata?.slaStatus)?.result.metadata?.slaStatus as string | undefined;
+
+    const created = await createRecordWithPayload("issues", {
+      title: form.title.trim(),
+      subtitle: `${form.branch} · ${form.source}`,
+      status: form.immediateContainment ? "Contained" : "New",
+      owner: form.owner || "Incident Center",
+      detailItems: [
+        { label: "Branch", value: form.branch },
+        { label: "Source", value: form.source },
+        { label: "Source Record ID", value: form.linkedInspectionId || form.linkedOutletExecutionId || form.linkedFefoWasteId || "manual" },
+        { label: "Severity", value: form.severity },
+        { label: "Category", value: form.category },
+        { label: "Impact Area", value: form.impactArea },
+        { label: "Reported Time", value: form.reportedTime },
+        { label: "Customer / Service Impact", value: form.customerImpact },
+        { label: "Immediate Containment", value: form.immediateContainment },
+        { label: "Containment Status", value: form.immediateContainment ? "Contained" : "Open" },
+        { label: "Due Time", value: form.dueTime },
+        { label: "SLA Status", value: slaStatus || getIncidentSlaSummary(undefined).status },
+        { label: "Escalation Level", value: escalated || (form.severity === "Critical" ? "Critical" : "None") },
+        { label: "Review Status", value: "Pending Review" },
+        { label: "Resolution Evidence", value: "" },
+        { label: "Linked Inspection", value: inspectionRows.find((row) => row.id === form.linkedInspectionId)?.title || "" },
+        { label: "Linked Inspection ID", value: form.linkedInspectionId },
+        { label: "Linked Failed Item ID", value: form.linkedInspectionFailedItemId },
+        { label: "Linked Outlet Execution", value: taskRows.find((row) => row.id === form.linkedOutletExecutionId)?.title || "" },
+        { label: "Linked Outlet Execution ID", value: form.linkedOutletExecutionId },
+        { label: "Linked FEFO / Waste ID", value: form.linkedFefoWasteId },
+        { label: "Linked Corrective Action IDs", value: "" },
+        { label: "Linked Corrective Actions", value: "" },
+      ],
+      detailNote: form.nextAction || "Review containment, assign owner, and prepare corrective action.",
+      nextAction: form.createCorrectiveAction === "Yes" ? "Create corrective action" : "Assign owner",
+    });
+    setSelectedIncidentId(created.id);
+    setDialogOpen(false);
+    await logAction("issues", "report-incident", `Reported incident ${created.title}`);
+    if (form.createCorrectiveAction === "Yes") {
+      const createdIncident = getRows("issues", []).find((row) => row.id === created.id) ?? created;
+      await createCorrectiveActionForIncident(createdIncident);
+    }
+  }
+
+  async function createCorrectiveActionForIncident(incident = selectedIncident) {
+    if (!incident) return;
+    const seed = createTaskFromIncident(incident, {
+      linkedInspectionId: detailValue(incident, "Linked Inspection ID") || undefined,
+      dueAt: detailValue(incident, "Due Time") || undefined,
+      photoProofRequired: true,
+    });
+    const branch = detailValue(incident, "Branch") || incident.subtitle;
+    const created = await createRecordWithPayload("tasks", {
+      title: seed.title,
+      subtitle: `${branch} · corrective action`,
+      status: "Scheduled",
+      owner: "Outlet Execution",
+      detailItems: [
+        { label: "Task Type", value: Array.from(taskMasterData.taskType)[0] || "Corrective Action" },
+        { label: "Outlets", value: branch },
+        { label: "Completed Outlets", value: "" },
+        { label: "Photo Proofs", value: "" },
+        { label: "Due Date", value: (seed.dueAt || "").slice(0, 10) },
+        { label: "Due Time", value: (seed.dueAt || "").slice(11, 16) },
+        { label: "Time Trigger", value: "After Incident" },
+        { label: "Repeat Rule", value: Array.from(taskMasterData.repeatRule)[0] || "Once" },
+        { label: "Photo Required", value: seed.photoProofRequired ? "Required" : "Optional" },
+        { label: "Completion Standard", value: seed.completionStandard },
+        { label: "Linked Incident", value: incident.title },
+        { label: "Linked Incident ID", value: incident.id },
+        { label: "Linked Inspection", value: detailValue(incident, "Linked Inspection") },
+        { label: "Inspection Source", value: detailValue(incident, "Linked Inspection") },
+      ],
+      detailNote: "Corrective action created from incident center. Outlet must rework and upload photo proof.",
+      nextAction: "Submit photo proof",
+    });
+
+    const actionIds = splitList(detailValue(incident, "Linked Corrective Action IDs"));
+    const actionTitles = splitList(detailValue(incident, "Linked Corrective Actions"));
+    actionIds.push(created.id);
+    actionTitles.push(created.title);
+    let nextDetails = incident.detailItems ?? [];
+    nextDetails = upsertDetail(nextDetails, "Linked Corrective Action IDs", actionIds.join(", "));
+    nextDetails = upsertDetail(nextDetails, "Linked Corrective Actions", actionTitles.join(", "));
+    await updateRecord("issues", incident.id, {
+      status: incident.status === "New" ? "Assigned" : incident.status,
+      detailItems: nextDetails,
+      nextAction: "Review corrective action submission",
+    });
+    await logAction("issues", "create-corrective-action", `Created corrective action ${created.title} from ${incident.title}`);
+  }
+
+  async function markContained() {
+    if (!selectedIncident) return;
+    const containment = detailValue(selectedIncident, "Immediate Containment") || "Temporary containment applied by manager.";
+    let nextDetails = selectedIncident.detailItems ?? [];
+    nextDetails = upsertDetail(nextDetails, "Immediate Containment", containment);
+    nextDetails = upsertDetail(nextDetails, "Containment Status", "Contained");
+    await updateRecord("issues", selectedIncident.id, { status: "Contained", detailItems: nextDetails, nextAction: "Assign owner" });
+    await logAction("issues", "mark-contained", `Marked contained ${selectedIncident.title}`);
+  }
+
+  async function assignOwner() {
+    if (!selectedIncident) return;
+    await updateRecord("issues", selectedIncident.id, { status: "Assigned", owner: "Branch Manager", nextAction: "Create corrective action" });
+    await logAction("issues", "assign-owner", `Assigned owner for ${selectedIncident.title}`);
+  }
+
+  async function escalateIncident() {
+    if (!selectedIncident) return;
+    const current = detailValue(selectedIncident, "Escalation Level") || "None";
+    const index = escalationLevels.indexOf(current);
+    const nextLevel = escalationLevels[Math.min(index + 1, escalationLevels.length - 1)] || "Supervisor";
+    let nextDetails = selectedIncident.detailItems ?? [];
+    nextDetails = upsertDetail(nextDetails, "Escalation Level", nextLevel);
+    await updateRecord("issues", selectedIncident.id, { detailItems: nextDetails, nextAction: `Escalated to ${nextLevel}` });
+    await logAction("issues", "escalate", `Escalated ${selectedIncident.title} to ${nextLevel}`);
+  }
+
+  async function markPendingReview() {
+    if (!selectedIncident) return;
+    await updateRecord("issues", selectedIncident.id, { status: "Pending Review", nextAction: "Resolve after manager review" });
+    await logAction("issues", "pending-review", `Marked pending review ${selectedIncident.title}`);
+  }
+
+  async function resolveIncident() {
+    if (!selectedIncident) return;
+    let nextDetails = selectedIncident.detailItems ?? [];
+    nextDetails = upsertDetail(nextDetails, "Resolution Evidence", "Manager verified corrective action and accepted proof." );
+    nextDetails = upsertDetail(nextDetails, "Review Status", "Resolved" );
+    await updateRecord("issues", selectedIncident.id, { status: "Resolved", detailItems: nextDetails, nextAction: "Reopen if issue recurs" });
+    await logAction("issues", "resolve-incident", `Resolved incident ${selectedIncident.title}`);
+  }
+
+  async function reopenIncident() {
+    if (!selectedIncident) return;
+    await updateRecord("issues", selectedIncident.id, { status: "Reopened", nextAction: "Review repeated failure" });
+    await logAction("issues", "reopen-incident", `Reopened incident ${selectedIncident.title}`);
+  }
+
+  return (
+    <ErpShell>
+      <div className="space-y-5 pb-24 md:pb-6">
+        <header className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Incident Center</h1>
+            <p className="text-sm text-muted-foreground">Control branch incidents, containment, escalation, corrective action, and resolution review.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => createCorrectiveActionForIncident()} disabled={!selectedIncident}>
+              <Target className="h-4 w-4" />
+              Create Corrective Action
+            </Button>
+            <Button variant="outline" onClick={escalateIncident} disabled={!selectedIncident}>
+              <Siren className="h-4 w-4" />
+              Escalate
+            </Button>
+            <Button onClick={openManualIncident}>
+              <ShieldAlert className="h-4 w-4" />
+              Report Incident
+            </Button>
+          </div>
+        </header>
+
+        <section className="grid gap-3 md:grid-cols-3 xl:grid-cols-7">
+          {kpis.slice(0, 7).map((kpi) => (
+            <Card key={kpi.label}>
+              <CardHeader className="pb-1"><CardTitle className="text-xs font-medium text-muted-foreground">{kpi.label}</CardTitle></CardHeader>
+              <CardContent><p className="text-2xl font-semibold">{kpi.value}</p></CardContent>
+            </Card>
+          ))}
+        </section>
+
+        <section className="grid gap-4 xl:grid-cols-[340px_minmax(0,1fr)_420px]">
+          <Card className="min-h-[640px]">
+            <CardHeader className="space-y-3">
+              <div>
+                <CardTitle className="text-base">Incident Queue</CardTitle>
+                <p className="mt-1 text-sm text-muted-foreground">Track incidents by severity, containment, SLA, and resolution state.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {["Critical", "New", "Contained", "Overdue", "Pending Review", "Resolved"].map((filter) => (
+                  <button key={filter} type="button" onClick={() => setActiveFilter(filter)}>
+                    <Badge variant={activeFilter === filter ? "secondary" : "outline"}>{filter}</Badge>
+                  </button>
+                ))}
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {!filteredQueue.length ? (
+                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                  Review source signals from inspection, outlet execution, or FEFO alerts before creating a manual incident.
+                </div>
+              ) : null}
+              {filteredQueue.map((row) => {
+                const sla = getIncidentSlaSummary(row);
+                return (
+                  <button
+                    key={row.id}
+                    type="button"
+                    onClick={() => setSelectedIncidentId(row.id)}
+                    className={cn(
+                      "w-full rounded-xl border p-3 text-left transition-colors hover:border-primary/60",
+                      selectedIncident?.id === row.id ? "border-primary bg-primary/5" : "border-border"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-medium">{row.title}</p>
+                        <p className="text-xs text-muted-foreground">{detailValue(row, "Branch") || row.subtitle}</p>
+                      </div>
+                      <Badge variant={getIncidentStatusTone(detailValue(row, "Severity") || row.status)}>{detailValue(row, "Severity") || row.status}</Badge>
+                    </div>
+                    <div className="mt-3 grid gap-1 text-xs text-muted-foreground">
+                      <div className="flex justify-between"><span>Status</span><span>{row.status}</span></div>
+                      <div className="flex justify-between"><span>SLA</span><span>{sla.status}</span></div>
+                      <div className="flex justify-between"><span>Corrective Action</span><span>{detailValue(row, "Linked Corrective Actions") || "Not created"}</span></div>
+                    </div>
+                  </button>
+                );
+              })}
+            </CardContent>
+          </Card>
+
+          <Card className="min-h-[640px]">
+            <CardHeader>
+              <CardTitle className="text-base">Source Signals</CardTitle>
+              <p className="text-sm text-muted-foreground">Candidates from inspection failures, outlet execution, and FEFO alerts.</p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {!signals.length ? (
+                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+                  No incident source signals yet. Failed inspection items, overdue execution, rejected proof, or FEFO exceptions will appear here.
+                </div>
+              ) : null}
+              {signals.map((signal) => (
+                <div key={signal.id} className={cn("rounded-xl border p-3", selectedSignalId === signal.id ? "border-primary bg-primary/5" : "border-border")}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium">{signal.title}</p>
+                      <p className="text-xs text-muted-foreground">{signal.branch}</p>
+                    </div>
+                    <Badge variant={getIncidentStatusTone(signal.severity)}>{signal.severity}</Badge>
+                  </div>
+                  <div className="mt-3 grid gap-1 text-xs text-muted-foreground">
+                    <div className="flex justify-between"><span>Source</span><span>{signal.sourceType}</span></div>
+                    <div className="flex justify-between"><span>Reason</span><span>{signal.reason}</span></div>
+                    <div className="flex justify-between"><span>Due</span><span>{signal.dueAt || "Set by SLA"}</span></div>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <Button size="sm" onClick={() => openSignalIncident(signal)}>Create Incident</Button>
+                    <Button variant="outline" size="sm" onClick={() => setSelectedSignalId(signal.id)}>Select</Button>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="min-h-[640px]">
+            <CardHeader>
+              <CardTitle className="text-base">Incident Detail</CardTitle>
+              <p className="text-sm text-muted-foreground">Containment, SLA, escalation, corrective action, and resolution evidence.</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!selectedIncident || !reviewSummary ? (
+                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">Select an incident or create one from a source signal.</div>
+              ) : (
+                <>
+                  <div>
+                    <p className="font-medium">{selectedIncident.title}</p>
+                    <p className="text-sm text-muted-foreground">{selectedIncident.subtitle}</p>
+                  </div>
+                  <div className="grid gap-2 text-sm">
+                    {[
+                      ["Source", reviewSummary.source],
+                      ["Branch", reviewSummary.branch],
+                      ["Severity", reviewSummary.severity],
+                      ["Category", reviewSummary.category],
+                      ["Impact Area", reviewSummary.impactArea],
+                      ["Containment", reviewSummary.containment],
+                      ["Owner", reviewSummary.owner],
+                      ["SLA", reviewSummary.slaStatus],
+                      ["Escalation", reviewSummary.escalationLevel],
+                      ["Linked Inspection", reviewSummary.linkedInspection],
+                      ["Linked Execution", reviewSummary.linkedExecutionTask],
+                      ["Corrective Action", reviewSummary.linkedCorrectiveAction],
+                      ["Resolution Evidence", reviewSummary.resolutionEvidence],
+                      ["Review Status", reviewSummary.reviewStatus],
+                    ].map(([label, value]) => (
+                      <div key={label} className="flex items-center justify-between gap-3">
+                        <span className="text-muted-foreground">{label}</span>
+                        <span className="text-right font-medium">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium"><Flag className="h-4 w-4 text-primary" />Next Actions</div>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      {nextActions.map((action) => <div key={action} className="rounded-lg border px-3 py-2">{action}</div>)}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium"><ClipboardList className="h-4 w-4 text-primary" />Linked Corrective Actions</div>
+                    {!correctiveActions.length ? (
+                      <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No corrective action created yet.</div>
+                    ) : (
+                      correctiveActions.map((action) => (
+                        <div key={action.id} className="rounded-lg border p-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="font-medium">{action.title}</p>
+                              <p className="text-xs text-muted-foreground">{action.subtitle}</p>
+                            </div>
+                            <Badge variant={getIncidentStatusTone(action.status)}>{action.status}</Badge>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Button variant="outline" onClick={markContained}><CheckCheck className="h-4 w-4" />Mark Contained</Button>
+                    <Button variant="outline" onClick={assignOwner}><ArrowUpRight className="h-4 w-4" />Assign Owner</Button>
+                    <Button variant="outline" onClick={() => createCorrectiveActionForIncident()}><Target className="h-4 w-4" />Create Corrective Action</Button>
+                    <Button variant="outline" onClick={escalateIncident}><Siren className="h-4 w-4" />Escalate</Button>
+                    <Button variant="outline" onClick={markPendingReview}><AlertTriangle className="h-4 w-4" />Mark Pending Review</Button>
+                    <Button onClick={resolveIncident}><CheckCheck className="h-4 w-4" />Resolve Incident</Button>
+                    <Button variant="outline" onClick={reopenIncident}>Reopen</Button>
+                  </div>
+                </>
+              )}
+              <p className="text-xs text-muted-foreground">Sync: {syncStatus} · {syncMessage}</p>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[760px]">
+          <DialogHeader>
+            <DialogTitle>Report Incident</DialogTitle>
+            <DialogDescription>Capture incident source, severity, containment, SLA, and whether corrective action should be created.</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <div className="grid gap-3 rounded-md border p-3 md:grid-cols-2">
+              <div className="space-y-1.5 md:col-span-2">
+                <Label>Incident Title</Label>
+                <Input value={form.title} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} placeholder="Example: fryer cleaning missed before opening" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Branch</Label>
+                <Select value={form.branch || undefined} onValueChange={(value) => setForm((current) => ({ ...current, branch: value }))}>
+                  <SelectTrigger><SelectValue placeholder="Select branch" /></SelectTrigger>
+                  <SelectContent>{branchOptions.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Source</Label>
+                <Select value={form.source} onValueChange={(value) => setForm((current) => ({ ...current, source: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{sourceOptions.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Severity</Label>
+                <Select value={form.severity} onValueChange={(value) => setForm((current) => ({ ...current, severity: value, dueTime: getIncidentDueAtBySeverity(value) }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{severityOptions.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Category</Label>
+                <Select value={form.category} onValueChange={(value) => setForm((current) => ({ ...current, category: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{categoryOptions.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Impact Area</Label>
+                <Select value={form.impactArea} onValueChange={(value) => setForm((current) => ({ ...current, impactArea: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>{impactAreaOptions.map((option) => <SelectItem key={option} value={option}>{option}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Reported Time</Label>
+                <Input type="datetime-local" value={form.reportedTime} onChange={(event) => setForm((current) => ({ ...current, reportedTime: event.target.value }))} />
+              </div>
+            </div>
+
+            <div className="grid gap-3 rounded-md border p-3 md:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label>Customer / Service Impact</Label>
+                <Input value={form.customerImpact} onChange={(event) => setForm((current) => ({ ...current, customerImpact: event.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Owner</Label>
+                <Input value={form.owner} onChange={(event) => setForm((current) => ({ ...current, owner: event.target.value }))} />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label>Immediate Containment</Label>
+                <Textarea value={form.immediateContainment} onChange={(event) => setForm((current) => ({ ...current, immediateContainment: event.target.value }))} placeholder="What was done immediately to reduce risk?" />
+              </div>
+              <div className="space-y-1.5 md:col-span-2">
+                <Label>Next Action</Label>
+                <Textarea value={form.nextAction} onChange={(event) => setForm((current) => ({ ...current, nextAction: event.target.value }))} placeholder="Describe the expected review or follow-up step." />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Due Time</Label>
+                <Input type="datetime-local" value={form.dueTime} onChange={(event) => setForm((current) => ({ ...current, dueTime: event.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Create Corrective Action</Label>
+                <Select value={form.createCorrectiveAction} onValueChange={(value) => setForm((current) => ({ ...current, createCorrectiveAction: value }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent><SelectItem value="Yes">Yes</SelectItem><SelectItem value="No">No</SelectItem></SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button onClick={saveIncident} disabled={!form.title.trim() || !form.branch}>Report Incident</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </ErpShell>
+  );
+}

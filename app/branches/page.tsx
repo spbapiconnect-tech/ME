@@ -1,8 +1,7 @@
 "use client";
 
-import { ModulePageShell } from "@/components/module/module-page-shell";
-import { modulePages } from "@/components/module/module-pages";
+import { BranchControlPage } from "@/components/branches/branch-control-page";
 
 export default function Page() {
-  return <ModulePageShell config={modulePages["branches"]} />;
+  return <BranchControlPage />;
 }

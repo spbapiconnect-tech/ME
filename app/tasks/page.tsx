@@ -1,8 +1,7 @@
 "use client";
 
-import { ModulePageShell } from "@/components/module/module-page-shell";
-import { modulePages } from "@/components/module/module-pages";
+import { OutletExecutionCommandCenter } from "@/components/tasks/outlet-execution-command-center";
 
 export default function Page() {
-  return <ModulePageShell config={modulePages["tasks"]} />;
+  return <OutletExecutionCommandCenter />;
 }

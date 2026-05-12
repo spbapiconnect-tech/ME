@@ -1,8 +1,7 @@
 "use client";
 
-import { ModulePageShell } from "@/components/module/module-page-shell";
-import { modulePages } from "@/components/module/module-pages";
+import { IncidentCenterPage } from "@/components/issues/incident-center-page";
 
 export default function Page() {
-  return <ModulePageShell config={modulePages["issues"]} />;
+  return <IncidentCenterPage />;
 }

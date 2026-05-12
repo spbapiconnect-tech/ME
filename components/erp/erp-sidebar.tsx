@@ -37,6 +37,7 @@ import {
   Warehouse,
   Workflow,
 } from "lucide-react";
+import { getModulesByGroup } from "@/lib/me/module-registry";
 
 type SidebarItem = {
   key: string;
@@ -51,71 +52,57 @@ type SidebarGroup = {
   items: SidebarItem[];
 };
 
-const sidebarGroups: SidebarGroup[] = [
-  {
-    key: "dashboard",
-    label: "Dashboard",
-    items: [{ key: "dashboard", label: "Dashboard", href: "/", icon: LayoutDashboard }],
-  },
-  {
-    key: "store-operations",
-    label: "Store Operations",
-    items: [
-      { key: "branches", label: "Branches", href: "/branches", icon: Store },
-      { key: "inspection", label: "Inspection", href: "/inspection", icon: ClipboardList },
-      { key: "issues", label: "Issue Center", href: "/issues", icon: AlertCircle },
-      { key: "tasks", label: "Tasks", href: "/tasks", icon: ListTodo },
-      { key: "expiry", label: "Expiry Control", href: "/expiry", icon: ClipboardCheck },
-      { key: "sop", label: "SOP Library", href: "/sop", icon: BookOpen },
-    ],
-  },
-  {
-    key: "psi",
-    label: "PSI",
-    items: [
-      { key: "psi-overview", label: "PSI Overview", href: "/psi", icon: BarChart3 },
-      { key: "procurement", label: "Procurement", href: "/psi/procurement", icon: Truck },
-      { key: "supplier", label: "Supplier", href: "/psi/supplier", icon: Users },
-      { key: "inventory", label: "Inventory", href: "/psi/inventory", icon: Warehouse },
-      { key: "receiving", label: "Receiving", href: "/psi/receiving", icon: History },
-    ],
-  },
-  {
-    key: "workforce",
-    label: "Workforce",
-    items: [
-      { key: "staff", label: "Staff", href: "/staff", icon: Users },
-      { key: "schedule", label: "Schedule", href: "/schedule", icon: CalendarDays },
-      { key: "training", label: "Training", href: "/training", icon: ClipboardList },
-      { key: "roles", label: "Roles", href: "/roles", icon: ShieldCheck },
-    ],
-  },
-  {
-    key: "business",
-    label: "Business",
-    items: [
-      { key: "reports", label: "Reports", href: "/reports", icon: BarChart3 },
-      { key: "pos-report", label: "POS Report", href: "/reports/pos", icon: CalendarRange },
-      { key: "finance", label: "Finance", href: "/finance", icon: Receipt },
-      { key: "packages", label: "Packages", href: "/packages", icon: Package },
-      { key: "stakeholder", label: "Stakeholder Summary", href: "/stakeholder-summary", icon: Building2 },
-    ],
-  },
-  {
-    key: "system",
-    label: "System",
-    items: [
-      { key: "settings", label: "Settings", href: "/settings", icon: Settings },
-      { key: "access-control", label: "Access Control", href: "/access-control", icon: ShieldCheck },
-      { key: "rules", label: "Rules", href: "/rules", icon: SlidersHorizontal },
-      { key: "notifications", label: "Notifications", href: "/notifications", icon: Bell },
-      { key: "integration", label: "Integrations", href: "/integration", icon: LayoutGrid },
-      { key: "workflow", label: "Workflow", href: "/workflow", icon: Workflow },
-      { key: "templates", label: "Templates", href: "/templates", icon: FileText },
-      { key: "audit-trail", label: "Audit Trail", href: "/audit-trail", icon: ScrollText },
-    ],
-  },
+const iconMap = {
+  LayoutDashboard,
+  Store,
+  ClipboardList,
+  AlertCircle,
+  ListTodo,
+  ClipboardCheck,
+  BookOpen,
+  BarChart3,
+  Truck,
+  Users,
+  Warehouse,
+  History,
+  CalendarDays,
+  GraduationCap: ClipboardList,
+  ShieldCheck,
+  CalendarRange,
+  Receipt,
+  Package,
+  Building2,
+  Settings,
+  SlidersHorizontal,
+  Bell,
+  LayoutGrid,
+  Workflow,
+  FileText,
+  ScrollText,
+} as const;
+
+const groupMeta = [
+  { key: "dashboard", label: "Dashboard", registryKey: "Dashboard" as const },
+  { key: "store-operations", label: "Store Operations", registryKey: "Store Operations" as const },
+  { key: "psi", label: "PSI", registryKey: "PSI" as const },
+  { key: "workforce", label: "Workforce", registryKey: "Workforce" as const },
+  { key: "business", label: "Business", registryKey: "Business" as const },
+  { key: "system", label: "System", registryKey: "System" as const },
 ];
+
+const sidebarGroups: SidebarGroup[] = groupMeta.map((group) => ({
+  key: group.key,
+  label: group.label,
+  items:
+    group.registryKey === "Dashboard"
+      ? [{ key: "dashboard", label: "Dashboard", href: "/", icon: LayoutDashboard }]
+      : getModulesByGroup(group.registryKey).map((item) => ({
+          key: item.key,
+          label: item.name,
+          href: item.route,
+          icon: iconMap[item.iconKey as keyof typeof iconMap] ?? LayoutDashboard,
+        })),
+}));
 
 function isItemActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";

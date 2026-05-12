@@ -1,8 +1,7 @@
 "use client";
 
-import { ModulePageShell } from "@/components/module/module-page-shell";
-import { modulePages } from "@/components/module/module-pages";
+import { InspectionWorkspacePage } from "@/components/inspection/inspection-workspace-page";
 
 export default function Page() {
-  return <ModulePageShell config={modulePages["inspection"]} />;
+  return <InspectionWorkspacePage />;
 }

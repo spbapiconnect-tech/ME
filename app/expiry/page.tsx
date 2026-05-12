@@ -1,8 +1,7 @@
 "use client";
 
-import { ModulePageShell } from "@/components/module/module-page-shell";
-import { modulePages } from "@/components/module/module-pages";
+import { FefoWasteControlPage } from "@/components/expiry/fefo-waste-control-page";
 
 export default function Page() {
-  return <ModulePageShell config={modulePages["expiry"]} />;
+  return <FefoWasteControlPage />;
 }

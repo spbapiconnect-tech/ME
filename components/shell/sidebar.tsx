@@ -33,69 +33,59 @@ import {
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useDictionary } from "@/lib/i18n";
+import { getModulesByGroup } from "@/lib/me/module-registry";
 
 export function Sidebar() {
   const pathname = usePathname();
   const dict = useDictionary();
 
+  const iconMap = {
+    LayoutDashboard,
+    Store,
+    ClipboardList,
+    AlertCircle,
+    ListTodo,
+    ClipboardCheck,
+    BookOpen,
+    BarChart3,
+    Truck,
+    Users,
+    Warehouse,
+    History,
+    CalendarDays,
+    GraduationCap,
+    ShieldCheck,
+    CalendarRange,
+    Receipt,
+    Package,
+    Building2,
+    Settings,
+    SlidersHorizontal,
+    Bell,
+    LayoutGrid,
+    Workflow,
+    FileText,
+    ScrollText,
+  } as const;
+
+  const makeGroup = (label: string, key: Parameters<typeof getModulesByGroup>[0]) => ({
+    group: label,
+    items: getModulesByGroup(key)
+      .filter((item) => item.route !== "/")
+      .map((item) => ({
+        name: item.name,
+        href: item.route,
+        icon: iconMap[item.iconKey as keyof typeof iconMap] ?? LayoutDashboard,
+      })),
+  });
+
   const navigation = [
-    {
-      group: dict.sidebar.dashboard,
-      items: [{ name: dict.sidebar.dashboard, href: "/", icon: LayoutDashboard }],
-    },
-    {
-      group: dict.sidebar.storeOperations,
-      items: [
-        { name: "Branches", href: "/branches", icon: Store },
-        { name: "Inspection", href: "/inspection", icon: ClipboardList },
-        { name: "Issue Center", href: "/issues", icon: AlertCircle },
-        { name: "Tasks", href: "/tasks", icon: ListTodo },
-        { name: "Expiry Control", href: "/expiry", icon: ClipboardCheck },
-        { name: "SOP Library", href: "/sop", icon: BookOpen },
-      ],
-    },
-    {
-      group: dict.sidebar.psi,
-      items: [
-        { name: dict.sidebar.psiOverview, href: "/psi", icon: BarChart3 },
-        { name: dict.sidebar.procurement, href: "/psi/procurement", icon: Truck },
-        { name: dict.sidebar.supplier, href: "/psi/supplier", icon: Users },
-        { name: dict.sidebar.inventory, href: "/psi/inventory", icon: Warehouse },
-        { name: dict.sidebar.receiving, href: "/psi/receiving", icon: History },
-      ],
-    },
-    {
-      group: dict.sidebar.workforce,
-      items: [
-        { name: "Staff", href: "/staff", icon: Users },
-        { name: "Schedule", href: "/schedule", icon: CalendarDays },
-        { name: "Training", href: "/training", icon: GraduationCap },
-        { name: "Roles", href: "/roles", icon: ShieldCheck },
-      ],
-    },
-    {
-      group: dict.sidebar.business,
-      items: [
-        { name: "Reports", href: "/reports", icon: BarChart3 },
-        { name: "POS Report", href: "/reports/pos", icon: CalendarRange },
-        { name: "Finance", href: "/finance", icon: Receipt },
-        { name: "Packages", href: "/packages", icon: Package },
-        { name: "Stakeholder Summary", href: "/stakeholder-summary", icon: Building2 },
-      ],
-    },
-    {
-      group: dict.sidebar.system,
-      items: [
-        { name: "Settings", href: "/settings", icon: Settings },
-        { name: "Access Control", href: "/access-control", icon: ShieldCheck },
-        { name: "Rules", href: "/rules", icon: SlidersHorizontal },
-        { name: "Notifications", href: "/notifications", icon: Bell },
-        { name: "Integrations", href: "/integration", icon: LayoutGrid },
-        { name: "Workflow", href: "/workflow", icon: Workflow },
-        { name: "Templates", href: "/templates", icon: FileText },
-        { name: "Audit Trail", href: "/audit-trail", icon: ScrollText },
-      ],
-    },
+    { group: dict.sidebar.dashboard, items: [{ name: dict.sidebar.dashboard, href: "/", icon: LayoutDashboard }] },
+    makeGroup(dict.sidebar.storeOperations, "Store Operations"),
+    makeGroup(dict.sidebar.psi, "PSI"),
+    makeGroup(dict.sidebar.workforce, "Workforce"),
+    makeGroup(dict.sidebar.business, "Business"),
+    makeGroup(dict.sidebar.system, "System"),
   ];
 
   return (
