@@ -50,6 +50,116 @@ function upsertDetail(items: Array<{ label: string; value: string }> | undefined
   return next;
 }
 
+type TaskLinkedSopStep = {
+  id: string;
+  title?: string;
+  instruction: string;
+};
+
+type TaskLinkedSopBlock = {
+  id: string;
+  type: string;
+  title?: string;
+  body?: string;
+  imageUrl?: string;
+  pdfUrl?: string;
+  checklistItems?: string[];
+  steps?: TaskLinkedSopStep[];
+};
+
+type TaskLinkedSopPage = {
+  id: string;
+  pageNo: number;
+  title: string;
+  coverImageUrl?: string;
+  blocks: TaskLinkedSopBlock[];
+};
+
+type TaskLinkedSopContent = {
+  mode?: string;
+  pages: TaskLinkedSopPage[];
+};
+
+function parseLinkedSopContent(row: { detailItems?: Array<{ label: string; value: string }> }): TaskLinkedSopContent {
+  const raw = detailValue(row, "SOP Content JSON");
+  if (!raw) return { mode: "Linked SOP", pages: [] };
+
+  try {
+    const parsed = JSON.parse(raw) as TaskLinkedSopContent;
+    return {
+      mode: parsed.mode || "Linked SOP",
+      pages: Array.isArray(parsed.pages) ? parsed.pages : [],
+    };
+  } catch {
+    return { mode: "Linked SOP", pages: [] };
+  }
+}
+
+function renderLinkedSopBlock(block: TaskLinkedSopBlock) {
+  if (block.type === "heading") {
+    return <div className="text-base font-semibold">{block.title || block.body || "Heading"}</div>;
+  }
+
+  if (block.type === "text") {
+    return <div className="whitespace-pre-wrap text-sm text-muted-foreground">{block.body || "No text content."}</div>;
+  }
+
+  if (block.type === "image") {
+    return (
+      <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+        <div className="font-medium">Image</div>
+        <div className="break-all text-muted-foreground">{block.imageUrl || "Image placeholder not set."}</div>
+      </div>
+    );
+  }
+
+  if (block.type === "pdf") {
+    return (
+      <div className="rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+        <div className="font-medium">PDF</div>
+        <div className="break-all text-muted-foreground">{block.pdfUrl || "PDF placeholder not set."}</div>
+      </div>
+    );
+  }
+
+  if (block.type === "warning") {
+    return (
+      <div className="rounded-lg border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-sm">
+        <div className="font-medium">{block.title || "Warning"}</div>
+        <div className="whitespace-pre-wrap text-muted-foreground">{block.body || "No warning content."}</div>
+      </div>
+    );
+  }
+
+  if (block.type === "checklist") {
+    const items = block.checklistItems ?? [];
+    return (
+      <div className="space-y-2 rounded-lg border px-3 py-2 text-sm">
+        <div className="font-medium">{block.title || "Checklist"}</div>
+        {items.length ? items.map((item) => (
+          <div key={item} className="flex items-start gap-2">
+            <span className="mt-1 h-3 w-3 rounded border" />
+            <span>{item}</span>
+          </div>
+        )) : <div className="text-muted-foreground">No checklist items.</div>}
+      </div>
+    );
+  }
+
+  const steps = block.steps ?? [];
+  return (
+    <div className="space-y-2 rounded-lg border px-3 py-2 text-sm">
+      <div className="font-medium">{block.title || "Step By Step"}</div>
+      {steps.length ? steps.map((step, index) => (
+        <div key={step.id} className="rounded-md bg-muted/40 px-3 py-2">
+          <div className="font-medium">Step {index + 1}{step.title ? ` · ${step.title}` : ""}</div>
+          <div className="whitespace-pre-wrap text-muted-foreground">{step.instruction}</div>
+        </div>
+      )) : <div className="text-muted-foreground">No steps.</div>}
+    </div>
+  );
+}
+
 function formatLocalDate(date: Date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -556,6 +666,56 @@ export function OutletExecutionCommandCenter() {
                     <Badge variant={getPhotoProofStatusTone(detail.photoProofStatus)}>{detail.photoProofStatus}</Badge>
                     <Badge variant={getManagerReviewStatusTone(detail.managerReviewStatus)}>{detail.managerReviewStatus}</Badge>
                   </div>
+                  {(() => {
+                    const linkedSopContent = parseLinkedSopContent(detail.row);
+                    const linkedSopName = detailValue(detail.row, "Linked SOP");
+                    const isTrainingTask = detail.taskType === "Training Acknowledgement" || Boolean(detailValue(detail.row, "Linked SOP ID")) || Boolean(linkedSopName);
+
+                    if (!isTrainingTask) {
+                      return (
+                        <div className="space-y-2">
+                          <p className="text-sm font-semibold">Task Instructions</p>
+                          <div className="rounded-lg border px-3 py-2 text-sm">
+                            <div className="font-medium">Completion Standard</div>
+                            <div className="whitespace-pre-wrap text-muted-foreground">{detail.completionStandard || "No completion standard defined."}</div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-semibold">Linked SOP Employee Preview</p>
+                          <Badge variant="outline">{linkedSopContent.mode || "Linked SOP"}</Badge>
+                        </div>
+                        <div className="rounded-lg border px-3 py-2 text-sm">
+                          <div className="font-medium">{linkedSopName || "Linked SOP"}</div>
+                          <div className="text-muted-foreground">Staff should read this SOP content before acknowledging the task.</div>
+                        </div>
+                        {!linkedSopContent.pages.length ? (
+                          <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">
+                            This task is linked to an SOP, but no page-by-page SOP content was stored on the task yet.
+                          </div>
+                        ) : linkedSopContent.pages.map((page) => (
+                          <div key={page.id} className="rounded-xl border p-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <div className="text-xs font-medium uppercase text-muted-foreground">Page {page.pageNo}</div>
+                                <div className="font-semibold">{page.title}</div>
+                              </div>
+                              <Badge variant="secondary">{page.blocks.length} Blocks</Badge>
+                            </div>
+                            {page.coverImageUrl ? <div className="mt-2 rounded-lg border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">Cover: {page.coverImageUrl}</div> : null}
+                            <div className="mt-3 space-y-3">
+                              {page.blocks.map((block) => <div key={block.id}>{renderLinkedSopBlock(block)}</div>)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+
                   <div className="space-y-2">
                     <p className="text-sm font-semibold">Checklist</p>
                     {detail.checklistItems.length ? detail.checklistItems.map((item) => <div key={item} className="rounded-lg border px-3 py-2 text-sm">{item}</div>) : <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No checklist defined.</div>}
