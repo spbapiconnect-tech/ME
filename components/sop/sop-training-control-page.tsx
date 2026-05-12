@@ -6,6 +6,7 @@ import {
   FileText,
   GraduationCap,
   ImageIcon,
+  Maximize2,
   Plus,
   ScrollText,
   Trash2,
@@ -152,9 +153,25 @@ function newBlock(type: BlockType = "text"): BuilderBlock {
 function newPage(index: number): BuilderPage {
   return {
     id: `page-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    title: `Page ${index}`,
+    title: index === 1 ? "Page 1 · What staff need to know" : `Page ${index}`,
     coverImageUrl: "",
-    blocks: [newBlock("heading"), newBlock("text"), newBlock("step-list")],
+    blocks: [
+      {
+        ...newBlock("heading"),
+        title: "SOP title / section heading",
+        body: "Explain what this page is about.",
+      },
+      {
+        ...newBlock("text"),
+        title: "Instruction context",
+        body: "Write the reason, standard, or important background here so staff understand what to do.",
+      },
+      {
+        ...newBlock("step-list"),
+        title: "Step-by-step execution",
+        stepsText: "Step 1: Prepare the station\nStep 2: Follow the standard\nStep 3: Take proof photo if required",
+      },
+    ],
   };
 }
 
@@ -276,6 +293,7 @@ export function SopTrainingControlPage() {
   const [selectedSopId, setSelectedSopId] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("create");
+  const [builderFullscreen, setBuilderFullscreen] = useState(false);
   const [pages, setPages] = useState<BuilderPage[]>([newPage(1)]);
   const [form, setForm] = useState<SopForm>({
     title: "",
@@ -365,6 +383,7 @@ export function SopTrainingControlPage() {
       }));
     }
     if (mode === "create" && !pages.length) setPages([newPage(1)]);
+    setBuilderFullscreen(false);
     setDialogMode(mode);
     setDialogOpen(true);
   }
@@ -699,13 +718,17 @@ export function SopTrainingControlPage() {
         <DialogContent
           className={cn(
             dialogMode === "create"
-              ? "flex h-[90vh] w-[96vw] max-w-[1680px] flex-col overflow-hidden p-0"
+              ? builderFullscreen
+                ? "fixed inset-x-0 top-[72px] bottom-0 z-50 flex w-[calc(100vw-180px)] max-w-none translate-x-[90px] translate-y-0 flex-col overflow-hidden rounded-none border-l p-0"
+                : "flex h-[90vh] w-[96vw] max-w-[1680px] flex-col overflow-hidden p-0"
               : "max-h-[90vh] overflow-y-auto sm:max-w-[760px]",
           )}
         >
-          <DialogHeader className={dialogMode === "create" ? "shrink-0 border-b px-5 py-4" : undefined}>
-            <DialogTitle>{dialogMode === "create" ? "Create SOP" : dialogMode === "publish" ? "Publish Version" : dialogMode === "training" ? "Assign Training" : "Create Templates"}</DialogTitle>
-            <DialogDescription>
+          <DialogHeader className={dialogMode === "create" ? "shrink-0 border-b px-5 py-4 pr-16" : undefined}>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <DialogTitle>{dialogMode === "create" ? "Create SOP" : dialogMode === "publish" ? "Publish Version" : dialogMode === "training" ? "Assign Training" : "Create Templates"}</DialogTitle>
+                <DialogDescription>
               {dialogMode === "create"
                 ? "Build an employee-readable SOP with pages, images, step lists, PDF blocks, and checklist blocks."
                 : dialogMode === "publish"
@@ -713,7 +736,15 @@ export function SopTrainingControlPage() {
                   : dialogMode === "training"
                     ? "Assign acknowledgement training to outlet and role targets."
                     : "Generate checklist, inspection, and task templates from this SOP."}
-            </DialogDescription>
+                </DialogDescription>
+              </div>
+              {dialogMode === "create" ? (
+                <Button type="button" variant="outline" size="sm" onClick={() => setBuilderFullscreen((current) => !current)}>
+                  <Maximize2 className="h-4 w-4" />
+                  {builderFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                </Button>
+              ) : null}
+            </div>
           </DialogHeader>
 
           {dialogMode === "create" ? (
@@ -768,7 +799,11 @@ export function SopTrainingControlPage() {
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <div className="space-y-1.5"><Label>Page Title</Label><Input value={page.title} onChange={(e) => updatePage(page.id, { title: e.target.value })} /></div>
-                        <div className="space-y-1.5"><Label>Cover Image URL / File Name Placeholder</Label><Input value={page.coverImageUrl} onChange={(e) => updatePage(page.id, { coverImageUrl: e.target.value })} /></div>
+                        <div className="space-y-1.5">
+                          <Label>Cover Image</Label>
+                          <Input type="file" accept="image/*" onChange={(e) => updatePage(page.id, { coverImageUrl: e.target.files?.[0]?.name ?? "" })} />
+                          {page.coverImageUrl ? <div className="text-xs text-muted-foreground">Selected: {page.coverImageUrl}</div> : null}
+                        </div>
 
                         <div className="flex flex-wrap gap-2">
                           {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
@@ -795,11 +830,19 @@ export function SopTrainingControlPage() {
                                 ) : null}
 
                                 {block.type === "image" ? (
-                                  <div className="space-y-1.5"><Label>Image URL / File Name Placeholder</Label><Input value={block.imageUrl} onChange={(e) => updateBlock(page.id, block.id, { imageUrl: e.target.value })} /></div>
+                                  <div className="space-y-1.5">
+                                    <Label>Image Upload</Label>
+                                    <Input type="file" accept="image/*" onChange={(e) => updateBlock(page.id, block.id, { imageUrl: e.target.files?.[0]?.name ?? "" })} />
+                                    {block.imageUrl ? <div className="text-xs text-muted-foreground">Selected: {block.imageUrl}</div> : null}
+                                  </div>
                                 ) : null}
 
                                 {block.type === "pdf" ? (
-                                  <div className="space-y-1.5"><Label>PDF URL / File Name Placeholder</Label><Input value={block.pdfUrl} onChange={(e) => updateBlock(page.id, block.id, { pdfUrl: e.target.value })} /></div>
+                                  <div className="space-y-1.5">
+                                    <Label>PDF Upload</Label>
+                                    <Input type="file" accept="application/pdf" onChange={(e) => updateBlock(page.id, block.id, { pdfUrl: e.target.files?.[0]?.name ?? "" })} />
+                                    {block.pdfUrl ? <div className="text-xs text-muted-foreground">Selected: {block.pdfUrl}</div> : null}
+                                  </div>
                                 ) : null}
 
                                 {block.type === "step-list" ? (
