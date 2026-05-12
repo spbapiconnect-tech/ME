@@ -1,8 +1,10 @@
-"use client";
-
-import { ModulePageShell } from "@/components/module/module-page-shell";
-import { modulePages } from "@/components/module/module-pages";
+import { Suspense } from "react";
+import { SopTrainingControlPage } from "@/components/sop/sop-training-control-page";
 
 export default function Page() {
-  return <ModulePageShell moduleKey="sop" config={modulePages["sop"]} />;
+  return (
+    <Suspense fallback={null}>
+      <SopTrainingControlPage />
+    </Suspense>
+  );
 }

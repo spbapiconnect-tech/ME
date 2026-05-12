@@ -5,6 +5,13 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { modulePages } from "@/lib/me/module-shell-data";
 import type { ModuleRow } from "@/components/module/module-page-shell";
 import { getMeDataProvider } from "@/lib/me/data-provider";
+import {
+  createBranchSetupTask as createBranchSetupTaskSeed,
+  createDisposalTaskFromFefoRecord as createDisposalTaskSeed,
+  createIncidentFromInspectionFailure as createIncidentFromInspectionFailureSeed,
+  createTaskFromIncident as createTaskFromIncidentSeed,
+  createUseFirstTaskFromFefoRecord as createUseFirstTaskSeed,
+} from "@/lib/store-operations/store-operation-links";
 
 type RuntimeModuleKey = keyof typeof modulePages;
 
@@ -60,6 +67,16 @@ type MeRuntimeState = {
   raiseIssueFromRecord: (sourceModuleKey: string, rowId: string) => Promise<ModuleRow | null>;
   createTaskFromIssue: (issueRowId: string) => Promise<ModuleRow | null>;
   resolveRecord: (moduleKey: string, rowId: string, resolutionNote?: string) => Promise<void>;
+  createIncidentFromInspectionFailure: (inspectionId: string, failedItemId?: string) => Promise<ModuleRow | null>;
+  createTaskFromIncident: (incidentId: string) => Promise<ModuleRow | null>;
+  createUseFirstTaskFromFefoRecord: (fefoId: string) => Promise<ModuleRow | null>;
+  createDisposalTaskFromFefoRecord: (fefoId: string) => Promise<ModuleRow | null>;
+  createBranchSetupTask: (branchId: string, missingSetupItem?: string) => Promise<ModuleRow | null>;
+  updateTaskProofAccepted: (taskId: string) => Promise<void>;
+  updateTaskProofRejected: (taskId: string) => Promise<void>;
+  transitionIncidentStatus: (incidentId: string, status: string, note?: string) => Promise<void>;
+  transitionInspectionReviewStatus: (inspectionId: string, status: string, note?: string) => Promise<void>;
+  transitionFefoReviewStatus: (fefoId: string, status: string, note?: string) => Promise<void>;
 };
 
 function nowIso() {
@@ -199,6 +216,10 @@ function upsertDetail(items: ModuleRow["detailItems"], label: string, value: str
   if (index >= 0) next[index] = { label, value };
   else next.push({ label, value });
   return next;
+}
+
+function detailValue(items: ModuleRow["detailItems"], label: string) {
+  return items?.find((item) => item.label === label)?.value ?? "";
 }
 
 export const useMeRuntimeStore = create<MeRuntimeState>()(
@@ -541,6 +562,314 @@ export const useMeRuntimeStore = create<MeRuntimeState>()(
         });
         await get().logAction("tasks", "created-from-issue", `Created task from issue:${issueRowId}`);
         return get().modules["tasks"]?.rows.find((row) => row.id === created.id) ?? null;
+      },
+      createIncidentFromInspectionFailure: async (inspectionId, failedItemId) => {
+        const inspection = (get().modules["inspection"]?.rows ?? []).find((row) => row.id === inspectionId);
+        if (!inspection) return null;
+        const payload = detailValue(inspection.detailItems, "Failed Item Payload");
+        let failedItem: { id?: string; label: string; severity?: string; comment?: string } | undefined;
+        if (payload) {
+          try {
+            const parsed = JSON.parse(payload);
+            failedItem = Array.isArray(parsed) ? parsed.find((item) => item.id === failedItemId) : undefined;
+          } catch {}
+        }
+        const seed = createIncidentFromInspectionFailureSeed(inspection, failedItem);
+        const created = await get().createRecordWithPayload("issues", {
+          title: seed.title,
+          subtitle: `${detailValue(inspection.detailItems, "Branch") || inspection.subtitle} · Store Inspection`,
+          status: "New",
+          owner: "Incident Center",
+          detailItems: [
+            { label: "Branch", value: detailValue(inspection.detailItems, "Branch") || inspection.subtitle },
+            { label: "Source", value: "Store Inspection" },
+            { label: "Source Record ID", value: inspection.id },
+            { label: "Severity", value: seed.severity || "High" },
+            { label: "Category", value: "Store Inspection Failure" },
+            { label: "Impact Area", value: "Outlet Execution" },
+            { label: "Immediate Containment", value: "" },
+            { label: "Containment Status", value: "Open" },
+            { label: "Due Time", value: "" },
+            { label: "SLA Status", value: "On Track" },
+            { label: "Escalation Level", value: seed.severity === "Critical" ? "Critical" : "None" },
+            { label: "Linked Inspection ID", value: inspection.id },
+            { label: "Linked Inspection", value: inspection.title },
+            { label: "Linked Inspection Failed Item ID", value: failedItem?.id || "" },
+            { label: "Linked Outlet Execution ID", value: detailValue(inspection.detailItems, "Linked Outlet Execution ID") },
+            { label: "Linked Outlet Execution", value: detailValue(inspection.detailItems, "Linked Outlet Execution") },
+            { label: "Linked Corrective Actions", value: "" },
+            { label: "Resolution Evidence", value: "" },
+            { label: "Review Status", value: "New" },
+          ],
+          detailNote: seed.summary || "Incident created from failed inspection item.",
+          nextAction: "Capture containment and create corrective action",
+        });
+        let nextDetails = inspection.detailItems ?? [];
+        const ids = [detailValue(nextDetails, "Linked Incident IDs"), created.id].filter(Boolean).join(", ");
+        const titles = [detailValue(nextDetails, "Linked Incident Titles"), created.title].filter(Boolean).join(", ");
+        nextDetails = upsertDetail(nextDetails, "Linked Incident IDs", ids);
+        nextDetails = upsertDetail(nextDetails, "Linked Incident Titles", titles);
+        await get().updateRecord("inspection", inspection.id, { detailItems: nextDetails, status: "Failed Items", nextAction: "Create corrective action" });
+        return created;
+      },
+      createTaskFromIncident: async (incidentId) => {
+        const incident = (get().modules["issues"]?.rows ?? []).find((row) => row.id === incidentId);
+        if (!incident) return null;
+        const seed = createTaskFromIncidentSeed(incident, {
+          linkedInspectionId: detailValue(incident.detailItems, "Linked Inspection ID"),
+        });
+        const branch = detailValue(incident.detailItems, "Branch") || incident.subtitle;
+        const dueAt = seed.dueAt || new Date().toISOString().slice(0, 16);
+        const created = await get().createRecordWithPayload("tasks", {
+          title: seed.title,
+          subtitle: `${branch} · Corrective Action`,
+          status: "Scheduled",
+          owner: "Outlet Manager",
+          detailItems: [
+            { label: "Branch", value: branch },
+            { label: "Task Type", value: "Corrective Action" },
+            { label: "Role Target", value: "Outlet Manager" },
+            { label: "Outlets", value: branch },
+            { label: "Completed Outlets", value: "" },
+            { label: "Due Date", value: dueAt.slice(0, 10) },
+            { label: "Due Time", value: dueAt.slice(11, 16) },
+            { label: "Due At", value: dueAt },
+            { label: "Repeat Rule", value: "Once" },
+            { label: "Completion Standard", value: seed.completionStandard },
+            { label: "Photo Required", value: seed.photoProofRequired ? "Required" : "Not Required" },
+            { label: "Photo Proof Status", value: seed.photoProofRequired ? "Missing" : "Not Required" },
+            { label: "Photo Proofs", value: "" },
+            { label: "Manager Review Status", value: "Not Submitted" },
+            { label: "Source", value: "Incident Center" },
+            { label: "Linked Incident ID", value: incident.id },
+            { label: "Linked Incident", value: incident.title },
+            { label: "Linked Inspection ID", value: detailValue(incident.detailItems, "Linked Inspection ID") },
+            { label: "Linked Inspection", value: detailValue(incident.detailItems, "Linked Inspection") },
+            { label: "SLA Status", value: detailValue(incident.detailItems, "SLA Status") || "On Track" },
+          ],
+          detailNote: seed.completionStandard,
+          nextAction: "Start corrective action",
+        });
+        let nextDetails = incident.detailItems ?? [];
+        nextDetails = upsertDetail(nextDetails, "Linked Corrective Actions", [detailValue(nextDetails, "Linked Corrective Actions"), created.title].filter(Boolean).join(", "));
+        await get().updateRecord("issues", incident.id, { detailItems: nextDetails, status: "Assigned", nextAction: "Track corrective action" });
+        return created;
+      },
+      createUseFirstTaskFromFefoRecord: async (fefoId) => {
+        const fefo = (get().modules["expiry"]?.rows ?? []).find((row) => row.id === fefoId);
+        if (!fefo) return null;
+        const seed = createUseFirstTaskSeed(fefo, { dueAt: new Date().toISOString().slice(0, 16) });
+        const branch = detailValue(fefo.detailItems, "Branch") || fefo.subtitle;
+        const created = await get().createRecordWithPayload("tasks", {
+          title: seed.title,
+          subtitle: `${branch} · FEFO Action`,
+          status: "Scheduled",
+          owner: "Outlet Manager",
+          detailItems: [
+            { label: "Branch", value: branch },
+            { label: "Task Type", value: "FEFO Action" },
+            { label: "Role Target", value: "Outlet Manager" },
+            { label: "Outlets", value: branch },
+            { label: "Completed Outlets", value: "" },
+            { label: "Due Date", value: (seed.dueAt || "").slice(0, 10) },
+            { label: "Due Time", value: (seed.dueAt || "").slice(11, 16) },
+            { label: "Due At", value: seed.dueAt || "" },
+            { label: "Repeat Rule", value: "Once" },
+            { label: "Completion Standard", value: seed.completionStandard },
+            { label: "Photo Required", value: seed.photoProofRequired ? "Required" : "Not Required" },
+            { label: "Photo Proof Status", value: seed.photoProofRequired ? "Missing" : "Not Required" },
+            { label: "Photo Proofs", value: "" },
+            { label: "Manager Review Status", value: "Not Submitted" },
+            { label: "Source", value: "FEFO / Waste Control" },
+            { label: "Linked FEFO / Waste ID", value: fefo.id },
+            { label: "Linked FEFO / Waste", value: fefo.title },
+            { label: "SLA Status", value: "On Track" },
+          ],
+          detailNote: seed.completionStandard,
+          nextAction: "Complete FEFO action",
+        });
+        let nextDetails = fefo.detailItems ?? [];
+        nextDetails = upsertDetail(nextDetails, "Linked Outlet Execution ID", created.id);
+        nextDetails = upsertDetail(nextDetails, "Linked Outlet Execution", created.title);
+        nextDetails = upsertDetail(nextDetails, "Action Type", "Use First");
+        await get().updateRecord("expiry", fefo.id, { detailItems: nextDetails, status: "Use First", nextAction: "Review FEFO task proof" });
+        return created;
+      },
+      createDisposalTaskFromFefoRecord: async (fefoId) => {
+        const fefo = (get().modules["expiry"]?.rows ?? []).find((row) => row.id === fefoId);
+        if (!fefo) return null;
+        const seed = createDisposalTaskSeed(fefo, { dueAt: new Date().toISOString().slice(0, 16) });
+        const branch = detailValue(fefo.detailItems, "Branch") || fefo.subtitle;
+        const created = await get().createRecordWithPayload("tasks", {
+          title: seed.title,
+          subtitle: `${branch} · FEFO Action`,
+          status: "Scheduled",
+          owner: "Outlet Manager",
+          detailItems: [
+            { label: "Branch", value: branch },
+            { label: "Task Type", value: "FEFO Action" },
+            { label: "Role Target", value: "Outlet Manager" },
+            { label: "Outlets", value: branch },
+            { label: "Completed Outlets", value: "" },
+            { label: "Due Date", value: (seed.dueAt || "").slice(0, 10) },
+            { label: "Due Time", value: (seed.dueAt || "").slice(11, 16) },
+            { label: "Due At", value: seed.dueAt || "" },
+            { label: "Repeat Rule", value: "Once" },
+            { label: "Completion Standard", value: seed.completionStandard },
+            { label: "Photo Required", value: "Required" },
+            { label: "Photo Proof Status", value: "Missing" },
+            { label: "Photo Proofs", value: "" },
+            { label: "Manager Review Status", value: "Not Submitted" },
+            { label: "Source", value: "FEFO / Waste Control" },
+            { label: "Linked FEFO / Waste ID", value: fefo.id },
+            { label: "Linked FEFO / Waste", value: fefo.title },
+            { label: "SLA Status", value: "On Track" },
+          ],
+          detailNote: seed.completionStandard,
+          nextAction: "Upload disposal proof",
+        });
+        let nextDetails = fefo.detailItems ?? [];
+        nextDetails = upsertDetail(nextDetails, "Linked Outlet Execution ID", created.id);
+        nextDetails = upsertDetail(nextDetails, "Linked Outlet Execution", created.title);
+        nextDetails = upsertDetail(nextDetails, "Action Type", "Dispose");
+        await get().updateRecord("expiry", fefo.id, { detailItems: nextDetails, status: "Expired", nextAction: "Review disposal proof" });
+        return created;
+      },
+      createBranchSetupTask: async (branchId, missingSetupItem) => {
+        const branch = (get().modules["branches"]?.rows ?? []).find((row) => row.id === branchId);
+        if (!branch) return null;
+        const seed = createBranchSetupTaskSeed(branch, { missingSetupItem, dueAt: `${new Date().toISOString().slice(0, 10)}T18:00` });
+        const created = await get().createRecordWithPayload("tasks", {
+          title: seed.title,
+          subtitle: `${branch.title} · Branch Setup`,
+          status: "Scheduled",
+          owner: "Outlet Manager",
+          detailItems: [
+            { label: "Branch", value: branch.title },
+            { label: "Task Type", value: "Daily Operation" },
+            { label: "Role Target", value: "Outlet Manager" },
+            { label: "Outlets", value: branch.title },
+            { label: "Completed Outlets", value: "" },
+            { label: "Due Date", value: (seed.dueAt || "").slice(0, 10) },
+            { label: "Due Time", value: "18:00" },
+            { label: "Due At", value: seed.dueAt || "" },
+            { label: "Repeat Rule", value: "Once" },
+            { label: "Completion Standard", value: seed.completionStandard },
+            { label: "Photo Required", value: seed.photoProofRequired ? "Required" : "Not Required" },
+            { label: "Photo Proof Status", value: seed.photoProofRequired ? "Missing" : "Not Required" },
+            { label: "Photo Proofs", value: "" },
+            { label: "Manager Review Status", value: "Not Submitted" },
+            { label: "Source", value: "Branch Control" },
+            { label: "Linked Branch ID", value: branch.id },
+            { label: "Linked Branch", value: branch.title },
+            { label: "SLA Status", value: "On Track" },
+          ],
+          detailNote: seed.completionStandard,
+          nextAction: "Complete branch setup item",
+        });
+        let nextDetails = branch.detailItems ?? [];
+        nextDetails = upsertDetail(nextDetails, "Linked Task IDs", [detailValue(nextDetails, "Linked Task IDs"), created.id].filter(Boolean).join(", "));
+        nextDetails = upsertDetail(nextDetails, "Setup Status", "In Progress");
+        await get().updateRecord("branches", branch.id, { detailItems: nextDetails, status: "Setup Required", nextAction: "Track branch setup completion" });
+        return created;
+      },
+      updateTaskProofAccepted: async (taskId) => {
+        const task = (get().modules["tasks"]?.rows ?? []).find((row) => row.id === taskId);
+        if (!task) return;
+        let taskDetails = task.detailItems ?? [];
+        taskDetails = upsertDetail(taskDetails, "Photo Proof Status", "Accepted");
+        taskDetails = upsertDetail(taskDetails, "Manager Review Status", "Accepted");
+        taskDetails = upsertDetail(taskDetails, "Reviewed At", nowIso());
+        await get().updateRecord("tasks", task.id, { status: "Completed", detailItems: taskDetails, nextAction: "Close linked review" });
+
+        const linkedIncidentId = detailValue(task.detailItems, "Linked Incident ID");
+        if (linkedIncidentId) {
+          const incident = (get().modules["issues"]?.rows ?? []).find((row) => row.id === linkedIncidentId);
+          if (incident) {
+            let incidentDetails = incident.detailItems ?? [];
+            incidentDetails = upsertDetail(incidentDetails, "Linked Corrective Actions", task.title);
+            incidentDetails = upsertDetail(incidentDetails, "Review Status", "Pending Review");
+            incidentDetails = upsertDetail(incidentDetails, "Resolution Evidence", "Corrective action proof accepted.");
+            await get().updateRecord("issues", incident.id, { status: "Pending Review", detailItems: incidentDetails, nextAction: "Resolve incident after final review" });
+          }
+        }
+        const linkedInspectionId = detailValue(task.detailItems, "Linked Inspection ID");
+        if (linkedInspectionId) {
+          const inspection = (get().modules["inspection"]?.rows ?? []).find((row) => row.id === linkedInspectionId);
+          if (inspection) {
+            let inspectionDetails = inspection.detailItems ?? [];
+            inspectionDetails = upsertDetail(inspectionDetails, "Required New Photo Proof", "Accepted");
+            inspectionDetails = upsertDetail(inspectionDetails, "Corrective Action Status", "Completed");
+            await get().updateRecord("inspection", inspection.id, { detailItems: inspectionDetails, nextAction: "Close inspection review" });
+          }
+        }
+        const linkedFefoId = detailValue(task.detailItems, "Linked FEFO / Waste ID");
+        if (linkedFefoId) {
+          const fefo = (get().modules["expiry"]?.rows ?? []).find((row) => row.id === linkedFefoId);
+          if (fefo) {
+            let fefoDetails = fefo.detailItems ?? [];
+            fefoDetails = upsertDetail(fefoDetails, "Photo Proof Status", "Accepted");
+            fefoDetails = upsertDetail(fefoDetails, "Manager Review Status", "Accepted");
+            fefoDetails = upsertDetail(fefoDetails, "Linked Outlet Execution", task.title);
+            fefoDetails = upsertDetail(fefoDetails, "Linked Outlet Execution ID", task.id);
+            const nextStatus = task.title.toLowerCase().includes("dispose") ? "Reviewed" : fefo.status;
+            await get().updateRecord("expiry", fefo.id, { status: nextStatus, detailItems: fefoDetails, nextAction: nextStatus === "Reviewed" ? "Close FEFO review" : "Monitor next expiry action" });
+          }
+        }
+      },
+      updateTaskProofRejected: async (taskId) => {
+        const task = (get().modules["tasks"]?.rows ?? []).find((row) => row.id === taskId);
+        if (!task) return;
+        let taskDetails = task.detailItems ?? [];
+        taskDetails = upsertDetail(taskDetails, "Photo Proof Status", "Recheck Required");
+        taskDetails = upsertDetail(taskDetails, "Manager Review Status", "Rejected");
+        taskDetails = upsertDetail(taskDetails, "Manager Review Comment", "Proof rejected. Rework and upload new evidence.");
+        await get().updateRecord("tasks", task.id, { status: "Rework Required", detailItems: taskDetails, nextAction: "Upload new proof" });
+        const linkedInspectionId = detailValue(task.detailItems, "Linked Inspection ID");
+        if (linkedInspectionId) {
+          const inspection = (get().modules["inspection"]?.rows ?? []).find((row) => row.id === linkedInspectionId);
+          if (inspection) {
+            let inspectionDetails = inspection.detailItems ?? [];
+            inspectionDetails = upsertDetail(inspectionDetails, "Required New Photo Proof", "Rejected");
+            inspectionDetails = upsertDetail(inspectionDetails, "Corrective Action Status", "Rework Required");
+            await get().updateRecord("inspection", inspection.id, { detailItems: inspectionDetails, nextAction: "Request new proof" });
+          }
+        }
+        const linkedFefoId = detailValue(task.detailItems, "Linked FEFO / Waste ID");
+        if (linkedFefoId) {
+          const fefo = (get().modules["expiry"]?.rows ?? []).find((row) => row.id === linkedFefoId);
+          if (fefo) {
+            let fefoDetails = fefo.detailItems ?? [];
+            fefoDetails = upsertDetail(fefoDetails, "Photo Proof Status", "Rejected");
+            fefoDetails = upsertDetail(fefoDetails, "Manager Review Status", "Rejected");
+            fefoDetails = upsertDetail(fefoDetails, "Action Required", "Yes");
+            await get().updateRecord("expiry", fefo.id, { detailItems: fefoDetails, nextAction: "Upload new FEFO / disposal proof" });
+          }
+        }
+      },
+      transitionIncidentStatus: async (incidentId, status, note) => {
+        const incident = (get().modules["issues"]?.rows ?? []).find((row) => row.id === incidentId);
+        if (!incident) return;
+        let details = incident.detailItems ?? [];
+        details = upsertDetail(details, "Review Status", status);
+        if (note) details = upsertDetail(details, "Resolution Evidence", note);
+        await get().updateRecord("issues", incident.id, { status, detailItems: details, nextAction: status === "Resolved" ? "Closed after review" : incident.nextAction });
+      },
+      transitionInspectionReviewStatus: async (inspectionId, status, note) => {
+        const inspection = (get().modules["inspection"]?.rows ?? []).find((row) => row.id === inspectionId);
+        if (!inspection) return;
+        let details = inspection.detailItems ?? [];
+        details = upsertDetail(details, "Review Status", status);
+        if (note) details = upsertDetail(details, "Review Note", note);
+        await get().updateRecord("inspection", inspection.id, { status, detailItems: details, nextAction: status === "Completed" ? "Inspection closed" : inspection.nextAction });
+      },
+      transitionFefoReviewStatus: async (fefoId, status, note) => {
+        const fefo = (get().modules["expiry"]?.rows ?? []).find((row) => row.id === fefoId);
+        if (!fefo) return;
+        let details = fefo.detailItems ?? [];
+        details = upsertDetail(details, "Manager Review Status", status);
+        if (note) details = upsertDetail(details, "Review Note", note);
+        await get().updateRecord("expiry", fefo.id, { status: status === "Accepted" ? "Reviewed" : fefo.status, detailItems: details, nextAction: status === "Accepted" ? "Close FEFO review" : fefo.nextAction });
       },
       resolveRecord: async (moduleKey, rowId, resolutionNote) => {
         let patch: Partial<ModuleRow> = {};
