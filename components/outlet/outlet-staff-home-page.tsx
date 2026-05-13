@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { ErpShell } from "@/components/erp/erp-shell";
+import { SopMobileReader } from "@/components/outlet/sop-mobile-reader";
 import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -1524,9 +1525,14 @@ function WorkItemSheet({
         onClick={(event) => event.stopPropagation()}
       >
         {isReader ? (
-          <div className="h-[100dvh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:h-auto sm:max-h-[92dvh]">
-            <SopReader item={item} onClose={onClose} />
-          </div>
+          <>
+            <div className="xl:hidden">
+              <SopMobileReader item={item} onClose={onClose} />
+            </div>
+            <div className="hidden max-h-[92dvh] overflow-y-auto [scrollbar-width:none] xl:block xl:[&::-webkit-scrollbar]:hidden">
+              <SopReader item={item} onClose={onClose} />
+            </div>
+          </>
         ) : (
           <Card className="border-0 shadow-none">
             <CardHeader className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
