@@ -842,12 +842,26 @@ function CalendarView({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   const [selectedDate, setSelectedDate] = useState(todayISO());
-  const now = new Date(selectedDate);
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay();
+  const selected = new Date(`${selectedDate}T00:00:00`);
+  const year = selected.getFullYear();
+  const month = selected.getMonth();
   const monthLabel = new Date(year, month, 1).toLocaleString(undefined, { month: "long", year: "numeric" });
+
+  const firstOfMonth = new Date(year, month, 1);
+  const startOfGrid = new Date(firstOfMonth);
+  startOfGrid.setDate(firstOfMonth.getDate() - firstOfMonth.getDay());
+
+  const calendarDays = Array.from({ length: 42 }).map((_, index) => {
+    const date = new Date(startOfGrid);
+    date.setDate(startOfGrid.getDate() + index);
+
+    return {
+      date,
+      iso: date.toISOString().slice(0, 10),
+      day: date.getDate(),
+      isCurrentMonth: date.getMonth() === month,
+    };
+  });
 
   const calendarItems = workItems.filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item));
   const itemsByDate = (date: string) => calendarItems.filter((item) => item.date === date);
@@ -857,10 +871,10 @@ function CalendarView({
   const selectedSummary = summarizeShifts(selectedShifts);
 
   return (
-    <div className="grid min-w-0 gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between gap-3">
+    <div className="grid min-w-0 items-stretch gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+      <Card className="flex h-full min-h-[720px] flex-col">
+        <CardHeader className="shrink-0 pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <CardTitle className="flex items-center gap-2 text-base">
                 <CalendarDays className="h-4 w-4 text-primary" />
@@ -883,37 +897,35 @@ function CalendarView({
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="flex min-h-0 flex-1 flex-col">
           <div className="mb-3 font-medium">{monthLabel}</div>
 
           <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <div key={day} className="py-1">{day}</div>)}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
-            {Array.from({ length: firstDay }).map((_, index) => <div key={`empty-${index}`} />)}
-
-            {Array.from({ length: daysInMonth }).map((_, index) => {
-              const day = index + 1;
-              const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-              const dayItems = itemsByDate(date);
-              const dayShifts = shiftsByDate(date);
+          <div className="grid flex-1 grid-cols-7 grid-rows-6 gap-1">
+            {calendarDays.map((day) => {
+              const dayItems = itemsByDate(day.iso);
+              const dayShifts = shiftsByDate(day.iso);
               const hasRed = dayItems.some(isOverdue);
 
               return (
                 <button
-                  key={date}
+                  key={day.iso}
                   type="button"
-                  onClick={() => setSelectedDate(date)}
+                  onClick={() => setSelectedDate(day.iso)}
                   className={cn(
-                    "min-h-[60px] rounded-xl border bg-card p-2 text-left transition hover:bg-muted/30 sm:min-h-[72px] md:min-h-[92px]",
-                    selectedDate === date && "border-primary ring-1 ring-primary/30",
+                    "min-h-[72px] rounded-xl border bg-card p-2 text-left transition hover:bg-muted/30 md:min-h-[92px]",
+                    selectedDate === day.iso && "border-primary ring-1 ring-primary/30",
+                    !day.isCurrentMonth && "opacity-40",
                     dayShifts.length && "bg-muted/20",
                     hasRed && "border-red-500/70 ring-1 ring-red-500/20",
                   )}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{day}</span>
+                    <span className="text-sm font-medium">{day.day}</span>
                     {dayShifts.length ? <span className="text-[10px] text-muted-foreground">{dayShifts.length} staff</span> : null}
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
@@ -928,7 +940,7 @@ function CalendarView({
         </CardContent>
       </Card>
 
-      <div className="space-y-4">
+      <div className="grid min-h-[720px] min-w-0 grid-rows-[auto_minmax(0,1fr)] gap-4">
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">{selectedDate}</CardTitle>
@@ -949,12 +961,12 @@ function CalendarView({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
+        <Card className="flex min-h-0 flex-col">
+          <CardHeader className="shrink-0 pb-3">
             <CardTitle className="text-base">Scheduled Work</CardTitle>
             <p className="text-sm text-muted-foreground">{selectedItems.length} item(s)</p>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {!selectedItems.length ? (
               <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No timed work on this day.</div>
             ) : selectedItems.map((item) => (
