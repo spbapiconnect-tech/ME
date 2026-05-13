@@ -525,7 +525,7 @@ export function SopBuilderWorkspaceV3({
 
         <ResizablePanel defaultSize={inspectorOpen ? 56 : 84} minSize={36}>
           <main className="h-full min-h-0 overflow-y-auto bg-background [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <SopBlockNoteEditor disabled={Boolean(renameTarget)} onDocumentChange={handleDocumentChange} />
+            <SopBlockNoteEditor disabled={Boolean(renameTarget) || (inspectorOpen && inspectorTab === "settings")} onDocumentChange={handleDocumentChange} />
           </main>
         </ResizablePanel>
 
@@ -580,7 +580,15 @@ export function SopBuilderWorkspaceV3({
                     />
                   </div>
                 ) : (
-                  <div className="min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div
+                    className="min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                    onPointerDownCapture={(event) => event.stopPropagation()}
+                    onMouseDownCapture={(event) => event.stopPropagation()}
+                    onClickCapture={(event) => event.stopPropagation()}
+                    onKeyDownCapture={(event) => event.stopPropagation()}
+                    onBeforeInputCapture={(event) => event.stopPropagation()}
+                    onInputCapture={(event) => event.stopPropagation()}
+                  >
                     <div className="space-y-6">
                       <section className="border-b pb-5">
                         <div className="mb-3">
