@@ -125,3 +125,53 @@
 .sop-blocknote-shell .bn-menu button:hover {
   background: hsl(var(--muted)) !important;
 }
+
+/* Keep BlockNote text toolbar and color menu usable inside ME workspace. */
+.sop-blocknote-shell .bn-formatting-toolbar,
+.sop-blocknote-shell .bn-toolbar,
+.sop-blocknote-shell .bn-menu,
+.sop-blocknote-shell .bn-popover,
+.sop-blocknote-shell [role="menu"],
+.sop-blocknote-shell [role="listbox"],
+.sop-blocknote-shell [data-radix-popper-content-wrapper],
+.sop-blocknote-shell [class*="Toolbar"],
+.sop-blocknote-shell [class*="toolbar"],
+.sop-blocknote-shell [class*="Menu"],
+.sop-blocknote-shell [class*="menu"],
+.sop-blocknote-shell [class*="Popover"],
+.sop-blocknote-shell [class*="popover"] {
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+.sop-blocknote-shell .bn-formatting-toolbar,
+.sop-blocknote-shell .bn-toolbar,
+.sop-blocknote-shell .bn-menu,
+.sop-blocknote-shell .bn-popover,
+.sop-blocknote-shell [role="menu"],
+.sop-blocknote-shell [role="listbox"] {
+  border: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  opacity: 1 !important;
+  box-shadow: 0 18px 50px rgb(15 23 42 / 0.22) !important;
+}
+
+.sop-blocknote-shell .bn-formatting-toolbar button,
+.sop-blocknote-shell .bn-toolbar button,
+.sop-blocknote-shell .bn-menu button,
+.sop-blocknote-shell .bn-popover button,
+.sop-blocknote-shell [role="menuitem"],
+.sop-blocknote-shell [role="option"] {
+  color: hsl(var(--popover-foreground)) !important;
+  opacity: 1 !important;
+}
+
+.sop-blocknote-shell .bn-formatting-toolbar button:hover,
+.sop-blocknote-shell .bn-toolbar button:hover,
+.sop-blocknote-shell .bn-menu button:hover,
+.sop-blocknote-shell .bn-popover button:hover,
+.sop-blocknote-shell [role="menuitem"]:hover,
+.sop-blocknote-shell [role="option"]:hover {
+  background: hsl(var(--muted)) !important;
+}

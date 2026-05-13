@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   Check,
@@ -85,6 +85,16 @@ export function SopBuilderWorkspaceV3({
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
   const [previewFull, setPreviewFull] = useState(false);
   const [previewDocument, setPreviewDocument] = useState<SopBlockNoteDocument>([]);
   const [visibleRoles, setVisibleRoles] = useState<string[]>(["Outlet Manager", "Branch Manager"]);
@@ -256,9 +266,10 @@ export function SopBuilderWorkspaceV3({
                             {renamingPageId === chapter.id ? (
                               <input
                                 autoFocus
+                                onClick={(event) => event.stopPropagation()}
                                 value={renameValue}
                                 onChange={(event) => setRenameValue(event.target.value)}
-                                onBlur={() => commitRename(chapter.id)}
+                                onBlur={() => undefined}
                                 onKeyDown={(event) => {
                                   if (event.key === "Enter") commitRename(chapter.id);
                                   if (event.key === "Escape") setRenamingPageId(null);
@@ -331,7 +342,7 @@ export function SopBuilderWorkspaceV3({
                                     autoFocus
                                     value={renameValue}
                                     onChange={(event) => setRenameValue(event.target.value)}
-                                    onBlur={() => commitRename(page.id)}
+                                    onBlur={() => undefined}
                                     onKeyDown={(event) => {
                                       if (event.key === "Enter") commitRename(page.id);
                                       if (event.key === "Escape") setRenamingPageId(null);
