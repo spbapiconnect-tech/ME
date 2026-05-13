@@ -605,7 +605,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     return type === "video" ? "image" : type;
   }
 
-  function v3BlockToLegacyBlock(block: SopBuilderV3Block) {
+  function v3BlockToLegacyBlock(block: SopBuilderV3Block): BuilderBlock {
     const legacyType = v3BlockTypeToLegacy(block.type);
 
     return {
@@ -615,9 +615,11 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
       body: block.body,
       imageUrl: legacyType === "image" ? block.assetUrl || "" : "",
       pdfUrl: legacyType === "pdf" ? block.assetUrl || "" : "",
-      stepsText: block.steps ? block.steps.join("\n") : "",
-      checklistText: block.checklist ? block.checklist.join("\n") : "",
-      warningLevel: block.warningLevel,
+      stepsText: block.steps ? block.steps.join("
+") : "",
+      checklistText: block.checklist ? block.checklist.join("
+") : "",
+      warningLevel: block.warningLevel ?? "Info",
     };
   }
 
