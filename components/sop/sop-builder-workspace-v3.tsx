@@ -15,6 +15,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -269,7 +270,18 @@ export function SopBuilderWorkspaceV3({
     onDocumentChange?.(blocks);
   }
 
-  function patchSettings(patch: Partial<SopBuilderV3Settings>) {
+  function patchSettings(patch: Partial<SopBuilderV3Settings>, syncParent = false) {
+    setLocalSettings((current) => ({
+      ...current,
+      ...patch,
+    }));
+
+    if (syncParent) {
+      onUpdateSettings(patch);
+    }
+  }
+
+  function commitSettings(patch: Partial<SopBuilderV3Settings>) {
     setLocalSettings((current) => ({
       ...current,
       ...patch,
@@ -319,6 +331,39 @@ export function SopBuilderWorkspaceV3({
   }
 
   const createAction = onCreateSop || onCreateSOP || onCreate || onSubmit;
+
+  function SettingsCheckRow({
+    label,
+    description,
+    checked,
+    onCheckedChange,
+  }: {
+    label: string;
+    description?: string;
+    checked: boolean;
+    onCheckedChange: () => void;
+  }) {
+    return (
+      <button
+        type="button"
+        onClick={onCheckedChange}
+        className={cn(
+          "flex w-full items-start gap-3 rounded-xl border bg-background px-3 py-3 text-left transition hover:bg-muted/40",
+          checked && "border-primary/60 bg-primary/5",
+        )}
+      >
+        <Checkbox checked={checked} className="mt-0.5" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-medium leading-none">{label}</span>
+          {description ? (
+            <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+              {description}
+            </span>
+          ) : null}
+        </span>
+      </button>
+    );
+  }
 
   return (
     <div
@@ -614,6 +659,7 @@ export function SopBuilderWorkspaceV3({
                             <Input
                               value={settings.title}
                               onChange={(event) => patchSettings({ title: event.target.value })}
+                              onBlur={(event) => commitSettings({ title: event.target.value })}
                             />
                           </div>
 
@@ -625,6 +671,9 @@ export function SopBuilderWorkspaceV3({
                                 onChange={(event) =>
                                   patchSettings({ documentCode: event.target.value })
                                 }
+                                onBlur={(event) =>
+                                  commitSettings({ documentCode: event.target.value })
+                                }
                               />
                             </div>
                             <div className="space-y-1.5">
@@ -632,6 +681,7 @@ export function SopBuilderWorkspaceV3({
                               <Input
                                 value={settings.version}
                                 onChange={(event) => patchSettings({ version: event.target.value })}
+                                onBlur={(event) => commitSettings({ version: event.target.value })}
                               />
                             </div>
                           </div>
@@ -644,22 +694,22 @@ export function SopBuilderWorkspaceV3({
                           <div className="text-xs text-muted-foreground">Select every outlet that should receive this SOP.</div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="space-y-2">
                           {outletOptions.map((outlet) => {
                             const active = csvToArray(settings.targetOutlet).includes(outlet);
 
                             return (
-                              <button
+                              <SettingsCheckRow
                                 key={outlet}
-                                type="button"
-                                onClick={() => toggleCsvSetting("targetOutlet", outlet)}
-                                className={cn(
-                                  "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
-                                  active && "border-primary bg-primary text-primary-foreground",
-                                )}
-                              >
-                                {outlet}
-                              </button>
+                                label={outlet}
+                                description={
+                                  outlet === "All Outlets"
+                                    ? "Apply this SOP to every current and future outlet."
+                                    : "This outlet will receive the SOP in staff library."
+                                }
+                                checked={active}
+                                onCheckedChange={() => toggleCsvSetting("targetOutlet", outlet)}
+                              />
                             );
                           })}
                         </div>
@@ -671,22 +721,18 @@ export function SopBuilderWorkspaceV3({
                           <div className="text-xs text-muted-foreground">These roles must read and acknowledge the SOP.</div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="space-y-2">
                           {roleOptions.map((role) => {
                             const active = csvToArray(settings.targetRole).includes(role);
 
                             return (
-                              <button
+                              <SettingsCheckRow
                                 key={role}
-                                type="button"
-                                onClick={() => toggleCsvSetting("targetRole", role)}
-                                className={cn(
-                                  "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
-                                  active && "border-primary bg-primary text-primary-foreground",
-                                )}
-                              >
-                                {role}
-                              </button>
+                                label={role}
+                                description="Must read and acknowledge before this SOP is considered complete."
+                                checked={active}
+                                onCheckedChange={() => toggleCsvSetting("targetRole", role)}
+                              />
                             );
                           })}
                         </div>
@@ -698,22 +744,18 @@ export function SopBuilderWorkspaceV3({
                           <div className="text-xs text-muted-foreground">Roles that can view this SOP even when acknowledgement is not required.</div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="space-y-2">
                           {roleOptions.map((role) => {
                             const active = visibleRoles.includes(role);
 
                             return (
-                              <button
+                              <SettingsCheckRow
                                 key={role}
-                                type="button"
-                                onClick={() => toggleLocalList(visibleRoles, setVisibleRoles, role)}
-                                className={cn(
-                                  "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
-                                  active && "border-primary bg-primary text-primary-foreground",
-                                )}
-                              >
-                                {role}
-                              </button>
+                                label={role}
+                                description="Can view this SOP in the library even when acknowledgement is not required."
+                                checked={active}
+                                onCheckedChange={() => toggleLocalList(visibleRoles, setVisibleRoles, role)}
+                              />
                             );
                           })}
                         </div>
@@ -725,22 +767,18 @@ export function SopBuilderWorkspaceV3({
                           <div className="text-xs text-muted-foreground">Manager roles allowed to review, update, or publish this SOP.</div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
+                        <div className="space-y-2">
                           {roleOptions.map((role) => {
                             const active = reviewerRoles.includes(role);
 
                             return (
-                              <button
+                              <SettingsCheckRow
                                 key={role}
-                                type="button"
-                                onClick={() => toggleLocalList(reviewerRoles, setReviewerRoles, role)}
-                                className={cn(
-                                  "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
-                                  active && "border-primary bg-primary text-primary-foreground",
-                                )}
-                              >
-                                {role}
-                              </button>
+                                label={role}
+                                description="Can review, update, and publish this SOP."
+                                checked={active}
+                                onCheckedChange={() => toggleLocalList(reviewerRoles, setReviewerRoles, role)}
+                              />
                             );
                           })}
                         </div>
