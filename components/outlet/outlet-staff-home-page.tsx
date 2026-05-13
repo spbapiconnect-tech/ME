@@ -749,7 +749,7 @@ function TodayHome({
 
   return (
     <div className="space-y-4">
-      <div className="grid min-w-0 items-stretch gap-3 md:gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
+      <div className="grid min-w-0 items-stretch gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-[1.1fr_0.8fr_1fr]">
         <ShiftSummaryCard shifts={shifts.filter((shift) => shift.date === today)} />
         <RedLightCard overdue={overdue} missed={missed} waiting={waiting} />
         <DoFirstCard item={doFirst} onOpen={onOpen} />
@@ -761,38 +761,40 @@ function TodayHome({
         <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
       </div>
 
-      {activeMobileQueue.length ? (
-        <Card className="md:hidden">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <CardTitle className="text-base">Active Queue</CardTitle>
-                <p className="text-sm text-muted-foreground">Only active station work is shown on mobile.</p>
-              </div>
-              <Badge variant="outline">{activeMobileQueue.length}</Badge>
+      <Card className="md:hidden">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <CardTitle className="text-base">Active Queue</CardTitle>
+              <p className="text-sm text-muted-foreground">Only active station work is shown on mobile.</p>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {activeMobileQueue.map(({ group, item }) => (
-              <button
-                key={`${group}-${item.id}`}
-                type="button"
-                onClick={() => onOpen(item)}
-                className="relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30"
-              >
-                <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">{item.title}</div>
-                    <div className="truncate text-xs text-muted-foreground">{group} · {item.startTime} · {item.inboxGroup}</div>
-                  </div>
-                  <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+            <Badge variant="outline">{activeMobileQueue.length}</Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {!activeMobileQueue.length ? (
+            <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
+              No active station queue.
+            </div>
+          ) : activeMobileQueue.map(({ group, item }) => (
+            <button
+              key={`${group}-${item.id}`}
+              type="button"
+              onClick={() => onOpen(item)}
+              className="relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30"
+            >
+              <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">{item.title}</div>
+                  <div className="truncate text-xs text-muted-foreground">{group} · {item.startTime} · {item.inboxGroup}</div>
                 </div>
-              </button>
-            ))}
-          </CardContent>
-        </Card>
-      ) : null}
+                <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+              </div>
+            </button>
+          ))}
+        </CardContent>
+      </Card>
 
       <Card className="hidden max-h-[280px] overflow-hidden md:block">
         <CardHeader className="shrink-0 pb-3">
@@ -804,16 +806,17 @@ function TodayHome({
             <Badge variant="outline">{station}</Badge>
           </div>
         </CardHeader>
-        <CardContent className="grid max-h-[190px] gap-3 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2 xl:grid-cols-3">
+
+        <CardContent className="grid max-h-[190px] items-start gap-3 overflow-y-auto pr-1 [scrollbar-width:none] md:grid-cols-2 xl:grid-cols-3 [&::-webkit-scrollbar]:hidden">
           {stationGroups.map(({ group, items }) => (
-            <div key={group} className="rounded-2xl border bg-background p-3">
+            <div key={group} className="max-h-[160px] overflow-y-auto rounded-2xl border bg-background p-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <div className="mb-2 flex items-center justify-between">
                 <div className="font-medium">{group}</div>
                 <Badge variant="outline">{items.length}</Badge>
               </div>
               <div className="space-y-2">
                 {!items.length ? (
-                  <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">No active queue.</div>
+                  <div className="rounded-xl border border-dashed px-3 py-2 text-xs text-muted-foreground">No active queue.</div>
                 ) : items.map((item) => (
                   <button key={item.id} type="button" onClick={() => onOpen(item)} className="w-full rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30">
                     <div className="truncate text-sm font-medium">{item.title}</div>
@@ -1014,7 +1017,9 @@ function InboxView({
                   </div>
                   <div className="text-sm text-muted-foreground md:block">{item.sourceRecordId}</div>
                   <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-                  <Button size="sm" variant="secondary" className="w-full md:w-auto">{item.primaryAction}</Button>
+                  <span className="inline-flex h-9 w-full items-center justify-center rounded-md bg-secondary px-3 text-sm font-medium text-secondary-foreground md:w-auto">
+                    {item.primaryAction}
+                  </span>
                 </button>
               ))}
             </CardContent>
@@ -1530,7 +1535,7 @@ export function OutletStaffHomePage() {
 
   return (
     <ErpShell>
-      <div className="min-w-0 space-y-4 p-3 pb-20 sm:p-4 md:space-y-5 md:p-6">
+      <div className="min-w-0 space-y-4 p-3 pb-24 sm:p-4 md:space-y-5 md:p-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Outlet Staff App</p>
