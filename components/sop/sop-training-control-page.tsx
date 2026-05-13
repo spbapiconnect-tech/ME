@@ -165,6 +165,7 @@ function newBlock(type: BlockType = "text"): BuilderBlock {
 function newPage(index: number, parentPageId?: string): BuilderPage {
   return {
     id: `page-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    parentPageId,
     title: index === 1 ? "Page 1 · What staff need to know" : `Page ${index}`,
     coverImageUrl: "",
     blocks: [

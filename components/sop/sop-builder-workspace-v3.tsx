@@ -1,20 +1,13 @@
 "use client";
 
-import { useMemo, useState, type ComponentType } from "react";
+import { useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import {
-  AlertTriangle,
   Check,
-  CheckSquare,
   ChevronLeft,
-  FileText,
-  ImageIcon,
-  ListChecks,
   Plus,
   Settings2,
   Smartphone,
-  Type,
-  Video,
   X,
 
   Pencil,
@@ -61,25 +54,6 @@ const SopBlockNoteEditor = dynamic(
   },
 );
 
-const insertSections: Array<{
-  type: SopBuilderV3BlockType;
-  label: string;
-  description: string;
-  icon: ComponentType<{ className?: string }>;
-}> = [
-  { type: "heading", label: "Section Heading", description: "Create a clear SOP section.", icon: Type },
-  { type: "text", label: "Instruction Text", description: "Explain rules, reasons, or standards.", icon: FileText },
-  { type: "step-list", label: "Step by Step", description: "One action per line.", icon: ListChecks },
-  { type: "image", label: "Photo / GIF Guide", description: "Show examples or product build.", icon: ImageIcon },
-  { type: "video", label: "Training Video", description: "Video block for API media later.", icon: Video },
-  { type: "pdf", label: "PDF / Document", description: "Formal document reference.", icon: FileText },
-  { type: "warning", label: "Warning / Risk", description: "Mistakes, risk, or safety warning.", icon: AlertTriangle },
-  { type: "checklist", label: "Checklist", description: "Final confirmation before acknowledge.", icon: CheckSquare },
-];
-
-function sectionLabel(type: SopBuilderV3BlockType) {
-  return insertSections.find((section) => section.type === type)?.label || type;
-}
 
 export function SopBuilderWorkspaceV3({
   document: sopDocument,
