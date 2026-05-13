@@ -311,6 +311,12 @@ export function SopTrainingControlPage() {
   const [dialogMode, setDialogMode] = useState<ModalMode>("create");
   const [createTypeModalOpen, setCreateTypeModalOpen] = useState(false);
   const [builderVariant, setBuilderVariant] = useState<"classic" | "v3">("v3");
+  const [mounted, setMounted] = useState(false);
+
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [blockNoteDocument, setBlockNoteDocument] = useState<SopBlockNoteDocument>([]);
   const [builderMode, setBuilderMode] = useState(false);
   const [pages, setPages] = useState<BuilderPage[]>([newPage(1)]);
@@ -1022,6 +1028,17 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
           </div>
         </div>
         )}
+      </ErpShell>
+    );
+  }
+
+
+  if (!mounted) {
+    return (
+      <ErpShell>
+        <div className="flex min-h-[calc(100vh-56px)] items-center justify-center text-sm text-muted-foreground">
+          Loading SOP workspace...
+        </div>
       </ErpShell>
     );
   }

@@ -131,14 +131,21 @@ export function SopBuilderWorkspaceV3({
       targetRole: "",
       acknowledgementRequired: "",
       trainingRequired: "",
-    } as SopBuilderV3Settings);
+      reviewCycle: "",
+      reviewDueDate: "",
+      status: "draft",
+    } as unknown as SopBuilderV3Settings);
 
   useEffect(() => {
+    if (typeof document === "undefined" || !document.body) return;
+
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      if (document.body) {
+        document.body.style.overflow = previousOverflow;
+      }
     };
   }, []);
 
