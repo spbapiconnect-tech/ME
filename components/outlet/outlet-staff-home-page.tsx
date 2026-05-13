@@ -585,6 +585,105 @@ function InboxSummaryCard({
   );
 }
 
+
+function CompactTimeline({
+  items,
+  shifts,
+  onOpen,
+}: {
+  items: OutletStaffWorkItem[];
+  shifts: ShiftItem[];
+  onOpen: (item: OutletStaffWorkItem) => void;
+}) {
+  const today = todayISO();
+  const todayItems = items.filter((item) => item.date === today).sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const todayShifts = shifts.filter((shift) => shift.date === today);
+
+  const usedHours = todayItems
+    .map((item) => Number(item.startTime.slice(0, 2)))
+    .filter((hour) => !Number.isNaN(hour));
+
+  const shiftHours = todayShifts.flatMap((shift) => {
+    const startHour = Number(shift.startTime.slice(0, 2));
+    const endHour = Number(shift.endTime.slice(0, 2));
+
+    if (Number.isNaN(startHour) || Number.isNaN(endHour)) return [];
+
+    return Array.from({ length: Math.max(1, endHour - startHour) }).map((_, index) => startHour + index);
+  });
+
+  const hours = Array.from(new Set([...usedHours, ...shiftHours]))
+    .filter((hour) => hour >= 6 && hour <= 23)
+    .sort((a, b) => a - b);
+
+  const visibleHours = hours.length ? hours : [9, 12, 15, 18];
+
+  return (
+    <Card className="flex h-auto min-h-[220px] flex-col xl:h-[260px]">
+      <CardHeader className="shrink-0 pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Clock3 className="h-4 w-4 text-primary" />
+              Today Timeline
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">Only useful time blocks, not empty 00:00 walls.</p>
+          </div>
+          <Badge variant="outline">{todayItems.length} items</Badge>
+        </div>
+      </CardHeader>
+
+      <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {visibleHours.map((hour) => {
+          const label = `${String(hour).padStart(2, "0")}:00`;
+          const slotItems = todayItems.filter((item) => Number(item.startTime.slice(0, 2)) === hour);
+          const slotShifts = todayShifts.filter((shift) => {
+            const startHour = Number(shift.startTime.slice(0, 2));
+            const endHour = Number(shift.endTime.slice(0, 2));
+            return hour >= startHour && hour < endHour;
+          });
+
+          return (
+            <div key={hour} className="grid grid-cols-[68px_1fr] gap-3 border-b py-2 last:border-b-0">
+              <div className="text-xs font-medium text-muted-foreground">{label}</div>
+
+              <div className="space-y-2">
+                {slotShifts.length ? (
+                  <div className="rounded-lg border border-dashed bg-muted/20 px-3 py-1 text-xs text-muted-foreground">
+                    Shift · {slotShifts.length} staff on duty
+                  </div>
+                ) : null}
+
+                {!slotItems.length && !slotShifts.length ? (
+                  <div className="h-6 rounded-lg bg-muted/10" />
+                ) : null}
+
+                {slotItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onOpen(item)}
+                    className={cn("relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30", itemBorderClass(item))}
+                  >
+                    <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">{item.title}</div>
+                        <div className="truncate text-xs text-muted-foreground">{item.inboxGroup} · {item.description}</div>
+                      </div>
+                      <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+}
+
 function TodayHome({
   workItems,
   shifts,
