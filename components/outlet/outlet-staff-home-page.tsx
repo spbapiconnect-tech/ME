@@ -506,6 +506,7 @@ function DoFirstCard({
   );
 }
 
+
 function NextUpCard({
   items,
   onOpen,
@@ -514,15 +515,15 @@ function NextUpCard({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="flex h-auto min-h-[220px] flex-col xl:h-[260px]">
+      <CardHeader className="shrink-0 pb-3">
         <CardTitle className="text-base">Next Up</CardTitle>
         <p className="text-sm text-muted-foreground">The next few things staff should prepare for.</p>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {!items.length ? (
           <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">No upcoming task after current item.</div>
-        ) : items.slice(0, 4).map((item) => (
+        ) : items.map((item) => (
           <button
             key={item.id}
             type="button"
@@ -541,6 +542,7 @@ function NextUpCard({
   );
 }
 
+
 function InboxSummaryCard({
   items,
   onOpen,
@@ -549,8 +551,8 @@ function InboxSummaryCard({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="flex h-auto min-h-[220px] flex-col xl:h-[260px]">
+      <CardHeader className="shrink-0 pb-3">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Inbox className="h-4 w-4 text-primary" />
@@ -560,10 +562,10 @@ function InboxSummaryCard({
         </div>
         <p className="text-sm text-muted-foreground">Messages, complaints, rework, and review items.</p>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {!items.length ? (
           <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No urgent management message now.</div>
-        ) : items.slice(0, 5).map((item) => (
+        ) : items.map((item) => (
           <button
             key={item.id}
             type="button"
@@ -578,104 +580,6 @@ function InboxSummaryCard({
             <div className="mt-1 truncate text-xs text-muted-foreground">{item.inboxGroup} · {item.startTime}</div>
           </button>
         ))}
-      </CardContent>
-    </Card>
-  );
-}
-
-function CompactTimeline({
-  items,
-  shifts,
-  onOpen,
-}: {
-  items: OutletStaffWorkItem[];
-  shifts: ShiftItem[];
-  onOpen: (item: OutletStaffWorkItem) => void;
-}) {
-  const today = todayISO();
-  const todayItems = items.filter((item) => item.date === today).sort((a, b) => a.startTime.localeCompare(b.startTime));
-  const todayShifts = shifts.filter((shift) => shift.date === today);
-
-  const usedHours = todayItems
-    .map((item) => Number(item.startTime.slice(0, 2)))
-    .filter((hour) => !Number.isNaN(hour));
-
-  const shiftHours = todayShifts.flatMap((shift) => {
-    const startHour = Number(shift.startTime.slice(0, 2));
-    const endHour = Number(shift.endTime.slice(0, 2));
-
-    if (Number.isNaN(startHour) || Number.isNaN(endHour)) return [];
-
-    return Array.from({ length: Math.max(1, endHour - startHour) }).map((_, index) => startHour + index);
-  });
-
-  const hours = Array.from(new Set([...usedHours, ...shiftHours]))
-    .filter((hour) => hour >= 6 && hour <= 23)
-    .sort((a, b) => a - b);
-
-  const visibleHours = hours.length ? hours : [9, 12, 15, 18];
-
-  return (
-    <Card>
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Clock3 className="h-4 w-4 text-primary" />
-              Today Timeline
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">Only useful time blocks, not empty 00:00 walls.</p>
-          </div>
-          <Badge variant="outline">{todayItems.length} items</Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
-        {visibleHours.map((hour) => {
-          const label = `${String(hour).padStart(2, "0")}:00`;
-          const slotItems = todayItems.filter((item) => Number(item.startTime.slice(0, 2)) === hour);
-          const slotShifts = todayShifts.filter((shift) => {
-            const startHour = Number(shift.startTime.slice(0, 2));
-            const endHour = Number(shift.endTime.slice(0, 2));
-            return hour >= startHour && hour < endHour;
-          });
-
-          return (
-            <div key={hour} className="grid grid-cols-[68px_1fr] gap-3 border-b py-2 last:border-b-0">
-              <div className="text-xs font-medium text-muted-foreground">{label}</div>
-              <div className="space-y-2">
-                {slotShifts.length ? (
-                  <div className="rounded-lg border border-dashed bg-muted/20 px-3 py-1 text-xs text-muted-foreground">
-                    Shift · {slotShifts.length} staff on duty
-                  </div>
-                ) : null}
-
-                {!slotItems.length && !slotShifts.length ? (
-                  <div className="h-6 rounded-lg bg-muted/10" />
-                ) : null}
-
-                {slotItems.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => onOpen(item)}
-                    className={cn("relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30", itemBorderClass(item))}
-                  >
-                    <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium">{item.title}</div>
-                        <div className="truncate text-xs text-muted-foreground">{item.inboxGroup} · {item.description}</div>
-                      </div>
-                      <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
       </CardContent>
     </Card>
   );
@@ -705,24 +609,24 @@ function TodayHome({
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   const doFirst = overdue[0] || now[0] || next[0];
-  const inboxPreview = [...overdue, ...waiting].slice(0, 5);
+  const inboxPreview = [...overdue, ...waiting];
 
   return (
     <div className="space-y-4">
-      <div className="grid min-w-0 items-start gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
+      <div className="grid min-w-0 items-stretch gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
         <ShiftSummaryCard shifts={shifts.filter((shift) => shift.date === today)} />
         <RedLightCard overdue={overdue} missed={missed} waiting={waiting} />
         <DoFirstCard item={doFirst} onOpen={onOpen} />
       </div>
 
-      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
+      <div className="grid min-w-0 items-stretch gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
         <NextUpCard items={next} onOpen={onOpen} />
         <CompactTimeline items={surfaced} shifts={shifts} onOpen={onOpen} />
         <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
       </div>
 
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="max-h-[280px] overflow-hidden">
+        <CardHeader className="shrink-0 pb-3">
           <div className="flex items-center justify-between gap-3">
             <div>
               <CardTitle className="text-base">Station Queue</CardTitle>
@@ -731,12 +635,12 @@ function TodayHome({
             <Badge variant="outline">{station}</Badge>
           </div>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <CardContent className="grid max-h-[190px] gap-3 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2 xl:grid-cols-3">
           {(["Kitchen", "Front", "Manager"] as StationFilter[]).map((group) => {
             const groupItems = sectionItems(workItems, group)
               .filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item))
               .filter((item) => item.date === today || isOverdue(item))
-              .slice(0, 3);
+              .slice(0, 8);
 
             return (
               <div key={group} className="rounded-2xl border bg-background p-3">
