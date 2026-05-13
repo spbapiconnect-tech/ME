@@ -330,9 +330,16 @@ function RedLightPanel({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-semibold">{overdue.length}</div>
-        <div className="text-sm text-muted-foreground">missed / overdue item(s)</div>
-        <div className="mt-3 text-sm text-muted-foreground">{waiting.length} waiting manager review</div>
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <div className="text-2xl font-semibold">{overdue.length}</div>
+            <div className="text-sm text-muted-foreground">missed / overdue</div>
+          </div>
+          <div className="text-right text-sm text-muted-foreground">
+            <div>{waiting.length}</div>
+            <div>waiting review</div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
@@ -350,7 +357,24 @@ function TodayTimeline({
   const today = todayISO();
   const todayItems = items.filter((item) => item.date === today).sort((a, b) => a.startTime.localeCompare(b.startTime));
   const todayShifts = shifts.filter((shift) => shift.date === today);
-  const hours = Array.from({ length: 24 }).map((_, index) => index);
+  const usedHours = todayItems
+    .map((item) => Number(item.startTime.slice(0, 2)))
+    .filter((hour) => !Number.isNaN(hour));
+
+  const shiftHours = todayShifts.flatMap((shift) => {
+    const startHour = Number(shift.startTime.slice(0, 2));
+    const endHour = Number(shift.endTime.slice(0, 2));
+
+    if (Number.isNaN(startHour) || Number.isNaN(endHour)) return [];
+
+    return Array.from({ length: Math.max(1, endHour - startHour) }).map((_, index) => startHour + index);
+  });
+
+  const visibleHours = Array.from(new Set([...usedHours, ...shiftHours]))
+    .filter((hour) => hour >= 6 && hour <= 23)
+    .sort((a, b) => a - b);
+
+  const hours = visibleHours.length ? visibleHours : [9, 12, 15, 18];
 
   return (
     <Card>
@@ -431,47 +455,86 @@ function TodayView({
     .sort((a, b) => a.startTime.localeCompare(b.startTime))
     .slice(0, 3);
 
-  const heroItem = overdue[0] || now[0] || next[0];
+  const doFirst = overdue[0] || now[0] || next[0];
+  const inboxPreview = [...overdue, ...waiting].slice(0, 4);
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)_360px]">
-      <div className="space-y-4">
-        <ShiftStrip shifts={shifts} />
-        <RedLightPanel overdue={overdue} waiting={waiting} />
-      </div>
+    <div className="space-y-4">
+      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
+        <div className="space-y-4">
+          <ShiftStrip shifts={shifts} />
+          <RedLightPanel overdue={overdue} waiting={waiting} />
+        </div>
 
-      <div className="space-y-4">
-        {heroItem ? (
-          <WorkCard item={heroItem} onOpen={onOpen} label={isOverdue(heroItem) ? "Do first" : isNow(heroItem) ? "Now" : "Next"} />
-        ) : (
+        <div className="space-y-4">
+          {doFirst ? (
+            <WorkCard item={doFirst} onOpen={onOpen} label={isOverdue(doFirst) ? "Do first" : isNow(doFirst) ? "Now" : "Next"} />
+          ) : (
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-lg font-semibold">Nothing urgent right now.</div>
+                <p className="mt-1 text-sm text-muted-foreground">No current task due in this time window.</p>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
-            <CardContent className="p-6">
-              <div className="text-lg font-semibold">Nothing urgent right now.</div>
-              <p className="mt-1 text-sm text-muted-foreground">No current task due in this time window.</p>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Next Up</CardTitle>
+              <p className="text-sm text-muted-foreground">The next few things staff should prepare for.</p>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {!next.length ? (
+                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No upcoming task after current item.</div>
+              ) : next.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onOpen(item)}
+                  className="flex w-full items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium">{item.title}</div>
+                    <div className="text-xs text-muted-foreground">{item.startTime} · {item.inboxGroup}</div>
+                  </div>
+                  <Badge variant={statusVariant(item)}>{item.status}</Badge>
+                </button>
+              ))}
             </CardContent>
           </Card>
-        )}
+        </div>
 
-        <TodayTimeline items={items} shifts={shifts} onOpen={onOpen} />
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Inbox className="h-4 w-4" />
+              Inbox Summary
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">Only urgent messages and review items.</p>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {!inboxPreview.length ? (
+              <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No urgent management message now.</div>
+            ) : inboxPreview.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onOpen(item)}
+                className="relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30"
+              >
+                <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="truncate text-sm font-medium">{item.title}</div>
+                  <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">{item.inboxGroup} · {item.startTime}</div>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
       </div>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Inbox className="h-4 w-4" />
-            Management Inbox
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">Messages, complaints, inspection follow-up, and rework.</p>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {[...overdue, ...waiting].slice(0, 5).map((item) => (
-            <WorkCard key={item.id} item={item} onOpen={onOpen} />
-          ))}
-          {!overdue.length && !waiting.length ? (
-            <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No messages waiting.</div>
-          ) : null}
-        </CardContent>
-      </Card>
+      <TodayTimeline items={items} shifts={shifts} onOpen={onOpen} />
     </div>
   );
 }
@@ -660,8 +723,8 @@ function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
   if (!item) {
     return [{
       id: "empty",
-      title: "Select SOP",
-      body: "Select an SOP or training document to start reading.",
+      title: "No SOP selected",
+      body: "Choose a document from the left list. If there is only one assigned SOP, it will open automatically.",
       type: "text",
     }];
   }
@@ -870,7 +933,7 @@ function SopView({
         </CardContent>
       </Card>
 
-      <SopReader item={selected} />
+      <SopReader item={activeSop} />
     </div>
   );
 }
