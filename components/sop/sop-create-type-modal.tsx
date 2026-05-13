@@ -4,108 +4,16 @@ import { BookOpen, ChefHat, DoorOpen, GraduationCap, ShieldCheck, Sparkles, Spra
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { activeSopCreateTypes, type SopCreateIcon, type SopCreateTypeConfig } from "@/lib/sop/sop-create-types";
 
-export type SopCreateType =
-  | "recipe"
-  | "opening-closing"
-  | "cleaning"
-  | "service"
-  | "safety"
-  | "training"
-  | "product-launch";
-
-export type SopCreateTypeConfig = {
-  key: SopCreateType;
-  title: string;
-  description: string;
-  category: string;
-  processArea: string;
-  targetRole: string;
-  acknowledgementRequired: "Yes" | "No";
-  trainingRequired: "Yes" | "No";
-};
-
-export const sopCreateTypes: SopCreateTypeConfig[] = [
-  {
-    key: "recipe",
-    title: "Recipe / Product SOP",
-    description: "Burger build, product recipe, kitchen process, product standard.",
-    category: "Kitchen",
-    processArea: "Product",
-    targetRole: "Kitchen Staff",
-    acknowledgementRequired: "Yes",
-    trainingRequired: "Yes",
-  },
-  {
-    key: "opening-closing",
-    title: "Opening / Closing",
-    description: "Daily opening, closing, cash-up, handover and outlet readiness.",
-    category: "Operations",
-    processArea: "Outlet",
-    targetRole: "Outlet Staff",
-    acknowledgementRequired: "Yes",
-    trainingRequired: "No",
-  },
-  {
-    key: "cleaning",
-    title: "Cleaning",
-    description: "Cleaning checklist, hygiene, station reset and proof requirements.",
-    category: "Cleaning",
-    processArea: "Outlet",
-    targetRole: "Outlet Staff",
-    acknowledgementRequired: "Yes",
-    trainingRequired: "No",
-  },
-  {
-    key: "service",
-    title: "Service",
-    description: "Cashier, front counter, customer handling and complaint prevention.",
-    category: "Service",
-    processArea: "Front",
-    targetRole: "Front Staff",
-    acknowledgementRequired: "Yes",
-    trainingRequired: "No",
-  },
-  {
-    key: "safety",
-    title: "Safety",
-    description: "Food safety, equipment safety, risk control and escalation rules.",
-    category: "Safety",
-    processArea: "Compliance",
-    targetRole: "Outlet Staff",
-    acknowledgementRequired: "Yes",
-    trainingRequired: "Yes",
-  },
-  {
-    key: "training",
-    title: "Training",
-    description: "Onboarding, staff learning path, required reading and acknowledgement.",
-    category: "Training",
-    processArea: "People",
-    targetRole: "New Staff",
-    acknowledgementRequired: "Yes",
-    trainingRequired: "Yes",
-  },
-  {
-    key: "product-launch",
-    title: "Product Launch",
-    description: "New item rollout, launch briefing, media guide and staff acknowledgement.",
-    category: "Product",
-    processArea: "Launch",
-    targetRole: "Outlet Staff",
-    acknowledgementRequired: "Yes",
-    trainingRequired: "Yes",
-  },
-];
-
-const iconMap: Record<SopCreateType, React.ComponentType<{ className?: string }>> = {
-  recipe: ChefHat,
-  "opening-closing": DoorOpen,
+const iconMap: Record<SopCreateIcon, React.ComponentType<{ className?: string }>> = {
+  chef: ChefHat,
+  door: DoorOpen,
   cleaning: SprayCan,
-  service: BookOpen,
-  safety: ShieldCheck,
-  training: GraduationCap,
-  "product-launch": Sparkles,
+  book: BookOpen,
+  shield: ShieldCheck,
+  graduation: GraduationCap,
+  sparkles: Sparkles,
 };
 
 export function SopCreateTypeModal({
@@ -139,8 +47,8 @@ export function SopCreateTypeModal({
         </div>
 
         <div className="grid max-h-[70dvh] gap-3 overflow-y-auto p-5 [scrollbar-width:none] md:grid-cols-2 xl:grid-cols-3 [&::-webkit-scrollbar]:hidden">
-          {sopCreateTypes.map((item) => {
-            const Icon = iconMap[item.key];
+          {activeSopCreateTypes().map((item) => {
+            const Icon = iconMap[item.icon];
 
             return (
               <button
