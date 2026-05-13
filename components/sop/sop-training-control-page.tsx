@@ -89,6 +89,7 @@ type BuilderBlock = {
 
 type BuilderPage = {
   id: string;
+  parentPageId?: string;
   title: string;
   coverImageUrl: string;
   blocks: BuilderBlock[];
@@ -161,7 +162,7 @@ function newBlock(type: BlockType = "text"): BuilderBlock {
   };
 }
 
-function newPage(index: number): BuilderPage {
+function newPage(index: number, parentPageId?: string): BuilderPage {
   return {
     id: `page-${Date.now()}-${Math.random().toString(16).slice(2)}`,
     title: index === 1 ? "Page 1 · What staff need to know" : `Page ${index}`,
@@ -590,6 +591,26 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     setSelectedPageId(nextPage.id);
   }
 
+  function addV3SubPage(parentPageId: string) {
+    const parent = pages.find((page) => page.id === parentPageId);
+    const siblingCount = pages.filter((page) => page.parentPageId === parentPageId).length;
+
+    const nextPage = {
+      ...newPage(pages.length + 1, parentPageId),
+      title: `${parent?.title || "Page"} · Sub ${siblingCount + 1}`,
+    };
+
+    setPages((current) => {
+      const parentIndex = current.findIndex((page) => page.id === parentPageId);
+      const insertAt = parentIndex === -1 ? current.length : parentIndex + 1 + siblingCount;
+      const next = [...current];
+      next.splice(insertAt, 0, nextPage);
+      return next;
+    });
+
+    setSelectedPageId(nextPage.id);
+  }
+
   function deleteV3Page(pageId: string) {
     if (pages.length <= 1) return;
 
@@ -629,6 +650,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
               ...page,
               title: patch.title ?? page.title,
               coverImageUrl: patch.coverAssetUrl ?? page.coverImageUrl,
+              parentPageId: patch.parentPageId ?? page.parentPageId,
               blocks: patch.blocks ? patch.blocks.map(v3BlockToLegacyBlock) : page.blocks,
             }
           : page,
@@ -698,6 +720,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             }}
             onSelectPage={setSelectedPageId}
             onAddPage={addV3Page}
+            onAddSubPage={addV3SubPage}
             onDeletePage={deleteV3Page}
             onUpdatePage={updateV3Page}
             onAddBlock={addV3Block}

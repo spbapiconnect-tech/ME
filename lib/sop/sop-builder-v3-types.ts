@@ -30,6 +30,7 @@ export type SopBuilderV3Block = {
 
 export type SopBuilderV3Page = {
   id: string;
+  parentPageId?: string;
   title: string;
   coverAssetUrl?: string;
   blocks: SopBuilderV3Block[];
@@ -87,6 +88,7 @@ export type LegacySopBlockLike = {
 
 export type LegacySopPageLike = {
   id?: string;
+  parentPageId?: string;
   title?: string;
   coverImageUrl?: string;
   blocks?: LegacySopBlockLike[];
@@ -151,9 +153,10 @@ export function createSopBuilderV3Block(type: SopBuilderV3BlockType): SopBuilder
   };
 }
 
-export function createSopBuilderV3Page(index: number): SopBuilderV3Page {
+export function createSopBuilderV3Page(index: number, parentPageId?: string): SopBuilderV3Page {
   return {
     id: uid("sop-page"),
+    parentPageId,
     title: `Page ${index}: What staff need to know`,
     blocks: [
       createSopBuilderV3Block("heading"),
@@ -185,6 +188,7 @@ export function legacyFormToV3Settings(form: LegacySopFormLike): SopBuilderV3Set
 export function legacyPagesToV3Pages(pages: LegacySopPageLike[]): SopBuilderV3Page[] {
   return pages.map((page, pageIndex) => ({
     id: page.id || uid("sop-page"),
+    parentPageId: page.parentPageId,
     title: page.title || `Page ${pageIndex + 1}`,
     coverAssetUrl: page.coverImageUrl || "",
     blocks: (page.blocks || []).map((block) => {

@@ -136,6 +136,7 @@ export function SopBuilderWorkspaceV3({
   onCreate,
   onSelectPage,
   onAddPage,
+  onAddSubPage,
   onUpdateSettings,
   onUseClassic,
 }: {
@@ -145,6 +146,7 @@ export function SopBuilderWorkspaceV3({
   onCreate: () => void | Promise<void>;
   onSelectPage: (pageId: string) => void;
   onAddPage: () => void;
+  onAddSubPage?: (parentPageId: string) => void;
   onDeletePage: (pageId: string) => void;
   onUpdatePage: (pageId: string, patch: Partial<SopBuilderV3Page>) => void;
   onAddBlock: (pageId: string, type: SopBuilderV3BlockType) => void;
@@ -162,6 +164,19 @@ export function SopBuilderWorkspaceV3({
     () => pages.find((page) => page.id === selectedPageId) || pages[0],
     [pages, selectedPageId],
   );
+
+  const rootPages = useMemo(() => {
+    const roots = pages.filter((page) => !page.parentPageId);
+    return roots.length ? roots : pages;
+  }, [pages]);
+
+  const subPagesByParent = useMemo(() => {
+    return pages.reduce<Record<string, SopBuilderV3Page[]>>((groups, page) => {
+      if (!page.parentPageId) return groups;
+      groups[page.parentPageId] = [...(groups[page.parentPageId] || []), page];
+      return groups;
+    }, {});
+  }, [pages]);
 
   const checks = sopBuilderV3Readiness(sopDocument);
   const readyCount = checks.filter((item) => item.done).length;
@@ -207,42 +222,112 @@ export function SopBuilderWorkspaceV3({
       </header>
 
       <div className={cn("grid min-h-0 flex-1 overflow-hidden", previewOpen ? "lg:grid-cols-[280px_minmax(0,1fr)_360px]" : "lg:grid-cols-[280px_minmax(0,1fr)]")}>
-        <aside className="hidden min-h-0 border-r bg-muted/20 lg:block">
-          <div className="border-b p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-sm font-semibold">Pages</div>
-                <div className="text-xs text-muted-foreground">Reader order</div>
-              </div>
-              <Button size="sm" variant="outline" onClick={onAddPage}>
-                <Plus className="h-4 w-4" />
-                Page
-              </Button>
-            </div>
-          </div>
-
-          <div className="max-h-[calc(100vh-170px)] space-y-2 overflow-y-auto p-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {!pages.length ? (
-              <div className="rounded-xl border border-dashed bg-background px-3 py-6 text-center text-sm text-muted-foreground">
-                No page yet.
-              </div>
-            ) : pages.map((page, index) => (
-              <button
-                key={page.id}
-                type="button"
-                onClick={() => onSelectPage(page.id)}
-                className={cn(
-                  "w-full rounded-xl border bg-background p-3 text-left transition hover:bg-muted/30",
-                  activePage?.id === page.id && "border-primary bg-primary/5",
-                )}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-xs text-muted-foreground">Page {index + 1}</div>
-                  <Badge variant="outline">{page.blocks.length}</Badge>
+        <aside className="hidden min-h-0 border-r bg-background lg:block">
+          <div className="flex h-full min-h-0 flex-col">
+            <div className="shrink-0 border-b px-4 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Document</div>
+                  <div className="mt-1 text-sm font-semibold">Pages</div>
                 </div>
-                <div className="mt-1 line-clamp-2 text-sm font-medium">{page.title || "Untitled page"}</div>
-              </button>
-            ))}
+                <Button size="sm" variant="outline" className="h-8" onClick={onAddPage}>
+                  <Plus className="h-4 w-4" />
+                  Page
+                </Button>
+              </div>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto px-2 py-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {!pages.length ? (
+                <button
+                  type="button"
+                  onClick={onAddPage}
+                  className="w-full rounded-xl border border-dashed px-3 py-6 text-center text-sm text-muted-foreground hover:bg-muted/30"
+                >
+                  Add first page
+                </button>
+              ) : (
+                <div className="space-y-1">
+                  {rootPages.map((page, pageIndex) => {
+                    const active = activePage?.id === page.id;
+                    const subPages = subPagesByParent[page.id] || [];
+
+                    return (
+                      <div key={page.id} className="space-y-1">
+                        <div
+                          className={cn(
+                            "group flex items-center gap-1 rounded-lg pr-1 transition hover:bg-muted/50",
+                            active && "bg-primary/10 text-primary",
+                          )}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => onSelectPage(page.id)}
+                            className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left text-sm"
+                          >
+                            <span
+                              className={cn(
+                                "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[11px] text-muted-foreground",
+                                active && "border-primary/40 text-primary",
+                              )}
+                            >
+                              {pageIndex + 1}
+                            </span>
+                            <span className="min-w-0 flex-1 truncate font-medium">
+                              {page.title || "Untitled page"}
+                            </span>
+                            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                              {page.blocks.length}
+                            </span>
+                          </button>
+
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="h-7 px-2 text-xs opacity-0 transition group-hover:opacity-100"
+                            onClick={() => onAddSubPage?.(page.id)}
+                          >
+                            Sub
+                          </Button>
+                        </div>
+
+                        {subPages.map((subPage, subIndex) => {
+                          const subActive = activePage?.id === subPage.id;
+
+                          return (
+                            <button
+                              key={subPage.id}
+                              type="button"
+                              onClick={() => onSelectPage(subPage.id)}
+                              className={cn(
+                                "ml-6 flex w-[calc(100%-1.5rem)] items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition hover:bg-muted/50",
+                                subActive && "bg-primary/10 text-primary",
+                              )}
+                            >
+                              <span
+                                className={cn(
+                                  "flex h-5 min-w-8 shrink-0 items-center justify-center rounded-md border px-1 text-[11px] text-muted-foreground",
+                                  subActive && "border-primary/40 text-primary",
+                                )}
+                              >
+                                {pageIndex + 1}.{subIndex + 1}
+                              </span>
+                              <span className="min-w-0 flex-1 truncate">
+                                {subPage.title || "Untitled sub page"}
+                              </span>
+                              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                                {subPage.blocks.length}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </aside>
 
