@@ -1,0 +1,44 @@
+.sop-blocknote-shell {
+  min-height: 100%;
+}
+
+.sop-blocknote-shell .bn-container {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.sop-blocknote-shell .bn-editor {
+  background: transparent !important;
+  padding-inline: 0 !important;
+}
+
+.sop-blocknote-shell .bn-block-content {
+  border-radius: 12px;
+}
+
+.sop-blocknote-shell img,
+.sop-blocknote-shell video {
+  max-width: 100%;
+  border-radius: 18px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+}
+
+.sop-blocknote-shell [class*="file"],
+.sop-blocknote-shell [class*="media"],
+.sop-blocknote-shell [class*="image"],
+.sop-blocknote-shell [class*="video"] {
+  border-radius: 16px;
+}
+
+.sop-blocknote-shell input[type="file"] {
+  cursor: pointer;
+}
+
+.sop-blocknote-shell .bn-side-menu {
+  opacity: 0.55;
+}
+
+.sop-blocknote-shell .bn-side-menu:hover {
+  opacity: 1;
+}

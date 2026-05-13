@@ -215,6 +215,7 @@ export function SopBuilderWorkspaceV3({
   onUseClassic?: () => void;
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [insertOpen, setInsertOpen] = useState(false);
 
   const { settings, pages } = sopDocument;
@@ -255,16 +256,19 @@ export function SopBuilderWorkspaceV3({
               <Settings2 className="h-4 w-4" />
               Settings
             </Button>
-            <Button variant="outline">
+            <Button
+              variant={previewOpen ? "default" : "outline"}
+              onClick={() => setPreviewOpen((value) => !value)}
+            >
               <Smartphone className="h-4 w-4" />
-              Preview
+              {previewOpen ? "Hide Preview" : "Preview"}
             </Button>
             <Button onClick={onCreate}>Create SOP</Button>
           </div>
         </div>
       </header>
 
-      <div className="grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)_360px]">
+      <div className={cn("grid min-h-0 flex-1 overflow-hidden", previewOpen ? "lg:grid-cols-[280px_minmax(0,1fr)_360px]" : "lg:grid-cols-[280px_minmax(0,1fr)]")}>
         <aside className="hidden min-h-0 border-r bg-muted/20 lg:block">
           <div className="border-b p-4">
             <div className="flex items-center justify-between gap-3">
@@ -308,6 +312,7 @@ export function SopBuilderWorkspaceV3({
           <SopBlockNoteEditor />
         </main>
 
+        {previewOpen ? (
         <aside className="hidden min-h-0 overflow-y-auto border-l bg-muted/10 p-5 [scrollbar-width:none] lg:block [&::-webkit-scrollbar]:hidden">
           <div className="sticky top-0 space-y-4">
             <div>
@@ -365,6 +370,7 @@ export function SopBuilderWorkspaceV3({
             </div>
           </div>
         </aside>
+        ) : null}
       </div>
 
       {settingsOpen ? (

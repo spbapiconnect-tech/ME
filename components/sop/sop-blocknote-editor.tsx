@@ -2,6 +2,7 @@
 
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
+import "./sop-blocknote-editor.css";
 
 import { useEffect } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
@@ -33,7 +34,7 @@ export function SopBlockNoteEditor() {
   }, [editor]);
 
   return (
-    <div className="min-h-full bg-background px-8 py-8">
+    <div className="sop-blocknote-shell min-h-full bg-background px-8 py-8">
       <div className="mx-auto max-w-5xl">
         <BlockNoteView
           editor={editor}
