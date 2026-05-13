@@ -142,11 +142,19 @@ function itemColor(item: OutletStaffWorkItem) {
 }
 
 function itemBorder(item: OutletStaffWorkItem) {
-  if (isOverdue(item) || item.priority === "urgent") return "border-red-300 bg-red-50/50";
-  if (item.type === "inspection") return "border-amber-300 bg-amber-50/50";
-  if (item.type === "training" || item.type === "sop") return "border-emerald-300 bg-emerald-50/50";
-  if (isWaitingReview(item)) return "border-violet-300 bg-violet-50/50";
-  return "border-primary/20 bg-primary/[0.03]";
+  if (isOverdue(item) || item.priority === "urgent") return "border-red-500/60 bg-card";
+  if (item.type === "inspection") return "border-amber-500/50 bg-card";
+  if (item.type === "training" || item.type === "sop") return "border-emerald-500/50 bg-card";
+  if (isWaitingReview(item)) return "border-violet-500/50 bg-card";
+  return "border-border bg-card";
+}
+
+function itemRailClass(item: OutletStaffWorkItem) {
+  if (isOverdue(item) || item.priority === "urgent") return "bg-red-500";
+  if (item.type === "inspection") return "bg-amber-500";
+  if (item.type === "training" || item.type === "sop") return "bg-emerald-500";
+  if (isWaitingReview(item)) return "bg-violet-500";
+  return "bg-blue-500";
 }
 
 function statusVariant(item: OutletStaffWorkItem) {
@@ -241,8 +249,9 @@ function WorkCard({
     <button
       type="button"
       onClick={() => onOpen(item)}
-      className={cn("w-full rounded-2xl border p-4 text-left transition hover:bg-muted/30", itemBorder(item))}
+      className={cn("relative w-full overflow-hidden rounded-2xl border bg-card p-4 pl-5 text-left text-card-foreground transition hover:bg-muted/30", itemBorder(item))}
     >
+      <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           {label ? <div className="mb-1 text-xs font-medium uppercase text-muted-foreground">{label}</div> : null}
@@ -313,10 +322,10 @@ function RedLightPanel({
   const hasRedLight = overdue.length > 0;
 
   return (
-    <Card className={cn(hasRedLight ? "border-red-300 bg-red-50/60" : "border-emerald-300 bg-emerald-50/60")}>
+    <Card className={cn("bg-card", hasRedLight ? "border-red-500/60" : "border-emerald-500/50")}>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-base">
-          {hasRedLight ? <AlertCircle className="h-4 w-4 text-red-600" /> : <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+          {hasRedLight ? <AlertCircle className="h-4 w-4 text-red-500" /> : <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
           Red Light
         </CardTitle>
       </CardHeader>
@@ -379,8 +388,9 @@ function TodayTimeline({
                         key={item.id}
                         type="button"
                         onClick={() => onOpen(item)}
-                        className={cn("w-full rounded-xl border bg-background p-3 text-left hover:bg-muted/30", itemBorder(item))}
+                        className={cn("relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left text-card-foreground hover:bg-muted/30", itemBorder(item))}
                       >
+                        <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-2">
                             <span className={cn("h-2 w-2 rounded-full", itemColor(item))} />
@@ -536,9 +546,9 @@ function CalendarView({
                   onClick={() => setSelectedDate(date)}
                   className={cn(
                     "min-h-[88px] rounded-xl border bg-background p-2 text-left transition hover:bg-muted/40",
-                    selectedDate === date && "border-primary bg-primary/5",
+                    selectedDate === date && "border-primary bg-muted/30",
                     dayShifts.length && "bg-primary/[0.03]",
-                    hasRed && "border-red-300 bg-red-50/70",
+                    hasRed && "border-red-500/70 bg-card ring-1 ring-red-500/30",
                   )}
                 >
                   <div className="flex items-center justify-between">
@@ -851,7 +861,7 @@ function SopView({
               key={item.id}
               type="button"
               onClick={() => onSelect(item)}
-              className={cn("w-full rounded-xl border p-3 text-left hover:bg-muted/30", selected?.id === item.id && "border-primary bg-primary/5")}
+              className={cn("w-full rounded-xl border p-3 text-left hover:bg-muted/30", selected?.id === item.id && "border-primary bg-muted/30")}
             >
               <div className="font-medium">{item.title}</div>
               <div className="text-xs text-muted-foreground">{item.description}</div>
