@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import {
+  Check,
   ChevronLeft,
   Maximize2,
   Pencil,
@@ -312,9 +313,21 @@ export function SopBuilderWorkspaceV3({
 
   function toggleCsvSetting(field: "targetOutlet" | "targetRole", value: string) {
     const current = csvToArray(localSettings[field]);
-    const next = current.includes(value)
-      ? current.filter((item) => item !== value)
-      : [...current, value];
+
+    let next: string[];
+
+    if (field === "targetOutlet" && value === "All Outlets") {
+      next = current.includes("All Outlets") ? [] : ["All Outlets"];
+    } else if (field === "targetOutlet") {
+      const withoutAll = current.filter((item) => item !== "All Outlets");
+      next = withoutAll.includes(value)
+        ? withoutAll.filter((item) => item !== value)
+        : [...withoutAll, value];
+    } else {
+      next = current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value];
+    }
 
     const patch = { [field]: arrayToCsv(next) } as Partial<SopBuilderV3Settings>;
 
@@ -370,23 +383,30 @@ export function SopBuilderWorkspaceV3({
     checked: boolean;
     onCheckedChange: () => void;
   }) {
-    const checkboxId = `sop-setting-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
-
     return (
-      <label
-        htmlFor={checkboxId}
+      <button
+        type="button"
+        aria-pressed={checked}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onCheckedChange();
+        }}
         className={cn(
           "flex w-full cursor-pointer items-start gap-3 rounded-xl border bg-background px-3 py-3 text-left transition hover:bg-muted/40",
           checked && "border-primary/60 bg-primary/5",
         )}
       >
-        <input
-          id={checkboxId}
-          type="checkbox"
-          checked={checked}
-          onChange={onCheckedChange}
-          className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
-        />
+        <span
+          className={cn(
+            "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border",
+            checked
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-muted-foreground/50 bg-background",
+          )}
+        >
+          {checked ? <Check className="h-3 w-3" /> : null}
+        </span>
 
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-medium leading-none">{label}</span>
@@ -396,7 +416,7 @@ export function SopBuilderWorkspaceV3({
             </span>
           ) : null}
         </span>
-      </label>
+      </button>
     );
   }
 
@@ -687,6 +707,24 @@ export function SopBuilderWorkspaceV3({
                               value={settingsDraft.title}
                               onChange={(event) => patchSettingsDraft("title", event.target.value)}
                               onBlur={(event) => commitSettingsDraft("title", event.target.value)}
+                            />
+                          </div>
+
+                          <div className="space-y-1.5">
+                            <Label>Category</Label>
+                            <Input
+                              value={settings.category || ""}
+                              placeholder="Selected during Create SOP"
+                              onChange={(event) => {
+                                const value = event.target.value;
+                                setLocalSettings((current) => ({
+                                  ...current,
+                                  category: value,
+                                }));
+                              }}
+                              onBlur={(event) =>
+                                onUpdateSettings({ category: event.target.value })
+                              }
                             />
                           </div>
 
