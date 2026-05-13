@@ -296,7 +296,7 @@ export function SopBuilderWorkspaceV3({
               <div className="max-w-sm rounded-3xl border border-dashed bg-card p-10 text-center">
                 <div className="text-lg font-semibold">Start writing the SOP</div>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Add a page, then write like a note. Type "/" to insert SOP sections.
+                  Add a page, then write like a note. Type slash command to insert SOP sections.
                 </p>
                 <Button className="mt-4" onClick={onAddPage}>
                   <Plus className="h-4 w-4" />

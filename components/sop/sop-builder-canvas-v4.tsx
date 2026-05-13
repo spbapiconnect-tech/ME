@@ -44,15 +44,21 @@ function uid(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function iconFor(type: SopBuilderV4CommandKey) {
-  if (type === "heading") return Type;
-  if (type === "step") return ListChecks;
-  if (type === "image" || type === "gif") return ImageIcon;
-  if (type === "video") return PlaySquare;
-  if (type === "warning") return AlertTriangle;
-  if (type === "checklist") return CheckSquare;
-  if (type === "proof") return ShieldCheck;
-  return FileText;
+function SopCommandIcon({
+  type,
+  className,
+}: {
+  type: SopBuilderV4CommandKey;
+  className?: string;
+}) {
+  if (type === "heading") return <Type className={className} />;
+  if (type === "step") return <ListChecks className={className} />;
+  if (type === "image" || type === "gif") return <ImageIcon className={className} />;
+  if (type === "video") return <PlaySquare className={className} />;
+  if (type === "warning") return <AlertTriangle className={className} />;
+  if (type === "checklist") return <CheckSquare className={className} />;
+  if (type === "proof") return <ShieldCheck className={className} />;
+  return <FileText className={className} />;
 }
 
 function defaultSection(command: SopBuilderV4Command): SopBuilderV4Section {
@@ -95,13 +101,11 @@ function commandLabel(type: SopBuilderV4CommandKey) {
 }
 
 function SectionPreview({ section }: { section: SopBuilderV4Section }) {
-  const Icon = iconFor(section.type);
-
   if (section.type === "step") {
     return (
       <div className="space-y-3">
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <Icon className="h-4 w-4 text-primary" />
+          <SopCommandIcon type={section.type} className="h-4 w-4 text-primary" />
           {section.title || "Step by Step"}
         </div>
 
@@ -133,7 +137,7 @@ function SectionPreview({ section }: { section: SopBuilderV4Section }) {
     return (
       <div>
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <Icon className="h-4 w-4 text-primary" />
+          <SopCommandIcon type={section.type} className="h-4 w-4 text-primary" />
           {section.title || commandLabel(section.type)}
         </div>
         <div className="mt-3 rounded-2xl border border-dashed bg-muted/30 px-4 py-8 text-center text-sm text-muted-foreground">
@@ -150,7 +154,7 @@ function SectionPreview({ section }: { section: SopBuilderV4Section }) {
     return (
       <div>
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <Icon className="h-4 w-4 text-primary" />
+          <SopCommandIcon type={section.type} className="h-4 w-4 text-primary" />
           {section.title || commandLabel(section.type)}
         </div>
         <div className="mt-3 space-y-2">
@@ -169,7 +173,7 @@ function SectionPreview({ section }: { section: SopBuilderV4Section }) {
     return (
       <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4">
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <Icon className="h-4 w-4 text-destructive" />
+          <SopCommandIcon type={section.type} className="h-4 w-4 text-destructive" />
           {section.title || "Warning"}
         </div>
         <div className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
@@ -193,7 +197,7 @@ function SectionPreview({ section }: { section: SopBuilderV4Section }) {
   return (
     <div>
       <div className="flex items-center gap-2 text-sm font-semibold">
-        <Icon className="h-4 w-4 text-primary" />
+        <SopCommandIcon type={section.type} className="h-4 w-4 text-primary" />
         {section.title || commandLabel(section.type)}
       </div>
       <div className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
@@ -417,8 +421,6 @@ export function SopBuilderCanvasV4({
               </div>
               <div className="max-h-80 overflow-y-auto p-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {commands.map((command) => {
-                  const Icon = iconFor(command.key);
-
                   return (
                     <button
                       key={command.key}
@@ -427,7 +429,7 @@ export function SopBuilderCanvasV4({
                       className="flex w-full gap-3 rounded-xl px-3 py-2 text-left hover:bg-muted"
                     >
                       <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border bg-background text-primary">
-                        <Icon className="h-4 w-4" />
+                        <SopCommandIcon type={command.key} className="h-4 w-4" />
                       </span>
                       <span>
                         <span className="block text-sm font-medium">{command.label}</span>
