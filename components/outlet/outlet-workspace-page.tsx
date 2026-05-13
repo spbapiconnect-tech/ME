@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   BookOpen,
   CheckCircle2,
@@ -59,7 +58,7 @@ function WorkspaceSection({
   icon: React.ReactNode;
   items: OutletWorkspaceCard[];
   empty: string;
-  onOpen: (href: string) => void;
+  onOpen: (item: OutletWorkspaceCard) => void;
 }) {
   return (
     <Card>
@@ -87,7 +86,7 @@ function WorkspaceSection({
               {item.proofLabel ? <span className="rounded-full border px-2 py-0.5">Proof {item.proofLabel}</span> : null}
             </div>
             <div className="mt-3">
-              <Button size="sm" variant="outline" onClick={() => onOpen(item.href)}>
+              <Button size="sm" variant="outline" onClick={() => onOpen(item)}>
                 {item.actionLabel || "Open"}
               </Button>
             </div>
@@ -98,8 +97,116 @@ function WorkspaceSection({
   );
 }
 
+
+function StaffWorkPanel({
+  item,
+  onClose,
+}: {
+  item?: OutletWorkspaceCard;
+  onClose: () => void;
+}) {
+  if (!item) {
+    return (
+      <Card className="border-dashed">
+        <CardHeader>
+          <CardTitle className="text-base">Staff Work View</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Select today work, training, SOP, inspection, or proof item. Staff will complete the action here without opening manager modules.
+          </p>
+        </CardHeader>
+        <CardContent className="grid gap-3 text-sm md:grid-cols-3">
+          {["Read", "Do", "Upload Proof"].map((step) => (
+            <div key={step} className="rounded-xl border bg-muted/10 p-3">
+              <div className="font-medium">{step}</div>
+              <div className="text-xs text-muted-foreground">Simple staff action, no backend navigation.</div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const mode =
+    item.module === "sop" ? "SOP Reading" :
+    item.module === "tasks" ? "Task Execution" :
+    item.module === "inspection" ? "Inspection Runner" :
+    item.module === "issues" ? "Rework Request" :
+    "Outlet Work";
+
+  const primaryAction =
+    item.module === "sop" ? "Acknowledge" :
+    item.module === "tasks" ? "Submit Proof" :
+    item.module === "inspection" ? "Submit Checklist" :
+    item.module === "issues" ? "Fix Again" :
+    "Continue";
+
+  return (
+    <Card className="border-primary/30 bg-primary/[0.02]">
+      <CardHeader className="pb-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-xs font-medium uppercase text-muted-foreground">{mode}</div>
+            <CardTitle className="text-lg">{item.title}</CardTitle>
+            <p className="text-sm text-muted-foreground">{item.subtitle}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant={statusVariant(item.tone)}>{item.status}</Badge>
+            <Button size="sm" variant="ghost" onClick={onClose}>Close</Button>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {item.module === "sop" ? (
+          <div className="rounded-2xl border bg-background p-4">
+            <div className="text-sm font-semibold">Employee Reading</div>
+            <div className="mt-2 rounded-xl border bg-muted/10 p-4 text-sm text-muted-foreground">
+              Staff should read the SOP page by page here, with image / video / PDF preview, checklist, then acknowledgement.
+            </div>
+          </div>
+        ) : null}
+
+        {item.module === "tasks" ? (
+          <div className="grid gap-3 md:grid-cols-3">
+            {["Read instruction", "Do work", "Upload proof"].map((step, index) => (
+              <div key={step} className="rounded-xl border bg-background p-3">
+                <div className="text-xs text-muted-foreground">Step {index + 1}</div>
+                <div className="font-medium">{step}</div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {item.module === "inspection" ? (
+          <div className="rounded-2xl border bg-background p-4">
+            <div className="font-medium">Checklist Runner</div>
+            <div className="mt-2 text-sm text-muted-foreground">
+              Staff should only see pass / fail, comment, and proof upload. Manager review controls stay hidden.
+            </div>
+          </div>
+        ) : null}
+
+        {item.module === "issues" ? (
+          <div className="rounded-2xl border bg-background p-4">
+            <div className="font-medium">What needs fixing</div>
+            <div className="mt-2 text-sm text-muted-foreground">
+              Show the rejected proof, what needs to be corrected, and allow a new photo / video proof submission.
+            </div>
+          </div>
+        ) : null}
+
+        <div className="flex flex-wrap gap-2">
+          <Button>{primaryAction}</Button>
+          <Button variant="outline">Upload Photo / Video</Button>
+          <Button variant="outline">Save Progress</Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+
 export function OutletWorkspacePage() {
-  const router = useRouter();
   const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
   const getRows = useMeRuntimeStore((state) => state.getRows);
 
@@ -121,6 +228,7 @@ export function OutletWorkspacePage() {
   const [selectedOutlet, setSelectedOutlet] = useState("All Branches");
   const [selectedRole, setSelectedRole] = useState("Outlet Manager");
   const [query, setQuery] = useState("");
+  const [selectedWorkItem, setSelectedWorkItem] = useState<OutletWorkspaceCard | undefined>();
 
   const filter = { outlet: selectedOutlet, role: selectedRole };
 
@@ -186,6 +294,8 @@ export function OutletWorkspacePage() {
           ))}
         </div>
 
+        <StaffWorkPanel item={selectedWorkItem} onClose={() => setSelectedWorkItem(undefined)} />
+
         <div className="grid gap-4 xl:grid-cols-[1.1fr_1fr_1fr]">
           <WorkspaceSection
             title="Today"
@@ -193,7 +303,7 @@ export function OutletWorkspacePage() {
             icon={<Store className="h-4 w-4" />}
             items={filteredTasks}
             empty="No outlet tasks for the current filter."
-            onOpen={router.push}
+            onOpen={setSelectedWorkItem}
           />
 
           <WorkspaceSection
@@ -202,7 +312,7 @@ export function OutletWorkspacePage() {
             icon={<GraduationCap className="h-4 w-4" />}
             items={filteredTraining}
             empty="No training acknowledgement pending."
-            onOpen={router.push}
+            onOpen={setSelectedWorkItem}
           />
 
           <WorkspaceSection
@@ -211,7 +321,7 @@ export function OutletWorkspacePage() {
             icon={<BookOpen className="h-4 w-4" />}
             items={filteredSops}
             empty="No SOPs available for this outlet or role."
-            onOpen={router.push}
+            onOpen={setSelectedWorkItem}
           />
         </div>
 
@@ -222,7 +332,7 @@ export function OutletWorkspacePage() {
             icon={<ClipboardCheck className="h-4 w-4" />}
             items={filteredInspections}
             empty="No inspection assigned."
-            onOpen={router.push}
+            onOpen={setSelectedWorkItem}
           />
 
           <WorkspaceSection
@@ -231,7 +341,7 @@ export function OutletWorkspacePage() {
             icon={<UploadCloud className="h-4 w-4" />}
             items={filteredProofs}
             empty="No proof, audit, or incident follow-up found."
-            onOpen={router.push}
+            onOpen={setSelectedWorkItem}
           />
         </div>
 
