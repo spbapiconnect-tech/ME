@@ -1002,7 +1002,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                       <div className="text-sm font-semibold">Live Employee Preview</div>
                       <div className="text-xs text-muted-foreground">Phone reading mode</div>
                     </div>
-                    <Badge variant="outline">{createPreview.pages.length} Pages</Badge>
+                    <Badge variant="outline">{(typeof createPreview === "string" ? 0 : createPreview.pages.length)} Pages</Badge>
                   </div>
 
                   <div className="rounded-[2rem] border bg-background p-3 shadow-sm">
@@ -1010,7 +1010,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                       <div className="h-1.5 w-16 rounded-full bg-muted" />
                     </div>
                     <div className="max-h-[calc(100vh-250px)] space-y-3 overflow-y-auto rounded-[1.5rem] border bg-muted/10 p-3">
-                      {createPreview.pages.map((page) => (
+                      {(typeof createPreview === "string" ? [] : createPreview.pages).map((page) => (
                         <div key={page.id} className="rounded-2xl border bg-background p-3">
                           <div className="text-xs font-medium uppercase text-muted-foreground">Page {page.pageNo}</div>
                           <div className="font-semibold">{page.title}</div>

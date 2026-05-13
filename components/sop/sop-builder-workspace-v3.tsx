@@ -205,49 +205,21 @@ export function SopBuilderWorkspaceV3({
   useEffect(() => {
     if (!renameTarget) return;
 
-    const timer = window.setTimeout(() => {
+    const focusInput = () => {
       renameInputRef.current?.focus();
       renameInputRef.current?.select();
-    }, 30);
+    };
 
-    return () => window.clearTimeout(timer);
-  }, [renameTarget]);
-
-  useEffect(() => {
-    if (!renameTarget) return;
-
-    function blockRenameEditorEvents(event: Event) {
-      const target = event.target as Node | null;
-      const input = renameInputRef.current;
-
-      if (input && target && input.contains(target)) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      if ("stopImmediatePropagation" in event) {
-        event.stopImmediatePropagation();
-      }
-    }
-
-    document.addEventListener("keydown", blockRenameEditorEvents, true);
-    document.addEventListener("beforeinput", blockRenameEditorEvents, true);
-    document.addEventListener("input", blockRenameEditorEvents, true);
-    document.addEventListener("compositionstart", blockRenameEditorEvents, true);
-    document.addEventListener("compositionupdate", blockRenameEditorEvents, true);
-    document.addEventListener("compositionend", blockRenameEditorEvents, true);
+    focusInput();
+    const frame = window.requestAnimationFrame(focusInput);
+    const timer = window.setTimeout(focusInput, 80);
 
     return () => {
-      document.removeEventListener("keydown", blockRenameEditorEvents, true);
-      document.removeEventListener("beforeinput", blockRenameEditorEvents, true);
-      document.removeEventListener("input", blockRenameEditorEvents, true);
-      document.removeEventListener("compositionstart", blockRenameEditorEvents, true);
-      document.removeEventListener("compositionupdate", blockRenameEditorEvents, true);
-      document.removeEventListener("compositionend", blockRenameEditorEvents, true);
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
     };
   }, [renameTarget]);
+
 
   const activePage = useMemo(
     () => pages.find((page) => page.id === selectedPageId) || pages[0],
@@ -784,44 +756,19 @@ export function SopBuilderWorkspaceV3({
       {renameTarget ? (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/55 backdrop-blur-sm"
-          onMouseDown={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-          }}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-          }}
-          onKeyDownCapture={(event) => {
-            event.stopPropagation();
-          }}
-          onBeforeInputCapture={(event) => {
-            event.stopPropagation();
-          }}
-          onInputCapture={(event) => {
-            event.stopPropagation();
-          }}
           onKeyDown={(event) => {
-            event.stopPropagation();
+            if (event.key === "Escape") {
+              event.preventDefault();
+              closeRename();
+            }
           }}
         >
           <form
             className="w-full max-w-sm rounded-2xl border bg-popover p-4 text-popover-foreground shadow-2xl"
-            onMouseDown={(event) => {
-              event.stopPropagation();
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-            }}
-            onKeyDownCapture={(event) => {
-              event.stopPropagation();
-            }}
-            onBeforeInputCapture={(event) => {
-              event.stopPropagation();
-            }}
-            onInputCapture={(event) => {
-              event.stopPropagation();
-            }}
+            onPointerDown={(event) => event.stopPropagation()}
+            onMouseDown={(event) => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => event.stopPropagation()}
             onSubmit={(event) => {
               event.preventDefault();
               event.stopPropagation();
@@ -833,14 +780,14 @@ export function SopBuilderWorkspaceV3({
 
             <Input
               ref={renameInputRef}
+              autoFocus
               className="mt-4"
               value={renameValue}
+              onFocus={(event) => event.currentTarget.select()}
               onChange={(event) => setRenameValue(event.target.value)}
+              onPointerDown={(event) => event.stopPropagation()}
               onMouseDown={(event) => event.stopPropagation()}
               onClick={(event) => event.stopPropagation()}
-              onKeyDownCapture={(event) => event.stopPropagation()}
-              onBeforeInputCapture={(event) => event.stopPropagation()}
-              onInputCapture={(event) => event.stopPropagation()}
               onKeyDown={(event) => {
                 event.stopPropagation();
 
