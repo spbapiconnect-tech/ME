@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
+import { serializeUploadAsset, uploadAssetLabel, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
 import {
@@ -64,6 +65,16 @@ type ShiftItem = {
 
 function detailValue(row: RuntimeRow, label: string) {
   return row.detailItems?.find((item) => item.label === label)?.value || "";
+}
+
+function upsertDetail(items: RuntimeDetail[] | undefined, label: string, value: string) {
+  const next = [...(items || [])].map((item) => ({ label: item.label, value: item.value || "" }));
+  const index = next.findIndex((item) => item.label === label);
+
+  if (index >= 0) next[index] = { label, value };
+  else next.push({ label, value });
+
+  return next;
 }
 
 function todayISO() {
@@ -857,11 +868,14 @@ function SopView({
 function WorkItemSheet({
   item,
   onClose,
+  onSubmitProof,
 }: {
   item?: OutletStaffWorkItem;
   onClose: () => void;
+  onSubmitProof: (item: OutletStaffWorkItem, asset: string) => Promise<void>;
 }) {
   const [proofName, setProofName] = useState("");
+  const [proofAsset, setProofAsset] = useState("");
 
   if (!item) return null;
 
@@ -906,14 +920,27 @@ function WorkItemSheet({
               className="mt-3"
               type="file"
               accept="image/*,video/*"
-              onChange={(event) => setProofName(event.target.files?.[0]?.name || "")}
+              onChange={async (event) => {
+                const asset = await uploadLocalPreviewAsset(event.target.files?.[0], "outlet");
+                const serialized = serializeUploadAsset(asset);
+                setProofAsset(serialized);
+                setProofName(uploadAssetLabel(serialized));
+              }}
             />
             {proofName ? <div className="mt-2 text-xs text-muted-foreground">Selected: {proofName}</div> : null}
+            {proofAsset ? <UploadAssetPreview value={proofAsset} compact /> : null}
           </div>
         ) : null}
 
         <div className="flex flex-wrap gap-2">
-          <Button>{isOverdue(item) ? "Fix and upload again" : item.primaryAction}</Button>
+          <Button
+            disabled={item.proofRequired && !proofAsset}
+            onClick={async () => {
+              if (proofAsset) await onSubmitProof(item, proofAsset);
+            }}
+          >
+            {item.proofRequired ? "Submit Proof" : isOverdue(item) ? "Fix and submit" : item.primaryAction}
+          </Button>
           <Button variant="outline">Save progress</Button>
         </div>
       </CardContent>
@@ -924,6 +951,8 @@ function WorkItemSheet({
 export function OutletStaffHomePage() {
   const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
   const getRows = useMeRuntimeStore((state) => state.getRows);
+  const updateRecord = useMeRuntimeStore((state) => state.updateRecord);
+  const logAction = useMeRuntimeStore((state) => state.logAction);
 
   useEffect(() => {
     hydrateFromFoundation();
@@ -977,6 +1006,50 @@ export function OutletStaffHomePage() {
     sop: trainingItems.length,
   };
 
+  async function submitStaffProof(item: OutletStaffWorkItem, asset: string) {
+    const sourceRows =
+      item.sourceModule === "tasks" ? taskRows :
+      item.sourceModule === "inspection" ? inspectionRows :
+      item.sourceModule === "issues" ? issueRows :
+      sopRows;
+
+    const source = sourceRows.find((row) => row.id === item.sourceRecordId);
+    if (!source) return;
+
+    let nextDetails = source.detailItems || [];
+
+    if (item.sourceModule === "tasks") {
+      const existing = detailValue(source, "Photo Proofs");
+      nextDetails = upsertDetail(nextDetails, "Photo Proofs", [existing, asset].filter(Boolean).join(", "));
+      nextDetails = upsertDetail(nextDetails, "Photo Proof Status", "Submitted");
+      nextDetails = upsertDetail(nextDetails, "Manager Review Status", "Pending Review");
+    }
+
+    if (item.sourceModule === "inspection") {
+      const existing = detailValue(source, "Outlet Proofs") || detailValue(source, "Photo Proofs");
+      nextDetails = upsertDetail(nextDetails, "Outlet Proofs", [existing, asset].filter(Boolean).join(", "));
+      nextDetails = upsertDetail(nextDetails, "Required New Photo Proof", "Submitted");
+      nextDetails = upsertDetail(nextDetails, "Corrective Action Status", "Submitted");
+      nextDetails = upsertDetail(nextDetails, "Manager Review Status", "Pending Review");
+    }
+
+    if (item.sourceModule === "issues") {
+      const existing = detailValue(source, "Resolution Evidence") || detailValue(source, "Photo Proofs");
+      nextDetails = upsertDetail(nextDetails, "Resolution Evidence", [existing, asset].filter(Boolean).join(", "));
+      nextDetails = upsertDetail(nextDetails, "Proof Status", "Submitted");
+      nextDetails = upsertDetail(nextDetails, "Manager Review Status", "Pending Review");
+    }
+
+    await updateRecord(item.sourceModule, item.sourceRecordId, {
+      status: "Pending Review",
+      detailItems: nextDetails,
+      nextAction: "Manager review proof",
+    });
+
+    await logAction(item.sourceModule, "outlet-submit-proof", `Outlet submitted proof for ${item.title}`);
+    setSelectedItem(undefined);
+  }
+
   return (
     <ErpShell>
       <div className="space-y-5 p-4 pb-24 md:p-6">
@@ -1016,7 +1089,7 @@ export function OutletStaffHomePage() {
         }} counts={counts} />
 
         {selectedItem ? (
-          <WorkItemSheet item={selectedItem} onClose={() => setSelectedItem(undefined)} />
+          <WorkItemSheet item={selectedItem} onClose={() => setSelectedItem(undefined)} onSubmitProof={submitStaffProof} />
         ) : null}
 
         {activeTab === "today" ? <TodayView items={workItems} shifts={shiftItems} onOpen={setSelectedItem} /> : null}
