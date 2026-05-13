@@ -64,8 +64,8 @@ import { useMeRuntimeStore } from "@/stores/me-runtime";
 import { SopCreateTypeModal } from "@/components/sop/sop-create-type-modal";
 import type { SopCreateTypeConfig } from "@/lib/sop/sop-create-types";
 import { SopBuilderWorkspaceV3 } from "@/components/sop/sop-builder-workspace-v3";
-import {
 import type { SopBlockNoteDocument } from "@/components/sop/sop-blocknote-preview";
+import {
   createSopBuilderV3Document,
   type SopBuilderV3Block,
   type SopBuilderV3BlockType,
