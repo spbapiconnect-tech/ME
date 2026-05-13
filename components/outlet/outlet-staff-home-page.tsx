@@ -1165,85 +1165,185 @@ function SopReader({
   const [fullscreen, setFullscreen] = useState(false);
 
   const pages = parseSopReaderPages(item);
-  const active = pages[Math.min(page, pages.length - 1)] || pages[0];
+  const safePage = Math.min(page, pages.length - 1);
+  const active = pages[safePage] || pages[0];
+  const progress = Math.round(((safePage + 1) / pages.length) * 100);
+
+  function goPrevious() {
+    setPage((value) => Math.max(0, value - 1));
+  }
+
+  function goNext() {
+    setPage((value) => Math.min(pages.length - 1, value + 1));
+  }
+
+  function renderPageBody() {
+    if (active.type === "media" && active.asset) {
+      return <UploadAssetPreview value={active.asset} label="Training Media" />;
+    }
+
+    if (active.type === "pdf" && active.asset) {
+      return <UploadAssetPreview value={active.asset} label="PDF Document" />;
+    }
+
+    if (active.type === "checklist") {
+      return (
+        <div className="space-y-3">
+          {(active.checklist || []).map((check) => (
+            <div key={check} className="rounded-2xl border bg-card px-4 py-3 text-sm">
+              {check}
+            </div>
+          ))}
+          <p className="pt-2 text-sm leading-7 text-muted-foreground">{active.body}</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="whitespace-pre-wrap text-base leading-8 text-muted-foreground">
+        {active.body}
+      </div>
+    );
+  }
 
   return (
-    <Card className={cn("min-h-0 sm:min-h-[620px]", fullscreen && "fixed inset-0 z-50 overflow-y-auto rounded-none bg-background shadow-2xl sm:inset-4 sm:rounded-2xl")}>
-      <CardHeader className="border-b">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <CardTitle className="text-xl">{item?.title || "SOP Reader"}</CardTitle>
-            <p className="text-sm text-muted-foreground">Read like a handbook. SOP library stays separate from daily timeline unless assigned.</p>
+    <Card className={cn(
+      "overflow-hidden border-0 bg-background shadow-none xl:min-h-[620px] xl:border xl:shadow-sm",
+      fullscreen && "fixed inset-0 z-50 overflow-y-auto rounded-none bg-background shadow-2xl xl:inset-4 xl:rounded-2xl",
+    )}>
+      <div className="flex min-h-[100dvh] flex-col bg-background xl:hidden">
+        <div className="sticky top-0 z-20 border-b bg-background/95 px-4 py-3 backdrop-blur">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                SOP Reader
+              </div>
+              <div className="truncate text-lg font-semibold">{item?.title || "SOP Reader"}</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                Page {safePage + 1} of {pages.length}
+              </div>
+            </div>
+            {onClose ? (
+              <Button size="sm" variant="outline" onClick={onClose}>
+                Close
+              </Button>
+            ) : null}
           </div>
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setFullscreen((value) => !value)}>
-              {fullscreen ? "Exit" : "Full Screen"}
-            </Button>
-            {onClose ? <Button size="sm" variant="ghost" onClick={onClose}>Close</Button> : null}
+
+          <div className="mt-3 space-y-2">
+            <select
+              value={String(safePage)}
+              onChange={(event) => setPage(Number(event.target.value))}
+              className="h-10 w-full rounded-xl border bg-background px-3 text-sm"
+            >
+              {pages.map((readerPage, index) => (
+                <option key={readerPage.id} value={String(index)}>
+                  {index + 1}. {readerPage.title}
+                </option>
+              ))}
+            </select>
+
+            <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+              <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
+            </div>
           </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="grid min-w-0 gap-0 p-0 xl:grid-cols-[240px_minmax(0,1fr)_220px]">
-        <aside className="border-b p-4 xl:border-b-0 xl:border-r">
-          <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Pages</div>
-          <div className="space-y-1">
-            {pages.map((readerPage, index) => (
-              <button
-                key={readerPage.id}
-                type="button"
-                onClick={() => setPage(index)}
-                className={cn("w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-muted", page === index && "bg-muted font-medium")}
-              >
-                {index + 1}. {readerPage.title}
-              </button>
-            ))}
-          </div>
-        </aside>
-
-        <main className="mx-auto w-full min-w-0 max-w-4xl p-4 md:p-6">
-          <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Page {Math.min(page + 1, pages.length)} of {pages.length}</div>
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{active.title}</h2>
-
-          {active.type === "media" && active.asset ? (
-            <div className="mt-5">
-              <UploadAssetPreview value={active.asset} label="Training Media" />
+        <main className="min-h-0 flex-1 overflow-y-auto px-5 py-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <article className="mx-auto max-w-[68ch]">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Page {safePage + 1}
             </div>
-          ) : active.type === "pdf" && active.asset ? (
-            <div className="mt-5">
-              <UploadAssetPreview value={active.asset} label="PDF Document" />
+            <h1 className="mt-2 text-2xl font-semibold leading-tight tracking-tight">
+              {active.title}
+            </h1>
+            <div className="mt-6">
+              {renderPageBody()}
             </div>
-          ) : active.type === "checklist" ? (
-            <div className="mt-5 space-y-2">
-              {(active.checklist || []).map((check) => (
-                <div key={check} className="rounded-xl border px-4 py-3 text-sm">{check}</div>
-              ))}
-              <p className="pt-2 text-sm leading-7 text-muted-foreground">{active.body}</p>
-            </div>
-          ) : (
-            <div className="mt-5 whitespace-pre-wrap text-base leading-8 text-muted-foreground">{active.body}</div>
-          )}
-
-          <div className="mt-8 flex items-center justify-between border-t pt-4">
-            <Button variant="outline" disabled={page === 0} onClick={() => setPage((value) => Math.max(0, value - 1))}>Previous</Button>
-            {page === pages.length - 1 ? (
-              <Button>Mark as understood</Button>
-            ) : (
-              <Button onClick={() => setPage((value) => Math.min(pages.length - 1, value + 1))}>Next</Button>
-            )}
-          </div>
+          </article>
         </main>
 
-        <aside className="border-t p-4 xl:border-l xl:border-t-0">
-          <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Progress</div>
-          <div className="text-2xl font-semibold">{Math.round(((Math.min(page + 1, pages.length)) / pages.length) * 100)}%</div>
-          <p className="mt-2 text-sm text-muted-foreground">Acknowledge only at the end.</p>
-        </aside>
-      </CardContent>
+        <div className="sticky bottom-0 z-20 border-t bg-background/95 px-4 py-3 backdrop-blur">
+          <div className="flex gap-2">
+            <Button className="flex-1" variant="outline" disabled={safePage === 0} onClick={goPrevious}>
+              Previous
+            </Button>
+            {safePage === pages.length - 1 ? (
+              <Button className="flex-1">
+                Mark understood
+              </Button>
+            ) : (
+              <Button className="flex-1" onClick={goNext}>
+                Next
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden xl:block">
+        <CardHeader className="border-b">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <CardTitle className="text-xl">{item?.title || "SOP Reader"}</CardTitle>
+              <p className="text-sm text-muted-foreground">Read like a handbook. SOP library stays separate from daily timeline unless assigned.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setFullscreen((value) => !value)}>
+                {fullscreen ? "Exit" : "Full Screen"}
+              </Button>
+              {onClose ? <Button size="sm" variant="ghost" onClick={onClose}>Close</Button> : null}
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="grid min-w-0 gap-0 p-0 xl:grid-cols-[240px_minmax(0,1fr)_220px]">
+          <aside className="border-b p-4 xl:border-b-0 xl:border-r">
+            <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Pages</div>
+            <div className="space-y-1">
+              {pages.map((readerPage, index) => (
+                <button
+                  key={readerPage.id}
+                  type="button"
+                  onClick={() => setPage(index)}
+                  className={cn("w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-muted", safePage === index && "bg-muted font-medium")}
+                >
+                  {index + 1}. {readerPage.title}
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <main className="mx-auto w-full min-w-0 max-w-4xl p-4 md:p-6">
+            <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">
+              Page {safePage + 1} of {pages.length}
+            </div>
+            <h2 className="text-3xl font-semibold tracking-tight">{active.title}</h2>
+
+            <div className="mt-5">
+              {renderPageBody()}
+            </div>
+
+            <div className="mt-8 flex items-center justify-between border-t pt-4">
+              <Button variant="outline" disabled={safePage === 0} onClick={goPrevious}>Previous</Button>
+              {safePage === pages.length - 1 ? (
+                <Button>Mark as understood</Button>
+              ) : (
+                <Button onClick={goNext}>Next</Button>
+              )}
+            </div>
+          </main>
+
+          <aside className="border-t p-4 xl:border-l xl:border-t-0">
+            <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Progress</div>
+            <div className="text-2xl font-semibold">{progress}%</div>
+            <p className="mt-2 text-sm text-muted-foreground">Acknowledge only at the end.</p>
+          </aside>
+        </CardContent>
+      </div>
     </Card>
   );
 }
-
 
 function SopView({
   items,
