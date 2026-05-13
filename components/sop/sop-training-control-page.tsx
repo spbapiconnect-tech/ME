@@ -739,7 +739,6 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             onUpdateBlock={updateV3Block}
             onDeleteBlock={deleteV3Block}
             onUpdateSettings={updateV3Settings}
-            onUseClassic={() => setBuilderVariant("classic")}
           />
         ) : (
         <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">

@@ -4,8 +4,7 @@ import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
 import "./sop-blocknote-editor.css";
 
-import { useEffect, useRef } from "react";
-import { FileUp, ImageIcon, Video } from "lucide-react";
+import type { PartialBlock } from "@blocknote/core";
 import { filterSuggestionItems } from "@blocknote/core/extensions";
 import {
   type DefaultReactSuggestionItem,
@@ -14,6 +13,10 @@ import {
   useCreateBlockNote,
 } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
+import { FileUp, ImageIcon, Video } from "lucide-react";
+import { useEffect, useRef } from "react";
+
+import type { SopBlockNoteDocument } from "@/components/sop/sop-blocknote-preview";
 
 type UploadKind = "image" | "video" | "file";
 
@@ -27,19 +30,17 @@ type InsertableFileBlock = {
 };
 
 type InsertableEditor = {
-  document?: unknown[];
+  document?: PartialBlock[];
   focus: () => void;
-  getTextCursorPosition?: () => { block?: unknown };
+  getTextCursorPosition?: () => { block?: PartialBlock };
   insertBlocks: (
     blocks: InsertableFileBlock[],
-    referenceBlock?: unknown,
+    referenceBlock?: PartialBlock,
     placement?: "before" | "after" | "nested",
   ) => void;
 };
 
 async function uploadLocalPreviewFile(file: File) {
-  // Temporary local browser preview.
-  // Later replace this with API / Supabase / S3 upload and return permanent URL.
   return URL.createObjectURL(file);
 }
 
@@ -82,7 +83,11 @@ function getSopSlashMenuItems(
   return [...uploadItems, ...defaultItems];
 }
 
-export function SopBlockNoteEditor() {
+export function SopBlockNoteEditor({
+  onDocumentChange,
+}: {
+  onDocumentChange?: (blocks: SopBlockNoteDocument) => void;
+}) {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -100,10 +105,11 @@ export function SopBlockNoteEditor() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       editor.focus();
+      onDocumentChange?.(editor.document as SopBlockNoteDocument);
     }, 80);
 
     return () => window.clearTimeout(timer);
-  }, [editor]);
+  }, [editor, onDocumentChange]);
 
   function openUploadPicker(kind: UploadKind) {
     if (kind === "image") imageInputRef.current?.click();
@@ -149,6 +155,7 @@ export function SopBlockNoteEditor() {
       editorApi.insertBlocks([block]);
     }
 
+    onDocumentChange?.(editor.document as SopBlockNoteDocument);
     window.setTimeout(() => editor.focus(), 60);
   }
 
@@ -198,6 +205,9 @@ export function SopBlockNoteEditor() {
           slashMenu={false}
           filePanel={false}
           className="min-h-[calc(100vh-220px)] rounded-2xl bg-background"
+          onChange={(currentEditor) => {
+            onDocumentChange?.(currentEditor.document as SopBlockNoteDocument);
+          }}
         >
           <SuggestionMenuController
             triggerCharacter="/"
