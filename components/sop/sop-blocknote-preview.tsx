@@ -13,16 +13,12 @@ export function SopEmployeePreviewDevice({
   blocks,
   title,
   version,
-  outlets,
-  readRoles,
-  visibleRoles,
+  category,
 }: {
   blocks: SopBlockNoteDocument;
   title: string;
   version: string;
-  outlets: string[];
-  readRoles: string[];
-  visibleRoles: string[];
+  category?: string;
 }) {
   const initialContent: SopBlockNoteDocument = blocks.length
     ? blocks

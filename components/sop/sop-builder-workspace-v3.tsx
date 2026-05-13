@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic";
 import {
-  Check,
   ChevronLeft,
   Maximize2,
   Pencil,
@@ -95,16 +94,6 @@ const fallbackSettings = {
   status: "draft",
 } as unknown as SopBuilderV3Settings;
 
-function csvToArray(value?: string) {
-  return (value || "")
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function arrayToCsv(value: string[]) {
-  return value.join(", ");
-}
 
 function cleanOutlineTitle(title?: string) {
   const clean = (title || "")
@@ -141,8 +130,6 @@ export function SopBuilderWorkspaceV3({
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [inspectorTab, setInspectorTab] = useState<"preview" | "settings">("preview");
   const [previewFull, setPreviewFull] = useState(false);
-  const [visibleRoles, setVisibleRoles] = useState<string[]>(["Outlet Manager", "Branch Manager"]);
-  const [reviewerRoles, setReviewerRoles] = useState<string[]>(["Outlet Manager"]);
   const [renameTarget, setRenameTarget] = useState<SopBuilderV3Page | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [titleOverrides, setTitleOverrides] = useState<Record<string, string>>({});
@@ -162,7 +149,7 @@ export function SopBuilderWorkspaceV3({
 
   const [settingsDraft, setSettingsDraft] = useState(() => ({
     title: resolvedSettings.title || "",
-    documentCode: resolvedSettings.documentCode || "",
+    category: resolvedSettings.category || "",
     version: resolvedSettings.version || "v1.0",
   }));
 
@@ -256,16 +243,6 @@ export function SopBuilderWorkspaceV3({
     }, {});
   }, [pages]);
 
-  const outletOptions = ["All Outlets", "RR-KCH", "SKONE-BTU"];
-  const roleOptions = [
-    "Kitchen Staff",
-    "Front Staff",
-    "Cashier",
-    "Outlet Manager",
-    "Branch Manager",
-    "Area Manager",
-    "Trainer",
-  ];
 
   function displayTitle(page: SopBuilderV3Page) {
     return cleanOutlineTitle(titleOverrides[page.id] ?? page.title);
@@ -289,7 +266,7 @@ export function SopBuilderWorkspaceV3({
 
 
   function patchSettingsDraft(
-    field: "title" | "documentCode" | "version",
+    field: "title" | "category" | "version",
     value: string,
   ) {
     setSettingsDraft((current) => ({
@@ -304,44 +281,14 @@ export function SopBuilderWorkspaceV3({
   }
 
   function commitSettingsDraft(
-    field: "title" | "documentCode" | "version",
+    field: "title" | "category" | "version",
     value: string,
   ) {
     patchSettingsDraft(field, value);
     onUpdateSettings({ [field]: value } as Partial<SopBuilderV3Settings>);
   }
 
-  function toggleCsvSetting(field: "targetOutlet" | "targetRole", value: string) {
-    const current = csvToArray(localSettings[field]);
 
-    let next: string[];
-
-    if (field === "targetOutlet" && value === "All Outlets") {
-      next = current.includes("All Outlets") ? [] : ["All Outlets"];
-    } else if (field === "targetOutlet") {
-      const withoutAll = current.filter((item) => item !== "All Outlets");
-      next = withoutAll.includes(value)
-        ? withoutAll.filter((item) => item !== value)
-        : [...withoutAll, value];
-    } else {
-      next = current.includes(value)
-        ? current.filter((item) => item !== value)
-        : [...current, value];
-    }
-
-    const patch = { [field]: arrayToCsv(next) } as Partial<SopBuilderV3Settings>;
-
-    setLocalSettings((currentSettings) => ({
-      ...currentSettings,
-      ...patch,
-    }));
-
-    onUpdateSettings(patch);
-  }
-
-  function toggleLocalList(list: string[], setList: (value: string[]) => void, value: string) {
-    setList(list.includes(value) ? list.filter((item) => item !== value) : [...list, value]);
-  }
 
   function openRename(page: SopBuilderV3Page) {
     const activeElement = globalThis.document?.activeElement as HTMLElement | null;
@@ -371,54 +318,6 @@ export function SopBuilderWorkspaceV3({
   }
 
   const createAction = onCreateSop || onCreateSOP || onCreate || onSubmit;
-
-  function SettingsCheckRow({
-    label,
-    description,
-    checked,
-    onCheckedChange,
-  }: {
-    label: string;
-    description?: string;
-    checked: boolean;
-    onCheckedChange: () => void;
-  }) {
-    return (
-      <button
-        type="button"
-        aria-pressed={checked}
-        onClick={(event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          onCheckedChange();
-        }}
-        className={cn(
-          "flex w-full cursor-pointer items-start gap-3 rounded-xl border bg-background px-3 py-3 text-left transition hover:bg-muted/40",
-          checked && "border-primary/60 bg-primary/5",
-        )}
-      >
-        <span
-          className={cn(
-            "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border",
-            checked
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-muted-foreground/50 bg-background",
-          )}
-        >
-          {checked ? <Check className="h-3 w-3" /> : null}
-        </span>
-
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-medium leading-none">{label}</span>
-          {description ? (
-            <span className="mt-1 block text-xs leading-5 text-muted-foreground">
-              {description}
-            </span>
-          ) : null}
-        </span>
-      </button>
-    );
-  }
 
   return (
     <div
@@ -686,25 +585,26 @@ export function SopBuilderWorkspaceV3({
                       blocks={previewDocument}
                       title={settings.title}
                       version={settings.version}
-                      outlets={csvToArray(settings.targetOutlet)}
-                      readRoles={csvToArray(settings.targetRole)}
-                      visibleRoles={visibleRoles}
+                      category={settings.category}
                     />
                   </div>
                 ) : (
                   <div className="min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    <div className="space-y-6">
+                    <div className="space-y-5">
                       <section className="border-b pb-5">
-                        <div className="mb-3">
-                          <div className="text-sm font-semibold">Document</div>
-                          <div className="text-xs text-muted-foreground">Basic SOP identity and version control.</div>
+                        <div className="mb-4">
+                          <div className="text-sm font-semibold">File settings</div>
+                          <div className="text-xs text-muted-foreground">
+                            Basic file identity only. Outlet and role assignment will happen during Publish.
+                          </div>
                         </div>
 
-                        <div className="grid gap-3">
+                        <div className="grid gap-4">
                           <div className="space-y-1.5">
-                            <Label>SOP Title</Label>
+                            <Label>File Name</Label>
                             <Input
                               value={settingsDraft.title}
+                              placeholder="Example: Opening / Closing SOP"
                               onChange={(event) => patchSettingsDraft("title", event.target.value)}
                               onBlur={(event) => commitSettingsDraft("title", event.target.value)}
                             />
@@ -713,139 +613,29 @@ export function SopBuilderWorkspaceV3({
                           <div className="space-y-1.5">
                             <Label>Category</Label>
                             <Input
-                              value={settings.category || ""}
-                              placeholder="Selected during Create SOP"
-                              onChange={(event) => {
-                                const value = event.target.value;
-                                setLocalSettings((current) => ({
-                                  ...current,
-                                  category: value,
-                                }));
-                              }}
-                              onBlur={(event) =>
-                                onUpdateSettings({ category: event.target.value })
-                              }
+                              value={settingsDraft.category}
+                              placeholder="Example: Recipe / Product SOP"
+                              onChange={(event) => patchSettingsDraft("category", event.target.value)}
+                              onBlur={(event) => commitSettingsDraft("category", event.target.value)}
                             />
                           </div>
 
-                          <div className="grid grid-cols-2 gap-3">
-                            <div className="space-y-1.5">
-                              <Label>Document Code</Label>
-                              <Input
-                                value={settingsDraft.documentCode}
-                                onChange={(event) =>
-                                  patchSettingsDraft("documentCode", event.target.value)
-                                }
-                                onBlur={(event) =>
-                                  commitSettingsDraft("documentCode", event.target.value)
-                                }
-                              />
-                            </div>
-                            <div className="space-y-1.5">
-                              <Label>Version</Label>
-                              <Input
-                                value={settingsDraft.version}
-                                onChange={(event) => patchSettingsDraft("version", event.target.value)}
-                                onBlur={(event) => commitSettingsDraft("version", event.target.value)}
-                              />
-                            </div>
+                          <div className="space-y-1.5">
+                            <Label>Version</Label>
+                            <Input
+                              value={settingsDraft.version}
+                              placeholder="v1.0"
+                              onChange={(event) => patchSettingsDraft("version", event.target.value)}
+                              onBlur={(event) => commitSettingsDraft("version", event.target.value)}
+                            />
                           </div>
                         </div>
                       </section>
 
-                      <section className="border-b pb-5">
-                        <div className="mb-3">
-                          <div className="text-sm font-semibold">Assigned outlets</div>
-                          <div className="text-xs text-muted-foreground">Select every outlet that should receive this SOP.</div>
-                        </div>
-
-                        <div className="space-y-2">
-                          {outletOptions.map((outlet) => {
-                            const active = csvToArray(settings.targetOutlet).includes(outlet);
-
-                            return (
-                              <SettingsCheckRow
-                                key={outlet}
-                                label={outlet}
-                                description={
-                                  outlet === "All Outlets"
-                                    ? "Apply this SOP to every current and future outlet."
-                                    : "This outlet will receive the SOP in staff library."
-                                }
-                                checked={active}
-                                onCheckedChange={() => toggleCsvSetting("targetOutlet", outlet)}
-                              />
-                            );
-                          })}
-                        </div>
-                      </section>
-
-                      <section className="border-b pb-5">
-                        <div className="mb-3">
-                          <div className="text-sm font-semibold">Required to read</div>
-                          <div className="text-xs text-muted-foreground">These roles must read and acknowledge the SOP.</div>
-                        </div>
-
-                        <div className="space-y-2">
-                          {roleOptions.map((role) => {
-                            const active = csvToArray(settings.targetRole).includes(role);
-
-                            return (
-                              <SettingsCheckRow
-                                key={role}
-                                label={role}
-                                description="Must read and acknowledge before this SOP is considered complete."
-                                checked={active}
-                                onCheckedChange={() => toggleCsvSetting("targetRole", role)}
-                              />
-                            );
-                          })}
-                        </div>
-                      </section>
-
-                      <section className="border-b pb-5">
-                        <div className="mb-3">
-                          <div className="text-sm font-semibold">Visible in library</div>
-                          <div className="text-xs text-muted-foreground">Roles that can view this SOP even when acknowledgement is not required.</div>
-                        </div>
-
-                        <div className="space-y-2">
-                          {roleOptions.map((role) => {
-                            const active = visibleRoles.includes(role);
-
-                            return (
-                              <SettingsCheckRow
-                                key={role}
-                                label={role}
-                                description="Can view this SOP in the library even when acknowledgement is not required."
-                                checked={active}
-                                onCheckedChange={() => toggleLocalList(visibleRoles, setVisibleRoles, role)}
-                              />
-                            );
-                          })}
-                        </div>
-                      </section>
-
-                      <section>
-                        <div className="mb-3">
-                          <div className="text-sm font-semibold">Can review / publish</div>
-                          <div className="text-xs text-muted-foreground">Manager roles allowed to review, update, or publish this SOP.</div>
-                        </div>
-
-                        <div className="space-y-2">
-                          {roleOptions.map((role) => {
-                            const active = reviewerRoles.includes(role);
-
-                            return (
-                              <SettingsCheckRow
-                                key={role}
-                                label={role}
-                                description="Can review, update, and publish this SOP."
-                                checked={active}
-                                onCheckedChange={() => toggleLocalList(reviewerRoles, setReviewerRoles, role)}
-                              />
-                            );
-                          })}
+                      <section className="rounded-2xl border bg-muted/20 p-4">
+                        <div className="text-sm font-semibold">Publish assignment</div>
+                        <div className="mt-1 text-xs leading-5 text-muted-foreground">
+                          Outlet assignment, required readers, visibility, and reviewer permission will be configured when publishing this SOP.
                         </div>
                       </section>
                     </div>
@@ -875,9 +665,7 @@ export function SopBuilderWorkspaceV3({
               blocks={previewDocument}
               title={settings.title}
               version={settings.version}
-              outlets={csvToArray(settings.targetOutlet)}
-              readRoles={csvToArray(settings.targetRole)}
-              visibleRoles={visibleRoles}
+              category={settings.category}
             />
           </div>
         </div>
