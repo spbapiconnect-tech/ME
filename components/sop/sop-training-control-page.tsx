@@ -567,7 +567,24 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
               <div>
                 <div className="text-sm text-muted-foreground">SOP & Training</div>
                 <h1 className="text-2xl font-semibold tracking-tight">Create SOP</h1>
-                <p className="text-sm text-muted-foreground">Build an employee-readable SOP with pages, images, step lists, PDF blocks, and checklist blocks.</p>
+                <p className="text-sm text-muted-foreground">Build a controlled SOP with setup, document content, employee preview, and publish readiness.</p>
+                <div className="mt-4 grid gap-2 md:grid-cols-5">
+                  {[
+                    ["1", "Type", "Selected before builder"],
+                    ["2", "Setup", "Owner, outlet, role"],
+                    ["3", "Write", "Pages and content"],
+                    ["4", "Preview", "Employee reading mode"],
+                    ["5", "Publish", "Review and assign"],
+                  ].map(([step, title, desc]) => (
+                    <div key={step} className="rounded-xl border bg-card px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[11px] font-semibold text-primary-foreground">{step}</span>
+                        <span className="text-sm font-medium">{title}</span>
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground">{desc}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" onClick={() => setBuilderMode(false)}>Back</Button>
@@ -581,24 +598,40 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/10 px-3 py-2">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <div className="font-semibold">SOP Content Builder</div>
+                  <div className="font-semibold">Write SOP</div>
                   <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">{activeBuilderPageLabel}</span>
                 </div>
-                <div className="text-xs text-muted-foreground">Add blocks to the selected SOP page.</div>
+                <div className="text-xs text-muted-foreground">Build the SOP page content. Add only the blocks staff need to read.</div>
               </div>
-              <div className="flex flex-wrap gap-2">
+
+              <div className="flex flex-wrap items-center gap-2">
                 <Button variant="outline" size="sm" className="h-8" onClick={() => {
                   const nextPage = newPage(pages.length + 1);
                   setPages((current) => [...current, nextPage]);
                   setSelectedPageId(nextPage.id);
                 }}><Plus className="h-4 w-4" />Add Page</Button>
-                {activeBuilderPageId ? (
-                  <>
-                    {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
-                      <Button key={type} type="button" variant="outline" size="sm" className="h-8" onClick={() => addBlock(activeBuilderPageId, type)}>+ {type}</Button>
-                    ))}
-                  </>
-                ) : null}
+
+                <details className="relative">
+                  <summary className="inline-flex h-8 cursor-pointer list-none items-center rounded-md border bg-background px-3 text-sm font-medium hover:bg-muted/30 [&::-webkit-details-marker]:hidden">
+                    Add Content
+                  </summary>
+                  <div className="absolute right-0 top-9 z-40 w-56 rounded-xl border bg-popover p-2 shadow-xl">
+                    {activeBuilderPageId ? (
+                      (["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => addBlock(activeBuilderPageId, type)}
+                          className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-muted"
+                        >
+                          {type}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 text-sm text-muted-foreground">Select or add a page first.</div>
+                    )}
+                  </div>
+                </details>
               </div>
             </div>
           </div>
