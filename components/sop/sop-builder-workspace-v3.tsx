@@ -135,6 +135,7 @@ export function SopBuilderWorkspaceV3({
 }: SopBuilderWorkspaceV3Props) {
   const workspaceRef = useRef<HTMLDivElement | null>(null);
   const renameInputRef = useRef<HTMLInputElement | null>(null);
+
   const [previewDocument, setPreviewDocument] = useState<SopBlockNoteDocument>([]);
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [inspectorTab, setInspectorTab] = useState<"preview" | "settings">("preview");
@@ -147,17 +148,6 @@ export function SopBuilderWorkspaceV3({
 
   const pages = pagesInput ?? sopDocument?.pages ?? [];
   const settings = settingsInput ?? sopDocument?.settings ?? fallbackSettings;
-
-  useEffect(() => {
-    if (!renameTarget) return;
-
-    const timer = window.setTimeout(() => {
-      renameInputRef.current?.focus();
-      renameInputRef.current?.select();
-    }, 30);
-
-    return () => window.clearTimeout(timer);
-  }, [renameTarget]);
 
   useEffect(() => {
     const browserDocument = globalThis.document;
@@ -211,6 +201,17 @@ export function SopBuilderWorkspaceV3({
       });
     };
   }, []);
+
+  useEffect(() => {
+    if (!renameTarget) return;
+
+    const timer = window.setTimeout(() => {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    }, 30);
+
+    return () => window.clearTimeout(timer);
+  }, [renameTarget]);
 
   const activePage = useMemo(
     () => pages.find((page) => page.id === selectedPageId) || pages[0],
@@ -268,6 +269,11 @@ export function SopBuilderWorkspaceV3({
     setRenameValue(displayTitle(page));
   }
 
+  function closeRename() {
+    setRenameTarget(null);
+    setRenameValue("");
+  }
+
   function saveRename() {
     if (!renameTarget) return;
 
@@ -279,8 +285,7 @@ export function SopBuilderWorkspaceV3({
     }));
 
     onUpdatePage(renameTarget.id, { title: nextTitle });
-    setRenameTarget(null);
-    setRenameValue("");
+    closeRename();
   }
 
   const createAction = onCreateSop || onCreateSOP || onCreate || onSubmit;
@@ -348,10 +353,7 @@ export function SopBuilderWorkspaceV3({
         </div>
       </div>
 
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="min-h-0 flex-1 overflow-hidden"
-      >
+      <ResizablePanelGroup direction="horizontal" className="min-h-0 flex-1 overflow-hidden">
         <ResizablePanel defaultSize={16} minSize={12} maxSize={22}>
           <aside className="flex h-full min-h-0 flex-col border-r bg-background">
             <div className="shrink-0 border-b px-3 py-4">
@@ -784,8 +786,7 @@ export function SopBuilderWorkspaceV3({
 
                 if (event.key === "Escape") {
                   event.preventDefault();
-                  setRenameTarget(null);
-                  setRenameValue("");
+                  closeRename();
                 }
               }}
             />
@@ -797,8 +798,7 @@ export function SopBuilderWorkspaceV3({
                 onClick={(event) => {
                   event.preventDefault();
                   event.stopPropagation();
-                  setRenameTarget(null);
-                  setRenameValue("");
+                  closeRename();
                 }}
               >
                 Cancel
@@ -807,7 +807,6 @@ export function SopBuilderWorkspaceV3({
             </div>
           </form>
         </div>
-      ) : null}
       ) : null}
     </div>
   );
