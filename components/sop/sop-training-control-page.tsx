@@ -601,6 +601,26 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     }
   }
 
+  function v3BlockTypeToLegacy(type: SopBuilderV3BlockType): BlockType {
+    return type === "video" ? "image" : type;
+  }
+
+  function v3BlockToLegacyBlock(block: SopBuilderV3Block) {
+    const legacyType = v3BlockTypeToLegacy(block.type);
+
+    return {
+      id: block.id,
+      type: legacyType,
+      title: block.title,
+      body: block.body,
+      imageUrl: legacyType === "image" ? block.assetUrl || "" : "",
+      pdfUrl: legacyType === "pdf" ? block.assetUrl || "" : "",
+      stepsText: block.steps ? block.steps.join("\n") : "",
+      checklistText: block.checklist ? block.checklist.join("\n") : "",
+      warningLevel: block.warningLevel,
+    };
+  }
+
   function updateV3Page(pageId: string, patch: Partial<SopBuilderV3Page>) {
     setPages((current) =>
       current.map((page) =>
@@ -609,11 +629,13 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
               ...page,
               title: patch.title ?? page.title,
               coverImageUrl: patch.coverAssetUrl ?? page.coverImageUrl,
+              blocks: patch.blocks ? patch.blocks.map(v3BlockToLegacyBlock) : page.blocks,
             }
           : page,
       ),
     );
   }
+
 
   function addV3Block(pageId: string, type: SopBuilderV3BlockType) {
     const legacyType: BlockType = type === "video" ? "image" : type;

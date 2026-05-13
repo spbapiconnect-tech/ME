@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { SopBuilderCanvasV4, type SopBuilderV4Section } from "@/components/sop/sop-builder-canvas-v4";
 import {
   sopBuilderV3Readiness,
   type SopBuilderV3Block,
@@ -126,6 +127,48 @@ function PreviewBlock({ block }: { block: SopBuilderV3Block }) {
       </div>
     </div>
   );
+}
+
+
+function v3BlockToV4Section(block: SopBuilderV3Block): SopBuilderV4Section {
+  return {
+    id: block.id,
+    type: block.type === "step-list" ? "step" : block.type,
+    title: block.title,
+    content: block.body,
+    mediaUrl: block.assetUrl,
+    checklist: block.checklist,
+    steps: block.steps?.map((step, index) => ({
+      id: `${block.id}-step-${index}`,
+      title: `Step ${index + 1}`,
+      instruction: step,
+    })),
+  };
+}
+
+function v4TypeToV3Type(type: SopBuilderV4Section["type"]): SopBuilderV3BlockType {
+  if (type === "step") return "step-list";
+  if (type === "gif") return "image";
+  if (type === "proof") return "checklist";
+  if (type === "acknowledgement") return "checklist";
+  return type;
+}
+
+function v4SectionsToV3Blocks(sections: SopBuilderV4Section[]): SopBuilderV3Block[] {
+  return sections.map((section) => {
+    const type = v4TypeToV3Type(section.type);
+
+    return {
+      id: section.id,
+      type,
+      title: section.title,
+      body: section.content,
+      assetUrl: section.mediaUrl,
+      steps: section.steps?.map((step) => step.instruction).filter(Boolean),
+      checklist: section.checklist,
+      warningLevel: section.type === "warning" ? "Warning" : undefined,
+    };
+  });
 }
 
 export function SopBuilderWorkspaceV3({
@@ -247,13 +290,13 @@ export function SopBuilderWorkspaceV3({
           </div>
         </aside>
 
-        <main className="min-h-0 overflow-y-auto p-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <main className="min-h-0 overflow-y-auto bg-background [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {!activePage ? (
-            <div className="flex min-h-[520px] items-center justify-center rounded-3xl border border-dashed bg-card">
-              <div className="max-w-sm text-center">
+            <div className="flex min-h-[520px] items-center justify-center p-5">
+              <div className="max-w-sm rounded-3xl border border-dashed bg-card p-10 text-center">
                 <div className="text-lg font-semibold">Start writing the SOP</div>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Add a page, then insert SOP sections like steps, warning, media, or checklist.
+                  Add a page, then write like a note. Type "/" to insert SOP sections.
                 </p>
                 <Button className="mt-4" onClick={onAddPage}>
                   <Plus className="h-4 w-4" />
@@ -262,149 +305,15 @@ export function SopBuilderWorkspaceV3({
               </div>
             </div>
           ) : (
-            <div className="mx-auto max-w-4xl space-y-4">
-              <div className="rounded-3xl border bg-card p-5">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1 space-y-2">
-                    <Label>Page title</Label>
-                    <Input
-                      value={activePage.title}
-                      onChange={(event) => onUpdatePage(activePage.id, { title: event.target.value })}
-                      className="h-12 text-lg font-semibold"
-                      placeholder="Example: What staff need to know"
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => setInsertOpen((value) => !value)}>
-                      <Plus className="h-4 w-4" />
-                      Insert Section
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      disabled={pages.length <= 1}
-                      onClick={() => onDeletePage(activePage.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {insertOpen ? (
-                  <div className="mt-4 grid gap-2 rounded-2xl border bg-background p-2 md:grid-cols-2">
-                    {insertSections.map((item) => {
-                      const Icon = item.icon;
-
-                      return (
-                        <button
-                          key={item.type}
-                          type="button"
-                          onClick={() => {
-                            onAddBlock(activePage.id, item.type);
-                            setInsertOpen(false);
-                          }}
-                          className="flex gap-3 rounded-xl p-3 text-left hover:bg-muted"
-                        >
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border bg-card text-primary">
-                            <Icon className="h-4 w-4" />
-                          </span>
-                          <span>
-                            <span className="block text-sm font-medium">{item.label}</span>
-                            <span className="block text-xs leading-5 text-muted-foreground">{item.description}</span>
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : null}
-              </div>
-
-              <div className="space-y-3">
-                {!activePage.blocks.length ? (
-                  <div className="rounded-3xl border border-dashed bg-card p-10 text-center">
-                    <div className="text-base font-semibold">No section yet</div>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      Insert sections only when staff need to read, watch, check, or acknowledge something.
-                    </p>
-                  </div>
-                ) : activePage.blocks.map((block, index) => {
-                  const Icon = sectionIcon(block.type);
-
-                  return (
-                    <section key={block.id} className="rounded-3xl border bg-card p-5">
-                      <div className="mb-4 flex items-start justify-between gap-3">
-                        <div className="flex gap-3">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border bg-background text-primary">
-                            <Icon className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <div className="text-sm font-semibold">{index + 1}. {sectionLabel(block.type)}</div>
-                            <div className="text-xs text-muted-foreground">This section appears in the employee reader.</div>
-                          </div>
-                        </div>
-
-                        <Button variant="ghost" size="icon" onClick={() => onDeleteBlock(activePage.id, block.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      <div className="grid gap-3">
-                        <div className="space-y-1.5">
-                          <Label>Title</Label>
-                          <Input
-                            value={block.title}
-                            onChange={(event) => onUpdateBlock(activePage.id, block.id, { title: event.target.value })}
-                            placeholder={sectionLabel(block.type)}
-                          />
-                        </div>
-
-                        {block.type === "step-list" ? (
-                          <div className="space-y-1.5">
-                            <Label>Steps</Label>
-                            <Textarea
-                              rows={7}
-                              value={linesToText(block.steps)}
-                              onChange={(event) => onUpdateBlock(activePage.id, block.id, { steps: textToLines(event.target.value) })}
-                              placeholder={"Prepare the station\nFollow the standard\nTake proof photo if required"}
-                            />
-                          </div>
-                        ) : block.type === "checklist" ? (
-                          <div className="space-y-1.5">
-                            <Label>Checklist</Label>
-                            <Textarea
-                              rows={6}
-                              value={linesToText(block.checklist)}
-                              onChange={(event) => onUpdateBlock(activePage.id, block.id, { checklist: textToLines(event.target.value) })}
-                              placeholder={"I have read the SOP\nI understand the key steps\nI know when to ask manager"}
-                            />
-                          </div>
-                        ) : block.type === "image" || block.type === "video" || block.type === "pdf" ? (
-                          <div className="space-y-1.5">
-                            <Label>Asset URL</Label>
-                            <Input
-                              value={block.assetUrl || ""}
-                              onChange={(event) => onUpdateBlock(activePage.id, block.id, { assetUrl: event.target.value })}
-                              placeholder="Media URL after API storage is connected"
-                            />
-                          </div>
-                        ) : (
-                          <div className="space-y-1.5">
-                            <Label>{block.type === "warning" ? "Warning message" : "Content"}</Label>
-                            <Textarea
-                              rows={block.type === "heading" ? 3 : 6}
-                              value={block.body}
-                              onChange={(event) => onUpdateBlock(activePage.id, block.id, { body: event.target.value })}
-                              placeholder="Write what staff need to know."
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </section>
-                  );
-                })}
-              </div>
-            </div>
+            <SopBuilderCanvasV4
+              title={activePage.title || settings.title}
+              sections={activePage.blocks.map(v3BlockToV4Section)}
+              onChange={(nextSections) => {
+                onUpdatePage(activePage.id, {
+                  blocks: v4SectionsToV3Blocks(nextSections),
+                });
+              }}
+            />
           )}
         </main>
 
