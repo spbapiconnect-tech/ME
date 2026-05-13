@@ -61,6 +61,7 @@ import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { uploadAssetLabel, serializeUploadAsset, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
+import { SopCreateTypeModal, type SopCreateTypeConfig } from "@/components/sop/sop-create-type-modal";
 
 type BlockType = "heading" | "text" | "image" | "step-list" | "warning" | "pdf" | "checklist";
 type ModalMode = "create" | "publish" | "training" | "checklist";
@@ -223,6 +224,12 @@ function renderBlock(block: SopPreviewBlock) {
   if (block.type === "image") {
     return (
       <div className="rounded-xl border bg-muted/30 p-3 text-sm">
+      <SopCreateTypeModal
+        open={createTypeModalOpen}
+        onClose={() => setCreateTypeModalOpen(false)}
+        onSelect={startCreateSopFromType}
+      />
+
         <div className="mb-2 flex items-center gap-2 font-medium"><ImageIcon className="h-4 w-4" />Image</div>
         <div className="break-all text-muted-foreground">{block.imageUrl ? <UploadAssetPreview value={block.imageUrl} compact /> : "Media placeholder not set."}</div>
       </div>
@@ -295,6 +302,7 @@ export function SopTrainingControlPage() {
   const [selectedSopId, setSelectedSopId] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("create");
+  const [createTypeModalOpen, setCreateTypeModalOpen] = useState(false);
   const [builderMode, setBuilderMode] = useState(false);
   const [pages, setPages] = useState<BuilderPage[]>([newPage(1)]);
   const [selectedPageId, setSelectedPageId] = useState<string>("");
@@ -527,6 +535,27 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     if (dialogMode === "checklist") await createChecklistTemplate();
   }
 
+
+  function startCreateSopFromType(type: SopCreateTypeConfig) {
+    setCreateTypeModalOpen(false);
+
+    setForm((current) => ({
+      ...current,
+      title: current.title || type.title,
+      category: categoryOptions.includes(type.category) ? type.category : current.category,
+      processArea: processAreaOptions.includes(type.processArea) ? type.processArea : current.processArea,
+      targetRole: type.targetRole || current.targetRole,
+      acknowledgementRequired: type.acknowledgementRequired,
+      trainingRequired: type.trainingRequired,
+    }));
+
+    const starterPage = pages[0] || newPage(1);
+    if (!pages.length) setPages([starterPage]);
+
+    setSelectedPageId(starterPage.id);
+    setBuilderMode(true);
+  }
+
   const createPreview = serializeContent(form.employeeReadMode, pages);
 
   const activeBuilderPageId = selectedPageId || pages[0]?.id || "";
@@ -749,7 +778,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setBuilderMode(true)}><Plus className="h-4 w-4" />Create SOP</Button>
+            <Button onClick={() => setCreateTypeModalOpen(true)}><Plus className="h-4 w-4" />Create SOP</Button>
             <Button variant="outline" onClick={() => openModal("publish")} disabled={!selectedSop}><ScrollText className="h-4 w-4" />Publish Version</Button>
             <Button variant="outline" onClick={() => openModal("training")} disabled={!selectedSop}><GraduationCap className="h-4 w-4" />Assign Training</Button>
             <Button variant="outline" onClick={() => openModal("checklist")} disabled={!selectedSop}><ClipboardList className="h-4 w-4" />Create Templates</Button>
