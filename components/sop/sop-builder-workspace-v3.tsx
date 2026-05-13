@@ -165,8 +165,17 @@ export function SopBuilderWorkspaceV3({
   }
 
   function beginRename(page: SopBuilderV3Page) {
-    setRenamingPageId(page.id);
-    setRenameValue(cleanOutlineTitle(page.title));
+    const currentTitle = cleanOutlineTitle(page.title);
+    const nextTitle = window.prompt("Rename", currentTitle);
+
+    if (nextTitle === null) return;
+
+    const cleanTitle = nextTitle.trim();
+    if (!cleanTitle) return;
+
+    onUpdatePage(page.id, { title: cleanTitle });
+    setRenamingPageId(null);
+    setRenameValue("");
   }
 
   function commitRename(pageId: string) {
@@ -189,24 +198,6 @@ export function SopBuilderWorkspaceV3({
       <header className="shrink-0 border-b bg-background px-5 py-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <Button variant="outline" size="icon" onClick={onBack}>
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-
-            <div className="min-w-0">
-              <div className="text-xs text-muted-foreground">SOP Builder V3</div>
-              <div className="truncate text-xl font-semibold tracking-tight">{settings.title || "Untitled SOP"}</div>
-            </div>
-
-            <Badge variant="outline">{settings.version || "v1.0"}</Badge>
-            <Badge variant="secondary">{settings.status}</Badge>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" onClick={() => setSettingsOpen(true)}>
-              <Settings2 className="h-4 w-4" />
-              Settings
-            </Button>
             <Button
               variant={inspectorOpen && inspectorTab === "preview" ? "default" : "outline"}
               onClick={() => {
@@ -252,7 +243,7 @@ export function SopBuilderWorkspaceV3({
                   {rootPages.map((chapter, chapterIndex) => {
                     const active = activePage?.id === chapter.id;
                     const subPages = subPagesByParent[chapter.id] || [];
-                    const renamingChapter = renamingPageId === chapter.id;
+                    const renamingChapter = false;
 
                     return (
                       <div key={chapter.id} className="space-y-1">
@@ -367,7 +358,7 @@ export function SopBuilderWorkspaceV3({
 
                         {subPages.map((page, pageIndex) => {
                           const subActive = activePage?.id === page.id;
-                          const renamingPage = renamingPageId === page.id;
+                          const renamingPage = false;
 
                           return (
                             <div

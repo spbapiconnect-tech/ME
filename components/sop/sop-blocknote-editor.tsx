@@ -56,16 +56,27 @@ async function uploadLocalPreviewFile(file: File) {
   return URL.createObjectURL(file);
 }
 
-type SopTextColor = "default" | "gray" | "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink";
+type SopTextColor = "default" | "gray" | "brown" | "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "pink";
 
-function SopColorButton({ color, label }: { color: SopTextColor; label: string }) {
+function SopColorButton({
+  color,
+  label,
+  mode = "text",
+}: {
+  color: SopTextColor;
+  label: string;
+  mode?: "text" | "background";
+}) {
   const editor = useBlockNoteEditor();
   const Components = useComponentsContext()!;
   const blocks = useSelectedBlocks();
 
   const isSelected = useEditorState({
     editor,
-    selector: ({ editor }) => editor.getActiveStyles().textColor === color,
+    selector: ({ editor }) => {
+      const styles = editor.getActiveStyles();
+      return mode === "text" ? styles.textColor === color : styles.backgroundColor === color;
+    },
   });
 
   if (blocks.filter((block) => block.content !== undefined).length === 0) {
@@ -74,8 +85,14 @@ function SopColorButton({ color, label }: { color: SopTextColor; label: string }
 
   return (
     <Components.FormattingToolbar.Button
-      mainTooltip={`${label} text`}
-      onClick={() => editor.toggleStyles({ textColor: color })}
+      mainTooltip={`${label} ${mode === "text" ? "text" : "background"}`}
+      onClick={() =>
+        editor.toggleStyles(
+          mode === "text"
+            ? { textColor: color }
+            : { backgroundColor: color },
+        )
+      }
       isSelected={isSelected}
     >
       <span className="flex items-center gap-1 text-xs">
@@ -83,13 +100,13 @@ function SopColorButton({ color, label }: { color: SopTextColor; label: string }
           className="h-3 w-3 rounded-full border"
           style={{ backgroundColor: color === "default" ? "transparent" : color }}
         />
-        {label}
+        {mode === "text" ? label : `BG ${label}`}
       </span>
     </Components.FormattingToolbar.Button>
   );
 }
 
-function SopFormattingToolbar() {
+function SopFormattingToolbarfunction SopFormattingToolbar() {
   return (
     <FormattingToolbar>
       <BlockTypeSelect key="blockTypeSelect" />
@@ -101,10 +118,18 @@ function SopFormattingToolbar() {
       <TextAlignButton textAlignment="center" key="alignCenter" />
       <TextAlignButton textAlignment="right" key="alignRight" />
       <SopColorButton color="default" label="Auto" key="colorAuto" />
+      <SopColorButton color="gray" label="Gray" key="colorGray" />
+      <SopColorButton color="brown" label="Brown" key="colorBrown" />
       <SopColorButton color="red" label="Red" key="colorRed" />
-      <SopColorButton color="blue" label="Blue" key="colorBlue" />
-      <SopColorButton color="green" label="Green" key="colorGreen" />
       <SopColorButton color="orange" label="Orange" key="colorOrange" />
+      <SopColorButton color="yellow" label="Yellow" key="colorYellow" />
+      <SopColorButton color="green" label="Green" key="colorGreen" />
+      <SopColorButton color="blue" label="Blue" key="colorBlue" />
+      <SopColorButton color="purple" label="Purple" key="colorPurple" />
+      <SopColorButton color="pink" label="Pink" key="colorPink" />
+      <SopColorButton color="yellow" label="Yellow" mode="background" key="bgYellow" />
+      <SopColorButton color="red" label="Red" mode="background" key="bgRed" />
+      <SopColorButton color="blue" label="Blue" mode="background" key="bgBlue" />
       <NestBlockButton key="nest" />
       <UnnestBlockButton key="unnest" />
       <CreateLinkButton key="link" />
