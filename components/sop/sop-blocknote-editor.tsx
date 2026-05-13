@@ -72,6 +72,29 @@ function fenceCode(text: string) {
   return "```text\n" + text.replace(/```/g, "\`\`\`") + "\n```";
 }
 
+function looksLikeTerminalOrCode(value: string) {
+  const text = value.trim();
+
+  if (!text) return false;
+
+  const lines = text.split("\n").filter(Boolean);
+  const commandLikeLines = lines.filter((line) =>
+    /^\s*(cd |git |npm |pnpm |yarn |python3? |npx |cat >|EOF|rm -rf|mkdir |grep |sed |python - <<|Last login:|mil@|[a-zA-Z0-9_-]+@)/.test(line),
+  );
+
+  return (
+    text.includes("```") ||
+    commandLikeLines.length >= 2 ||
+    /(^|\n)\s*(import|export|const|let|var|function|class|type|interface|return|if|for|while|switch|case)\b/.test(text) ||
+    /<\/?[a-zA-Z][\s\S]*?>/.test(text) ||
+    (text.length > 240 && text.includes("{") && text.includes("}"))
+  );
+}
+
+function toFencedCode(value: string) {
+  return "```text\n" + value.replace(/```/g, "\`\`\`") + "\n```";
+}
+
 function useResolvedBlockNoteTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 

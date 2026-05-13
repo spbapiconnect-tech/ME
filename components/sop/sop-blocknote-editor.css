@@ -138,3 +138,85 @@
 .sop-reader-preview [class*="FileName"] {
   display: none !important;
 }
+
+/* Hard lock only when SOP builder is open. Prevent pasted long content from moving ERP shell/browser body. */
+html.sop-builder-page-lock,
+body.sop-builder-page-lock {
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+body.sop-builder-page-lock main,
+body.sop-builder-page-lock main:has(.sop-builder-workspace),
+body.sop-builder-page-lock .sop-builder-workspace {
+  min-height: 0 !important;
+  height: calc(100dvh - 56px) !important;
+  max-height: calc(100dvh - 56px) !important;
+  overflow: hidden !important;
+}
+
+/* Make sure BlockNote editor is the only scroll owner. */
+body.sop-builder-page-lock .sop-blocknote-shell,
+body.sop-builder-page-lock .sop-blocknote-scroll {
+  min-height: 0 !important;
+  max-height: 100% !important;
+  overscroll-behavior: contain !important;
+}
+
+body.sop-builder-page-lock .sop-blocknote-scroll {
+  overflow-y: auto !important;
+  scroll-padding-top: 5rem;
+  scroll-padding-bottom: 14rem;
+}
+
+body.sop-builder-page-lock .sop-blocknote-page {
+  padding-bottom: 14rem !important;
+}
+
+/* BlockNote portal menus are outside .sop-blocknote-shell, so theme them through body lock. */
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] > *,
+body.sop-builder-page-lock .bn-formatting-toolbar,
+body.sop-builder-page-lock .bn-toolbar,
+body.sop-builder-page-lock .bn-menu,
+body.sop-builder-page-lock .bn-popover,
+body.sop-builder-page-lock .bn-suggestion-menu {
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.22) !important;
+}
+
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] button,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="menuitem"],
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="option"],
+body.sop-builder-page-lock .bn-formatting-toolbar button,
+body.sop-builder-page-lock .bn-toolbar button,
+body.sop-builder-page-lock .bn-menu button,
+body.sop-builder-page-lock .bn-popover button,
+body.sop-builder-page-lock .bn-suggestion-menu button {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] button:hover,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="option"]:hover,
+body.sop-builder-page-lock .bn-menu button:hover,
+body.sop-builder-page-lock .bn-popover button:hover,
+body.sop-builder-page-lock .bn-suggestion-menu button:hover {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Code block visibility in both themes. */
+body.sop-builder-page-lock .sop-blocknote-shell pre,
+body.sop-builder-page-lock .sop-blocknote-shell code,
+body.sop-builder-page-lock .sop-reader-preview pre,
+body.sop-builder-page-lock .sop-reader-preview code,
+body.sop-builder-page-lock .sop-blocknote-shell [data-content-type="codeBlock"],
+body.sop-builder-page-lock .sop-reader-preview [data-content-type="codeBlock"] {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 0.75rem !important;
+}

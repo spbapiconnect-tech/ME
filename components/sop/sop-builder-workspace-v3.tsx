@@ -163,6 +163,9 @@ export function SopBuilderWorkspaceV3({
     const previousBodyOverflow = body.style.overflow;
     const previousHtmlOverflow = html.style.overflow;
 
+    body.classList.add("sop-builder-page-lock");
+    html.classList.add("sop-builder-page-lock");
+
     body.style.overflow = "hidden";
     html.style.overflow = "hidden";
     body.scrollTop = 0;
@@ -196,6 +199,9 @@ export function SopBuilderWorkspaceV3({
     }
 
     return () => {
+      body.classList.remove("sop-builder-page-lock");
+      html.classList.remove("sop-builder-page-lock");
+
       body.style.overflow = previousBodyOverflow;
       html.style.overflow = previousHtmlOverflow;
 
