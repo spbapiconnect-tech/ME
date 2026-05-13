@@ -50,3 +50,12 @@
 .sop-blocknote-shell [class*="file-panel"] {
   display: none !important;
 }
+
+/* Employee preview should show the SOP content, not local upload filenames. */
+.sop-reader-preview figcaption,
+.sop-reader-preview [class*="caption"],
+.sop-reader-preview [class*="fileName"],
+.sop-reader-preview [class*="file-name"],
+.sop-reader-preview [class*="FileName"] {
+  display: none !important;
+}

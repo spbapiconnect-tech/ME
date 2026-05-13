@@ -85,6 +85,7 @@ export function SopBuilderWorkspaceV3({
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewFull, setPreviewFull] = useState(false);
   const [previewDocument, setPreviewDocument] = useState<SopBlockNoteDocument>([]);
   const [visibleRoles, setVisibleRoles] = useState<string[]>(["Outlet Manager", "Branch Manager"]);
   const [reviewerRoles, setReviewerRoles] = useState<string[]>(["Outlet Manager"]);
@@ -385,19 +386,39 @@ export function SopBuilderWorkspaceV3({
             <button
               type="button"
               className="absolute inset-0 cursor-default"
-              onClick={() => setPreviewOpen(false)}
+              onClick={() => {
+                setPreviewOpen(false);
+                setPreviewFull(false);
+              }}
               aria-label="Close preview"
             />
 
-            <aside className="absolute right-0 top-0 h-full w-full max-w-[520px] overflow-y-auto border-l bg-background p-5 shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <aside
+              className={cn(
+                "absolute right-0 top-0 h-full w-full overflow-y-auto border-l bg-background p-5 shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+                previewFull ? "max-w-none" : "max-w-[520px]",
+              )}
+            >
               <div className="mb-5 flex items-start justify-between gap-3">
                 <div>
                   <div className="text-sm font-semibold">Real Employee Preview</div>
                   <div className="text-xs text-muted-foreground">Read-only BlockNote content inside a real device frame.</div>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => setPreviewOpen(false)}>
-                  Close
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setPreviewFull((value) => !value)}>
+                    {previewFull ? "Side view" : "Full view"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setPreviewOpen(false);
+                      setPreviewFull(false);
+                    }}
+                  >
+                    Close
+                  </Button>
+                </div>
               </div>
 
               <SopEmployeePreviewDevice
@@ -416,7 +437,7 @@ export function SopBuilderWorkspaceV3({
                     <div className="text-xs text-muted-foreground">{readyCount}/{checks.length} ready</div>
                   </div>
                   <Badge variant={readyCount === checks.length ? "default" : "outline"}>
-                    {readyCount === checks.length ? "Ready" : "Draft"}
+                    {readyCount === checks.length ? "Ready" : "Not published"}
                   </Badge>
                 </div>
 
@@ -454,10 +475,14 @@ export function SopBuilderWorkspaceV3({
               </Button>
             </div>
 
-            <div className="grid gap-5">
-              <div className="rounded-2xl border bg-card p-4">
-                <div className="text-sm font-semibold">Document Identity</div>
-                <div className="mt-4 grid gap-3">
+            <div className="space-y-6">
+              <section className="border-b pb-5">
+                <div className="mb-3">
+                  <div className="text-sm font-semibold">Document</div>
+                  <div className="text-xs text-muted-foreground">Basic SOP identity and version control.</div>
+                </div>
+
+                <div className="grid gap-3">
                   <div className="space-y-1.5">
                     <Label>SOP Title</Label>
                     <Input value={settings.title} onChange={(event) => onUpdateSettings({ title: event.target.value })} />
@@ -474,12 +499,15 @@ export function SopBuilderWorkspaceV3({
                     </div>
                   </div>
                 </div>
-              </div>
+              </section>
 
-              <div className="rounded-2xl border bg-card p-4">
-                <div className="text-sm font-semibold">Assign to Outlet</div>
-                <div className="mt-1 text-xs text-muted-foreground">Choose one or multiple outlets that should receive this SOP.</div>
-                <div className="mt-4 grid grid-cols-2 gap-2">
+              <section className="border-b pb-5">
+                <div className="mb-3">
+                  <div className="text-sm font-semibold">Assigned outlets</div>
+                  <div className="text-xs text-muted-foreground">Select every outlet that should receive this SOP.</div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
                   {outletOptions.map((outlet) => {
                     const active = csvToArray(settings.targetOutlet).includes(outlet);
 
@@ -489,8 +517,8 @@ export function SopBuilderWorkspaceV3({
                         type="button"
                         onClick={() => toggleCsvSetting("targetOutlet", outlet)}
                         className={cn(
-                          "rounded-xl border px-3 py-2 text-left text-sm transition hover:bg-muted/50",
-                          active && "border-primary bg-primary/10 text-primary",
+                          "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
+                          active && "border-primary bg-primary text-primary-foreground",
                         )}
                       >
                         {outlet}
@@ -498,12 +526,15 @@ export function SopBuilderWorkspaceV3({
                     );
                   })}
                 </div>
-              </div>
+              </section>
 
-              <div className="rounded-2xl border bg-card p-4">
-                <div className="text-sm font-semibold">Required Reading Roles</div>
-                <div className="mt-1 text-xs text-muted-foreground">These roles must read and acknowledge the SOP.</div>
-                <div className="mt-4 grid grid-cols-2 gap-2">
+              <section className="border-b pb-5">
+                <div className="mb-3">
+                  <div className="text-sm font-semibold">Required to read</div>
+                  <div className="text-xs text-muted-foreground">These roles must read and acknowledge the SOP.</div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
                   {roleOptions.map((role) => {
                     const active = csvToArray(settings.targetRole).includes(role);
 
@@ -513,8 +544,8 @@ export function SopBuilderWorkspaceV3({
                         type="button"
                         onClick={() => toggleCsvSetting("targetRole", role)}
                         className={cn(
-                          "rounded-xl border px-3 py-2 text-left text-sm transition hover:bg-muted/50",
-                          active && "border-primary bg-primary/10 text-primary",
+                          "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
+                          active && "border-primary bg-primary text-primary-foreground",
                         )}
                       >
                         {role}
@@ -522,12 +553,15 @@ export function SopBuilderWorkspaceV3({
                     );
                   })}
                 </div>
-              </div>
+              </section>
 
-              <div className="rounded-2xl border bg-card p-4">
-                <div className="text-sm font-semibold">Visible To Roles</div>
-                <div className="mt-1 text-xs text-muted-foreground">Roles that can see this SOP in the library even if they are not required to acknowledge.</div>
-                <div className="mt-4 grid grid-cols-2 gap-2">
+              <section className="border-b pb-5">
+                <div className="mb-3">
+                  <div className="text-sm font-semibold">Visible in library</div>
+                  <div className="text-xs text-muted-foreground">Roles that can view this SOP even when acknowledgement is not required.</div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
                   {roleOptions.map((role) => {
                     const active = visibleRoles.includes(role);
 
@@ -537,8 +571,8 @@ export function SopBuilderWorkspaceV3({
                         type="button"
                         onClick={() => toggleLocalList(visibleRoles, setVisibleRoles, role)}
                         className={cn(
-                          "rounded-xl border px-3 py-2 text-left text-sm transition hover:bg-muted/50",
-                          active && "border-primary bg-primary/10 text-primary",
+                          "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
+                          active && "border-primary bg-primary text-primary-foreground",
                         )}
                       >
                         {role}
@@ -546,12 +580,15 @@ export function SopBuilderWorkspaceV3({
                     );
                   })}
                 </div>
-              </div>
+              </section>
 
-              <div className="rounded-2xl border bg-card p-4">
-                <div className="text-sm font-semibold">Review / Approval Roles</div>
-                <div className="mt-1 text-xs text-muted-foreground">Manager roles allowed to review, update, or publish this SOP.</div>
-                <div className="mt-4 grid grid-cols-2 gap-2">
+              <section>
+                <div className="mb-3">
+                  <div className="text-sm font-semibold">Can review / publish</div>
+                  <div className="text-xs text-muted-foreground">Manager roles allowed to review, update, or publish this SOP.</div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
                   {roleOptions.map((role) => {
                     const active = reviewerRoles.includes(role);
 
@@ -561,8 +598,8 @@ export function SopBuilderWorkspaceV3({
                         type="button"
                         onClick={() => toggleLocalList(reviewerRoles, setReviewerRoles, role)}
                         className={cn(
-                          "rounded-xl border px-3 py-2 text-left text-sm transition hover:bg-muted/50",
-                          active && "border-primary bg-primary/10 text-primary",
+                          "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
+                          active && "border-primary bg-primary text-primary-foreground",
                         )}
                       >
                         {role}
@@ -570,7 +607,7 @@ export function SopBuilderWorkspaceV3({
                     );
                   })}
                 </div>
-              </div>
+              </section>
             </div>
             <div className="mt-6 flex justify-end">
               <Button onClick={() => setSettingsOpen(false)}>Done</Button>

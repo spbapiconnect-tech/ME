@@ -131,7 +131,6 @@ export function SopBlockNoteEditor({
             type: "video",
             props: {
               url,
-              name: file.name,
             },
           }
         : file.type === "application/pdf"
@@ -139,14 +138,14 @@ export function SopBlockNoteEditor({
               type: "file",
               props: {
                 url,
-                name: file.name,
+                name: "Attached document",
               },
             }
           : {
               type: "image",
               props: {
                 url,
-                caption: file.name,
+                caption: "",
               },
             };
 
