@@ -597,7 +597,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
 
     const nextPage = {
       ...newPage(pages.length + 1, parentPageId),
-      title: `${parent?.title || "Page"} · Sub ${siblingCount + 1}`,
+      title: `Page ${siblingCount + 1}`,
     };
 
     setPages((current) => {

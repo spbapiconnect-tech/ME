@@ -228,11 +228,11 @@ export function SopBuilderWorkspaceV3({
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <div className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Document</div>
-                  <div className="mt-1 text-sm font-semibold">Pages</div>
+                  <div className="mt-1 text-sm font-semibold">Chapters</div>
                 </div>
-                <Button size="sm" variant="outline" className="h-8" onClick={onAddPage}>
+                <Button size="sm" variant="outline" className="h-8 px-2" onClick={onAddPage}>
                   <Plus className="h-4 w-4" />
-                  Page
+                  Chapter
                 </Button>
               </div>
             </div>
@@ -244,7 +244,7 @@ export function SopBuilderWorkspaceV3({
                   onClick={onAddPage}
                   className="w-full rounded-xl border border-dashed px-3 py-6 text-center text-sm text-muted-foreground hover:bg-muted/30"
                 >
-                  Add first page
+                  Add first chapter
                 </button>
               ) : (
                 <div className="space-y-1">
@@ -263,7 +263,7 @@ export function SopBuilderWorkspaceV3({
                           <button
                             type="button"
                             onClick={() => onSelectPage(page.id)}
-                            className="flex min-w-0 flex-1 items-center gap-2 px-3 py-2 text-left text-sm"
+                            className="flex min-w-0 flex-1 items-center gap-2 px-2 py-2 text-left text-sm"
                           >
                             <span
                               className={cn(
@@ -285,10 +285,10 @@ export function SopBuilderWorkspaceV3({
                             type="button"
                             size="sm"
                             variant="ghost"
-                            className="h-7 px-2 text-xs opacity-0 transition group-hover:opacity-100"
+                            className="h-7 px-1.5 text-xs opacity-0 transition group-hover:opacity-100"
                             onClick={() => onAddSubPage?.(page.id)}
                           >
-                            Sub
+                            + Page
                           </Button>
                         </div>
 
@@ -301,7 +301,7 @@ export function SopBuilderWorkspaceV3({
                               type="button"
                               onClick={() => onSelectPage(subPage.id)}
                               className={cn(
-                                "ml-6 flex w-[calc(100%-1.5rem)] items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition hover:bg-muted/50",
+                                "ml-5 flex w-[calc(100%-1.25rem)] items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition hover:bg-muted/50",
                                 subActive && "bg-primary/10 text-primary",
                               )}
                             >
