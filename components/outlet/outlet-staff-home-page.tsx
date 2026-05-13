@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AlertCircle,
-  Bell,
   BookOpen,
   CalendarDays,
   CheckCircle2,
