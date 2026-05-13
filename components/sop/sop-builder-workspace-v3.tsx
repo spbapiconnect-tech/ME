@@ -213,6 +213,42 @@ export function SopBuilderWorkspaceV3({
     return () => window.clearTimeout(timer);
   }, [renameTarget]);
 
+  useEffect(() => {
+    if (!renameTarget) return;
+
+    function blockRenameEditorEvents(event: Event) {
+      const target = event.target as Node | null;
+      const input = renameInputRef.current;
+
+      if (input && target && input.contains(target)) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      if ("stopImmediatePropagation" in event) {
+        event.stopImmediatePropagation();
+      }
+    }
+
+    document.addEventListener("keydown", blockRenameEditorEvents, true);
+    document.addEventListener("beforeinput", blockRenameEditorEvents, true);
+    document.addEventListener("input", blockRenameEditorEvents, true);
+    document.addEventListener("compositionstart", blockRenameEditorEvents, true);
+    document.addEventListener("compositionupdate", blockRenameEditorEvents, true);
+    document.addEventListener("compositionend", blockRenameEditorEvents, true);
+
+    return () => {
+      document.removeEventListener("keydown", blockRenameEditorEvents, true);
+      document.removeEventListener("beforeinput", blockRenameEditorEvents, true);
+      document.removeEventListener("input", blockRenameEditorEvents, true);
+      document.removeEventListener("compositionstart", blockRenameEditorEvents, true);
+      document.removeEventListener("compositionupdate", blockRenameEditorEvents, true);
+      document.removeEventListener("compositionend", blockRenameEditorEvents, true);
+    };
+  }, [renameTarget]);
+
   const activePage = useMemo(
     () => pages.find((page) => page.id === selectedPageId) || pages[0],
     [pages, selectedPageId],
@@ -265,6 +301,9 @@ export function SopBuilderWorkspaceV3({
   }
 
   function openRename(page: SopBuilderV3Page) {
+    const activeElement = globalThis.document?.activeElement as HTMLElement | null;
+    activeElement?.blur?.();
+
     setRenameTarget(page);
     setRenameValue(displayTitle(page));
   }
@@ -753,6 +792,15 @@ export function SopBuilderWorkspaceV3({
             event.preventDefault();
             event.stopPropagation();
           }}
+          onKeyDownCapture={(event) => {
+            event.stopPropagation();
+          }}
+          onBeforeInputCapture={(event) => {
+            event.stopPropagation();
+          }}
+          onInputCapture={(event) => {
+            event.stopPropagation();
+          }}
           onKeyDown={(event) => {
             event.stopPropagation();
           }}
@@ -763,6 +811,15 @@ export function SopBuilderWorkspaceV3({
               event.stopPropagation();
             }}
             onClick={(event) => {
+              event.stopPropagation();
+            }}
+            onKeyDownCapture={(event) => {
+              event.stopPropagation();
+            }}
+            onBeforeInputCapture={(event) => {
+              event.stopPropagation();
+            }}
+            onInputCapture={(event) => {
               event.stopPropagation();
             }}
             onSubmit={(event) => {
@@ -781,6 +838,9 @@ export function SopBuilderWorkspaceV3({
               onChange={(event) => setRenameValue(event.target.value)}
               onMouseDown={(event) => event.stopPropagation()}
               onClick={(event) => event.stopPropagation()}
+              onKeyDownCapture={(event) => event.stopPropagation()}
+              onBeforeInputCapture={(event) => event.stopPropagation()}
+              onInputCapture={(event) => event.stopPropagation()}
               onKeyDown={(event) => {
                 event.stopPropagation();
 
