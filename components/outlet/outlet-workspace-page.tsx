@@ -98,6 +98,64 @@ function WorkspaceSection({
 }
 
 
+
+function StaffDayPlan({ items }: { items: OutletWorkspaceCard[] }) {
+  const [view, setView] = useState<"timeline" | "calendar">("timeline");
+
+  const workItems = items.slice(0, 6);
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <CardTitle className="text-base">Today Plan</CardTitle>
+            <p className="text-sm text-muted-foreground">Simple outlet view for what starts now, what is next, and what needs proof.</p>
+          </div>
+          <div className="flex rounded-lg border p-1">
+            <Button size="sm" variant={view === "timeline" ? "secondary" : "ghost"} onClick={() => setView("timeline")}>Timeline</Button>
+            <Button size="sm" variant={view === "calendar" ? "secondary" : "ghost"} onClick={() => setView("calendar")}>Calendar</Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {!workItems.length ? (
+          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No scheduled staff work for this outlet filter.</div>
+        ) : view === "timeline" ? (
+          <div className="space-y-3">
+            {workItems.map((item, index) => (
+              <div key={`${item.id}-${index}`} className="grid grid-cols-[72px_1fr] gap-3">
+                <div className="text-sm font-medium">{item.dueLabel || "Today"}</div>
+                <div className="rounded-xl border bg-muted/10 p-3">
+                  <div className="font-medium">{item.title}</div>
+                  <div className="text-xs text-muted-foreground">{item.subtitle}</div>
+                  {item.proofLabel ? <div className="mt-2 text-xs text-muted-foreground">Proof: {item.proofLabel}</div> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-3">
+            {["Morning", "Afternoon", "Night"].map((slot, index) => (
+              <div key={slot} className="rounded-xl border bg-muted/10 p-3">
+                <div className="text-xs text-muted-foreground">{slot}</div>
+                <div className="mt-2 space-y-2">
+                  {workItems.filter((_, itemIndex) => itemIndex % 3 === index).map((item) => (
+                    <div key={item.id} className="rounded-lg bg-background px-3 py-2 text-sm">
+                      <div className="font-medium">{item.title}</div>
+                      <div className="text-xs text-muted-foreground">{item.dueLabel || "No time set"}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function StaffWorkPanel({
   item,
   onClose,
@@ -105,20 +163,24 @@ function StaffWorkPanel({
   item?: OutletWorkspaceCard;
   onClose: () => void;
 }) {
+  const [readerPage, setReaderPage] = useState(1);
+  const [proofName, setProofName] = useState("");
+  const [mediaMode, setMediaMode] = useState<"normal" | "focus">("normal");
+
   if (!item) {
     return (
       <Card className="border-dashed">
         <CardHeader>
           <CardTitle className="text-base">Staff Work View</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Select today work, training, SOP, inspection, or proof item. Staff will complete the action here without opening manager modules.
+            Select work from Today, Training, SOP Library, Inspection, or Proof Log. Staff complete it here without opening manager modules.
           </p>
         </CardHeader>
         <CardContent className="grid gap-3 text-sm md:grid-cols-3">
           {["Read", "Do", "Upload Proof"].map((step) => (
             <div key={step} className="rounded-xl border bg-muted/10 p-3">
               <div className="font-medium">{step}</div>
-              <div className="text-xs text-muted-foreground">Simple staff action, no backend navigation.</div>
+              <div className="text-xs text-muted-foreground">One simple staff action at a time.</div>
             </div>
           ))}
         </CardContent>
@@ -130,14 +192,14 @@ function StaffWorkPanel({
     item.module === "sop" ? "SOP Reading" :
     item.module === "tasks" ? "Task Execution" :
     item.module === "inspection" ? "Inspection Runner" :
-    item.module === "issues" ? "Rework Request" :
+    item.module === "issues" ? "Fix Again" :
     "Outlet Work";
 
   const primaryAction =
     item.module === "sop" ? "Acknowledge" :
     item.module === "tasks" ? "Submit Proof" :
     item.module === "inspection" ? "Submit Checklist" :
-    item.module === "issues" ? "Fix Again" :
+    item.module === "issues" ? "Submit Again" :
     "Continue";
 
   return (
@@ -158,53 +220,102 @@ function StaffWorkPanel({
 
       <CardContent className="space-y-4">
         {item.module === "sop" ? (
-          <div className="rounded-2xl border bg-background p-4">
-            <div className="text-sm font-semibold">Employee Reading</div>
-            <div className="mt-2 rounded-xl border bg-muted/10 p-4 text-sm text-muted-foreground">
-              Staff should read the SOP page by page here, with image / video / PDF preview, checklist, then acknowledgement.
+          <div className={cn("rounded-2xl border bg-background p-4", mediaMode === "focus" && "fixed inset-4 z-50 overflow-y-auto bg-background shadow-2xl")}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div className="text-sm font-semibold">Page {readerPage} of 3</div>
+                <div className="text-xs text-muted-foreground">Staff reading mode</div>
+              </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => setReaderPage((value) => Math.max(1, value - 1))}>Previous</Button>
+                <Button size="sm" variant="outline" onClick={() => setReaderPage((value) => Math.min(3, value + 1))}>Next</Button>
+                <Button size="sm" variant="outline" onClick={() => setMediaMode((value) => value === "focus" ? "normal" : "focus")}>
+                  {mediaMode === "focus" ? "Exit" : "Full Screen"}
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-2xl border bg-muted/10 p-4">
+              {readerPage === 1 ? (
+                <>
+                  <div className="font-medium">Read the instruction</div>
+                  <div className="mt-2 text-sm text-muted-foreground">SOP content appears here as page-by-page reading, not a backend editor.</div>
+                </>
+              ) : readerPage === 2 ? (
+                <>
+                  <div className="font-medium">Watch training video</div>
+                  <div className="mt-2 rounded-xl border bg-black px-4 py-12 text-center text-sm text-white">
+                    Video preview area · browser video controls allow fullscreen
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground">Use Next after watching. Keep only one clear action visible.</div>
+                </>
+              ) : (
+                <>
+                  <div className="font-medium">Read PDF / checklist</div>
+                  <div className="mt-2 rounded-xl border bg-background p-4 text-sm text-muted-foreground">
+                    PDF reading should feel like a simple PRD/document reader: clean page, easy scroll, no manager controls.
+                  </div>
+                </>
+              )}
             </div>
           </div>
         ) : null}
 
         {item.module === "tasks" ? (
-          <div className="grid gap-3 md:grid-cols-3">
-            {["Read instruction", "Do work", "Upload proof"].map((step, index) => (
-              <div key={step} className="rounded-xl border bg-background p-3">
-                <div className="text-xs text-muted-foreground">Step {index + 1}</div>
-                <div className="font-medium">{step}</div>
+          <div className="space-y-3">
+            <div className="grid gap-3 md:grid-cols-3">
+              {["Start", "Do", "Proof"].map((step, index) => (
+                <div key={step} className="rounded-xl border bg-background p-3">
+                  <div className="text-xs text-muted-foreground">Step {index + 1}</div>
+                  <div className="font-medium">{step}</div>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-xl border bg-background p-3">
+              <div className="text-sm font-medium">Upload photo / video proof</div>
+              <Input
+                className="mt-2"
+                type="file"
+                accept="image/*,video/*"
+                onChange={(event) => setProofName(event.target.files?.[0]?.name || "")}
+              />
+              {proofName ? <div className="mt-2 text-xs text-muted-foreground">Selected: {proofName}</div> : null}
+            </div>
+          </div>
+        ) : null}
+
+        {item.module === "inspection" ? (
+          <div className="space-y-3 rounded-2xl border bg-background p-4">
+            <div className="font-medium">Checklist Runner</div>
+            {["Clean station", "Stock ready", "Photo proof"].map((check) => (
+              <div key={check} className="flex items-center justify-between rounded-xl border px-3 py-2 text-sm">
+                <span>{check}</span>
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline">Pass</Button>
+                  <Button size="sm" variant="outline">Fail</Button>
+                </div>
               </div>
             ))}
           </div>
         ) : null}
 
-        {item.module === "inspection" ? (
-          <div className="rounded-2xl border bg-background p-4">
-            <div className="font-medium">Checklist Runner</div>
-            <div className="mt-2 text-sm text-muted-foreground">
-              Staff should only see pass / fail, comment, and proof upload. Manager review controls stay hidden.
-            </div>
-          </div>
-        ) : null}
-
         {item.module === "issues" ? (
           <div className="rounded-2xl border bg-background p-4">
-            <div className="font-medium">What needs fixing</div>
+            <div className="font-medium">Fix Again</div>
             <div className="mt-2 text-sm text-muted-foreground">
-              Show the rejected proof, what needs to be corrected, and allow a new photo / video proof submission.
+              Show only what failed, what to fix, and upload new proof. Do not show incident center controls.
             </div>
           </div>
         ) : null}
 
         <div className="flex flex-wrap gap-2">
           <Button>{primaryAction}</Button>
-          <Button variant="outline">Upload Photo / Video</Button>
-          <Button variant="outline">Save Progress</Button>
+          {item.module !== "sop" ? <Button variant="outline">Save Progress</Button> : null}
         </div>
       </CardContent>
     </Card>
   );
 }
-
 
 export function OutletWorkspacePage() {
   const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
@@ -293,6 +404,8 @@ export function OutletWorkspacePage() {
             </Card>
           ))}
         </div>
+
+        <StaffDayPlan items={filteredTasks} />
 
         <StaffWorkPanel item={selectedWorkItem} onClose={() => setSelectedWorkItem(undefined)} />
 
