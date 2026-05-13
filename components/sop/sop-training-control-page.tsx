@@ -315,7 +315,11 @@ export function SopTrainingControlPage() {
 
 
   useEffect(() => {
-    setMounted(true);
+    const frame = window.requestAnimationFrame(() => {
+      setMounted(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
   const [blockNoteDocument, setBlockNoteDocument] = useState<SopBlockNoteDocument>([]);
   const [builderMode, setBuilderMode] = useState(false);

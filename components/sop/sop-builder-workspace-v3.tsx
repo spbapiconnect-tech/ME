@@ -146,8 +146,15 @@ export function SopBuilderWorkspaceV3({
   const [renameValue, setRenameValue] = useState("");
   const [titleOverrides, setTitleOverrides] = useState<Record<string, string>>({});
 
-  const pages = pagesInput ?? sopDocument?.pages ?? [];
-  const settings = settingsInput ?? sopDocument?.settings ?? fallbackSettings;
+  const pages = useMemo(
+    () => pagesInput ?? sopDocument?.pages ?? [],
+    [pagesInput, sopDocument?.pages],
+  );
+
+  const settings = useMemo(
+    () => settingsInput ?? sopDocument?.settings ?? fallbackSettings,
+    [settingsInput, sopDocument?.settings],
+  );
 
   useEffect(() => {
     const browserDocument = globalThis.document;
