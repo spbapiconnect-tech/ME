@@ -1017,7 +1017,10 @@ export function OutletStaffHomePage() {
     const source = sourceRows.find((row) => row.id === item.sourceRecordId);
     if (!source) return;
 
-    let nextDetails = source.detailItems || [];
+    let nextDetails: Array<{ label: string; value: string }> = (source.detailItems || []).map((detail) => ({
+      label: detail.label,
+      value: detail.value || "",
+    }));
 
     if (item.sourceModule === "tasks") {
       const existing = detailValue(source, "Photo Proofs");
