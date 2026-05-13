@@ -5,11 +5,37 @@ import "@blocknote/shadcn/style.css";
 import "./sop-blocknote-editor.css";
 
 import { useEffect, useRef } from "react";
-import { Upload } from "lucide-react";
-import { useCreateBlockNote } from "@blocknote/react";
+import { FileUp, ImageIcon, Video } from "lucide-react";
+import { filterSuggestionItems } from "@blocknote/core/extensions";
+import {
+  type DefaultReactSuggestionItem,
+  getDefaultReactSlashMenuItems,
+  SuggestionMenuController,
+  useCreateBlockNote,
+} from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 
-import { Button } from "@/components/ui/button";
+type UploadKind = "image" | "video" | "file";
+
+type InsertableFileBlock = {
+  type: "image" | "video" | "file";
+  props: {
+    url: string;
+    name?: string;
+    caption?: string;
+  };
+};
+
+type InsertableEditor = {
+  document?: unknown[];
+  focus: () => void;
+  getTextCursorPosition?: () => { block?: unknown };
+  insertBlocks: (
+    blocks: InsertableFileBlock[],
+    referenceBlock?: unknown,
+    placement?: "before" | "after" | "nested",
+  ) => void;
+};
 
 async function uploadLocalPreviewFile(file: File) {
   // Temporary local browser preview.
@@ -17,7 +43,48 @@ async function uploadLocalPreviewFile(file: File) {
   return URL.createObjectURL(file);
 }
 
+function getSopSlashMenuItems(
+  editor: Parameters<typeof getDefaultReactSlashMenuItems>[0],
+  openUploadPicker: (kind: UploadKind) => void,
+): DefaultReactSuggestionItem[] {
+  const defaultItems = getDefaultReactSlashMenuItems(editor).filter((item) => {
+    const title = item.title.toLowerCase();
+    return !["image", "video", "audio", "file"].some((keyword) => title.includes(keyword));
+  });
+
+  const uploadItems: DefaultReactSuggestionItem[] = [
+    {
+      title: "Upload image",
+      subtext: "Choose photo or GIF from computer / phone.",
+      aliases: ["image", "photo", "picture", "gif", "upload"],
+      group: "SOP Media",
+      icon: <ImageIcon size={18} />,
+      onItemClick: () => openUploadPicker("image"),
+    },
+    {
+      title: "Upload video",
+      subtext: "Choose training video from computer / phone.",
+      aliases: ["video", "clip", "training", "upload"],
+      group: "SOP Media",
+      icon: <Video size={18} />,
+      onItemClick: () => openUploadPicker("video"),
+    },
+    {
+      title: "Upload PDF / file",
+      subtext: "Attach PDF or document reference.",
+      aliases: ["pdf", "file", "document", "upload"],
+      group: "SOP Media",
+      icon: <FileUp size={18} />,
+      onItemClick: () => openUploadPicker("file"),
+    },
+  ];
+
+  return [...uploadItems, ...defaultItems];
+}
+
 export function SopBlockNoteEditor() {
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const videoInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const editor = useCreateBlockNote({
@@ -38,14 +105,20 @@ export function SopBlockNoteEditor() {
     return () => window.clearTimeout(timer);
   }, [editor]);
 
+  function openUploadPicker(kind: UploadKind) {
+    if (kind === "image") imageInputRef.current?.click();
+    if (kind === "video") videoInputRef.current?.click();
+    if (kind === "file") fileInputRef.current?.click();
+  }
+
   async function insertUploadedFile(file: File) {
     const url = await uploadLocalPreviewFile(file);
-    const editorApi = editor as any;
+    const editorApi = editor as unknown as InsertableEditor;
     const cursorBlock = editorApi.getTextCursorPosition?.()?.block;
     const lastBlock = editorApi.document?.[editorApi.document.length - 1];
     const referenceBlock = cursorBlock || lastBlock;
 
-    const block =
+    const block: InsertableFileBlock =
       file.type.startsWith("video/")
         ? {
             type: "video",
@@ -79,49 +152,60 @@ export function SopBlockNoteEditor() {
     window.setTimeout(() => editor.focus(), 60);
   }
 
-  async function handleFiles(files: FileList | null) {
+  async function handleFiles(files: FileList | null, input: HTMLInputElement | null) {
     if (!files?.length) return;
 
     for (const file of Array.from(files)) {
       await insertUploadedFile(file);
     }
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (input) input.value = "";
   }
 
   return (
     <div className="sop-blocknote-shell min-h-full bg-background px-8 py-8">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-3 flex justify-end">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="h-9 gap-2"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="h-4 w-4" />
-            Upload media
-          </Button>
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(event) => void handleFiles(event.target.files, event.currentTarget)}
+        />
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,video/*,application/pdf"
-            multiple
-            className="hidden"
-            onChange={(event) => void handleFiles(event.target.files)}
-          />
-        </div>
+        <input
+          ref={videoInputRef}
+          type="file"
+          accept="video/*"
+          multiple
+          className="hidden"
+          onChange={(event) => void handleFiles(event.target.files, event.currentTarget)}
+        />
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/pdf"
+          multiple
+          className="hidden"
+          onChange={(event) => void handleFiles(event.target.files, event.currentTarget)}
+        />
 
         <BlockNoteView
           editor={editor}
           theme="light"
+          slashMenu={false}
           filePanel={false}
           className="min-h-[calc(100vh-220px)] rounded-2xl bg-background"
-        />
+        >
+          <SuggestionMenuController
+            triggerCharacter="/"
+            getItems={async (query) =>
+              filterSuggestionItems(getSopSlashMenuItems(editor, openUploadPicker), query)
+            }
+          />
+        </BlockNoteView>
       </div>
     </div>
   );
