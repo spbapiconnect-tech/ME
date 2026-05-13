@@ -402,7 +402,7 @@ function ShiftSummaryCard({ shifts }: { shifts: ShiftItem[] }) {
 
   return (
     <Card>
-      <CardHeader className="pb-3">
+      <CardHeader className="shrink-0 pb-3">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <UsersRound className="h-4 w-4 text-primary" />
@@ -485,8 +485,8 @@ function DoFirstCard({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="flex h-full min-h-0 flex-col">
+      <CardHeader className="shrink-0 pb-3">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <AlertCircle className="h-4 w-4 text-primary" />
@@ -519,7 +519,7 @@ function NextUpCard({
         <CardTitle className="text-base">Next Up</CardTitle>
         <p className="text-sm text-muted-foreground">The next few things staff should prepare for.</p>
       </CardHeader>
-      <CardContent className="space-y-2">
+      <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-2">
         {!items.length ? (
           <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">No upcoming task after current item.</div>
         ) : items.slice(0, 4).map((item) => (
@@ -549,7 +549,7 @@ function InboxSummaryCard({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   return (
-    <Card>
+    <Card className="flex h-full min-h-0 flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2 text-base">
@@ -681,6 +681,64 @@ function CompactTimeline({
   );
 }
 
+function StationQueuePanel({
+  workItems,
+  onOpen,
+}: {
+  workItems: OutletStaffWorkItem[];
+  onOpen: (item: OutletStaffWorkItem) => void;
+}) {
+  const today = todayISO();
+
+  return (
+    <Card className="flex min-h-0 flex-col">
+      <CardHeader className="shrink-0 pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <CardTitle className="text-base">Station Queue</CardTitle>
+            <p className="text-sm text-muted-foreground">Kitchen / Front / Manager separated.</p>
+          </div>
+          <Badge variant="outline">Today</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="min-h-0 flex-1 overflow-y-auto pr-2">
+        <div className="grid gap-3">
+          {(["Kitchen", "Front", "Manager"] as StationFilter[]).map((group) => {
+            const groupItems = sectionItems(workItems, group)
+              .filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item))
+              .filter((item) => item.date === today || isOverdue(item))
+              .slice(0, 4);
+
+            return (
+              <div key={group} className="rounded-2xl border bg-background p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="font-medium">{group}</div>
+                  <Badge variant="outline">{groupItems.length}</Badge>
+                </div>
+                <div className="space-y-2">
+                  {!groupItems.length ? (
+                    <div className="rounded-xl border border-dashed px-3 py-2 text-xs text-muted-foreground">No active queue.</div>
+                  ) : groupItems.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => onOpen(item)}
+                      className="w-full rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30"
+                    >
+                      <div className="truncate text-sm font-medium">{item.title}</div>
+                      <div className="text-xs text-muted-foreground">{item.startTime} · {item.inboxGroup}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function TodayHome({
   workItems,
   shifts,
@@ -705,60 +763,30 @@ function TodayHome({
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   const doFirst = overdue[0] || now[0] || next[0];
-  const inboxPreview = [...overdue, ...waiting].slice(0, 5);
+  const inboxPreview = [...overdue, ...waiting].slice(0, 8);
 
   return (
-    <div className="space-y-4">
-      <div className="grid min-w-0 items-start gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
+    <div className="grid min-w-0 gap-4 xl:h-[calc(100dvh-290px)] xl:min-h-[620px] xl:grid-rows-[auto_minmax(0,1fr)] xl:overflow-hidden">
+      <div className="grid min-w-0 shrink-0 items-start gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
         <ShiftSummaryCard shifts={shifts.filter((shift) => shift.date === today)} />
         <RedLightCard overdue={overdue} missed={missed} waiting={waiting} />
         <DoFirstCard item={doFirst} onOpen={onOpen} />
       </div>
 
-      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
-        <NextUpCard items={next} onOpen={onOpen} />
-        <CompactTimeline items={surfaced} shifts={shifts} onOpen={onOpen} />
-        <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
+      <div className="grid min-h-0 min-w-0 gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
+        <div className="grid min-h-0 gap-4 xl:grid-rows-[auto_minmax(0,1fr)]">
+          <NextUpCard items={next} onOpen={onOpen} />
+          <StationQueuePanel workItems={workItems} onOpen={onOpen} />
+        </div>
+
+        <div className="min-h-0 overflow-hidden">
+          <CompactTimeline items={surfaced} shifts={shifts} onOpen={onOpen} />
+        </div>
+
+        <div className="min-h-0 overflow-hidden">
+          <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
+        </div>
       </div>
-
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <CardTitle className="text-base">Station Queue</CardTitle>
-              <p className="text-sm text-muted-foreground">Kitchen / Front / Manager work stays separated so staff do not see irrelevant tasks.</p>
-            </div>
-            <Badge variant="outline">{station}</Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {(["Kitchen", "Front", "Manager"] as StationFilter[]).map((group) => {
-            const groupItems = sectionItems(workItems, group)
-              .filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item))
-              .filter((item) => item.date === today || isOverdue(item))
-              .slice(0, 3);
-
-            return (
-              <div key={group} className="rounded-2xl border bg-background p-3">
-                <div className="mb-2 flex items-center justify-between">
-                  <div className="font-medium">{group}</div>
-                  <Badge variant="outline">{groupItems.length}</Badge>
-                </div>
-                <div className="space-y-2">
-                  {!groupItems.length ? (
-                    <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">No active queue.</div>
-                  ) : groupItems.map((item) => (
-                    <button key={item.id} type="button" onClick={() => onOpen(item)} className="w-full rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30">
-                      <div className="truncate text-sm font-medium">{item.title}</div>
-                      <div className="text-xs text-muted-foreground">{item.startTime} · {item.inboxGroup}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </CardContent>
-      </Card>
     </div>
   );
 }
