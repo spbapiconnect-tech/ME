@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/resizable";
 import type { SopBlockNoteDocument } from "@/components/sop/sop-blocknote-preview";
 import type {
+  SopBuilderV3Document,
   SopBuilderV3Page,
   SopBuilderV3Settings,
 } from "@/lib/sop/sop-builder-v3-types";
@@ -48,9 +49,10 @@ const SopEmployeePreviewDevice = dynamic(
 );
 
 type SopBuilderWorkspaceV3Props = {
-  pages: SopBuilderV3Page[];
+  document?: SopBuilderV3Document;
+  pages?: SopBuilderV3Page[];
   selectedPageId?: string;
-  settings: SopBuilderV3Settings;
+  settings?: SopBuilderV3Settings;
   onBack?: () => void;
   onCreate?: () => void;
   onCreateSop?: () => void;
@@ -87,9 +89,10 @@ function cleanOutlineTitle(title?: string) {
 }
 
 export function SopBuilderWorkspaceV3({
-  pages,
+  document,
+  pages: pagesInput,
   selectedPageId,
-  settings,
+  settings: settingsInput,
   onBack,
   onCreate,
   onCreateSop,
@@ -110,6 +113,25 @@ export function SopBuilderWorkspaceV3({
   const [reviewerRoles, setReviewerRoles] = useState<string[]>(["Outlet Manager"]);
   const [renameTarget, setRenameTarget] = useState<SopBuilderV3Page | null>(null);
   const [renameValue, setRenameValue] = useState("");
+
+  const pages = pagesInput ?? document?.pages ?? [];
+  const settings =
+    settingsInput ??
+    document?.settings ??
+    ({
+      title: "Untitled SOP",
+      documentCode: "",
+      version: "v1.0",
+      category: "",
+      processArea: "",
+      employeeReadMode: "",
+      owner: "",
+      approver: "",
+      targetOutlet: "",
+      targetRole: "",
+      acknowledgementRequired: "",
+      trainingRequired: "",
+    } as SopBuilderV3Settings);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
