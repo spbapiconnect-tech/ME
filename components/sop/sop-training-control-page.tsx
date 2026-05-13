@@ -65,6 +65,7 @@ import { SopCreateTypeModal } from "@/components/sop/sop-create-type-modal";
 import type { SopCreateTypeConfig } from "@/lib/sop/sop-create-types";
 import { SopBuilderWorkspaceV3 } from "@/components/sop/sop-builder-workspace-v3";
 import {
+import type { SopBlockNoteDocument } from "@/components/sop/sop-blocknote-preview";
   createSopBuilderV3Document,
   type SopBuilderV3Block,
   type SopBuilderV3BlockType,
@@ -310,6 +311,7 @@ export function SopTrainingControlPage() {
   const [dialogMode, setDialogMode] = useState<ModalMode>("create");
   const [createTypeModalOpen, setCreateTypeModalOpen] = useState(false);
   const [builderVariant, setBuilderVariant] = useState<"classic" | "v3">("v3");
+  const [blockNoteDocument, setBlockNoteDocument] = useState<SopBlockNoteDocument>([]);
   const [builderMode, setBuilderMode] = useState(false);
   const [pages, setPages] = useState<BuilderPage[]>([newPage(1)]);
   const [selectedPageId, setSelectedPageId] = useState<string>("");
@@ -713,7 +715,52 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     );
   }
 
-  const createPreview = serializeContent(form.employeeReadMode, pages);
+
+  function blockNoteText(value: unknown): string {
+    if (typeof value === "string") return value;
+
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => {
+          if (typeof item === "string") return item;
+          if (item && typeof item === "object" && "text" in item) {
+            return String((item as { text?: unknown }).text || "");
+          }
+          return "";
+        })
+        .filter(Boolean)
+        .join("");
+    }
+
+    return "";
+  }
+
+  function serializeBlockNoteDocument(blocks: SopBlockNoteDocument) {
+    const plainText = blocks
+      .map((block) => {
+        const record = block as Record<string, unknown>;
+        const type = String(record.type || "block");
+        const content = blockNoteText(record.content);
+        return content ? `${type}: ${content}` : type;
+      })
+      .filter(Boolean)
+      .join("\n");
+
+    return JSON.stringify(
+      {
+        source: "blocknote",
+        version: 1,
+        plainText,
+        blocks,
+      },
+      null,
+      2,
+    );
+  }
+
+  const createPreview = blockNoteDocument.length
+    ? serializeBlockNoteDocument(blockNoteDocument)
+    : serializeContent(form.employeeReadMode, pages);
 
   const activeBuilderPageId = selectedPageId || pages[0]?.id || "";
   const activeBuilderPageIndex = Math.max(0, pages.findIndex((page) => page.id === activeBuilderPageId));
@@ -740,6 +787,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             onUpdateBlock={updateV3Block}
             onDeleteBlock={deleteV3Block}
             onUpdateSettings={updateV3Settings}
+            onDocumentChange={setBlockNoteDocument}
           />
         ) : (
         <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">

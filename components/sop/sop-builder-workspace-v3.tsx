@@ -66,6 +66,7 @@ export function SopBuilderWorkspaceV3({
   onDeletePage,
   onUpdatePage,
   onUpdateSettings,
+  onDocumentChange,
 }: {
   document: SopBuilderV3Document;
   selectedPageId?: string;
@@ -80,6 +81,7 @@ export function SopBuilderWorkspaceV3({
   onUpdateBlock: (pageId: string, blockId: string, patch: Partial<SopBuilderV3Block>) => void;
   onDeleteBlock: (pageId: string, blockId: string) => void;
   onUpdateSettings: (patch: Partial<SopBuilderV3Settings>) => void;
+  onDocumentChange?: (blocks: SopBlockNoteDocument) => void;
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -159,6 +161,12 @@ export function SopBuilderWorkspaceV3({
     setRenamingPageId(null);
     setRenameValue("");
   }
+
+  function handleBlockNoteDocumentChange(blocks: SopBlockNoteDocument) {
+    setPreviewDocument(blocks);
+    onDocumentChange?.(blocks);
+  }
+
 
   return (
     <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
@@ -369,7 +377,7 @@ export function SopBuilderWorkspaceV3({
         </aside>
 
         <main className="min-h-0 overflow-y-auto bg-background [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <SopBlockNoteEditor onDocumentChange={setPreviewDocument} />
+          <SopBlockNoteEditor onDocumentChange={handleBlockNoteDocumentChange} />
         </main>
 
         {previewOpen ? (
