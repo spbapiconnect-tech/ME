@@ -921,7 +921,8 @@ function WorkItemSheet({
               type="file"
               accept="image/*,video/*"
               onChange={async (event) => {
-                const asset = await uploadLocalPreviewAsset(event.target.files?.[0], "outlet");
+                const uploadScope = item.sourceModule === "issues" ? "incident" : item.sourceModule === "inspection" ? "inspection" : "task";
+                const asset = await uploadLocalPreviewAsset(event.target.files?.[0], uploadScope);
                 const serialized = serializeUploadAsset(asset);
                 setProofAsset(serialized);
                 setProofName(uploadAssetLabel(serialized));
