@@ -3,6 +3,7 @@
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/shadcn/style.css";
 
+import { useEffect } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 
@@ -10,31 +11,27 @@ export function SopBlockNoteEditor() {
   const editor = useCreateBlockNote({
     initialContent: [
       {
-        type: "heading",
-        content: "Page 1 · What staff need to know",
-      },
-      {
         type: "paragraph",
-        content: "Type / to insert SOP content. Add text, checklist, image, video, or file blocks directly in the document.",
-      },
-      {
-        type: "checkListItem",
-        content: "I have read this SOP",
-      },
-      {
-        type: "checkListItem",
-        content: "I understand the key steps",
+        content: "",
       },
     ],
   });
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      editor.focus();
+    }, 80);
+
+    return () => window.clearTimeout(timer);
+  }, [editor]);
+
   return (
-    <div className="min-h-[640px] bg-background px-10 py-8">
-      <div className="mx-auto max-w-4xl">
+    <div className="min-h-full bg-background px-8 py-8">
+      <div className="mx-auto max-w-5xl">
         <BlockNoteView
           editor={editor}
           theme="light"
-          className="min-h-[560px]"
+          className="min-h-[calc(100vh-220px)] rounded-2xl bg-background"
         />
       </div>
     </div>
