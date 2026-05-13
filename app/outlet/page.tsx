@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { OutletWorkspacePage } from "@/components/outlet/outlet-workspace-page";
+import { OutletStaffHomePage } from "@/components/outlet/outlet-staff-home-page";
 
 export default function Page() {
   return (
     <Suspense fallback={null}>
-      <OutletWorkspacePage />
+      <OutletStaffHomePage />
     </Suspense>
   );
 }
