@@ -256,7 +256,7 @@ export function SopBuilderWorkspaceV3({
     }, {});
   }, [pages]);
 
-  const outletOptions = ["All Outlets", "RR-KCH", "SKONE-BTU", "Branch A", "Branch B"];
+  const outletOptions = ["All Outlets", "RR-KCH", "SKONE-BTU"];
   const roleOptions = [
     "Kitchen Staff",
     "Front Staff",
@@ -317,7 +317,14 @@ export function SopBuilderWorkspaceV3({
       ? current.filter((item) => item !== value)
       : [...current, value];
 
-    patchSettings({ [field]: arrayToCsv(next) } as Partial<SopBuilderV3Settings>);
+    const patch = { [field]: arrayToCsv(next) } as Partial<SopBuilderV3Settings>;
+
+    setLocalSettings((currentSettings) => ({
+      ...currentSettings,
+      ...patch,
+    }));
+
+    onUpdateSettings(patch);
   }
 
   function toggleLocalList(list: string[], setList: (value: string[]) => void, value: string) {
@@ -365,15 +372,27 @@ export function SopBuilderWorkspaceV3({
     onCheckedChange: () => void;
   }) {
     return (
-      <button
-        type="button"
+      <div
+        role="checkbox"
+        aria-checked={checked}
+        tabIndex={0}
         onClick={onCheckedChange}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onCheckedChange();
+          }
+        }}
         className={cn(
-          "flex w-full items-start gap-3 rounded-xl border bg-background px-3 py-3 text-left transition hover:bg-muted/40",
+          "flex w-full cursor-pointer items-start gap-3 rounded-xl border bg-background px-3 py-3 text-left transition hover:bg-muted/40",
           checked && "border-primary/60 bg-primary/5",
         )}
       >
-        <Checkbox checked={checked} className="mt-0.5" />
+        <Checkbox
+          checked={checked}
+          tabIndex={-1}
+          className="mt-0.5 pointer-events-none"
+        />
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-medium leading-none">{label}</span>
           {description ? (
@@ -382,7 +401,7 @@ export function SopBuilderWorkspaceV3({
             </span>
           ) : null}
         </span>
-      </button>
+      </div>
     );
   }
 
@@ -658,15 +677,7 @@ export function SopBuilderWorkspaceV3({
                     />
                   </div>
                 ) : (
-                  <div
-                    className="min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-                    onPointerDownCapture={(event) => event.stopPropagation()}
-                    onMouseDownCapture={(event) => event.stopPropagation()}
-                    onClickCapture={(event) => event.stopPropagation()}
-                    onKeyDownCapture={(event) => event.stopPropagation()}
-                    onBeforeInputCapture={(event) => event.stopPropagation()}
-                    onInputCapture={(event) => event.stopPropagation()}
-                  >
+                  <div className="min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <div className="space-y-6">
                       <section className="border-b pb-5">
                         <div className="mb-3">
