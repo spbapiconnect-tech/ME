@@ -1,5 +1,22 @@
+"use client";
+
+import dynamic from "next/dynamic";
+
 import { ErpShell } from "@/components/erp/erp-shell";
-import { SopBlockNoteEditor } from "@/components/sop/sop-blocknote-editor";
+
+const SopBlockNoteEditor = dynamic(
+  () => import("@/components/sop/sop-blocknote-editor").then((mod) => mod.SopBlockNoteEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="min-h-[640px] bg-background px-10 py-8">
+        <div className="mx-auto max-w-4xl rounded-3xl border bg-card p-8 text-sm text-muted-foreground">
+          Loading BlockNote editor...
+        </div>
+      </div>
+    ),
+  },
+);
 
 export default function SopBlockNoteTestPage() {
   return (
