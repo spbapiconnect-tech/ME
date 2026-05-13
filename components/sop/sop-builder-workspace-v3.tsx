@@ -15,7 +15,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -312,7 +311,7 @@ export function SopBuilderWorkspaceV3({
   }
 
   function toggleCsvSetting(field: "targetOutlet" | "targetRole", value: string) {
-    const current = csvToArray(settings[field]);
+    const current = csvToArray(localSettings[field]);
     const next = current.includes(value)
       ? current.filter((item) => item !== value)
       : [...current, value];
@@ -371,28 +370,24 @@ export function SopBuilderWorkspaceV3({
     checked: boolean;
     onCheckedChange: () => void;
   }) {
+    const checkboxId = `sop-setting-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+
     return (
-      <div
-        role="checkbox"
-        aria-checked={checked}
-        tabIndex={0}
-        onClick={onCheckedChange}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            onCheckedChange();
-          }
-        }}
+      <label
+        htmlFor={checkboxId}
         className={cn(
           "flex w-full cursor-pointer items-start gap-3 rounded-xl border bg-background px-3 py-3 text-left transition hover:bg-muted/40",
           checked && "border-primary/60 bg-primary/5",
         )}
       >
-        <Checkbox
+        <input
+          id={checkboxId}
+          type="checkbox"
           checked={checked}
-          tabIndex={-1}
-          className="mt-0.5 pointer-events-none"
+          onChange={onCheckedChange}
+          className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
         />
+
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-medium leading-none">{label}</span>
           {description ? (
@@ -401,7 +396,7 @@ export function SopBuilderWorkspaceV3({
             </span>
           ) : null}
         </span>
-      </div>
+      </label>
     );
   }
 
