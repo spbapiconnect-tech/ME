@@ -1,229 +1,52 @@
-.sop-blocknote-shell {
-  min-height: 100%;
+/* SOP Builder frame: editor owns its own scroll. ERP shell must not move. */
+.sop-builder-workspace {
+  height: calc(100dvh - 56px);
+  max-height: calc(100dvh - 56px);
+  overflow: hidden;
 }
 
-.sop-blocknote-shell .bn-container {
-  border: 0 !important;
-  background: transparent !important;
+.sop-builder-workspace [data-panel-group] {
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
 }
 
-.sop-blocknote-shell .bn-editor {
-  background: transparent !important;
-  padding-inline: 0 !important;
+.sop-builder-editor-main {
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden !important;
 }
 
-.sop-blocknote-shell .bn-block-content {
-  border-radius: 12px;
-}
-
-.sop-blocknote-shell img,
-.sop-blocknote-shell video {
-  max-width: 100%;
-  border-radius: 18px;
-  border: 1px solid hsl(var(--border));
-  background: hsl(var(--background));
-}
-
-.sop-blocknote-shell [class*="file"],
-.sop-blocknote-shell [class*="media"],
-.sop-blocknote-shell [class*="image"],
-.sop-blocknote-shell [class*="video"] {
-  border-radius: 16px;
-}
-
-.sop-blocknote-shell input[type="file"] {
-  cursor: pointer;
-}
-
-.sop-blocknote-shell .bn-side-menu {
-  opacity: 0.55;
-}
-
-.sop-blocknote-shell .bn-side-menu:hover {
-  opacity: 1;
-}
-
-/* Hide BlockNote default Upload / Embed popup because SOP users should upload directly. */
-.sop-blocknote-shell .bn-file-panel,
-.sop-blocknote-shell [data-file-panel],
-.sop-blocknote-shell [class*="FilePanel"],
-.sop-blocknote-shell [class*="file-panel"] {
-  display: none !important;
-}
-
-/* Employee preview should show the SOP content, not local upload filenames. */
-.sop-reader-preview figcaption,
-.sop-reader-preview [class*="caption"],
-.sop-reader-preview [class*="fileName"],
-.sop-reader-preview [class*="file-name"],
-.sop-reader-preview [class*="FileName"] {
-  display: none !important;
-}
-
-/* SOP builder should behave like a document canvas, not a floating media/card wall. */
 .sop-blocknote-shell {
   height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  contain: layout paint;
+  overscroll-behavior: contain;
 }
 
+.sop-blocknote-scroll {
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-bottom: 12rem;
+}
+
+.sop-blocknote-page {
+  min-height: 100%;
+  padding-bottom: 12rem;
+}
+
+/* BlockNote theme variables: follow ME bright / dark instead of fixed black popovers. */
+.sop-blocknote-shell .bn-root,
 .sop-blocknote-shell .bn-container,
-.sop-blocknote-shell .bn-editor {
-  background: transparent !important;
-}
-
-.sop-blocknote-shell .bn-editor {
-  min-height: calc(100vh - 220px);
-}
-
-.sop-reader-preview .bn-container,
-.sop-reader-preview .bn-editor {
-  background: transparent !important;
-}
-
-.sop-reader-preview figcaption,
-.sop-reader-preview [class*="caption"],
-.sop-reader-preview [class*="fileName"],
-.sop-reader-preview [class*="file-name"],
-.sop-reader-preview [class*="FileName"] {
-  display: none !important;
-}
-
-.sop-reader-preview img,
-.sop-reader-preview video {
-  max-width: 100%;
-  border-radius: 14px;
-}
-
-/* Keep BlockNote toolbar usable inside ME workspace overlays. */
-.sop-blocknote-shell .bn-formatting-toolbar,
-.sop-blocknote-shell .bn-toolbar,
-.sop-blocknote-shell .bn-menu,
-.sop-blocknote-shell [data-radix-popper-content-wrapper],
-.sop-blocknote-shell [class*="Toolbar"],
-.sop-blocknote-shell [class*="toolbar"],
-.sop-blocknote-shell [class*="Menu"],
-.sop-blocknote-shell [class*="menu"] {
-  z-index: 80 !important;
-}
-
-.sop-blocknote-shell .bn-formatting-toolbar,
-.sop-blocknote-shell .bn-toolbar,
-.sop-blocknote-shell .bn-menu {
-  border: 1px solid hsl(var(--border)) !important;
-  background: hsl(var(--popover)) !important;
-  color: hsl(var(--popover-foreground)) !important;
-  box-shadow: 0 18px 50px rgb(15 23 42 / 0.18) !important;
-}
-
-.sop-blocknote-shell .bn-formatting-toolbar button,
-.sop-blocknote-shell .bn-toolbar button,
-.sop-blocknote-shell .bn-menu button {
-  color: hsl(var(--popover-foreground)) !important;
-}
-
-.sop-blocknote-shell .bn-formatting-toolbar button:hover,
-.sop-blocknote-shell .bn-toolbar button:hover,
-.sop-blocknote-shell .bn-menu button:hover {
-  background: hsl(var(--muted)) !important;
-}
-
-/* Keep BlockNote text toolbar and color menu usable inside ME workspace. */
-.sop-blocknote-shell .bn-formatting-toolbar,
-.sop-blocknote-shell .bn-toolbar,
-.sop-blocknote-shell .bn-menu,
-.sop-blocknote-shell .bn-popover,
-.sop-blocknote-shell [role="menu"],
-.sop-blocknote-shell [role="listbox"],
-.sop-blocknote-shell [data-radix-popper-content-wrapper],
-.sop-blocknote-shell [class*="Toolbar"],
-.sop-blocknote-shell [class*="toolbar"],
-.sop-blocknote-shell [class*="Menu"],
-.sop-blocknote-shell [class*="menu"],
-.sop-blocknote-shell [class*="Popover"],
-.sop-blocknote-shell [class*="popover"] {
-  z-index: 9999 !important;
-  pointer-events: auto !important;
-}
-
-.sop-blocknote-shell .bn-formatting-toolbar,
-.sop-blocknote-shell .bn-toolbar,
-.sop-blocknote-shell .bn-menu,
-.sop-blocknote-shell .bn-popover,
-.sop-blocknote-shell [role="menu"],
-.sop-blocknote-shell [role="listbox"] {
-  border: 1px solid hsl(var(--border)) !important;
-  background: hsl(var(--popover)) !important;
-  color: hsl(var(--popover-foreground)) !important;
-  opacity: 1 !important;
-  box-shadow: 0 18px 50px rgb(15 23 42 / 0.22) !important;
-}
-
-.sop-blocknote-shell .bn-formatting-toolbar button,
-.sop-blocknote-shell .bn-toolbar button,
-.sop-blocknote-shell .bn-menu button,
-.sop-blocknote-shell .bn-popover button,
-.sop-blocknote-shell [role="menuitem"],
-.sop-blocknote-shell [role="option"] {
-  color: hsl(var(--popover-foreground)) !important;
-  opacity: 1 !important;
-}
-
-.sop-blocknote-shell .bn-formatting-toolbar button:hover,
-.sop-blocknote-shell .bn-toolbar button:hover,
-.sop-blocknote-shell .bn-menu button:hover,
-.sop-blocknote-shell .bn-popover button:hover,
-.sop-blocknote-shell [role="menuitem"]:hover,
-.sop-blocknote-shell [role="option"]:hover {
-  background: hsl(var(--muted)) !important;
-}
-
-/* ME custom BlockNote toolbar: no broken transparent color dropdown. */
-.bn-formatting-toolbar,
-.bn-toolbar,
-.bn-menu,
-.bn-popover,
-[data-radix-popper-content-wrapper] {
-  z-index: 9999 !important;
-}
-
-.sop-blocknote-shell .bn-formatting-toolbar,
-.sop-blocknote-shell .bn-toolbar {
-  border: 1px solid hsl(var(--border)) !important;
-  background: hsl(var(--popover)) !important;
-  color: hsl(var(--popover-foreground)) !important;
-  box-shadow: 0 18px 50px rgb(15 23 42 / 0.2) !important;
-}
-
-.sop-blocknote-shell .bn-formatting-toolbar button,
-.sop-blocknote-shell .bn-toolbar button {
-  color: hsl(var(--popover-foreground)) !important;
-  opacity: 1 !important;
-}
-
-/* Preview must stay readable in dark theme. */
-.sop-reader-preview,
-.sop-reader-preview .bn-container,
-.sop-reader-preview .bn-editor {
-  background: transparent !important;
-  color: hsl(var(--foreground)) !important;
-}
-
-.sop-reader-preview .bn-editor * {
-  border-color: hsl(var(--border));
-}
-
-.sop-reader-preview figcaption,
-.sop-reader-preview [class*="caption"],
-.sop-reader-preview [class*="fileName"],
-.sop-reader-preview [class*="file-name"],
-.sop-reader-preview [class*="FileName"] {
-  display: none !important;
-}
-
-/* Strong ME dark-mode readability for BlockNote editor + preview. */
-.dark .sop-blocknote-shell,
-.dark .sop-reader-preview,
-[data-theme="dark"] .sop-blocknote-shell,
-[data-theme="dark"] .sop-reader-preview {
+.sop-reader-preview .bn-root,
+.sop-reader-preview .bn-container {
   --bn-colors-editor-text: hsl(var(--foreground));
   --bn-colors-editor-background: transparent;
   --bn-colors-menu-text: hsl(var(--popover-foreground));
@@ -236,115 +59,7 @@
   --bn-colors-selected-background: hsl(var(--primary));
   --bn-colors-disabled-text: hsl(var(--muted-foreground));
   --bn-colors-disabled-background: transparent;
-  --bn-colors-shadow: rgb(0 0 0 / 0.45);
-  --bn-colors-border: hsl(var(--border));
-}
-
-.dark .sop-blocknote-shell .bn-container,
-.dark .sop-blocknote-shell .bn-editor,
-.dark .sop-reader-preview .bn-container,
-.dark .sop-reader-preview .bn-editor {
-  background: transparent !important;
-  color: hsl(var(--foreground)) !important;
-}
-
-.dark .sop-blocknote-shell [contenteditable="true"],
-.dark .sop-blocknote-shell .bn-block-content,
-.dark .sop-blocknote-shell .bn-inline-content,
-.dark .sop-reader-preview .bn-block-content,
-.dark .sop-reader-preview .bn-inline-content {
-  color: hsl(var(--foreground)) !important;
-  opacity: 1 !important;
-}
-
-.dark .sop-blocknote-shell .bn-inline-content span:not([style*="color"]),
-.dark .sop-reader-preview .bn-inline-content span:not([style*="color"]) {
-  color: hsl(var(--foreground)) !important;
-  opacity: 1 !important;
-}
-
-.dark .sop-blocknote-shell [data-placeholder]::before {
-  color: hsl(var(--muted-foreground)) !important;
-  opacity: 0.75 !important;
-}
-
-/* ME BlockNote readability fix for both bright and dark themes, including readonly mode. */
-.sop-blocknote-shell,
-.sop-reader-preview {
-  --bn-colors-editor-text: hsl(var(--foreground));
-  --bn-colors-editor-background: transparent;
-  --bn-colors-menu-text: hsl(var(--popover-foreground));
-  --bn-colors-menu-background: hsl(var(--popover));
-  --bn-colors-tooltip-text: hsl(var(--popover-foreground));
-  --bn-colors-tooltip-background: hsl(var(--popover));
-  --bn-colors-hovered-text: hsl(var(--foreground));
-  --bn-colors-hovered-background: hsl(var(--muted));
-  --bn-colors-selected-text: hsl(var(--primary-foreground));
-  --bn-colors-selected-background: hsl(var(--primary));
-  --bn-colors-disabled-text: hsl(var(--foreground));
-  --bn-colors-disabled-background: transparent;
-  --bn-colors-shadow: rgb(0 0 0 / 0.2);
-  --bn-colors-border: hsl(var(--border));
-}
-
-.sop-blocknote-shell .bn-container,
-.sop-blocknote-shell .bn-editor,
-.sop-reader-preview .bn-container,
-.sop-reader-preview .bn-editor {
-  background: transparent !important;
-  color: hsl(var(--foreground)) !important;
-  opacity: 1 !important;
-}
-
-.sop-blocknote-shell [contenteditable],
-.sop-blocknote-shell [contenteditable="false"],
-.sop-blocknote-shell .bn-block-content,
-.sop-blocknote-shell .bn-inline-content,
-.sop-blocknote-shell .bn-inline-content *,
-.sop-reader-preview .bn-block-content,
-.sop-reader-preview .bn-inline-content,
-.sop-reader-preview .bn-inline-content * {
-  color: hsl(var(--foreground)) !important;
-  opacity: 1 !important;
-}
-
-.sop-blocknote-shell [data-placeholder]::before,
-.sop-blocknote-shell .bn-inline-content[data-placeholder]::before {
-  color: hsl(var(--muted-foreground)) !important;
-  opacity: 0.85 !important;
-}
-
-/* SOP builder: keep long pasted content inside the editor panel, not the ERP page. */
-.sop-blocknote-shell {
-  contain: layout paint;
-  overscroll-behavior: contain;
-}
-
-.sop-blocknote-scroll {
-  overscroll-behavior: contain;
-  scroll-padding-bottom: 12rem;
-}
-
-.sop-blocknote-page {
-  padding-bottom: 12rem;
-}
-
-/* BlockNote editor must always inherit ME theme colors. */
-.sop-blocknote-shell .bn-root,
-.sop-reader-preview .bn-root {
-  --bn-colors-editor-text: hsl(var(--foreground));
-  --bn-colors-editor-background: transparent;
-  --bn-colors-menu-text: hsl(var(--popover-foreground));
-  --bn-colors-menu-background: hsl(var(--popover));
-  --bn-colors-tooltip-text: hsl(var(--popover-foreground));
-  --bn-colors-tooltip-background: hsl(var(--popover));
-  --bn-colors-hovered-text: hsl(var(--foreground));
-  --bn-colors-hovered-background: hsl(var(--muted));
-  --bn-colors-selected-text: hsl(var(--primary-foreground));
-  --bn-colors-selected-background: hsl(var(--primary));
-  --bn-colors-disabled-text: hsl(var(--foreground));
-  --bn-colors-disabled-background: transparent;
-  --bn-colors-shadow: rgb(0 0 0 / 0.24);
+  --bn-colors-shadow: rgb(0 0 0 / 0.22);
   --bn-colors-border: hsl(var(--border));
   --bn-border-radius: 0.75rem;
 }
@@ -354,56 +69,79 @@
 .sop-reader-preview .bn-container,
 .sop-reader-preview .bn-editor {
   background: transparent !important;
-  color: hsl(var(--foreground)) !important;
-  opacity: 1 !important;
+  color: hsl(var(--foreground));
 }
 
-/* Pasted HTML often carries dark/blue/gray inline colors.
-   In SOP authoring mode we normalize pasted text so both bright/dark themes stay readable. */
-.sop-blocknote-shell .bn-editor,
-.sop-blocknote-shell .bn-editor p,
-.sop-blocknote-shell .bn-editor div,
-.sop-blocknote-shell .bn-editor span,
-.sop-blocknote-shell .bn-editor strong,
-.sop-blocknote-shell .bn-editor em,
-.sop-blocknote-shell .bn-editor code,
-.sop-blocknote-shell .bn-editor pre,
+.sop-blocknote-shell .bn-editor {
+  min-height: 720px !important;
+  padding-bottom: 12rem !important;
+}
+
+/* Keep normal text readable, but do NOT override inline colors from BlockNote color toolbar. */
 .sop-blocknote-shell .bn-block-content,
 .sop-blocknote-shell .bn-inline-content,
-.sop-blocknote-shell .bn-inline-content *,
-.sop-reader-preview .bn-editor,
-.sop-reader-preview .bn-editor p,
-.sop-reader-preview .bn-editor div,
-.sop-reader-preview .bn-editor span,
-.sop-reader-preview .bn-editor strong,
-.sop-reader-preview .bn-editor em,
-.sop-reader-preview .bn-editor code,
-.sop-reader-preview .bn-editor pre,
 .sop-reader-preview .bn-block-content,
-.sop-reader-preview .bn-inline-content,
-.sop-reader-preview .bn-inline-content * {
-  color: hsl(var(--foreground)) !important;
-  opacity: 1 !important;
+.sop-reader-preview .bn-inline-content {
+  color: hsl(var(--foreground));
 }
 
-.sop-blocknote-shell .bn-editor code,
-.sop-blocknote-shell .bn-editor pre,
-.sop-reader-preview .bn-editor code,
-.sop-reader-preview .bn-editor pre {
-  background: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
-  border-radius: 0.75rem;
-}
-
-/* Placeholder should be visible but not look like actual content. */
+/* Placeholder should be visible but still look like placeholder. */
 .sop-blocknote-shell [data-placeholder]::before,
 .sop-blocknote-shell .bn-inline-content[data-placeholder]::before {
   color: hsl(var(--muted-foreground)) !important;
   opacity: 0.75 !important;
 }
 
-/* Give user room at the bottom when typing near the last block. */
-.sop-blocknote-shell .bn-editor {
-  min-height: 680px !important;
-  padding-bottom: 10rem !important;
+/* Code block readability in both bright and dark theme. */
+.sop-blocknote-shell .bn-editor pre,
+.sop-blocknote-shell .bn-editor code,
+.sop-reader-preview .bn-editor pre,
+.sop-reader-preview .bn-editor code,
+.sop-blocknote-shell [data-content-type="codeBlock"],
+.sop-reader-preview [data-content-type="codeBlock"] {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+}
+
+/* BlockNote menus / toolbar / slash command should match current ME theme. */
+.sop-blocknote-shell .bn-formatting-toolbar,
+.sop-blocknote-shell .bn-toolbar,
+.sop-blocknote-shell .bn-menu,
+.sop-blocknote-shell .bn-popover,
+.sop-blocknote-shell [role="menu"],
+.sop-blocknote-shell [role="listbox"],
+.sop-blocknote-shell [data-radix-popper-content-wrapper] > * {
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.22) !important;
+  z-index: 80 !important;
+}
+
+.sop-blocknote-shell .bn-formatting-toolbar button,
+.sop-blocknote-shell .bn-toolbar button,
+.sop-blocknote-shell .bn-menu button,
+.sop-blocknote-shell .bn-popover button,
+.sop-blocknote-shell [role="menuitem"],
+.sop-blocknote-shell [role="option"] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+.sop-blocknote-shell .bn-menu button:hover,
+.sop-blocknote-shell .bn-popover button:hover,
+.sop-blocknote-shell [role="menuitem"]:hover,
+.sop-blocknote-shell [role="option"]:hover {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Hide uploaded file names in preview. */
+.sop-reader-preview figcaption,
+.sop-reader-preview [class*="caption"],
+.sop-reader-preview [class*="fileName"],
+.sop-reader-preview [class*="file-name"],
+.sop-reader-preview [class*="FileName"] {
+  display: none !important;
 }

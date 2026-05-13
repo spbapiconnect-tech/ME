@@ -1,6 +1,8 @@
 "use client";
 
 import "@blocknote/core/fonts/inter.css";
+import { BlockNoteSchema, createCodeBlockSpec } from "@blocknote/core";
+import { codeBlockOptions } from "@blocknote/code-block";
 import "@blocknote/shadcn/style.css";
 import "./sop-blocknote-editor.css";
 
@@ -41,6 +43,33 @@ type InsertableEditor = {
 
 async function uploadLocalPreviewFile(file: File) {
   return URL.createObjectURL(file);
+}
+
+const sopBlockNoteSchema = BlockNoteSchema.create().extend({
+  blockSpecs: {
+    codeBlock: createCodeBlockSpec({
+      ...codeBlockOptions,
+      indentLineWithTab: true,
+      defaultLanguage: "text",
+    }),
+  },
+});
+
+function looksLikeCode(text: string) {
+  const trimmed = text.trim();
+
+  if (!trimmed) return false;
+
+  return (
+    trimmed.includes("```") ||
+    /(^|\n)\s*(import|export|const|let|var|function|class|type|interface|return|if|for|while|switch|case)\b/.test(trimmed) ||
+    /(^|\n)\s*(cd |git |npm |pnpm |yarn |python3 |cat >|EOF)/.test(trimmed) ||
+    (trimmed.length > 180 && trimmed.includes("{") && trimmed.includes("}"))
+  );
+}
+
+function fenceCode(text: string) {
+  return "```text\n" + text.replace(/```/g, "\`\`\`") + "\n```";
 }
 
 function useResolvedBlockNoteTheme() {
@@ -131,6 +160,7 @@ export function SopBlockNoteEditor({
   const blockNoteTheme = useResolvedBlockNoteTheme();
 
   const editor = useCreateBlockNote({
+    schema: sopBlockNoteSchema,
     initialContent: [
       {
         type: "paragraph",
@@ -138,11 +168,25 @@ export function SopBlockNoteEditor({
       },
     ],
     uploadFile: uploadLocalPreviewFile,
-    pasteHandler: ({ defaultPasteHandler }) =>
-      defaultPasteHandler({
+    pasteHandler: ({ event, editor, defaultPasteHandler }) => {
+      const text = event.clipboardData?.getData("text/plain") || "";
+      const html = event.clipboardData?.getData("text/html") || "";
+
+      if (text && html && looksLikeCode(text)) {
+        editor.pasteMarkdown(fenceCode(text));
+        return true;
+      }
+
+      if (text && html && text.length > 280) {
+        editor.pasteText(text);
+        return true;
+      }
+
+      return defaultPasteHandler({
         prioritizeMarkdownOverHTML: true,
-        plainTextAsMarkdown: false,
-      }),
+        plainTextAsMarkdown: true,
+      });
+    },
   });
 
   useEffect(() => {

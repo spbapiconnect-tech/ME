@@ -322,7 +322,7 @@ export function SopBuilderWorkspaceV3({
   return (
     <div
       ref={workspaceRef}
-      className="flex h-[calc(100dvh-56px)] min-h-0 flex-col overflow-hidden bg-background"
+      className="sop-builder-workspace flex h-[calc(100dvh-56px)] min-h-0 flex-col overflow-hidden bg-background"
     >
       <div className="shrink-0 border-b px-4 py-3">
         <div className="flex items-center justify-between gap-4">
@@ -535,7 +535,7 @@ export function SopBuilderWorkspaceV3({
         <ResizableHandle withHandle />
 
         <ResizablePanel defaultSize={inspectorOpen ? 56 : 84} minSize={36}>
-          <main className="h-full min-h-0 overflow-y-auto bg-background [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <main className="sop-builder-editor-main h-full min-h-0 overflow-hidden bg-background">
             <SopBlockNoteEditor disabled={Boolean(renameTarget) || (inspectorOpen && inspectorTab === "settings")} onDocumentChange={handleDocumentChange} />
           </main>
         </ResizablePanel>

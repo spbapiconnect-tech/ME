@@ -1,6 +1,8 @@
 "use client";
 
 import "@blocknote/core/fonts/inter.css";
+import { BlockNoteSchema, createCodeBlockSpec } from "@blocknote/core";
+import { codeBlockOptions } from "@blocknote/code-block";
 import "@blocknote/shadcn/style.css";
 
 import type { PartialBlock } from "@blocknote/core";
@@ -9,6 +11,16 @@ import { BlockNoteView } from "@blocknote/shadcn";
 import { useEffect, useState } from "react";
 
 export type SopBlockNoteDocument = PartialBlock[];
+
+const sopPreviewBlockNoteSchema = BlockNoteSchema.create().extend({
+  blockSpecs: {
+    codeBlock: createCodeBlockSpec({
+      ...codeBlockOptions,
+      indentLineWithTab: true,
+      defaultLanguage: "text",
+    }),
+  },
+});
 
 function useResolvedBlockNoteTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -68,6 +80,7 @@ export function SopEmployeePreviewDevice({
 
   const editor = useCreateBlockNote(
     {
+      schema: sopPreviewBlockNoteSchema,
       initialContent,
     },
     [JSON.stringify(initialContent)],

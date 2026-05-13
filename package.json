@@ -20,6 +20,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@blocknote/code-block": "^0.50.0",
     "@blocknote/core": "^0.50.0",
     "@blocknote/react": "^0.50.0",
     "@blocknote/shadcn": "^0.50.0",
