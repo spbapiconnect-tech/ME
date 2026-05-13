@@ -16,7 +16,9 @@ import {
   Type,
   Video,
   X,
-} from "lucide-react";
+
+  Pencil,
+  Trash2,} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -137,6 +139,8 @@ export function SopBuilderWorkspaceV3({
   onSelectPage,
   onAddPage,
   onAddSubPage,
+  onDeletePage,
+  onUpdatePage,
   onUpdateSettings,
   onUseClassic,
 }: {
@@ -157,6 +161,8 @@ export function SopBuilderWorkspaceV3({
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [renamingPageId, setRenamingPageId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   const { settings, pages } = sopDocument;
 
@@ -180,6 +186,27 @@ export function SopBuilderWorkspaceV3({
 
   const checks = sopBuilderV3Readiness(sopDocument);
   const readyCount = checks.filter((item) => item.done).length;
+
+  function cleanOutlineTitle(title?: string) {
+    const clean = (title || "")
+      .replace(/^Page\s+\d+\s*[·:-]\s*/i, "")
+      .replace(/^New\s+/i, "")
+      .trim();
+
+    return clean || "Untitled";
+  }
+
+  function beginRename(page: SopBuilderV3Page) {
+    setRenamingPageId(page.id);
+    setRenameValue(cleanOutlineTitle(page.title));
+  }
+
+  function commitRename(pageId: string) {
+    const nextTitle = renameValue.trim() || "Untitled";
+    onUpdatePage(pageId, { title: nextTitle });
+    setRenamingPageId(null);
+    setRenameValue("");
+  }
 
   return (
     <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
@@ -224,14 +251,14 @@ export function SopBuilderWorkspaceV3({
       <div className={cn("grid min-h-0 flex-1 overflow-hidden", previewOpen ? "lg:grid-cols-[280px_minmax(0,1fr)_360px]" : "lg:grid-cols-[280px_minmax(0,1fr)]")}>
         <aside className="hidden min-h-0 border-r bg-background lg:block">
           <div className="flex h-full min-h-0 flex-col">
-            <div className="shrink-0 border-b px-4 py-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Document</div>
+            <div className="shrink-0 border-b px-3 py-4">
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground">Document</div>
                   <div className="mt-1 text-sm font-semibold">Chapters</div>
                 </div>
-                <Button size="sm" variant="outline" className="h-8 px-2" onClick={onAddPage}>
-                  <Plus className="h-4 w-4" />
+                <Button size="sm" variant="outline" className="h-8 px-2 text-xs" onClick={onAddPage}>
+                  <Plus className="h-3.5 w-3.5" />
                   Chapter
                 </Button>
               </div>
@@ -242,18 +269,18 @@ export function SopBuilderWorkspaceV3({
                 <button
                   type="button"
                   onClick={onAddPage}
-                  className="w-full rounded-xl border border-dashed px-3 py-6 text-center text-sm text-muted-foreground hover:bg-muted/30"
+                  className="w-full rounded-lg border border-dashed px-3 py-5 text-center text-sm text-muted-foreground hover:bg-muted/30"
                 >
-                  Add first chapter
+                  Add chapter
                 </button>
               ) : (
                 <div className="space-y-1">
-                  {rootPages.map((page, pageIndex) => {
-                    const active = activePage?.id === page.id;
-                    const subPages = subPagesByParent[page.id] || [];
+                  {rootPages.map((chapter, chapterIndex) => {
+                    const active = activePage?.id === chapter.id;
+                    const subPages = subPagesByParent[chapter.id] || [];
 
                     return (
-                      <div key={page.id} className="space-y-1">
+                      <div key={chapter.id} className="space-y-1">
                         <div
                           className={cn(
                             "group flex items-center gap-1 rounded-lg pr-1 transition hover:bg-muted/50",
@@ -262,64 +289,127 @@ export function SopBuilderWorkspaceV3({
                         >
                           <button
                             type="button"
-                            onClick={() => onSelectPage(page.id)}
+                            onClick={() => onSelectPage(chapter.id)}
                             className="flex min-w-0 flex-1 items-center gap-2 px-2 py-2 text-left text-sm"
                           >
-                            <span
-                              className={cn(
-                                "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[11px] text-muted-foreground",
-                                active && "border-primary/40 text-primary",
-                              )}
-                            >
-                              {pageIndex + 1}
+                            <span className="w-4 shrink-0 text-[11px] font-medium text-muted-foreground">
+                              {chapterIndex + 1}
                             </span>
-                            <span className="min-w-0 flex-1 truncate font-medium">
-                              {page.title || "Untitled page"}
-                            </span>
-                            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                              {page.blocks.length}
-                            </span>
+
+                            {renamingPageId === chapter.id ? (
+                              <input
+                                autoFocus
+                                value={renameValue}
+                                onChange={(event) => setRenameValue(event.target.value)}
+                                onBlur={() => commitRename(chapter.id)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter") commitRename(chapter.id);
+                                  if (event.key === "Escape") setRenamingPageId(null);
+                                }}
+                                className="min-w-0 flex-1 rounded-md border bg-background px-2 py-1 text-sm text-foreground"
+                              />
+                            ) : (
+                              <span className="min-w-0 flex-1 truncate font-medium">
+                                {cleanOutlineTitle(chapter.title)}
+                              </span>
+                            )}
                           </button>
 
                           <Button
                             type="button"
-                            size="sm"
+                            size="icon"
                             variant="ghost"
-                            className="h-7 px-1.5 text-xs opacity-0 transition group-hover:opacity-100"
-                            onClick={() => onAddSubPage?.(page.id)}
+                            className="h-7 w-7 opacity-0 transition group-hover:opacity-100"
+                            onClick={() => onAddSubPage?.(chapter.id)}
+                            title="Add page"
                           >
-                            + Page
+                            <Plus className="h-3.5 w-3.5" />
+                          </Button>
+
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7 opacity-0 transition group-hover:opacity-100"
+                            onClick={() => beginRename(chapter)}
+                            title="Rename chapter"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Button>
+
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            className="h-7 w-7 text-muted-foreground opacity-0 transition hover:text-destructive group-hover:opacity-100"
+                            onClick={() => onDeletePage(chapter.id)}
+                            title="Delete chapter"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </div>
 
-                        {subPages.map((subPage, subIndex) => {
-                          const subActive = activePage?.id === subPage.id;
+                        {subPages.map((page, pageIndex) => {
+                          const subActive = activePage?.id === page.id;
 
                           return (
-                            <button
-                              key={subPage.id}
-                              type="button"
-                              onClick={() => onSelectPage(subPage.id)}
+                            <div
+                              key={page.id}
                               className={cn(
-                                "ml-5 flex w-[calc(100%-1.25rem)] items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition hover:bg-muted/50",
+                                "group ml-4 flex items-center gap-1 rounded-lg pr-1 transition hover:bg-muted/50",
                                 subActive && "bg-primary/10 text-primary",
                               )}
                             >
-                              <span
-                                className={cn(
-                                  "flex h-5 min-w-8 shrink-0 items-center justify-center rounded-md border px-1 text-[11px] text-muted-foreground",
-                                  subActive && "border-primary/40 text-primary",
-                                )}
+                              <button
+                                type="button"
+                                onClick={() => onSelectPage(page.id)}
+                                className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left text-sm"
                               >
-                                {pageIndex + 1}.{subIndex + 1}
-                              </span>
-                              <span className="min-w-0 flex-1 truncate">
-                                {subPage.title || "Untitled sub page"}
-                              </span>
-                              <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                                {subPage.blocks.length}
-                              </span>
-                            </button>
+                                <span className="w-7 shrink-0 text-[11px] text-muted-foreground">
+                                  {chapterIndex + 1}.{pageIndex + 1}
+                                </span>
+
+                                {renamingPageId === page.id ? (
+                                  <input
+                                    autoFocus
+                                    value={renameValue}
+                                    onChange={(event) => setRenameValue(event.target.value)}
+                                    onBlur={() => commitRename(page.id)}
+                                    onKeyDown={(event) => {
+                                      if (event.key === "Enter") commitRename(page.id);
+                                      if (event.key === "Escape") setRenamingPageId(null);
+                                    }}
+                                    className="min-w-0 flex-1 rounded-md border bg-background px-2 py-1 text-sm text-foreground"
+                                  />
+                                ) : (
+                                  <span className="min-w-0 flex-1 truncate">
+                                    {cleanOutlineTitle(page.title)}
+                                  </span>
+                                )}
+                              </button>
+
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 opacity-0 transition group-hover:opacity-100"
+                                onClick={() => beginRename(page)}
+                                title="Rename page"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-muted-foreground opacity-0 transition hover:text-destructive group-hover:opacity-100"
+                                onClick={() => onDeletePage(page.id)}
+                                title="Delete page"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                           );
                         })}
                       </div>

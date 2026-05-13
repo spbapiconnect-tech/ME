@@ -586,23 +586,30 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   }
 
   function addV3Page() {
-    const nextPage = newPage(pages.length + 1);
+    const nextPage = { ...newPage(pages.length + 1), title: "New chapter" };
     setPages((current) => [...current, nextPage]);
     setSelectedPageId(nextPage.id);
   }
 
   function addV3SubPage(parentPageId: string) {
-    const parent = pages.find((page) => page.id === parentPageId);
     const siblingCount = pages.filter((page) => page.parentPageId === parentPageId).length;
 
     const nextPage = {
       ...newPage(pages.length + 1, parentPageId),
-      title: `Page ${siblingCount + 1}`,
+      title: `New page ${siblingCount + 1}`,
     };
 
     setPages((current) => {
       const parentIndex = current.findIndex((page) => page.id === parentPageId);
-      const insertAt = parentIndex === -1 ? current.length : parentIndex + 1 + siblingCount;
+      const childIndexes = current
+        .map((page, index) => ({ page, index }))
+        .filter((item) => item.page.parentPageId === parentPageId)
+        .map((item) => item.index);
+
+      const insertAt = childIndexes.length
+        ? Math.max(...childIndexes) + 1
+        : parentIndex + 1;
+
       const next = [...current];
       next.splice(insertAt, 0, nextPage);
       return next;
@@ -614,10 +621,15 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   function deleteV3Page(pageId: string) {
     if (pages.length <= 1) return;
 
-    const nextPages = pages.filter((page) => page.id !== pageId);
+    const idsToDelete = new Set([
+      pageId,
+      ...pages.filter((page) => page.parentPageId === pageId).map((page) => page.id),
+    ]);
+
+    const nextPages = pages.filter((page) => !idsToDelete.has(page.id));
     setPages(nextPages);
 
-    if (activeBuilderPageId === pageId) {
+    if (activeBuilderPageId && idsToDelete.has(activeBuilderPageId)) {
       setSelectedPageId(nextPages[0]?.id);
     }
   }
