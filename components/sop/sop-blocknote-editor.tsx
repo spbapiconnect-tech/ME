@@ -7,6 +7,12 @@ import { useEffect } from "react";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 
+async function uploadLocalPreviewFile(file: File) {
+  // Temporary local browser preview.
+  // Later replace this with API / Supabase / S3 upload and return permanent URL.
+  return URL.createObjectURL(file);
+}
+
 export function SopBlockNoteEditor() {
   const editor = useCreateBlockNote({
     initialContent: [
@@ -15,6 +21,7 @@ export function SopBlockNoteEditor() {
         content: "",
       },
     ],
+    uploadFile: uploadLocalPreviewFile,
   });
 
   useEffect(() => {
