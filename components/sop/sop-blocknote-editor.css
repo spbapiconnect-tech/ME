@@ -198,3 +198,23 @@
   color: hsl(var(--popover-foreground)) !important;
   opacity: 1 !important;
 }
+
+/* Preview must stay readable in dark theme. */
+.sop-reader-preview,
+.sop-reader-preview .bn-container,
+.sop-reader-preview .bn-editor {
+  background: transparent !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.sop-reader-preview .bn-editor * {
+  border-color: hsl(var(--border));
+}
+
+.sop-reader-preview figcaption,
+.sop-reader-preview [class*="caption"],
+.sop-reader-preview [class*="fileName"],
+.sop-reader-preview [class*="file-name"],
+.sop-reader-preview [class*="FileName"] {
+  display: none !important;
+}
