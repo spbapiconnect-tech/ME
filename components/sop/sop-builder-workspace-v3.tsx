@@ -13,7 +13,6 @@ import {
   Plus,
   Settings2,
   Smartphone,
-  Trash2,
   Type,
   Video,
   X,
@@ -23,9 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { SopBuilderCanvasV4, type SopBuilderV4Section } from "@/components/sop/sop-builder-canvas-v4";
 import {
   sopBuilderV3Readiness,
   type SopBuilderV3Block,
@@ -66,18 +63,6 @@ const insertSections: Array<{
 
 function sectionLabel(type: SopBuilderV3BlockType) {
   return insertSections.find((section) => section.type === type)?.label || type;
-}
-
-function sectionIcon(type: SopBuilderV3BlockType) {
-  return insertSections.find((section) => section.type === type)?.icon || FileText;
-}
-
-function linesToText(value?: string[]) {
-  return (value || []).join("\n");
-}
-
-function textToLines(value: string) {
-  return value.split("\n").map((item) => item.trim()).filter(Boolean);
 }
 
 function PreviewBlock({ block }: { block: SopBuilderV3Block }) {
@@ -144,47 +129,6 @@ function PreviewBlock({ block }: { block: SopBuilderV3Block }) {
 }
 
 
-function v3BlockToV4Section(block: SopBuilderV3Block): SopBuilderV4Section {
-  return {
-    id: block.id,
-    type: block.type === "step-list" ? "step" : block.type,
-    title: block.title,
-    content: block.body,
-    mediaUrl: block.assetUrl,
-    checklist: block.checklist,
-    steps: block.steps?.map((step, index) => ({
-      id: `${block.id}-step-${index}`,
-      title: `Step ${index + 1}`,
-      instruction: step,
-    })),
-  };
-}
-
-function v4TypeToV3Type(type: SopBuilderV4Section["type"]): SopBuilderV3BlockType {
-  if (type === "step") return "step-list";
-  if (type === "gif") return "image";
-  if (type === "proof") return "checklist";
-  if (type === "acknowledgement") return "checklist";
-  return type;
-}
-
-function v4SectionsToV3Blocks(sections: SopBuilderV4Section[]): SopBuilderV3Block[] {
-  return sections.map((section) => {
-    const type = v4TypeToV3Type(section.type);
-
-    return {
-      id: section.id,
-      type,
-      title: section.title,
-      body: section.content,
-      assetUrl: section.mediaUrl,
-      steps: section.steps?.map((step) => step.instruction).filter(Boolean),
-      checklist: section.checklist,
-      warningLevel: section.type === "warning" ? "Warning" : undefined,
-    };
-  });
-}
-
 export function SopBuilderWorkspaceV3({
   document: sopDocument,
   selectedPageId,
@@ -192,11 +136,6 @@ export function SopBuilderWorkspaceV3({
   onCreate,
   onSelectPage,
   onAddPage,
-  onDeletePage,
-  onUpdatePage,
-  onAddBlock,
-  onUpdateBlock,
-  onDeleteBlock,
   onUpdateSettings,
   onUseClassic,
 }: {
@@ -216,7 +155,6 @@ export function SopBuilderWorkspaceV3({
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [insertOpen, setInsertOpen] = useState(false);
 
   const { settings, pages } = sopDocument;
 
