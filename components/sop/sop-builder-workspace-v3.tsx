@@ -1,8 +1,17 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { ChevronLeft, Pencil, Plus, Settings2, Smartphone, Trash2, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  ChevronLeft,
+  Maximize2,
+  Pencil,
+  Plus,
+  Settings2,
+  Smartphone,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,6 +76,24 @@ type SopBuilderWorkspaceV3Props = {
   onDocumentChange?: (blocks: SopBlockNoteDocument) => void;
 } & Record<string, unknown>;
 
+const fallbackSettings = {
+  title: "Untitled SOP",
+  documentCode: "",
+  version: "v1.0",
+  category: "",
+  processArea: "",
+  employeeReadMode: "",
+  owner: "",
+  approver: "",
+  targetOutlet: "",
+  targetRole: "",
+  acknowledgementRequired: "",
+  trainingRequired: "",
+  reviewCycle: "",
+  reviewDueDate: "",
+  status: "draft",
+} as unknown as SopBuilderV3Settings;
+
 function csvToArray(value?: string) {
   return (value || "")
     .split(",")
@@ -89,7 +116,7 @@ function cleanOutlineTitle(title?: string) {
 }
 
 export function SopBuilderWorkspaceV3({
-  document,
+  document: sopDocument,
   pages: pagesInput,
   selectedPageId,
   settings: settingsInput,
@@ -106,46 +133,70 @@ export function SopBuilderWorkspaceV3({
   onUpdateSettings,
   onDocumentChange,
 }: SopBuilderWorkspaceV3Props) {
+  const workspaceRef = useRef<HTMLDivElement | null>(null);
   const [previewDocument, setPreviewDocument] = useState<SopBlockNoteDocument>([]);
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [inspectorTab, setInspectorTab] = useState<"preview" | "settings">("preview");
+  const [previewFull, setPreviewFull] = useState(false);
   const [visibleRoles, setVisibleRoles] = useState<string[]>(["Outlet Manager", "Branch Manager"]);
   const [reviewerRoles, setReviewerRoles] = useState<string[]>(["Outlet Manager"]);
   const [renameTarget, setRenameTarget] = useState<SopBuilderV3Page | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [titleOverrides, setTitleOverrides] = useState<Record<string, string>>({});
 
-  const pages = pagesInput ?? document?.pages ?? [];
-  const settings =
-    settingsInput ??
-    document?.settings ??
-    ({
-      title: "Untitled SOP",
-      documentCode: "",
-      version: "v1.0",
-      category: "",
-      processArea: "",
-      employeeReadMode: "",
-      owner: "",
-      approver: "",
-      targetOutlet: "",
-      targetRole: "",
-      acknowledgementRequired: "",
-      trainingRequired: "",
-      reviewCycle: "",
-      reviewDueDate: "",
-      status: "draft",
-    } as unknown as SopBuilderV3Settings);
+  const pages = pagesInput ?? sopDocument?.pages ?? [];
+  const settings = settingsInput ?? sopDocument?.settings ?? fallbackSettings;
 
   useEffect(() => {
-    if (typeof document === "undefined" || !document.body) return;
+    const browserDocument = globalThis.document;
+    if (!browserDocument?.body) return;
 
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const body = browserDocument.body;
+    const html = browserDocument.documentElement;
+
+    const previousBodyOverflow = body.style.overflow;
+    const previousHtmlOverflow = html.style.overflow;
+
+    body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
+    body.scrollTop = 0;
+    html.scrollTop = 0;
+
+    const lockedParents: Array<{ element: HTMLElement; overflow: string; overflowY: string }> = [];
+    let parent = workspaceRef.current?.parentElement || null;
+
+    while (parent && parent !== body) {
+      const computed = window.getComputedStyle(parent);
+      const canScroll =
+        parent.tagName.toLowerCase() === "main" ||
+        computed.overflow === "auto" ||
+        computed.overflow === "scroll" ||
+        computed.overflowY === "auto" ||
+        computed.overflowY === "scroll";
+
+      if (canScroll) {
+        lockedParents.push({
+          element: parent,
+          overflow: parent.style.overflow,
+          overflowY: parent.style.overflowY,
+        });
+
+        parent.style.overflow = "hidden";
+        parent.style.overflowY = "hidden";
+        parent.scrollTop = 0;
+      }
+
+      parent = parent.parentElement;
+    }
 
     return () => {
-      if (document.body) {
-        document.body.style.overflow = previousOverflow;
-      }
+      body.style.overflow = previousBodyOverflow;
+      html.style.overflow = previousHtmlOverflow;
+
+      lockedParents.forEach(({ element, overflow, overflowY }) => {
+        element.style.overflow = overflow;
+        element.style.overflowY = overflowY;
+      });
     };
   }, []);
 
@@ -178,6 +229,10 @@ export function SopBuilderWorkspaceV3({
     "Trainer",
   ];
 
+  function displayTitle(page: SopBuilderV3Page) {
+    return cleanOutlineTitle(titleOverrides[page.id] ?? page.title);
+  }
+
   function handleDocumentChange(blocks: SopBlockNoteDocument) {
     setPreviewDocument(blocks);
     onDocumentChange?.(blocks);
@@ -198,13 +253,19 @@ export function SopBuilderWorkspaceV3({
 
   function openRename(page: SopBuilderV3Page) {
     setRenameTarget(page);
-    setRenameValue(cleanOutlineTitle(page.title));
+    setRenameValue(displayTitle(page));
   }
 
   function saveRename() {
     if (!renameTarget) return;
 
     const nextTitle = renameValue.trim() || "Untitled";
+
+    setTitleOverrides((current) => ({
+      ...current,
+      [renameTarget.id]: nextTitle,
+    }));
+
     onUpdatePage(renameTarget.id, { title: nextTitle });
     setRenameTarget(null);
     setRenameValue("");
@@ -213,7 +274,10 @@ export function SopBuilderWorkspaceV3({
   const createAction = onCreateSop || onCreateSOP || onCreate || onSubmit;
 
   return (
-    <div className="flex h-[calc(100dvh-56px)] min-h-0 flex-col overflow-hidden bg-background">
+    <div
+      ref={workspaceRef}
+      className="flex h-[calc(100dvh-56px)] min-h-0 flex-col overflow-hidden bg-background"
+    >
       <div className="shrink-0 border-b px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
@@ -237,6 +301,11 @@ export function SopBuilderWorkspaceV3({
             <Button
               variant={inspectorOpen && inspectorTab === "settings" ? "default" : "outline"}
               onClick={() => {
+                if (inspectorOpen && inspectorTab === "settings") {
+                  setInspectorOpen(false);
+                  return;
+                }
+
                 setInspectorOpen(true);
                 setInspectorTab("settings");
               }}
@@ -248,6 +317,12 @@ export function SopBuilderWorkspaceV3({
             <Button
               variant={inspectorOpen && inspectorTab === "preview" ? "default" : "outline"}
               onClick={() => {
+                if (inspectorOpen && inspectorTab === "preview") {
+                  setInspectorOpen(false);
+                  setPreviewFull(false);
+                  return;
+                }
+
                 setInspectorOpen(true);
                 setInspectorTab("preview");
               }}
@@ -264,7 +339,6 @@ export function SopBuilderWorkspaceV3({
       <ResizablePanelGroup
         direction="horizontal"
         className="min-h-0 flex-1 overflow-hidden"
-        autoSaveId="me-sop-builder-v3-layout"
       >
         <ResizablePanel defaultSize={16} minSize={12} maxSize={22}>
           <aside className="flex h-full min-h-0 flex-col border-r bg-background">
@@ -316,7 +390,7 @@ export function SopBuilderWorkspaceV3({
                               {chapterIndex + 1}
                             </span>
                             <span className="min-w-0 flex-1 truncate font-medium">
-                              {cleanOutlineTitle(chapter.title)}
+                              {displayTitle(chapter)}
                             </span>
                           </button>
 
@@ -376,7 +450,7 @@ export function SopBuilderWorkspaceV3({
                                   {chapterIndex + 1}.{pageIndex + 1}
                                 </span>
                                 <span className="min-w-0 flex-1 truncate">
-                                  {cleanOutlineTitle(page.title)}
+                                  {displayTitle(page)}
                                 </span>
                               </button>
 
@@ -431,37 +505,35 @@ export function SopBuilderWorkspaceV3({
               <aside className="flex h-full min-h-0 flex-col border-l bg-background">
                 <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
                   <div>
-                    <div className="text-sm font-semibold">SOP Inspector</div>
-                    <div className="text-xs text-muted-foreground">Preview and setup while writing.</div>
+                    <div className="text-sm font-semibold">
+                      {inspectorTab === "preview" ? "Preview" : "Settings"}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {inspectorTab === "preview"
+                        ? "Staff reading view while writing."
+                        : "SOP assignment and publishing setup."}
+                    </div>
                   </div>
 
-                  <Button variant="ghost" size="icon" onClick={() => setInspectorOpen(false)}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
+                  <div className="flex items-center gap-1">
+                    {inspectorTab === "preview" ? (
+                      <Button variant="outline" size="sm" onClick={() => setPreviewFull(true)}>
+                        <Maximize2 className="h-3.5 w-3.5" />
+                        Full view
+                      </Button>
+                    ) : null}
 
-                <div className="grid shrink-0 grid-cols-2 gap-1 border-b p-2">
-                  <button
-                    type="button"
-                    onClick={() => setInspectorTab("preview")}
-                    className={cn(
-                      "rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-muted",
-                      inspectorTab === "preview" && "bg-primary text-primary-foreground",
-                    )}
-                  >
-                    Preview
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setInspectorTab("settings")}
-                    className={cn(
-                      "rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-muted",
-                      inspectorTab === "settings" && "bg-primary text-primary-foreground",
-                    )}
-                  >
-                    Settings
-                  </button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        setInspectorOpen(false);
+                        setPreviewFull(false);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
                 {inspectorTab === "preview" ? (
@@ -630,13 +702,37 @@ export function SopBuilderWorkspaceV3({
         ) : null}
       </ResizablePanelGroup>
 
+      {previewFull ? (
+        <div className="fixed inset-0 z-50 flex flex-col bg-background">
+          <div className="flex shrink-0 items-center justify-between border-b px-5 py-3">
+            <div>
+              <div className="text-sm font-semibold">Full Preview</div>
+              <div className="text-xs text-muted-foreground">Staff reading view.</div>
+            </div>
+
+            <Button variant="outline" size="sm" onClick={() => setPreviewFull(false)}>
+              Close
+            </Button>
+          </div>
+
+          <div className="min-h-0 flex-1 p-5">
+            <SopEmployeePreviewDevice
+              blocks={previewDocument}
+              title={settings.title}
+              version={settings.version}
+              outlets={csvToArray(settings.targetOutlet)}
+              readRoles={csvToArray(settings.targetRole)}
+              visibleRoles={visibleRoles}
+            />
+          </div>
+        </div>
+      ) : null}
+
       {renameTarget ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/45 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-2xl border bg-popover p-4 shadow-2xl">
             <div className="text-sm font-semibold">Rename</div>
-            <div className="mt-1 text-xs text-muted-foreground">
-              Rename this chapter or page.
-            </div>
+            <div className="mt-1 text-xs text-muted-foreground">Rename this chapter or page.</div>
 
             <Input
               autoFocus
