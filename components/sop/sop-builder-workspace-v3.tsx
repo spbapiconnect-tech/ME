@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, type ComponentType } from "react";
+import dynamic from "next/dynamic";
 import {
   AlertTriangle,
   Check,
@@ -33,6 +34,19 @@ import {
   type SopBuilderV3Page,
   type SopBuilderV3Settings,
 } from "@/lib/sop/sop-builder-v3-types";
+
+
+const SopBlockNoteEditor = dynamic(
+  () => import("@/components/sop/sop-blocknote-editor").then((mod) => mod.SopBlockNoteEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="mx-auto max-w-4xl px-10 py-10 text-sm text-muted-foreground">
+        Loading document editor...
+      </div>
+    ),
+  },
+);
 
 const insertSections: Array<{
   type: SopBuilderV3BlockType;
@@ -291,30 +305,7 @@ export function SopBuilderWorkspaceV3({
         </aside>
 
         <main className="min-h-0 overflow-y-auto bg-background [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {!activePage ? (
-            <div className="flex min-h-[520px] items-center justify-center p-5">
-              <div className="max-w-sm rounded-3xl border border-dashed bg-card p-10 text-center">
-                <div className="text-lg font-semibold">Start writing the SOP</div>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  Add a page, then write like a note. Type slash command to insert SOP sections.
-                </p>
-                <Button className="mt-4" onClick={onAddPage}>
-                  <Plus className="h-4 w-4" />
-                  Add first page
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <SopBuilderCanvasV4
-              title={activePage.title || settings.title}
-              sections={activePage.blocks.map(v3BlockToV4Section)}
-              onChange={(nextSections) => {
-                onUpdatePage(activePage.id, {
-                  blocks: v4SectionsToV3Blocks(nextSections),
-                });
-              }}
-            />
-          )}
+          <SopBlockNoteEditor />
         </main>
 
         <aside className="hidden min-h-0 overflow-y-auto border-l bg-muted/10 p-5 [scrollbar-width:none] lg:block [&::-webkit-scrollbar]:hidden">
