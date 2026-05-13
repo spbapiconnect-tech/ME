@@ -59,3 +59,36 @@
 .sop-reader-preview [class*="FileName"] {
   display: none !important;
 }
+
+/* SOP builder should behave like a document canvas, not a floating media/card wall. */
+.sop-blocknote-shell {
+  height: 100%;
+}
+
+.sop-blocknote-shell .bn-container,
+.sop-blocknote-shell .bn-editor {
+  background: transparent !important;
+}
+
+.sop-blocknote-shell .bn-editor {
+  min-height: calc(100vh - 220px);
+}
+
+.sop-reader-preview .bn-container,
+.sop-reader-preview .bn-editor {
+  background: transparent !important;
+}
+
+.sop-reader-preview figcaption,
+.sop-reader-preview [class*="caption"],
+.sop-reader-preview [class*="fileName"],
+.sop-reader-preview [class*="file-name"],
+.sop-reader-preview [class*="FileName"] {
+  display: none !important;
+}
+
+.sop-reader-preview img,
+.sop-reader-preview video {
+  max-width: 100%;
+  border-radius: 14px;
+}

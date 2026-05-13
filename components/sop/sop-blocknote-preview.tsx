@@ -41,45 +41,51 @@ export function SopEmployeePreviewDevice({
   );
 
   return (
-    <div className="flex justify-center overflow-x-auto py-3">
-      <div className="relative h-[720px] w-[360px] rounded-[2.4rem] border border-border bg-muted p-3 shadow-2xl">
-        <div className="absolute left-1/2 top-3 h-1.5 w-20 -translate-x-1/2 rounded-full bg-border" />
+    <div className="mx-auto w-full max-w-4xl">
+      <div className="overflow-hidden rounded-2xl border bg-background shadow-sm">
+        <div className="border-b bg-muted/20 px-5 py-4">
+          <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            SOP Reader Preview
+          </div>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <h2 className="text-xl font-semibold tracking-tight">{title || "Untitled SOP"}</h2>
+            <span className="rounded-full border bg-background px-2 py-0.5 text-xs text-muted-foreground">
+              {version || "v1.0"}
+            </span>
+          </div>
+        </div>
 
-        <div className="h-full w-full overflow-hidden rounded-[2rem] border bg-background">
-          <div className="h-full w-full overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <div className="sticky top-0 z-10 border-b bg-background/95 px-4 py-4 pt-6 backdrop-blur">
-              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                SOP Reader
-              </div>
-              <div className="mt-1 line-clamp-2 text-base font-semibold">{title || "Untitled SOP"}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{version || "v1.0"}</div>
-            </div>
+        <div className="grid gap-3 border-b bg-muted/10 px-5 py-4 text-xs text-muted-foreground sm:grid-cols-3">
+          <div>
+            <div className="font-medium text-foreground">Outlets</div>
+            <div className="mt-1 line-clamp-2">{outlets.length ? outlets.join(", ") : "Not assigned"}</div>
+          </div>
 
-            <div className="border-b px-4 py-3 text-xs text-muted-foreground">
-              <div className="font-medium text-foreground">Assigned outlets</div>
-              <div className="mt-1">{outlets.length ? outlets.join(", ") : "Not assigned"}</div>
+          <div>
+            <div className="font-medium text-foreground">Required to read</div>
+            <div className="mt-1 line-clamp-2">{readRoles.length ? readRoles.join(", ") : "No role selected"}</div>
+          </div>
 
-              <div className="mt-3 font-medium text-foreground">Required to read</div>
-              <div className="mt-1">{readRoles.length ? readRoles.join(", ") : "No role selected"}</div>
-
-              <div className="mt-3 font-medium text-foreground">Visible to</div>
-              <div className="mt-1">{visibleRoles.length ? visibleRoles.join(", ") : "No visibility role selected"}</div>
-            </div>
-
-            <div className="sop-reader-preview px-2 py-4">
-              <BlockNoteView
-                editor={editor}
-                editable={false}
-                theme="light"
-                formattingToolbar={false}
-                slashMenu={false}
-                sideMenu={false}
-                filePanel={false}
-                tableHandles={false}
-                className="min-h-[480px] bg-background"
-              />
+          <div>
+            <div className="font-medium text-foreground">Visible to</div>
+            <div className="mt-1 line-clamp-2">
+              {visibleRoles.length ? visibleRoles.join(", ") : "No visibility role selected"}
             </div>
           </div>
+        </div>
+
+        <div className="sop-reader-preview max-h-[calc(100vh-260px)] overflow-y-auto px-5 py-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <BlockNoteView
+            editor={editor}
+            editable={false}
+            theme="light"
+            formattingToolbar={false}
+            slashMenu={false}
+            sideMenu={false}
+            filePanel={false}
+            tableHandles={false}
+            className="min-h-[360px] bg-background"
+          />
         </div>
       </div>
     </div>

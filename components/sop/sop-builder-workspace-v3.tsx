@@ -205,7 +205,7 @@ export function SopBuilderWorkspaceV3({
       </header>
 
       <div className={cn("grid min-h-0 flex-1 overflow-hidden", previewOpen ? "lg:grid-cols-[280px_minmax(0,1fr)_360px]" : "lg:grid-cols-[280px_minmax(0,1fr)]")}>
-        <aside className="hidden min-h-0 border-r bg-background lg:block">
+        <aside className="hidden h-full min-h-0 overflow-hidden border-r bg-background lg:block">
           <div className="flex h-full min-h-0 flex-col">
             <div className="shrink-0 border-b px-3 py-4">
               <div className="flex items-center justify-between gap-2">
@@ -377,7 +377,7 @@ export function SopBuilderWorkspaceV3({
           </div>
         </aside>
 
-        <main className="min-h-0 overflow-y-auto bg-background [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <main className="h-full min-h-0 overflow-y-auto bg-background [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <SopBlockNoteEditor onDocumentChange={handleBlockNoteDocumentChange} />
         </main>
 
@@ -396,13 +396,13 @@ export function SopBuilderWorkspaceV3({
             <aside
               className={cn(
                 "absolute right-0 top-0 h-full w-full overflow-y-auto border-l bg-background p-5 shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-                previewFull ? "max-w-none" : "max-w-[520px]",
+                previewFull ? "max-w-none" : "max-w-[720px]",
               )}
             >
               <div className="mb-5 flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-sm font-semibold">Real Employee Preview</div>
-                  <div className="text-xs text-muted-foreground">Read-only BlockNote content inside a real device frame.</div>
+                  <div className="text-sm font-semibold">Employee Reading Preview</div>
+                  <div className="text-xs text-muted-foreground">Read-only SOP content as staff will see it.</div>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" size="sm" onClick={() => setPreviewFull((value) => !value)}>

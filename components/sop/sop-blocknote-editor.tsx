@@ -204,6 +204,7 @@ export function SopBlockNoteEditor({
           theme="light"
           slashMenu={false}
           filePanel={false}
+          formattingToolbar={false}
           className="min-h-[calc(100vh-220px)] rounded-2xl bg-background"
           onChange={(currentEditor) => {
             onDocumentChange?.(currentEditor.document as SopBlockNoteDocument);
