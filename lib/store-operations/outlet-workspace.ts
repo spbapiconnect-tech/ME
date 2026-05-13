@@ -181,18 +181,23 @@ export function buildOutletProofLog(taskRows: OutletRuntimeRow[], inspectionRows
     .filter((item) => ["Pending Review", "Rejected", "Failed Items", "Completed"].includes(item.status))
     .map((item) => ({ ...item, actionLabel: "View Review" }));
 
-  const incidents = issueRows
+  const incidents: OutletWorkspaceCard[] = issueRows
     .filter((row) => matchOutletTarget(row, filter))
-    .map((row) => ({
-      id: row.id,
-      title: row.title || "Incident",
-      subtitle: outletDetailValue(row, "Category") || outletDetailValue(row, "Source") || "Incident review",
-      status: row.status || "Open",
-      tone: String(row.status).toLowerCase().includes("resolved") ? "success" : "warning",
-      module: "issues" as const,
-      href: `/issues?incidentId=${row.id}`,
-      actionLabel: "View Incident",
-    }));
+    .map((row) => {
+      const status = row.status || "Open";
+      const tone: OutletActionTone = String(status).toLowerCase().includes("resolved") ? "success" : "warning";
+
+      return {
+        id: row.id,
+        title: row.title || "Incident",
+        subtitle: outletDetailValue(row, "Category") || outletDetailValue(row, "Source") || "Incident review",
+        status,
+        tone,
+        module: "issues",
+        href: `/issues?incidentId=${row.id}`,
+        actionLabel: "View Incident",
+      };
+    });
 
   return [...taskProofs, ...inspectionProofs, ...incidents];
 }
