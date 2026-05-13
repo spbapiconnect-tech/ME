@@ -1,7 +1,9 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useEffect, useMemo, useState } from "react";
-import { BookOpen, ChevronLeft, FileText, List, X } from "lucide-react";
+import { BookOpen, ChevronLeft, List, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -384,10 +386,6 @@ export function SopMobileReader({
   const safePage = Math.min(page, pages.length - 1);
   const active = pages[safePage] || pages[0];
   const progress = Math.round(((safePage + 1) / pages.length) * 100);
-
-  useEffect(() => {
-    setPage(0);
-  }, [item.id]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
