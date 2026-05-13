@@ -160,6 +160,12 @@ export function SopBuilderWorkspaceV3({
   const [localSettings, setLocalSettings] = useState<SopBuilderV3Settings>(resolvedSettings);
   const settings = localSettings;
 
+  const [settingsDraft, setSettingsDraft] = useState(() => ({
+    title: resolvedSettings.title || "",
+    documentCode: resolvedSettings.documentCode || "",
+    version: resolvedSettings.version || "v1.0",
+  }));
+
   useEffect(() => {
     const browserDocument = globalThis.document;
     if (!browserDocument?.body) return;
@@ -288,6 +294,29 @@ export function SopBuilderWorkspaceV3({
     }));
 
     onUpdateSettings(patch);
+  }
+
+  function patchSettingsDraft(
+    field: "title" | "documentCode" | "version",
+    value: string,
+  ) {
+    setSettingsDraft((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    setLocalSettings((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
+
+  function commitSettingsDraft(
+    field: "title" | "documentCode" | "version",
+    value: string,
+  ) {
+    patchSettingsDraft(field, value);
+    onUpdateSettings({ [field]: value } as Partial<SopBuilderV3Settings>);
   }
 
   function toggleCsvSetting(field: "targetOutlet" | "targetRole", value: string) {
@@ -657,9 +686,9 @@ export function SopBuilderWorkspaceV3({
                           <div className="space-y-1.5">
                             <Label>SOP Title</Label>
                             <Input
-                              value={settings.title}
-                              onChange={(event) => patchSettings({ title: event.target.value })}
-                              onBlur={(event) => commitSettings({ title: event.target.value })}
+                              value={settingsDraft.title}
+                              onChange={(event) => patchSettingsDraft("title", event.target.value)}
+                              onBlur={(event) => commitSettingsDraft("title", event.target.value)}
                             />
                           </div>
 
@@ -667,21 +696,21 @@ export function SopBuilderWorkspaceV3({
                             <div className="space-y-1.5">
                               <Label>Document Code</Label>
                               <Input
-                                value={settings.documentCode}
+                                value={settingsDraft.documentCode}
                                 onChange={(event) =>
-                                  patchSettings({ documentCode: event.target.value })
+                                  patchSettingsDraft("documentCode", event.target.value)
                                 }
                                 onBlur={(event) =>
-                                  commitSettings({ documentCode: event.target.value })
+                                  commitSettingsDraft("documentCode", event.target.value)
                                 }
                               />
                             </div>
                             <div className="space-y-1.5">
                               <Label>Version</Label>
                               <Input
-                                value={settings.version}
-                                onChange={(event) => patchSettings({ version: event.target.value })}
-                                onBlur={(event) => commitSettings({ version: event.target.value })}
+                                value={settingsDraft.version}
+                                onChange={(event) => patchSettingsDraft("version", event.target.value)}
+                                onBlur={(event) => commitSettingsDraft("version", event.target.value)}
                               />
                             </div>
                           </div>
