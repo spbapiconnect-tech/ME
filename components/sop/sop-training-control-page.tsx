@@ -61,7 +61,8 @@ import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { uploadAssetLabel, serializeUploadAsset, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
-import { SopCreateTypeModal, type SopCreateTypeConfig } from "@/components/sop/sop-create-type-modal";
+import { SopCreateTypeModal } from "@/components/sop/sop-create-type-modal";
+import type { SopCreateTypeConfig } from "@/lib/sop/sop-create-types";
 
 type BlockType = "heading" | "text" | "image" | "step-list" | "warning" | "pdf" | "checklist";
 type ModalMode = "create" | "publish" | "training" | "checklist";
