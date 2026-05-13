@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   BookOpen,
-  Camera,
   CheckCircle2,
   ClipboardCheck,
   GraduationCap,
@@ -28,6 +27,7 @@ import {
   buildOutletTaskCards,
   buildOutletTrainingCards,
   outletDetailValue,
+  type OutletRuntimeRow,
   type OutletWorkspaceCard,
 } from "@/lib/store-operations/outlet-workspace";
 
@@ -114,7 +114,7 @@ export function OutletWorkspacePage() {
   const branchRows = getRows("branches", []);
 
   const branchOptions = useMemo(() => {
-    const names = branchRows.map((row: any) => row.title || outletDetailValue(row, "Branch") || row.id).filter(Boolean);
+    const names = (branchRows as OutletRuntimeRow[]).map((row) => row.title || outletDetailValue(row, "Branch") || row.id).filter(Boolean);
     return ["All Branches", ...Array.from(new Set(names))];
   }, [branchRows]);
 
@@ -142,7 +142,6 @@ export function OutletWorkspacePage() {
   const filteredProofs = filterItems(proofLog);
 
   const urgentCount = [...todayTasks, ...proofLog].filter((item) => item.tone === "danger" || item.tone === "warning").length;
-  const readCount = trainingInbox.length;
   const proofCount = proofLog.length;
 
   return (

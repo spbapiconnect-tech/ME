@@ -1,3 +1,20 @@
+export type OutletRuntimeDetail = {
+  label: string;
+  value?: string;
+};
+
+export type OutletRuntimeRow = {
+  id: string;
+  title?: string;
+  status?: string;
+  description?: string;
+  branch?: string;
+  branchName?: string;
+  targetRole?: string;
+  dueDate?: string;
+  detailItems?: OutletRuntimeDetail[];
+};
+
 export type OutletWorkspaceFilter = {
   outlet: string;
   role: string;
@@ -18,12 +35,12 @@ export type OutletWorkspaceCard = {
   actionLabel?: string;
 };
 
-export function outletDetailValue(row: any, label: string) {
-  const item = row?.detailItems?.find((detail: any) => detail.label === label);
+export function outletDetailValue(row: OutletRuntimeRow, label: string) {
+  const item = row?.detailItems?.find((detail: OutletRuntimeDetail) => detail.label === label);
   return item?.value || "";
 }
 
-export function matchOutletTarget(row: any, filter: OutletWorkspaceFilter) {
+export function matchOutletTarget(row: OutletRuntimeRow, filter: OutletWorkspaceFilter) {
   const targetOutlet =
     outletDetailValue(row, "Target Outlet") ||
     outletDetailValue(row, "Target Branch") ||
@@ -38,7 +55,7 @@ export function matchOutletTarget(row: any, filter: OutletWorkspaceFilter) {
   return targetOutlet === filter.outlet || targetOutlet === "All Branches";
 }
 
-export function matchRoleTarget(row: any, filter: OutletWorkspaceFilter) {
+export function matchRoleTarget(row: OutletRuntimeRow, filter: OutletWorkspaceFilter) {
   const targetRole =
     outletDetailValue(row, "Target Role") ||
     outletDetailValue(row, "Role") ||
@@ -50,7 +67,7 @@ export function matchRoleTarget(row: any, filter: OutletWorkspaceFilter) {
   return targetRole === filter.role || targetRole === "All Roles";
 }
 
-export function buildOutletTaskCards(rows: any[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
+export function buildOutletTaskCards(rows: OutletRuntimeRow[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
   return rows
     .filter((row) => matchOutletTarget(row, filter) && matchRoleTarget(row, filter))
     .map((row) => {
@@ -90,7 +107,7 @@ export function buildOutletTaskCards(rows: any[], filter: OutletWorkspaceFilter)
     });
 }
 
-export function buildOutletTrainingCards(rows: any[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
+export function buildOutletTrainingCards(rows: OutletRuntimeRow[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
   return rows
     .filter((row) => matchOutletTarget(row, filter) && matchRoleTarget(row, filter))
     .filter((row) => {
@@ -121,7 +138,7 @@ export function buildOutletTrainingCards(rows: any[], filter: OutletWorkspaceFil
     });
 }
 
-export function buildOutletSopLibrary(rows: any[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
+export function buildOutletSopLibrary(rows: OutletRuntimeRow[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
   return rows
     .filter((row) => matchOutletTarget(row, filter) && matchRoleTarget(row, filter))
     .filter((row) => ["Approved", "Effective", "Review", "Draft"].includes(row.status || ""))
@@ -137,7 +154,7 @@ export function buildOutletSopLibrary(rows: any[], filter: OutletWorkspaceFilter
     }));
 }
 
-export function buildOutletInspectionCards(rows: any[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
+export function buildOutletInspectionCards(rows: OutletRuntimeRow[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
   return rows
     .filter((row) => matchOutletTarget(row, filter))
     .map((row) => {
@@ -155,7 +172,7 @@ export function buildOutletInspectionCards(rows: any[], filter: OutletWorkspaceF
     });
 }
 
-export function buildOutletProofLog(taskRows: any[], inspectionRows: any[], issueRows: any[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
+export function buildOutletProofLog(taskRows: OutletRuntimeRow[], inspectionRows: OutletRuntimeRow[], issueRows: OutletRuntimeRow[], filter: OutletWorkspaceFilter): OutletWorkspaceCard[] {
   const taskProofs = buildOutletTaskCards(taskRows, filter)
     .filter((item) => item.proofLabel || ["Pending Review", "Rework Required", "Completed"].includes(item.status))
     .map((item) => ({ ...item, subtitle: item.proofLabel || item.subtitle, actionLabel: "View Proof" }));
