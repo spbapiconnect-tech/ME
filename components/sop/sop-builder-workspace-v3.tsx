@@ -253,16 +253,6 @@ export function SopBuilderWorkspaceV3({
     onDocumentChange?.(blocks);
   }
 
-  function patchSettings(patch: Partial<SopBuilderV3Settings>, syncParent = false) {
-    setLocalSettings((current) => ({
-      ...current,
-      ...patch,
-    }));
-
-    if (syncParent) {
-      onUpdateSettings(patch);
-    }
-  }
 
 
   function patchSettingsDraft(

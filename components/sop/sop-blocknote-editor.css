@@ -1,14 +1,7 @@
-/* SOP Builder frame: editor owns its own scroll. ERP shell must not move. */
+/* SOP builder must behave like an IDE: ERP shell stays fixed, editor scrolls inside. */
 .sop-builder-workspace {
   height: calc(100dvh - 56px);
   max-height: calc(100dvh - 56px);
-  overflow: hidden;
-}
-
-.sop-builder-workspace [data-panel-group] {
-  height: 100%;
-  min-height: 0;
-  max-height: 100%;
   overflow: hidden;
 }
 
@@ -42,11 +35,9 @@
   padding-bottom: 12rem;
 }
 
-/* BlockNote theme variables: follow ME bright / dark instead of fixed black popovers. */
-.sop-blocknote-shell .bn-root,
-.sop-blocknote-shell .bn-container,
-.sop-reader-preview .bn-root,
-.sop-reader-preview .bn-container {
+/* Base BlockNote theme, supports bright + dark. */
+.sop-blocknote-shell,
+.sop-reader-preview {
   --bn-colors-editor-text: hsl(var(--foreground));
   --bn-colors-editor-background: transparent;
   --bn-colors-menu-text: hsl(var(--popover-foreground));
@@ -77,7 +68,7 @@
   padding-bottom: 12rem !important;
 }
 
-/* Keep normal text readable, but do NOT override inline colors from BlockNote color toolbar. */
+/* Do not force all inline spans to foreground, otherwise BlockNote color toolbar cannot work. */
 .sop-blocknote-shell .bn-block-content,
 .sop-blocknote-shell .bn-inline-content,
 .sop-reader-preview .bn-block-content,
@@ -85,14 +76,14 @@
   color: hsl(var(--foreground));
 }
 
-/* Placeholder should be visible but still look like placeholder. */
+/* Placeholder readable but not too strong. */
 .sop-blocknote-shell [data-placeholder]::before,
 .sop-blocknote-shell .bn-inline-content[data-placeholder]::before {
   color: hsl(var(--muted-foreground)) !important;
   opacity: 0.75 !important;
 }
 
-/* Code block readability in both bright and dark theme. */
+/* Code / pre readability in both themes. */
 .sop-blocknote-shell .bn-editor pre,
 .sop-blocknote-shell .bn-editor code,
 .sop-reader-preview .bn-editor pre,
@@ -105,14 +96,16 @@
   border-radius: 0.75rem;
 }
 
-/* BlockNote menus / toolbar / slash command should match current ME theme. */
-.sop-blocknote-shell .bn-formatting-toolbar,
-.sop-blocknote-shell .bn-toolbar,
-.sop-blocknote-shell .bn-menu,
-.sop-blocknote-shell .bn-popover,
-.sop-blocknote-shell [role="menu"],
-.sop-blocknote-shell [role="listbox"],
-.sop-blocknote-shell [data-radix-popper-content-wrapper] > * {
+/* BlockNote toolbar / slash menu are rendered in portal sometimes,
+   so target BlockNote menu classes globally, not only inside the editor shell. */
+.bn-formatting-toolbar,
+.bn-toolbar,
+.bn-menu,
+.bn-popover,
+[data-radix-popper-content-wrapper] .bn-menu,
+[data-radix-popper-content-wrapper] .bn-popover,
+[data-radix-popper-content-wrapper] [role="menu"],
+[data-radix-popper-content-wrapper] [role="listbox"] {
   background: hsl(var(--popover)) !important;
   color: hsl(var(--popover-foreground)) !important;
   border-color: hsl(var(--border)) !important;
@@ -120,19 +113,19 @@
   z-index: 80 !important;
 }
 
-.sop-blocknote-shell .bn-formatting-toolbar button,
-.sop-blocknote-shell .bn-toolbar button,
-.sop-blocknote-shell .bn-menu button,
-.sop-blocknote-shell .bn-popover button,
-.sop-blocknote-shell [role="menuitem"],
-.sop-blocknote-shell [role="option"] {
+.bn-formatting-toolbar button,
+.bn-toolbar button,
+.bn-menu button,
+.bn-popover button,
+[data-radix-popper-content-wrapper] [role="menuitem"],
+[data-radix-popper-content-wrapper] [role="option"] {
   color: hsl(var(--popover-foreground)) !important;
 }
 
-.sop-blocknote-shell .bn-menu button:hover,
-.sop-blocknote-shell .bn-popover button:hover,
-.sop-blocknote-shell [role="menuitem"]:hover,
-.sop-blocknote-shell [role="option"]:hover {
+.bn-menu button:hover,
+.bn-popover button:hover,
+[data-radix-popper-content-wrapper] [role="menuitem"]:hover,
+[data-radix-popper-content-wrapper] [role="option"]:hover {
   background: hsl(var(--muted)) !important;
   color: hsl(var(--foreground)) !important;
 }
