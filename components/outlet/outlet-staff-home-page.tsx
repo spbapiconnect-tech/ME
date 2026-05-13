@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AlertCircle,
+  Bell,
   BookOpen,
   CalendarDays,
   CheckCircle2,
@@ -17,12 +18,12 @@ import {
 } from "lucide-react";
 
 import { ErpShell } from "@/components/erp/erp-shell";
+import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { serializeUploadAsset, uploadAssetLabel, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
@@ -35,6 +36,7 @@ import {
 } from "@/lib/store-operations/outlet-staff-workspace";
 
 type StaffTab = "today" | "calendar" | "inbox" | "sop";
+type StationFilter = "All" | "Kitchen" | "Front" | "Manager";
 
 type RuntimeDetail = {
   label: string;
@@ -56,6 +58,7 @@ type ShiftItem = {
   title: string;
   staff: string;
   role: string;
+  station: StationFilter;
   branch: string;
   date: string;
   startTime: string;
@@ -63,14 +66,25 @@ type ShiftItem = {
   status: string;
 };
 
+type ShiftSummary = {
+  total: number;
+  kitchen: number;
+  front: number;
+  manager: number;
+  support: number;
+};
+
 function detailValue(row: RuntimeRow, label: string) {
   return row.detailItems?.find((item) => item.label === label)?.value || "";
 }
 
 function upsertDetail(items: RuntimeDetail[] | undefined, label: string, value: string) {
-  const next = [...(items || [])].map((item) => ({ label: item.label, value: item.value || "" }));
-  const index = next.findIndex((item) => item.label === label);
+  const next: Array<{ label: string; value: string }> = (items || []).map((item) => ({
+    label: item.label,
+    value: item.value || "",
+  }));
 
+  const index = next.findIndex((item) => item.label === label);
   if (index >= 0) next[index] = { label, value };
   else next.push({ label, value });
 
@@ -83,8 +97,10 @@ function todayISO() {
 
 function normalizeDate(value: string) {
   if (!value) return todayISO();
+
   const date = new Date(value);
   if (!Number.isNaN(date.getTime())) return date.toISOString().slice(0, 10);
+
   const match = value.match(/\d{4}-\d{2}-\d{2}/);
   return match?.[0] || todayISO();
 }
@@ -133,28 +149,42 @@ function isNow(item: OutletStaffWorkItem) {
   return diff >= -30 * 60 * 1000 && diff <= 90 * 60 * 1000 && !isDone(item) && !isWaitingReview(item);
 }
 
-function itemColor(item: OutletStaffWorkItem) {
-  if (isOverdue(item) || item.priority === "urgent") return "bg-red-500";
-  if (item.type === "inspection") return "bg-amber-500";
-  if (item.type === "training" || item.type === "sop") return "bg-emerald-500";
-  if (isWaitingReview(item)) return "bg-violet-500";
-  return "bg-blue-500";
+function shouldSurfaceTraining(item: OutletStaffWorkItem) {
+  if (item.inboxGroup !== "Training / SOP") return false;
+  if (isDone(item)) return false;
+
+  const value = `${item.status} ${item.reviewState || ""}`.toLowerCase();
+  return value.includes("pending") || value.includes("required") || item.date <= todayISO();
 }
 
-function itemBorder(item: OutletStaffWorkItem) {
-  if (isOverdue(item) || item.priority === "urgent") return "border-red-500/60 bg-card";
-  if (item.type === "inspection") return "border-amber-500/50 bg-card";
-  if (item.type === "training" || item.type === "sop") return "border-emerald-500/50 bg-card";
-  if (isWaitingReview(item)) return "border-violet-500/50 bg-card";
-  return "border-border bg-card";
+function stationOfItem(item: OutletStaffWorkItem): StationFilter {
+  const source = `${item.title} ${item.description} ${item.inboxGroup}`.toLowerCase();
+
+  if (source.includes("cashier") || source.includes("customer") || source.includes("grab") || source.includes("front") || source.includes("service")) return "Front";
+  if (source.includes("manager") || source.includes("review") || source.includes("approval")) return "Manager";
+  if (source.includes("kitchen") || source.includes("grill") || source.includes("fryer") || source.includes("prep") || source.includes("food") || source.includes("storage")) return "Kitchen";
+
+  return "All";
 }
 
 function itemRailClass(item: OutletStaffWorkItem) {
   if (isOverdue(item) || item.priority === "urgent") return "bg-red-500";
   if (item.type === "inspection") return "bg-amber-500";
-  if (item.type === "training" || item.type === "sop") return "bg-emerald-500";
+  if (item.inboxGroup === "Training / SOP") return "bg-emerald-500";
   if (isWaitingReview(item)) return "bg-violet-500";
-  return "bg-blue-500";
+  return "bg-primary";
+}
+
+function itemDotClass(item: OutletStaffWorkItem) {
+  return itemRailClass(item);
+}
+
+function itemBorderClass(item: OutletStaffWorkItem) {
+  if (isOverdue(item) || item.priority === "urgent") return "border-red-500/60";
+  if (item.type === "inspection") return "border-amber-500/50";
+  if (item.inboxGroup === "Training / SOP") return "border-emerald-500/50";
+  if (isWaitingReview(item)) return "border-violet-500/50";
+  return "border-border";
 }
 
 function statusVariant(item: OutletStaffWorkItem) {
@@ -178,6 +208,16 @@ function matchOutlet(row: RuntimeRow, outlet: string) {
   return target === outlet || target.includes(outlet) || target === "All Branches";
 }
 
+function stationFromRole(role: string): StationFilter {
+  const value = role.toLowerCase();
+
+  if (value.includes("cashier") || value.includes("front") || value.includes("service") || value.includes("foh")) return "Front";
+  if (value.includes("manager") || value.includes("leader") || value.includes("supervisor")) return "Manager";
+  if (value.includes("kitchen") || value.includes("grill") || value.includes("fryer") || value.includes("packaging") || value.includes("chef")) return "Kitchen";
+
+  return "All";
+}
+
 function buildShiftItems(rows: RuntimeRow[], outlet: string): ShiftItem[] {
   return rows
     .filter((row) => matchOutlet(row, outlet))
@@ -185,12 +225,14 @@ function buildShiftItems(rows: RuntimeRow[], outlet: string): ShiftItem[] {
       const start = detailValue(row, "Start Time") || detailValue(row, "Start") || detailValue(row, "Clock In") || "";
       const end = detailValue(row, "End Time") || detailValue(row, "End") || detailValue(row, "Clock Out") || "";
       const date = detailValue(row, "Date") || detailValue(row, "Shift Date") || detailValue(row, "Work Date") || row.createdAt || "";
+      const role = detailValue(row, "Role") || detailValue(row, "Duty") || detailValue(row, "Position") || "Outlet Staff";
 
       return {
         id: row.id,
         title: row.title || "Shift",
         staff: detailValue(row, "Staff") || detailValue(row, "Staff Name") || row.title || "Staff",
-        role: detailValue(row, "Role") || detailValue(row, "Duty") || detailValue(row, "Position") || "Outlet Staff",
+        role,
+        station: stationFromRole(role),
         branch: detailValue(row, "Branch") || detailValue(row, "Outlet") || outlet,
         date: normalizeDate(date),
         startTime: normalizeTime(start, "09:00"),
@@ -198,6 +240,78 @@ function buildShiftItems(rows: RuntimeRow[], outlet: string): ShiftItem[] {
         status: row.status || detailValue(row, "Status") || "Planned",
       };
     });
+}
+
+function summarizeShifts(shifts: ShiftItem[]): ShiftSummary {
+  const kitchen = shifts.filter((shift) => shift.station === "Kitchen").length;
+  const front = shifts.filter((shift) => shift.station === "Front").length;
+  const manager = shifts.filter((shift) => shift.station === "Manager").length;
+
+  return {
+    total: shifts.length,
+    kitchen,
+    front,
+    manager,
+    support: Math.max(0, shifts.length - kitchen - front - manager),
+  };
+}
+
+function sectionItems(items: OutletStaffWorkItem[], station: StationFilter) {
+  if (station === "All") return items;
+
+  return items.filter((item) => {
+    const itemStation = stationOfItem(item);
+    return itemStation === station || itemStation === "All";
+  });
+}
+
+function WorkCard({
+  item,
+  onOpen,
+  compact = false,
+  label,
+}: {
+  item: OutletStaffWorkItem;
+  onOpen: (item: OutletStaffWorkItem) => void;
+  compact?: boolean;
+  label?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(item)}
+      className={cn(
+        "relative w-full overflow-hidden rounded-2xl border bg-card p-4 pl-5 text-left text-card-foreground transition hover:bg-muted/30",
+        itemBorderClass(item),
+        compact && "rounded-xl p-3 pl-4",
+      )}
+    >
+      <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          {label ? <div className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</div> : null}
+          <div className={cn("truncate font-semibold", compact && "text-sm")}>{item.title}</div>
+          <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.description}</div>
+        </div>
+        <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1 rounded-full border bg-background px-2 py-1">
+          <span className={cn("h-2 w-2 rounded-full", itemDotClass(item))} />
+          {item.inboxGroup}
+        </span>
+        <span className="rounded-full border bg-background px-2 py-1">{item.date} · {item.startTime}</span>
+        {item.proofRequired ? <span className="rounded-full border bg-background px-2 py-1">Proof required</span> : null}
+      </div>
+
+      <div className="mt-4 flex items-center justify-between">
+        <span className="text-sm font-medium">{isOverdue(item) ? "Fix now" : item.primaryAction}</span>
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </div>
+    </button>
+  );
 }
 
 function StaffTabs({
@@ -217,17 +331,17 @@ function StaffTabs({
   ];
 
   return (
-    <div className="sticky top-0 z-20 -mx-4 border-y bg-background/95 px-4 py-2 backdrop-blur md:mx-0 md:rounded-2xl md:border">
+    <div className="rounded-2xl border bg-card p-1">
       <div className="grid grid-cols-4 gap-1">
         {tabs.map((tab) => (
           <Button
             key={tab.key}
             variant={activeTab === tab.key ? "secondary" : "ghost"}
-            className="h-auto flex-col gap-1 px-2 py-2 md:h-10 md:flex-row md:gap-2"
+            className="h-10 gap-2"
             onClick={() => onChange(tab.key)}
           >
             {tab.icon}
-            <span className="text-xs md:text-sm">{tab.label}</span>
+            <span>{tab.label}</span>
             {counts[tab.key] ? <span className="rounded-full bg-muted px-1.5 text-[10px]">{counts[tab.key]}</span> : null}
           </Button>
         ))}
@@ -236,116 +350,223 @@ function StaffTabs({
   );
 }
 
-function WorkCard({
-  item,
-  onOpen,
-  label,
+function StationFilterBar({
+  value,
+  onChange,
 }: {
-  item: OutletStaffWorkItem;
-  onOpen: (item: OutletStaffWorkItem) => void;
-  label?: string;
+  value: StationFilter;
+  onChange: (value: StationFilter) => void;
 }) {
+  const filters: Array<{ value: StationFilter; label: string }> = [
+    { value: "All", label: "All" },
+    { value: "Kitchen", label: "Kitchen" },
+    { value: "Front", label: "Front" },
+    { value: "Manager", label: "Manager" },
+  ];
+
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(item)}
-      className={cn("relative w-full overflow-hidden rounded-2xl border bg-card p-4 pl-5 text-left text-card-foreground transition hover:bg-muted/30", itemBorder(item))}
-    >
-      <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          {label ? <div className="mb-1 text-xs font-medium uppercase text-muted-foreground">{label}</div> : null}
-          <div className="truncate font-semibold">{item.title}</div>
-          <div className="mt-1 line-clamp-2 text-sm text-muted-foreground">{item.description}</div>
-        </div>
-        <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1 rounded-full border bg-background px-2 py-1">
-          <span className={cn("h-2 w-2 rounded-full", itemColor(item))} />
-          {item.inboxGroup}
-        </span>
-        <span className="rounded-full border bg-background px-2 py-1">{item.date} · {item.startTime}</span>
-        {item.proofRequired ? <span className="rounded-full border bg-background px-2 py-1">Proof required</span> : null}
-      </div>
-
-      <div className="mt-4 flex items-center justify-between">
-        <span className="text-sm font-medium">{isOverdue(item) ? "Fix now" : item.primaryAction}</span>
-        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-      </div>
-    </button>
+    <div className="flex flex-wrap gap-2">
+      {filters.map((item) => (
+        <Button
+          key={item.value}
+          size="sm"
+          variant={value === item.value ? "secondary" : "outline"}
+          onClick={() => onChange(item.value)}
+        >
+          {item.label}
+        </Button>
+      ))}
+    </div>
   );
 }
 
-function ShiftStrip({ shifts }: { shifts: ShiftItem[] }) {
-  const today = todayISO();
-  const todayShifts = shifts.filter((shift) => shift.date === today);
+function ShiftSummaryCard({ shifts }: { shifts: ShiftItem[] }) {
+  const summary = summarizeShifts(shifts);
 
   return (
-    <Card className="border-primary/20 bg-primary/[0.03]">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <UsersRound className="h-4 w-4" />
-          Today Shift
-        </CardTitle>
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <UsersRound className="h-4 w-4 text-primary" />
+            Today Shift Summary
+          </CardTitle>
+          <Badge variant="outline">{summary.total} staff</Badge>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {!todayShifts.length ? (
-          <div className="rounded-xl border border-dashed bg-background p-4 text-sm text-muted-foreground">
-            No shift data connected for today.
-          </div>
-        ) : todayShifts.slice(0, 4).map((shift) => (
-          <div key={shift.id} className="rounded-xl border bg-background p-3">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="font-medium">{shift.staff}</div>
-                <div className="text-sm text-muted-foreground">{shift.role}</div>
+      <CardContent>
+        {summary.total ? (
+          <div className="grid gap-3 sm:grid-cols-4">
+            {[
+              ["Kitchen", summary.kitchen],
+              ["Front", summary.front],
+              ["Manager", summary.manager],
+              ["Support", summary.support],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-xl border bg-background p-3">
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+                <div className="mt-1 text-2xl font-semibold">{value}</div>
+                <div className="text-xs text-muted-foreground">on duty</div>
               </div>
-              <Badge variant="outline">{shift.status}</Badge>
-            </div>
-            <div className="mt-2 text-sm font-medium">{shift.startTime} - {shift.endTime}</div>
+            ))}
           </div>
+        ) : (
+          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
+            No shift data connected for today. Connect schedule rows to show team by station.
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function RedLightCard({
+  overdue,
+  missed,
+  waiting,
+}: {
+  overdue: OutletStaffWorkItem[];
+  missed: OutletStaffWorkItem[];
+  waiting: OutletStaffWorkItem[];
+}) {
+  const hasIssue = overdue.length || missed.length;
+
+  return (
+    <Card className={cn(hasIssue ? "border-red-500/60" : "border-primary/40")}>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            {hasIssue ? <AlertCircle className="h-4 w-4 text-red-500" /> : <CheckCircle2 className="h-4 w-4 text-primary" />}
+            Red Light
+          </CardTitle>
+          <Badge variant={hasIssue ? "destructive" : "outline"}>{hasIssue ? "Needs action" : "Clear"}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="grid grid-cols-3 gap-3">
+        <div className="rounded-xl border bg-background p-3">
+          <div className="text-2xl font-semibold">{overdue.length}</div>
+          <div className="text-xs text-muted-foreground">Overdue</div>
+        </div>
+        <div className="rounded-xl border bg-background p-3">
+          <div className="text-2xl font-semibold">{missed.length}</div>
+          <div className="text-xs text-muted-foreground">Missed</div>
+        </div>
+        <div className="rounded-xl border bg-background p-3">
+          <div className="text-2xl font-semibold">{waiting.length}</div>
+          <div className="text-xs text-muted-foreground">Review</div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DoFirstCard({
+  item,
+  onOpen,
+}: {
+  item?: OutletStaffWorkItem;
+  onOpen: (item: OutletStaffWorkItem) => void;
+}) {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <AlertCircle className="h-4 w-4 text-primary" />
+            Do First
+          </CardTitle>
+          {item ? <Badge variant={statusVariant(item)}>{isOverdue(item) ? "High priority" : "Now"}</Badge> : null}
+        </div>
+      </CardHeader>
+      <CardContent>
+        {item ? (
+          <WorkCard item={item} onOpen={onOpen} label={isOverdue(item) ? "Fix first" : "Start now"} />
+        ) : (
+          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">Nothing urgent right now.</div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function NextUpCard({
+  items,
+  onOpen,
+}: {
+  items: OutletStaffWorkItem[];
+  onOpen: (item: OutletStaffWorkItem) => void;
+}) {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">Next Up</CardTitle>
+        <p className="text-sm text-muted-foreground">The next few things staff should prepare for.</p>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {!items.length ? (
+          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No upcoming task after current item.</div>
+        ) : items.slice(0, 4).map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onOpen(item)}
+            className="flex w-full items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30"
+          >
+            <div className="min-w-0">
+              <div className="truncate text-sm font-medium">{item.title}</div>
+              <div className="text-xs text-muted-foreground">{item.startTime} · {item.inboxGroup}</div>
+            </div>
+            <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+          </button>
         ))}
       </CardContent>
     </Card>
   );
 }
 
-function RedLightPanel({
-  overdue,
-  waiting,
+function InboxSummaryCard({
+  items,
+  onOpen,
 }: {
-  overdue: OutletStaffWorkItem[];
-  waiting: OutletStaffWorkItem[];
+  items: OutletStaffWorkItem[];
+  onOpen: (item: OutletStaffWorkItem) => void;
 }) {
-  const hasRedLight = overdue.length > 0;
-
   return (
-    <Card className={cn("bg-card", hasRedLight ? "border-red-500/60" : "border-emerald-500/50")}>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-base">
-          {hasRedLight ? <AlertCircle className="h-4 w-4 text-red-500" /> : <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
-          Red Light
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <div className="text-2xl font-semibold">{overdue.length}</div>
-            <div className="text-sm text-muted-foreground">missed / overdue</div>
-          </div>
-          <div className="text-right text-sm text-muted-foreground">
-            <div>{waiting.length}</div>
-            <div>waiting review</div>
-          </div>
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Inbox className="h-4 w-4 text-primary" />
+            Management Inbox
+          </CardTitle>
+          <Badge variant="outline">{items.length}</Badge>
         </div>
+        <p className="text-sm text-muted-foreground">Messages, complaints, rework, and review items.</p>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {!items.length ? (
+          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No urgent management message now.</div>
+        ) : items.slice(0, 5).map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onOpen(item)}
+            className="relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30"
+          >
+            <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
+            <div className="flex items-center justify-between gap-2">
+              <div className="truncate text-sm font-medium">{item.title}</div>
+              <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+            </div>
+            <div className="mt-1 truncate text-xs text-muted-foreground">{item.inboxGroup} · {item.startTime}</div>
+          </button>
+        ))}
       </CardContent>
     </Card>
   );
 }
 
-function TodayTimeline({
+function CompactTimeline({
   items,
   shifts,
   onOpen,
@@ -357,6 +578,7 @@ function TodayTimeline({
   const today = todayISO();
   const todayItems = items.filter((item) => item.date === today).sort((a, b) => a.startTime.localeCompare(b.startTime));
   const todayShifts = shifts.filter((shift) => shift.date === today);
+
   const usedHours = todayItems
     .map((item) => Number(item.startTime.slice(0, 2)))
     .filter((hour) => !Number.isNaN(hour));
@@ -370,186 +592,168 @@ function TodayTimeline({
     return Array.from({ length: Math.max(1, endHour - startHour) }).map((_, index) => startHour + index);
   });
 
-  const visibleHours = Array.from(new Set([...usedHours, ...shiftHours]))
+  const hours = Array.from(new Set([...usedHours, ...shiftHours]))
     .filter((hour) => hour >= 6 && hour <= 23)
     .sort((a, b) => a - b);
 
-  const hours = visibleHours.length ? visibleHours : [9, 12, 15, 18];
+  const visibleHours = hours.length ? hours : [9, 12, 15, 18];
 
   return (
     <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Clock3 className="h-4 w-4" />
-          24h Timeline
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">Shift background + timed tasks, proof, inspection, and complaint work.</p>
-      </CardHeader>
-      <CardContent>
-        <div className="max-h-[520px] space-y-1 overflow-y-auto pr-1">
-          {hours.map((hour) => {
-            const label = `${String(hour).padStart(2, "0")}:00`;
-            const slotItems = todayItems.filter((item) => item.startTime.startsWith(String(hour).padStart(2, "0")));
-            const slotShift = todayShifts.find((shift) => {
-              const startHour = Number(shift.startTime.slice(0, 2));
-              const endHour = Number(shift.endTime.slice(0, 2));
-              return hour >= startHour && hour < endHour;
-            });
-
-            return (
-              <div key={hour} className="grid grid-cols-[60px_1fr] gap-3 border-b py-2 last:border-b-0">
-                <div className="text-xs font-medium text-muted-foreground">{label}</div>
-                <div className={cn("min-h-7 rounded-xl p-1", slotShift && "bg-primary/5")}>
-                  {slotShift && !slotItems.length ? (
-                    <div className="rounded-lg border border-dashed bg-background/70 px-3 py-1 text-xs text-muted-foreground">
-                      Shift · {slotShift.staff}
-                    </div>
-                  ) : null}
-
-                  <div className="space-y-2">
-                    {slotItems.map((item) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => onOpen(item)}
-                        className={cn("relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left text-card-foreground hover:bg-muted/30", itemBorder(item))}
-                      >
-                        <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2">
-                            <span className={cn("h-2 w-2 rounded-full", itemColor(item))} />
-                            <span className="font-medium">{item.title}</span>
-                          </div>
-                          <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-                        </div>
-                        <div className="mt-1 text-xs text-muted-foreground">{item.inboxGroup} · {item.description}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Clock3 className="h-4 w-4 text-primary" />
+              Today Timeline
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">Only useful time blocks, not empty 00:00 walls.</p>
+          </div>
+          <Badge variant="outline">{todayItems.length} items</Badge>
         </div>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {visibleHours.map((hour) => {
+          const label = `${String(hour).padStart(2, "0")}:00`;
+          const slotItems = todayItems.filter((item) => Number(item.startTime.slice(0, 2)) === hour);
+          const slotShifts = todayShifts.filter((shift) => {
+            const startHour = Number(shift.startTime.slice(0, 2));
+            const endHour = Number(shift.endTime.slice(0, 2));
+            return hour >= startHour && hour < endHour;
+          });
+
+          return (
+            <div key={hour} className="grid grid-cols-[68px_1fr] gap-3 border-b py-2 last:border-b-0">
+              <div className="text-xs font-medium text-muted-foreground">{label}</div>
+              <div className="space-y-2">
+                {slotShifts.length ? (
+                  <div className="rounded-lg border border-dashed bg-muted/20 px-3 py-1 text-xs text-muted-foreground">
+                    Shift · {slotShifts.length} staff on duty
+                  </div>
+                ) : null}
+
+                {!slotItems.length && !slotShifts.length ? (
+                  <div className="h-6 rounded-lg bg-muted/10" />
+                ) : null}
+
+                {slotItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onOpen(item)}
+                    className={cn("relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30", itemBorderClass(item))}
+                  >
+                    <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">{item.title}</div>
+                        <div className="truncate text-xs text-muted-foreground">{item.inboxGroup} · {item.description}</div>
+                      </div>
+                      <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );
 }
 
-function TodayView({
-  items,
+function TodayHome({
+  workItems,
   shifts,
+  station,
   onOpen,
 }: {
-  items: OutletStaffWorkItem[];
+  workItems: OutletStaffWorkItem[];
   shifts: ShiftItem[];
+  station: StationFilter;
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   const today = todayISO();
-  const todayItems = items.filter((item) => item.date === today);
-  const overdue = items.filter(isOverdue);
+  const surfaced = sectionItems(workItems, station).filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item));
+  const todayItems = surfaced.filter((item) => item.date === today);
+  const overdue = surfaced.filter(isOverdue);
+  const missed = overdue.filter((item) => item.proofRequired);
+  const waiting = surfaced.filter(isWaitingReview);
+
   const now = todayItems.filter(isNow);
-  const waiting = todayItems.filter(isWaitingReview);
   const next = todayItems
     .filter((item) => !isOverdue(item) && !isNow(item) && !isWaitingReview(item) && !isDone(item))
-    .sort((a, b) => a.startTime.localeCompare(b.startTime))
-    .slice(0, 3);
+    .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
   const doFirst = overdue[0] || now[0] || next[0];
-  const inboxPreview = [...overdue, ...waiting].slice(0, 4);
+  const inboxPreview = [...overdue, ...waiting].slice(0, 5);
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
-        <div className="space-y-4">
-          <ShiftStrip shifts={shifts} />
-          <RedLightPanel overdue={overdue} waiting={waiting} />
-        </div>
-
-        <div className="space-y-4">
-          {doFirst ? (
-            <WorkCard item={doFirst} onOpen={onOpen} label={isOverdue(doFirst) ? "Do first" : isNow(doFirst) ? "Now" : "Next"} />
-          ) : (
-            <Card>
-              <CardContent className="p-6">
-                <div className="text-lg font-semibold">Nothing urgent right now.</div>
-                <p className="mt-1 text-sm text-muted-foreground">No current task due in this time window.</p>
-              </CardContent>
-            </Card>
-          )}
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Next Up</CardTitle>
-              <p className="text-sm text-muted-foreground">The next few things staff should prepare for.</p>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {!next.length ? (
-                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No upcoming task after current item.</div>
-              ) : next.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => onOpen(item)}
-                  className="flex w-full items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30"
-                >
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-medium">{item.title}</div>
-                    <div className="text-xs text-muted-foreground">{item.startTime} · {item.inboxGroup}</div>
-                  </div>
-                  <Badge variant={statusVariant(item)}>{item.status}</Badge>
-                </button>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Inbox className="h-4 w-4" />
-              Inbox Summary
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">Only urgent messages and review items.</p>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {!inboxPreview.length ? (
-              <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No urgent management message now.</div>
-            ) : inboxPreview.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onOpen(item)}
-                className="relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30"
-              >
-                <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
-                <div className="flex items-center justify-between gap-2">
-                  <div className="truncate text-sm font-medium">{item.title}</div>
-                  <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-                </div>
-                <div className="mt-1 text-xs text-muted-foreground">{item.inboxGroup} · {item.startTime}</div>
-              </button>
-            ))}
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 xl:grid-cols-[1.1fr_0.8fr_1fr]">
+        <ShiftSummaryCard shifts={shifts.filter((shift) => shift.date === today)} />
+        <RedLightCard overdue={overdue} missed={missed} waiting={waiting} />
+        <DoFirstCard item={doFirst} onOpen={onOpen} />
       </div>
 
-      <TodayTimeline items={items} shifts={shifts} onOpen={onOpen} />
+      <div className="grid gap-4 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
+        <NextUpCard items={next} onOpen={onOpen} />
+        <CompactTimeline items={surfaced} shifts={shifts} onOpen={onOpen} />
+        <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
+      </div>
+
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <CardTitle className="text-base">Station Queue</CardTitle>
+              <p className="text-sm text-muted-foreground">Kitchen / Front / Manager work stays separated so staff do not see irrelevant tasks.</p>
+            </div>
+            <Badge variant="outline">{station}</Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-3">
+          {(["Kitchen", "Front", "Manager"] as StationFilter[]).map((group) => {
+            const groupItems = sectionItems(workItems, group)
+              .filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item))
+              .filter((item) => item.date === today || isOverdue(item))
+              .slice(0, 3);
+
+            return (
+              <div key={group} className="rounded-2xl border bg-background p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="font-medium">{group}</div>
+                  <Badge variant="outline">{groupItems.length}</Badge>
+                </div>
+                <div className="space-y-2">
+                  {!groupItems.length ? (
+                    <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">No active queue.</div>
+                  ) : groupItems.map((item) => (
+                    <button key={item.id} type="button" onClick={() => onOpen(item)} className="w-full rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30">
+                      <div className="truncate text-sm font-medium">{item.title}</div>
+                      <div className="text-xs text-muted-foreground">{item.startTime} · {item.inboxGroup}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
 function CalendarView({
-  items,
+  workItems,
   shifts,
   onOpen,
 }: {
-  items: OutletStaffWorkItem[];
+  workItems: OutletStaffWorkItem[];
   shifts: ShiftItem[];
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   const [selectedDate, setSelectedDate] = useState(todayISO());
-
   const now = new Date(selectedDate);
   const year = now.getFullYear();
   const month = now.getMonth();
@@ -557,28 +761,30 @@ function CalendarView({
   const firstDay = new Date(year, month, 1).getDay();
   const monthLabel = new Date(year, month, 1).toLocaleString(undefined, { month: "long", year: "numeric" });
 
-  const itemsByDate = (date: string) => items.filter((item) => item.date === date);
+  const calendarItems = workItems.filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item));
+  const itemsByDate = (date: string) => calendarItems.filter((item) => item.date === date);
   const shiftsByDate = (date: string) => shifts.filter((shift) => shift.date === date);
   const selectedItems = itemsByDate(selectedDate);
+  const selectedShifts = shiftsByDate(selectedDate);
+  const selectedSummary = summarizeShifts(selectedShifts);
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+    <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
       <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <CalendarDays className="h-4 w-4" />
-            Month Calendar
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">Red means missed / overdue. Shift days are softly tinted.</p>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-3 flex items-center justify-between">
-            <div className="font-medium">{monthLabel}</div>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <CalendarDays className="h-4 w-4 text-primary" />
+                Outlet Calendar
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">Planning and awareness. Red means missed or overdue.</p>
+            </div>
             <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
               {[
-                ["Task", "bg-blue-500"],
+                ["Task", "bg-primary"],
                 ["Inspection", "bg-amber-500"],
-                ["Complaint / Overdue", "bg-red-500"],
+                ["Complaint / Rework", "bg-red-500"],
                 ["Training", "bg-emerald-500"],
               ].map(([label, color]) => (
                 <span key={label} className="flex items-center gap-1 rounded-full border px-2 py-1">
@@ -588,6 +794,9 @@ function CalendarView({
               ))}
             </div>
           </div>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-3 font-medium">{monthLabel}</div>
 
           <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
             {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <div key={day} className="py-1">{day}</div>)}
@@ -595,6 +804,7 @@ function CalendarView({
 
           <div className="grid grid-cols-7 gap-1">
             {Array.from({ length: firstDay }).map((_, index) => <div key={`empty-${index}`} />)}
+
             {Array.from({ length: daysInMonth }).map((_, index) => {
               const day = index + 1;
               const date = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
@@ -608,22 +818,21 @@ function CalendarView({
                   type="button"
                   onClick={() => setSelectedDate(date)}
                   className={cn(
-                    "min-h-[88px] rounded-xl border bg-background p-2 text-left transition hover:bg-muted/40",
-                    selectedDate === date && "border-primary bg-muted/30",
-                    dayShifts.length && "bg-primary/[0.03]",
-                    hasRed && "border-red-500/70 bg-card ring-1 ring-red-500/30",
+                    "min-h-[92px] rounded-xl border bg-card p-2 text-left transition hover:bg-muted/30",
+                    selectedDate === date && "border-primary ring-1 ring-primary/30",
+                    dayShifts.length && "bg-muted/20",
+                    hasRed && "border-red-500/70 ring-1 ring-red-500/20",
                   )}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">{day}</span>
-                    {dayShifts.length ? <span className="text-[10px] text-muted-foreground">Shift</span> : null}
+                    {dayShifts.length ? <span className="text-[10px] text-muted-foreground">{dayShifts.length} staff</span> : null}
                   </div>
                   <div className="mt-2 flex flex-wrap gap-1">
                     {dayItems.slice(0, 5).map((item) => (
-                      <span key={item.id} className={cn("h-2 w-2 rounded-full", itemColor(item))} />
+                      <span key={item.id} className={cn("h-2 w-2 rounded-full", itemDotClass(item))} />
                     ))}
                   </div>
-                  {dayItems.length > 5 ? <div className="mt-1 text-[10px] text-muted-foreground">+{dayItems.length - 5}</div> : null}
                 </button>
               );
             })}
@@ -632,17 +841,36 @@ function CalendarView({
       </Card>
 
       <div className="space-y-4">
-        <ShiftStrip shifts={shifts.filter((shift) => shift.date === selectedDate)} />
         <Card>
-          <CardHeader className="pb-2">
+          <CardHeader className="pb-3">
             <CardTitle className="text-base">{selectedDate}</CardTitle>
-            <p className="text-sm text-muted-foreground">{selectedItems.length} scheduled item(s)</p>
+            <p className="text-sm text-muted-foreground">Day summary before staff open task details.</p>
+          </CardHeader>
+          <CardContent className="grid grid-cols-4 gap-2">
+            {[
+              ["Staff", selectedSummary.total],
+              ["Kitchen", selectedSummary.kitchen],
+              ["Front", selectedSummary.front],
+              ["Manager", selectedSummary.manager],
+            ].map(([label, value]) => (
+              <div key={label} className="rounded-xl border bg-background p-3">
+                <div className="text-xl font-semibold">{value}</div>
+                <div className="text-xs text-muted-foreground">{label}</div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Scheduled Work</CardTitle>
+            <p className="text-sm text-muted-foreground">{selectedItems.length} item(s)</p>
           </CardHeader>
           <CardContent className="space-y-3">
             {!selectedItems.length ? (
               <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No timed work on this day.</div>
             ) : selectedItems.map((item) => (
-              <WorkCard key={item.id} item={item} onOpen={onOpen} />
+              <WorkCard key={item.id} item={item} onOpen={onOpen} compact />
             ))}
           </CardContent>
         </Card>
@@ -667,26 +895,42 @@ function InboxView({
   ];
 
   return (
-    <div className="grid gap-4 xl:grid-cols-2">
+    <div className="space-y-3">
       {groups.map((group) => {
         const groupItems = items.filter((item) => item.inboxGroup === group);
 
         return (
           <Card key={group}>
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between gap-2 text-base">
-                <span className="flex items-center gap-2">
-                  {group.includes("Complaint") ? <ShieldAlert className="h-4 w-4" /> : group.includes("Rework") ? <UploadCloud className="h-4 w-4" /> : <MessageSquare className="h-4 w-4" />}
+            <CardHeader className="border-b py-3">
+              <div className="flex items-center justify-between gap-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  {group.includes("Complaint") ? <ShieldAlert className="h-4 w-4 text-red-500" /> : group.includes("Rework") ? <UploadCloud className="h-4 w-4 text-violet-500" /> : <MessageSquare className="h-4 w-4 text-primary" />}
                   {group}
-                </span>
+                </CardTitle>
                 <Badge variant="outline">{groupItems.length}</Badge>
-              </CardTitle>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="p-0">
               {!groupItems.length ? (
-                <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">Nothing here.</div>
+                <div className="p-4 text-sm text-muted-foreground">Nothing here.</div>
               ) : groupItems.map((item) => (
-                <WorkCard key={item.id} item={item} onOpen={onOpen} />
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onOpen(item)}
+                  className="grid w-full grid-cols-[minmax(0,1fr)_160px_140px_120px] items-center gap-4 border-b px-4 py-3 text-left last:border-b-0 hover:bg-muted/30"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={cn("h-2 w-2 rounded-full", itemDotClass(item))} />
+                      <span className="truncate font-medium">{item.title}</span>
+                    </div>
+                    <div className="mt-1 truncate text-sm text-muted-foreground">{item.description}</div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">{item.sourceRecordId}</div>
+                  <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+                  <Button size="sm" variant="secondary">{item.primaryAction}</Button>
+                </button>
               ))}
             </CardContent>
           </Card>
@@ -695,7 +939,6 @@ function InboxView({
     </div>
   );
 }
-
 
 type ParsedSopBlock = {
   title?: string;
@@ -736,14 +979,14 @@ function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
       const parsed = JSON.parse(item.contentJson);
       const parsedPages: ParsedSopContentPage[] = Array.isArray(parsed?.pages) ? parsed.pages : [];
 
-      parsedPages.forEach((page: ParsedSopContentPage, pageIndex: number) => {
+      parsedPages.forEach((page, pageIndex) => {
         pages.push({
           id: String(page.id || `page-${pageIndex}`),
           title: page.title || `Page ${pageIndex + 1}`,
           body: Array.isArray(page.blocks)
             ? page.blocks
-                .map((block: ParsedSopBlock) => {
-                  if (block.checklistItems?.length) return `${block.title || "Checklist"}\n${block.checklistItems.map((item) => `• ${item}`).join("\n")}`;
+                .map((block) => {
+                  if (block.checklistItems?.length) return `${block.title || "Checklist"}\n${block.checklistItems.map((check) => `• ${check}`).join("\n")}`;
                   return [block.title, block.body, block.instruction].filter(Boolean).join("\n");
                 })
                 .filter(Boolean)
@@ -765,7 +1008,7 @@ function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
   if (!pages.length) {
     pages.push({
       id: "summary",
-      title: "Overview",
+      title: item.title,
       body: item.description || "Read this SOP carefully before acknowledging.",
       type: "text",
     });
@@ -775,7 +1018,7 @@ function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
     pages.push({
       id: "media",
       title: "Training Media",
-      body: "Watch the media before continuing to the next page.",
+      body: "Watch the media before continuing.",
       type: "media",
       asset: item.mediaUrl,
     });
@@ -785,7 +1028,7 @@ function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
     pages.push({
       id: "pdf",
       title: "PDF Document",
-      body: "Read the attached PDF like a PRD / handbook.",
+      body: "Read the attached PDF like a handbook.",
       type: "pdf",
       asset: item.pdfUrl,
     });
@@ -821,12 +1064,12 @@ function SopReader({
   const active = pages[Math.min(page, pages.length - 1)] || pages[0];
 
   return (
-    <Card className={cn("min-h-[560px]", fullscreen && "fixed inset-4 z-50 overflow-y-auto bg-background shadow-2xl")}>
+    <Card className={cn("min-h-[620px]", fullscreen && "fixed inset-4 z-50 overflow-y-auto bg-background shadow-2xl")}>
       <CardHeader className="border-b">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <CardTitle className="text-xl">{item?.title || "SOP Reader"}</CardTitle>
-            <p className="text-sm text-muted-foreground">Read like a handbook / PRD. No manager controls here.</p>
+            <p className="text-sm text-muted-foreground">Read like a handbook. SOP library stays separate from daily timeline unless assigned.</p>
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={() => setFullscreen((value) => !value)}>
@@ -837,13 +1080,13 @@ function SopReader({
         </div>
       </CardHeader>
 
-      <CardContent className="grid gap-6 p-0 md:grid-cols-[220px_minmax(0,1fr)_220px]">
+      <CardContent className="grid gap-0 p-0 md:grid-cols-[240px_minmax(0,1fr)_220px]">
         <aside className="border-r p-4">
           <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Pages</div>
           <div className="space-y-1">
             {pages.map((readerPage, index) => (
               <button
-                key={readerPage.title}
+                key={readerPage.id}
                 type="button"
                 onClick={() => setPage(index)}
                 className={cn("w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-muted", page === index && "bg-muted font-medium")}
@@ -854,9 +1097,9 @@ function SopReader({
           </div>
         </aside>
 
-        <main className="mx-auto w-full max-w-3xl p-6">
-          <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Page {page + 1} of {pages.length}</div>
-          <h2 className="text-2xl font-semibold tracking-tight">{active.title}</h2>
+        <main className="mx-auto w-full max-w-4xl p-6">
+          <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Page {Math.min(page + 1, pages.length)} of {pages.length}</div>
+          <h2 className="text-3xl font-semibold tracking-tight">{active.title}</h2>
 
           {active.type === "media" && active.asset ? (
             <div className="mt-5">
@@ -889,7 +1132,7 @@ function SopReader({
 
         <aside className="border-l p-4">
           <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Progress</div>
-          <div className="text-2xl font-semibold">{Math.round(((page + 1) / pages.length) * 100)}%</div>
+          <div className="text-2xl font-semibold">{Math.round(((Math.min(page + 1, pages.length)) / pages.length) * 100)}%</div>
           <p className="mt-2 text-sm text-muted-foreground">Acknowledge only at the end.</p>
         </aside>
       </CardContent>
@@ -906,15 +1149,17 @@ function SopView({
   selected?: OutletStaffWorkItem;
   onSelect: (item: OutletStaffWorkItem | undefined) => void;
 }) {
+  const activeSop = selected || items[0];
+
   return (
     <div className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
       <Card>
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
-            <BookOpen className="h-4 w-4" />
-            Training / SOP
+            <BookOpen className="h-4 w-4 text-primary" />
+            SOP Library
           </CardTitle>
-          <p className="text-sm text-muted-foreground">Open one document and read like a book.</p>
+          <p className="text-sm text-muted-foreground">Long-term SOPs stay here. Only assigned training appears in Today.</p>
         </CardHeader>
         <CardContent className="space-y-3">
           {!items.length ? (
@@ -924,7 +1169,7 @@ function SopView({
               key={item.id}
               type="button"
               onClick={() => onSelect(item)}
-              className={cn("w-full rounded-xl border p-3 text-left hover:bg-muted/30", selected?.id === item.id && "border-primary bg-muted/30")}
+              className={cn("w-full rounded-xl border bg-card p-3 text-left hover:bg-muted/30", activeSop?.id === item.id && "border-primary bg-muted/30")}
             >
               <div className="font-medium">{item.title}</div>
               <div className="text-xs text-muted-foreground">{item.description}</div>
@@ -957,7 +1202,7 @@ function WorkItemSheet({
   }
 
   return (
-    <Card className="border-primary/30 bg-primary/[0.02]">
+    <Card className="border-primary/30">
       <CardHeader className="border-b">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -994,8 +1239,11 @@ function WorkItemSheet({
               type="file"
               accept="image/*,video/*"
               onChange={async (event) => {
-                const uploadScope = item.sourceModule === "issues" ? "incident" : item.sourceModule === "inspection" ? "inspection" : "task";
-                const asset = await uploadLocalPreviewAsset(event.target.files?.[0], uploadScope);
+                const file = event.target.files?.[0];
+                if (!file) return;
+
+                const uploadScope: "task" | "inspection" | "incident" = item.sourceModule === "issues" ? "incident" : item.sourceModule === "inspection" ? "inspection" : "task";
+                const asset = await uploadLocalPreviewAsset(file, uploadScope);
                 const serialized = serializeUploadAsset(asset);
                 setProofAsset(serialized);
                 setProofName(uploadAssetLabel(serialized));
@@ -1041,6 +1289,7 @@ export function OutletStaffHomePage() {
 
   const [activeTab, setActiveTab] = useState<StaffTab>("today");
   const [selectedOutlet, setSelectedOutlet] = useState("All Branches");
+  const [station, setStation] = useState<StationFilter>("All");
   const [query, setQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<OutletStaffWorkItem | undefined>();
   const [selectedSop, setSelectedSop] = useState<OutletStaffWorkItem | undefined>();
@@ -1060,7 +1309,7 @@ export function OutletStaffHomePage() {
     issueRows: issueRows.filter((row) => matchOutlet(row, selectedOutlet)),
   }), [inspectionRows, issueRows, selectedOutlet, sopRows, taskRows]);
 
-  const workItems = useMemo(() => {
+  const allWorkItems = useMemo(() => {
     const items = buildOutletStaffWorkItems(filteredRuntimeRows);
     const search = query.trim().toLowerCase();
 
@@ -1069,13 +1318,15 @@ export function OutletStaffHomePage() {
     return items.filter((item) => `${item.title} ${item.description} ${item.status} ${item.inboxGroup}`.toLowerCase().includes(search));
   }, [filteredRuntimeRows, query]);
 
+  const workItems = useMemo(() => sectionItems(allWorkItems, station), [allWorkItems, station]);
   const shiftItems = useMemo(() => buildShiftItems(scheduleRows, selectedOutlet), [scheduleRows, selectedOutlet]);
   const inboxItems = getOutletInboxItems(workItems);
-  const trainingItems = getOutletTrainingItems(workItems);
+  const trainingItems = getOutletTrainingItems(allWorkItems);
+  const surfacedTodayItems = workItems.filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item));
 
   const counts: Record<StaffTab, number> = {
-    today: workItems.filter((item) => item.date === todayISO()).length,
-    calendar: workItems.length,
+    today: surfacedTodayItems.filter((item) => item.date === todayISO() || isOverdue(item)).length,
+    calendar: surfacedTodayItems.length,
     inbox: inboxItems.length,
     sop: trainingItems.length,
   };
@@ -1090,10 +1341,7 @@ export function OutletStaffHomePage() {
     const source = sourceRows.find((row) => row.id === item.sourceRecordId);
     if (!source) return;
 
-    let nextDetails: Array<{ label: string; value: string }> = (source.detailItems || []).map((detail) => ({
-      label: detail.label,
-      value: detail.value || "",
-    }));
+    let nextDetails = upsertDetail(source.detailItems, "Last Proof Asset", asset);
 
     if (item.sourceModule === "tasks") {
       const existing = detailValue(source, "Photo Proofs");
@@ -1134,9 +1382,9 @@ export function OutletStaffHomePage() {
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Outlet Staff App</p>
             <div>
-              <h1 className="text-3xl font-semibold tracking-tight">Today</h1>
+              <h1 className="text-3xl font-semibold tracking-tight">Today Home</h1>
               <p className="max-w-3xl text-muted-foreground">
-                Check shift, red light, now/next task, management inbox, calendar, and SOP reading.
+                Staff-first view for shift, red light, do-first task, station queues, inbox, calendar, and SOP reading.
               </p>
             </div>
           </div>
@@ -1160,17 +1408,21 @@ export function OutletStaffHomePage() {
           </div>
         </div>
 
-        <StaffTabs activeTab={activeTab} onChange={(tab) => {
-          setActiveTab(tab);
-          setSelectedItem(undefined);
-        }} counts={counts} />
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <StaffTabs activeTab={activeTab} onChange={(tab) => {
+            setActiveTab(tab);
+            setSelectedItem(undefined);
+          }} counts={counts} />
+
+          <StationFilterBar value={station} onChange={setStation} />
+        </div>
 
         {selectedItem ? (
           <WorkItemSheet item={selectedItem} onClose={() => setSelectedItem(undefined)} onSubmitProof={submitStaffProof} />
         ) : null}
 
-        {activeTab === "today" ? <TodayView items={workItems} shifts={shiftItems} onOpen={setSelectedItem} /> : null}
-        {activeTab === "calendar" ? <CalendarView items={workItems} shifts={shiftItems} onOpen={setSelectedItem} /> : null}
+        {activeTab === "today" ? <TodayHome workItems={workItems} shifts={shiftItems} station={station} onOpen={setSelectedItem} /> : null}
+        {activeTab === "calendar" ? <CalendarView workItems={workItems} shifts={shiftItems} onOpen={setSelectedItem} /> : null}
         {activeTab === "inbox" ? <InboxView items={inboxItems} onOpen={setSelectedItem} /> : null}
         {activeTab === "sop" ? <SopView items={trainingItems} selected={selectedSop} onSelect={setSelectedSop} /> : null}
       </div>
