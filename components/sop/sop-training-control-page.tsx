@@ -224,11 +224,6 @@ function renderBlock(block: SopPreviewBlock) {
   if (block.type === "image") {
     return (
       <div className="rounded-xl border bg-muted/30 p-3 text-sm">
-      <SopCreateTypeModal
-        open={createTypeModalOpen}
-        onClose={() => setCreateTypeModalOpen(false)}
-        onSelect={startCreateSopFromType}
-      />
 
         <div className="mb-2 flex items-center gap-2 font-medium"><ImageIcon className="h-4 w-4" />Image</div>
         <div className="break-all text-muted-foreground">{block.imageUrl ? <UploadAssetPreview value={block.imageUrl} compact /> : "Media placeholder not set."}</div>
@@ -768,6 +763,13 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
 
   return (
     <ErpShell>
+      <SopCreateTypeModal
+        open={createTypeModalOpen}
+        onClose={() => setCreateTypeModalOpen(false)}
+        onSelect={startCreateSopFromType}
+      />
+
+
       <div className="space-y-6 p-4 pb-24 md:p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-2">
