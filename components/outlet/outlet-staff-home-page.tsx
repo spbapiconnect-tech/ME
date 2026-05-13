@@ -332,12 +332,12 @@ function StaffTabs({
 
   return (
     <div className="rounded-2xl border bg-card p-1">
-      <div className="grid grid-cols-4 gap-1">
+      <div className="flex gap-1 overflow-x-auto">
         {tabs.map((tab) => (
           <Button
             key={tab.key}
             variant={activeTab === tab.key ? "secondary" : "ghost"}
-            className="h-10 gap-2"
+            className="h-10 min-w-[92px] shrink-0 gap-2 sm:min-w-0"
             onClick={() => onChange(tab.key)}
           >
             {tab.icon}
@@ -365,7 +365,7 @@ function StationFilterBar({
   ];
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
       {filters.map((item) => (
         <Button
           key={item.value}
@@ -396,7 +396,7 @@ function ShiftSummaryCard({ shifts }: { shifts: ShiftItem[] }) {
       </CardHeader>
       <CardContent>
         {summary.total ? (
-          <div className="grid gap-3 sm:grid-cols-4">
+          <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
             {[
               ["Kitchen", summary.kitchen],
               ["Front", summary.front],
@@ -613,6 +613,7 @@ function CompactTimeline({
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
+        <div className="max-h-[520px] space-y-2 overflow-y-auto pr-1">
         {visibleHours.map((hour) => {
           const label = `${String(hour).padStart(2, "0")}:00`;
           const slotItems = todayItems.filter((item) => Number(item.startTime.slice(0, 2)) === hour);
@@ -657,6 +658,7 @@ function CompactTimeline({
             </div>
           );
         })}
+      </div>
       </CardContent>
     </Card>
   );
@@ -690,13 +692,13 @@ function TodayHome({
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 xl:grid-cols-[1.1fr_0.8fr_1fr]">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
         <ShiftSummaryCard shifts={shifts.filter((shift) => shift.date === today)} />
         <RedLightCard overdue={overdue} missed={missed} waiting={waiting} />
         <DoFirstCard item={doFirst} onOpen={onOpen} />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
         <NextUpCard items={next} onOpen={onOpen} />
         <CompactTimeline items={surfaced} shifts={shifts} onOpen={onOpen} />
         <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
@@ -712,7 +714,7 @@ function TodayHome({
             <Badge variant="outline">{station}</Badge>
           </div>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-3">
+        <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {(["Kitchen", "Front", "Manager"] as StationFilter[]).map((group) => {
             const groupItems = sectionItems(workItems, group)
               .filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item))
@@ -769,7 +771,7 @@ function CalendarView({
   const selectedSummary = summarizeShifts(selectedShifts);
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+    <div className="grid min-w-0 gap-4 lg:grid-cols-[1.2fr_0.8fr]">
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between gap-3">
@@ -818,7 +820,7 @@ function CalendarView({
                   type="button"
                   onClick={() => setSelectedDate(date)}
                   className={cn(
-                    "min-h-[92px] rounded-xl border bg-card p-2 text-left transition hover:bg-muted/30",
+                    "min-h-[68px] rounded-xl border bg-card p-2 text-left transition hover:bg-muted/30 md:min-h-[92px]",
                     selectedDate === date && "border-primary ring-1 ring-primary/30",
                     dayShifts.length && "bg-muted/20",
                     hasRed && "border-red-500/70 ring-1 ring-red-500/20",
@@ -846,7 +848,7 @@ function CalendarView({
             <CardTitle className="text-base">{selectedDate}</CardTitle>
             <p className="text-sm text-muted-foreground">Day summary before staff open task details.</p>
           </CardHeader>
-          <CardContent className="grid grid-cols-4 gap-2">
+          <CardContent className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[
               ["Staff", selectedSummary.total],
               ["Kitchen", selectedSummary.kitchen],
@@ -918,7 +920,7 @@ function InboxView({
                   key={item.id}
                   type="button"
                   onClick={() => onOpen(item)}
-                  className="grid w-full grid-cols-[minmax(0,1fr)_160px_140px_120px] items-center gap-4 border-b px-4 py-3 text-left last:border-b-0 hover:bg-muted/30"
+                  className="grid w-full gap-3 border-b px-4 py-3 text-left last:border-b-0 hover:bg-muted/30 md:grid-cols-[minmax(0,1fr)_120px_110px_110px] md:items-center xl:grid-cols-[minmax(0,1fr)_160px_140px_120px]"
                 >
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
@@ -927,9 +929,9 @@ function InboxView({
                     </div>
                     <div className="mt-1 truncate text-sm text-muted-foreground">{item.description}</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">{item.sourceRecordId}</div>
+                  <div className="text-sm text-muted-foreground md:block">{item.sourceRecordId}</div>
                   <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-                  <Button size="sm" variant="secondary">{item.primaryAction}</Button>
+                  <Button size="sm" variant="secondary" className="w-full md:w-auto">{item.primaryAction}</Button>
                 </button>
               ))}
             </CardContent>
@@ -1080,8 +1082,8 @@ function SopReader({
         </div>
       </CardHeader>
 
-      <CardContent className="grid gap-0 p-0 md:grid-cols-[240px_minmax(0,1fr)_220px]">
-        <aside className="border-r p-4">
+      <CardContent className="grid min-w-0 gap-0 p-0 xl:grid-cols-[240px_minmax(0,1fr)_220px]">
+        <aside className="border-b p-4 xl:border-b-0 xl:border-r">
           <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Pages</div>
           <div className="space-y-1">
             {pages.map((readerPage, index) => (
@@ -1097,7 +1099,7 @@ function SopReader({
           </div>
         </aside>
 
-        <main className="mx-auto w-full max-w-4xl p-6">
+        <main className="mx-auto w-full min-w-0 max-w-4xl p-4 md:p-6">
           <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Page {Math.min(page + 1, pages.length)} of {pages.length}</div>
           <h2 className="text-3xl font-semibold tracking-tight">{active.title}</h2>
 
@@ -1130,7 +1132,7 @@ function SopReader({
           </div>
         </main>
 
-        <aside className="border-l p-4">
+        <aside className="border-t p-4 xl:border-l xl:border-t-0">
           <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Progress</div>
           <div className="text-2xl font-semibold">{Math.round(((Math.min(page + 1, pages.length)) / pages.length) * 100)}%</div>
           <p className="mt-2 text-sm text-muted-foreground">Acknowledge only at the end.</p>
@@ -1152,7 +1154,7 @@ function SopView({
   const activeSop = selected || items[0];
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
+    <div className="grid min-w-0 gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
@@ -1254,7 +1256,7 @@ function WorkItemSheet({
           </div>
         ) : null}
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
           <Button
             disabled={item.proofRequired && !proofAsset}
             onClick={async () => {
@@ -1377,7 +1379,7 @@ export function OutletStaffHomePage() {
 
   return (
     <ErpShell>
-      <div className="space-y-5 p-4 pb-24 md:p-6">
+      <div className="min-w-0 space-y-4 p-3 pb-24 sm:p-4 md:space-y-5 md:p-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Outlet Staff App</p>
@@ -1389,14 +1391,14 @@ export function OutletStaffHomePage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input className="w-[260px] pl-9" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search work..." />
+              <Input className="w-full pl-9 sm:w-[260px]" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search work..." />
             </div>
 
             <Select value={selectedOutlet} onValueChange={setSelectedOutlet}>
-              <SelectTrigger className="w-[190px]">
+              <SelectTrigger className="w-full sm:w-[190px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
