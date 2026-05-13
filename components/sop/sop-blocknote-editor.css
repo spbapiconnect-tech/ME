@@ -42,3 +42,11 @@
 .sop-blocknote-shell .bn-side-menu:hover {
   opacity: 1;
 }
+
+/* Hide BlockNote default Upload / Embed popup because SOP users should upload directly. */
+.sop-blocknote-shell .bn-file-panel,
+.sop-blocknote-shell [data-file-panel],
+.sop-blocknote-shell [class*="FilePanel"],
+.sop-blocknote-shell [class*="file-panel"] {
+  display: none !important;
+}
