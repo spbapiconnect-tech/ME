@@ -545,7 +545,7 @@ function NextUpCard({
         <CardTitle className="text-base">Next Up</CardTitle>
         <p className="text-sm text-muted-foreground">The next few things staff should prepare for.</p>
       </CardHeader>
-      <CardContent className="max-h-[280px] min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:max-h-none">
+      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-none xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
         {!items.length ? (
           <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">No upcoming task after current item.</div>
         ) : items.map((item) => (
@@ -587,7 +587,7 @@ function InboxSummaryCard({
         </div>
         <p className="text-sm text-muted-foreground">Messages, complaints, rework, and review items.</p>
       </CardHeader>
-      <CardContent className="max-h-[280px] min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:max-h-none">
+      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-none xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
         {!items.length ? (
           <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No urgent management message now.</div>
         ) : items.map((item) => (
@@ -658,7 +658,7 @@ function CompactTimeline({
         </div>
       </CardHeader>
 
-      <CardContent className="max-h-[280px] min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:max-h-none">
+      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-none xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
         {visibleHours.map((hour) => {
           const label = `${String(hour).padStart(2, "0")}:00`;
           const slotItems = todayItems.filter((item) => Number(item.startTime.slice(0, 2)) === hour);
@@ -735,6 +735,18 @@ function TodayHome({
   const doFirst = overdue[0] || now[0] || next[0];
   const inboxPreview = [...overdue, ...waiting];
 
+  const stationGroups = (["Kitchen", "Front", "Manager"] as StationFilter[]).map((group) => ({
+    group,
+    items: sectionItems(workItems, group)
+      .filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item))
+      .filter((item) => item.date === today || isOverdue(item))
+      .slice(0, 8),
+  }));
+
+  const activeMobileQueue = stationGroups
+    .flatMap(({ group, items }) => items.map((item) => ({ group, item })))
+    .slice(0, 8);
+
   return (
     <div className="space-y-4">
       <div className="grid min-w-0 items-stretch gap-3 md:gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
@@ -749,7 +761,40 @@ function TodayHome({
         <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
       </div>
 
-      <Card className="max-h-[360px] overflow-hidden xl:max-h-[280px]">
+      {activeMobileQueue.length ? (
+        <Card className="md:hidden">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <CardTitle className="text-base">Active Queue</CardTitle>
+                <p className="text-sm text-muted-foreground">Only active station work is shown on mobile.</p>
+              </div>
+              <Badge variant="outline">{activeMobileQueue.length}</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {activeMobileQueue.map(({ group, item }) => (
+              <button
+                key={`${group}-${item.id}`}
+                type="button"
+                onClick={() => onOpen(item)}
+                className="relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30"
+              >
+                <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium">{item.title}</div>
+                    <div className="truncate text-xs text-muted-foreground">{group} · {item.startTime} · {item.inboxGroup}</div>
+                  </div>
+                  <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+                </div>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Card className="hidden max-h-[280px] overflow-hidden md:block">
         <CardHeader className="shrink-0 pb-3">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -759,32 +804,25 @@ function TodayHome({
             <Badge variant="outline">{station}</Badge>
           </div>
         </CardHeader>
-        <CardContent className="grid max-h-[260px] gap-3 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2 xl:max-h-[190px] xl:grid-cols-3">
-          {(["Kitchen", "Front", "Manager"] as StationFilter[]).map((group) => {
-            const groupItems = sectionItems(workItems, group)
-              .filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item))
-              .filter((item) => item.date === today || isOverdue(item))
-              .slice(0, 8);
-
-            return (
-              <div key={group} className="rounded-2xl border bg-background p-3">
-                <div className="mb-2 flex items-center justify-between">
-                  <div className="font-medium">{group}</div>
-                  <Badge variant="outline">{groupItems.length}</Badge>
-                </div>
-                <div className="space-y-2">
-                  {!groupItems.length ? (
-                    <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">No active queue.</div>
-                  ) : groupItems.map((item) => (
-                    <button key={item.id} type="button" onClick={() => onOpen(item)} className="w-full rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30">
-                      <div className="truncate text-sm font-medium">{item.title}</div>
-                      <div className="text-xs text-muted-foreground">{item.startTime} · {item.inboxGroup}</div>
-                    </button>
-                  ))}
-                </div>
+        <CardContent className="grid max-h-[190px] gap-3 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2 xl:grid-cols-3">
+          {stationGroups.map(({ group, items }) => (
+            <div key={group} className="rounded-2xl border bg-background p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <div className="font-medium">{group}</div>
+                <Badge variant="outline">{items.length}</Badge>
               </div>
-            );
-          })}
+              <div className="space-y-2">
+                {!items.length ? (
+                  <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">No active queue.</div>
+                ) : items.map((item) => (
+                  <button key={item.id} type="button" onClick={() => onOpen(item)} className="w-full rounded-xl border bg-card px-3 py-2 text-left hover:bg-muted/30">
+                    <div className="truncate text-sm font-medium">{item.title}</div>
+                    <div className="text-xs text-muted-foreground">{item.startTime} · {item.inboxGroup}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </CardContent>
       </Card>
     </div>
@@ -1492,7 +1530,7 @@ export function OutletStaffHomePage() {
 
   return (
     <ErpShell>
-      <div className="min-w-0 space-y-4 p-3 pb-24 sm:p-4 md:space-y-5 md:p-6">
+      <div className="min-w-0 space-y-4 p-3 pb-20 sm:p-4 md:space-y-5 md:p-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Outlet Staff App</p>
