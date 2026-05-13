@@ -287,14 +287,6 @@ export function SopBuilderWorkspaceV3({
     }
   }
 
-  function commitSettings(patch: Partial<SopBuilderV3Settings>) {
-    setLocalSettings((current) => ({
-      ...current,
-      ...patch,
-    }));
-
-    onUpdateSettings(patch);
-  }
 
   function patchSettingsDraft(
     field: "title" | "documentCode" | "version",
