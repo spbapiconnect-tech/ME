@@ -12,7 +12,6 @@ import {
   MessageSquare,
   Search,
   ShieldAlert,
-  Store,
   UploadCloud,
   UsersRound,
 } from "lucide-react";
