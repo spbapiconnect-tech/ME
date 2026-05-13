@@ -313,3 +313,97 @@
   color: hsl(var(--muted-foreground)) !important;
   opacity: 0.85 !important;
 }
+
+/* SOP builder: keep long pasted content inside the editor panel, not the ERP page. */
+.sop-blocknote-shell {
+  contain: layout paint;
+  overscroll-behavior: contain;
+}
+
+.sop-blocknote-scroll {
+  overscroll-behavior: contain;
+  scroll-padding-bottom: 12rem;
+}
+
+.sop-blocknote-page {
+  padding-bottom: 12rem;
+}
+
+/* BlockNote editor must always inherit ME theme colors. */
+.sop-blocknote-shell .bn-root,
+.sop-reader-preview .bn-root {
+  --bn-colors-editor-text: hsl(var(--foreground));
+  --bn-colors-editor-background: transparent;
+  --bn-colors-menu-text: hsl(var(--popover-foreground));
+  --bn-colors-menu-background: hsl(var(--popover));
+  --bn-colors-tooltip-text: hsl(var(--popover-foreground));
+  --bn-colors-tooltip-background: hsl(var(--popover));
+  --bn-colors-hovered-text: hsl(var(--foreground));
+  --bn-colors-hovered-background: hsl(var(--muted));
+  --bn-colors-selected-text: hsl(var(--primary-foreground));
+  --bn-colors-selected-background: hsl(var(--primary));
+  --bn-colors-disabled-text: hsl(var(--foreground));
+  --bn-colors-disabled-background: transparent;
+  --bn-colors-shadow: rgb(0 0 0 / 0.24);
+  --bn-colors-border: hsl(var(--border));
+  --bn-border-radius: 0.75rem;
+}
+
+.sop-blocknote-shell .bn-container,
+.sop-blocknote-shell .bn-editor,
+.sop-reader-preview .bn-container,
+.sop-reader-preview .bn-editor {
+  background: transparent !important;
+  color: hsl(var(--foreground)) !important;
+  opacity: 1 !important;
+}
+
+/* Pasted HTML often carries dark/blue/gray inline colors.
+   In SOP authoring mode we normalize pasted text so both bright/dark themes stay readable. */
+.sop-blocknote-shell .bn-editor,
+.sop-blocknote-shell .bn-editor p,
+.sop-blocknote-shell .bn-editor div,
+.sop-blocknote-shell .bn-editor span,
+.sop-blocknote-shell .bn-editor strong,
+.sop-blocknote-shell .bn-editor em,
+.sop-blocknote-shell .bn-editor code,
+.sop-blocknote-shell .bn-editor pre,
+.sop-blocknote-shell .bn-block-content,
+.sop-blocknote-shell .bn-inline-content,
+.sop-blocknote-shell .bn-inline-content *,
+.sop-reader-preview .bn-editor,
+.sop-reader-preview .bn-editor p,
+.sop-reader-preview .bn-editor div,
+.sop-reader-preview .bn-editor span,
+.sop-reader-preview .bn-editor strong,
+.sop-reader-preview .bn-editor em,
+.sop-reader-preview .bn-editor code,
+.sop-reader-preview .bn-editor pre,
+.sop-reader-preview .bn-block-content,
+.sop-reader-preview .bn-inline-content,
+.sop-reader-preview .bn-inline-content * {
+  color: hsl(var(--foreground)) !important;
+  opacity: 1 !important;
+}
+
+.sop-blocknote-shell .bn-editor code,
+.sop-blocknote-shell .bn-editor pre,
+.sop-reader-preview .bn-editor code,
+.sop-reader-preview .bn-editor pre {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-radius: 0.75rem;
+}
+
+/* Placeholder should be visible but not look like actual content. */
+.sop-blocknote-shell [data-placeholder]::before,
+.sop-blocknote-shell .bn-inline-content[data-placeholder]::before {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 0.75 !important;
+}
+
+/* Give user room at the bottom when typing near the last block. */
+.sop-blocknote-shell .bn-editor {
+  min-height: 680px !important;
+  padding-bottom: 10rem !important;
+}

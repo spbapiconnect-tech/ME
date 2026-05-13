@@ -138,6 +138,11 @@ export function SopBlockNoteEditor({
       },
     ],
     uploadFile: uploadLocalPreviewFile,
+    pasteHandler: ({ defaultPasteHandler }) =>
+      defaultPasteHandler({
+        prioritizeMarkdownOverHTML: true,
+        plainTextAsMarkdown: false,
+      }),
   });
 
   useEffect(() => {
@@ -216,8 +221,9 @@ export function SopBlockNoteEditor({
   }
 
   return (
-    <div className="sop-blocknote-shell h-full min-h-0 bg-background px-8 py-8">
-      <div className="mx-auto h-full max-w-5xl">
+    <div className="sop-blocknote-shell h-full min-h-0 overflow-hidden bg-background">
+      <div className="sop-blocknote-scroll h-full min-h-0 overflow-y-auto px-8 py-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="sop-blocknote-page mx-auto min-h-full max-w-5xl pb-40">
         <input
           ref={imageInputRef}
           type="file"
@@ -252,7 +258,7 @@ export function SopBlockNoteEditor({
           editable={!disabled}
           filePanel={false}
           formattingToolbar={true}
-          className="min-h-[calc(100vh-220px)] rounded-2xl bg-background"
+          className="min-h-[680px] rounded-2xl bg-background"
           onChange={(currentEditor) => {
             onDocumentChange?.(currentEditor.document as SopBlockNoteDocument);
           }}
@@ -266,6 +272,7 @@ export function SopBlockNoteEditor({
             />
           ) : null}
         </BlockNoteView>
+        </div>
       </div>
     </div>
   );
