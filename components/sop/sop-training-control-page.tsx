@@ -589,7 +589,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   }
 
   function addV3Page() {
-    const nextPage = { ...newPage(pages.length + 1), title: "New chapter" };
+    const nextPage = { ...newPage(pages.length + 1), title: "Untitled chapter" };
     setPages((current) => [...current, nextPage]);
     setSelectedPageId(nextPage.id);
   }

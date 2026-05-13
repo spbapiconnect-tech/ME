@@ -92,3 +92,36 @@
   max-width: 100%;
   border-radius: 14px;
 }
+
+/* Keep BlockNote toolbar usable inside ME workspace overlays. */
+.sop-blocknote-shell .bn-formatting-toolbar,
+.sop-blocknote-shell .bn-toolbar,
+.sop-blocknote-shell .bn-menu,
+.sop-blocknote-shell [data-radix-popper-content-wrapper],
+.sop-blocknote-shell [class*="Toolbar"],
+.sop-blocknote-shell [class*="toolbar"],
+.sop-blocknote-shell [class*="Menu"],
+.sop-blocknote-shell [class*="menu"] {
+  z-index: 80 !important;
+}
+
+.sop-blocknote-shell .bn-formatting-toolbar,
+.sop-blocknote-shell .bn-toolbar,
+.sop-blocknote-shell .bn-menu {
+  border: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  box-shadow: 0 18px 50px rgb(15 23 42 / 0.18) !important;
+}
+
+.sop-blocknote-shell .bn-formatting-toolbar button,
+.sop-blocknote-shell .bn-toolbar button,
+.sop-blocknote-shell .bn-menu button {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+.sop-blocknote-shell .bn-formatting-toolbar button:hover,
+.sop-blocknote-shell .bn-toolbar button:hover,
+.sop-blocknote-shell .bn-menu button:hover {
+  background: hsl(var(--muted)) !important;
+}

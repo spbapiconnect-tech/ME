@@ -145,6 +145,7 @@ export function SopBuilderWorkspaceV3({
   function cleanOutlineTitle(title?: string) {
     const clean = (title || "")
       .replace(/^Page\s+\d+\s*[·:-]\s*/i, "")
+      .replace(/^What staff need to know$/i, "Overview")
       .replace(/^New\s+/i, "")
       .trim();
 
@@ -170,7 +171,7 @@ export function SopBuilderWorkspaceV3({
 
 
   return (
-    <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
+    <div className="flex h-[calc(100dvh-56px)] min-h-0 flex-col overflow-hidden bg-background">
       <header className="shrink-0 border-b bg-background px-5 py-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
@@ -205,7 +206,7 @@ export function SopBuilderWorkspaceV3({
       </header>
 
       <div className={cn("grid min-h-0 flex-1 overflow-hidden", previewOpen ? "lg:grid-cols-[280px_minmax(0,1fr)_360px]" : "lg:grid-cols-[280px_minmax(0,1fr)]")}>
-        <aside className="hidden h-full min-h-0 overflow-hidden border-r bg-background lg:block">
+        <aside className="hidden h-[calc(100dvh-56px)] min-h-0 self-start overflow-hidden border-r bg-background lg:sticky lg:top-0 lg:block">
           <div className="flex h-full min-h-0 flex-col">
             <div className="shrink-0 border-b px-3 py-4">
               <div className="flex items-center justify-between gap-2">
@@ -275,7 +276,7 @@ export function SopBuilderWorkspaceV3({
                             type="button"
                             size="icon"
                             variant="ghost"
-                            className="h-7 w-7 opacity-0 transition group-hover:opacity-100"
+                            className="h-7 w-7 shrink-0 opacity-100 transition md:opacity-0 md:group-hover:opacity-100"
                             onClick={() => onAddSubPage?.(chapter.id)}
                             title="Add page"
                           >
@@ -286,8 +287,8 @@ export function SopBuilderWorkspaceV3({
                             type="button"
                             size="icon"
                             variant="ghost"
-                            className="h-7 w-7 opacity-0 transition group-hover:opacity-100"
-                            onClick={() => beginRename(chapter)}
+                            className="h-7 w-7 shrink-0 opacity-100 transition md:opacity-0 md:group-hover:opacity-100"
+                            onClick={(event) => { event.stopPropagation(); beginRename(chapter); }}
                             title="Rename chapter"
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -297,8 +298,8 @@ export function SopBuilderWorkspaceV3({
                             type="button"
                             size="icon"
                             variant="ghost"
-                            className="h-7 w-7 text-muted-foreground opacity-0 transition hover:text-destructive group-hover:opacity-100"
-                            onClick={() => onDeletePage(chapter.id)}
+                            className="h-7 w-7 shrink-0 text-muted-foreground opacity-100 transition hover:text-destructive md:opacity-0 md:group-hover:opacity-100"
+                            onClick={(event) => { event.stopPropagation(); onDeletePage(chapter.id); }}
                             title="Delete chapter"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -348,8 +349,8 @@ export function SopBuilderWorkspaceV3({
                                 type="button"
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 opacity-0 transition group-hover:opacity-100"
-                                onClick={() => beginRename(page)}
+                                className="h-7 w-7 shrink-0 opacity-100 transition md:opacity-0 md:group-hover:opacity-100"
+                                onClick={(event) => { event.stopPropagation(); beginRename(page); }}
                                 title="Rename page"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
@@ -359,8 +360,8 @@ export function SopBuilderWorkspaceV3({
                                 type="button"
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 text-muted-foreground opacity-0 transition hover:text-destructive group-hover:opacity-100"
-                                onClick={() => onDeletePage(page.id)}
+                                className="h-7 w-7 shrink-0 text-muted-foreground opacity-100 transition hover:text-destructive md:opacity-0 md:group-hover:opacity-100"
+                                onClick={(event) => { event.stopPropagation(); onDeletePage(page.id); }}
                                 title="Delete page"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
