@@ -141,6 +141,7 @@ export function SopBuilderWorkspaceV3({
   onUpdateBlock,
   onDeleteBlock,
   onUpdateSettings,
+  onUseClassic,
 }: {
   document: SopBuilderV3Document;
   selectedPageId?: string;
@@ -154,6 +155,7 @@ export function SopBuilderWorkspaceV3({
   onUpdateBlock: (pageId: string, blockId: string, patch: Partial<SopBuilderV3Block>) => void;
   onDeleteBlock: (pageId: string, blockId: string) => void;
   onUpdateSettings: (patch: Partial<SopBuilderV3Settings>) => void;
+  onUseClassic?: () => void;
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [insertOpen, setInsertOpen] = useState(false);
@@ -187,6 +189,11 @@ export function SopBuilderWorkspaceV3({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {onUseClassic ? (
+              <Button variant="outline" onClick={onUseClassic}>
+                Use Classic
+              </Button>
+            ) : null}
             <Button variant="outline" onClick={() => setSettingsOpen(true)}>
               <Settings2 className="h-4 w-4" />
               Settings

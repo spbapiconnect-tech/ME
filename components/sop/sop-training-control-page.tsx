@@ -63,6 +63,14 @@ import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
 import { SopCreateTypeModal } from "@/components/sop/sop-create-type-modal";
 import type { SopCreateTypeConfig } from "@/lib/sop/sop-create-types";
+import { SopBuilderWorkspaceV3 } from "@/components/sop/sop-builder-workspace-v3";
+import {
+  createSopBuilderV3Document,
+  type SopBuilderV3Block,
+  type SopBuilderV3BlockType,
+  type SopBuilderV3Page,
+  type SopBuilderV3Settings,
+} from "@/lib/sop/sop-builder-v3-types";
 
 type BlockType = "heading" | "text" | "image" | "step-list" | "warning" | "pdf" | "checklist";
 type ModalMode = "create" | "publish" | "training" | "checklist";
@@ -299,6 +307,7 @@ export function SopTrainingControlPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("create");
   const [createTypeModalOpen, setCreateTypeModalOpen] = useState(false);
+  const [builderVariant, setBuilderVariant] = useState<"classic" | "v3">("v3");
   const [builderMode, setBuilderMode] = useState(false);
   const [pages, setPages] = useState<BuilderPage[]>([newPage(1)]);
   const [selectedPageId, setSelectedPageId] = useState<string>("");
@@ -549,7 +558,102 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     if (!pages.length) setPages([starterPage]);
 
     setSelectedPageId(starterPage.id);
+    setBuilderVariant("v3");
     setBuilderMode(true);
+  }
+
+
+  const v3Document = useMemo(() => createSopBuilderV3Document(form, pages), [form, pages]);
+
+  function updateV3Settings(patch: Partial<SopBuilderV3Settings>) {
+    setForm((current) => ({
+      ...current,
+      title: patch.title ?? current.title,
+      documentCode: patch.documentCode ?? current.documentCode,
+      category: patch.category ?? current.category,
+      processArea: patch.processArea ?? current.processArea,
+      version: patch.version ?? current.version,
+      processOwner: patch.owner ?? current.processOwner,
+      approver: patch.approver ?? current.approver,
+      targetBranch: patch.targetOutlet ?? current.targetBranch,
+      targetRole: patch.targetRole ?? current.targetRole,
+      acknowledgementRequired: patch.acknowledgementRequired ?? current.acknowledgementRequired,
+      trainingRequired: patch.trainingRequired ?? current.trainingRequired,
+      reviewCycle: patch.reviewCycle ?? current.reviewCycle,
+      reviewDueDate: patch.reviewDueDate ?? current.reviewDueDate,
+    }));
+  }
+
+  function addV3Page() {
+    const nextPage = newPage(pages.length + 1);
+    setPages((current) => [...current, nextPage]);
+    setSelectedPageId(nextPage.id);
+  }
+
+  function deleteV3Page(pageId: string) {
+    if (pages.length <= 1) return;
+
+    const nextPages = pages.filter((page) => page.id !== pageId);
+    setPages(nextPages);
+
+    if (activeBuilderPageId === pageId) {
+      setSelectedPageId(nextPages[0]?.id);
+    }
+  }
+
+  function updateV3Page(pageId: string, patch: Partial<SopBuilderV3Page>) {
+    setPages((current) =>
+      current.map((page) =>
+        page.id === pageId
+          ? {
+              ...page,
+              title: patch.title ?? page.title,
+              coverImageUrl: patch.coverAssetUrl ?? page.coverImageUrl,
+            }
+          : page,
+      ),
+    );
+  }
+
+  function addV3Block(pageId: string, type: SopBuilderV3BlockType) {
+    const legacyType: BlockType = type === "video" ? "image" : type;
+    addBlock(pageId, legacyType);
+  }
+
+  function updateV3Block(pageId: string, blockId: string, patch: Partial<SopBuilderV3Block>) {
+    setPages((current) =>
+      current.map((page) => {
+        if (page.id !== pageId) return page;
+
+        return {
+          ...page,
+          blocks: page.blocks.map((block) => {
+            if (block.id !== blockId) return block;
+
+            return {
+              ...block,
+              title: patch.title ?? block.title,
+              body: patch.body ?? block.body,
+              imageUrl: patch.assetUrl ?? block.imageUrl,
+              pdfUrl: patch.assetUrl ?? block.pdfUrl,
+              stepsText: patch.steps ? patch.steps.join("\n") : block.stepsText,
+              checklistText: patch.checklist ? patch.checklist.join("\n") : block.checklistText,
+              warningLevel: patch.warningLevel ?? block.warningLevel,
+            };
+          }),
+        };
+      }),
+    );
+  }
+
+  function deleteV3Block(pageId: string, blockId: string) {
+    setPages((current) =>
+      current.map((page) =>
+        page.id === pageId
+          ? { ...page, blocks: page.blocks.filter((block) => block.id !== blockId) }
+          : page,
+      ),
+    );
   }
 
   const createPreview = serializeContent(form.employeeReadMode, pages);
@@ -561,6 +665,26 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   if (builderMode) {
     return (
       <ErpShell>
+        {builderVariant === "v3" ? (
+          <SopBuilderWorkspaceV3
+            document={v3Document}
+            selectedPageId={activeBuilderPageId}
+            onBack={() => setBuilderMode(false)}
+            onCreate={async () => {
+              await createSop();
+              setBuilderMode(false);
+            }}
+            onSelectPage={setSelectedPageId}
+            onAddPage={addV3Page}
+            onDeletePage={deleteV3Page}
+            onUpdatePage={updateV3Page}
+            onAddBlock={addV3Block}
+            onUpdateBlock={updateV3Block}
+            onDeleteBlock={deleteV3Block}
+            onUpdateSettings={updateV3Settings}
+            onUseClassic={() => setBuilderVariant("classic")}
+          />
+        ) : (
         <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
           <div className="shrink-0 border-b bg-background px-5 py-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -587,6 +711,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => setBuilderVariant("v3")}>Use V3 Builder</Button>
                 <Button variant="outline" onClick={() => setBuilderMode(false)}>Back</Button>
                 <Button onClick={async () => {
                   await createSop();
@@ -791,6 +916,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             </div>
           </div>
         </div>
+        )}
       </ErpShell>
     );
   }
