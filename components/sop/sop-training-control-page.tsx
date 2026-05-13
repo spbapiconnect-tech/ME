@@ -615,10 +615,8 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
       body: block.body,
       imageUrl: legacyType === "image" ? block.assetUrl || "" : "",
       pdfUrl: legacyType === "pdf" ? block.assetUrl || "" : "",
-      stepsText: block.steps ? block.steps.join("
-") : "",
-      checklistText: block.checklist ? block.checklist.join("
-") : "",
+      stepsText: block.steps ? block.steps.join("\\n") : "",
+      checklistText: block.checklist ? block.checklist.join("\\n") : "",
       warningLevel: block.warningLevel ?? "Info",
     };
   }
