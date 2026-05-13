@@ -540,12 +540,12 @@ function NextUpCard({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   return (
-    <Card className="flex h-auto min-h-0 flex-col xl:h-[260px]">
+    <Card className="flex h-auto min-h-[240px] flex-col xl:h-[320px]">
       <CardHeader className="shrink-0 pb-3">
         <CardTitle className="text-base">Next Up</CardTitle>
         <p className="text-sm text-muted-foreground">The next few things staff should prepare for.</p>
       </CardHeader>
-      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-none xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
+      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-[240px] xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
         {!items.length ? (
           <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">No upcoming task after current item.</div>
         ) : items.map((item) => (
@@ -576,7 +576,7 @@ function InboxSummaryCard({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   return (
-    <Card className="flex h-auto min-h-0 flex-col xl:h-[260px]">
+    <Card className="flex h-auto min-h-[240px] flex-col xl:h-[320px]">
       <CardHeader className="shrink-0 pb-3">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2 text-base">
@@ -587,7 +587,7 @@ function InboxSummaryCard({
         </div>
         <p className="text-sm text-muted-foreground">Messages, complaints, rework, and review items.</p>
       </CardHeader>
-      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-none xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
+      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-[240px] xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
         {!items.length ? (
           <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No urgent management message now.</div>
         ) : items.map((item) => (
@@ -644,7 +644,7 @@ function CompactTimeline({
   const visibleHours = hours.length ? hours : [9, 12, 15, 18];
 
   return (
-    <Card className="flex h-auto min-h-0 flex-col xl:h-[260px]">
+    <Card className="flex h-auto min-h-[240px] flex-col xl:h-[320px]">
       <CardHeader className="shrink-0 pb-3">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -658,7 +658,7 @@ function CompactTimeline({
         </div>
       </CardHeader>
 
-      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-none xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
+      <CardContent className="max-h-none min-h-0 flex-1 space-y-2 overflow-visible pr-1 xl:max-h-[240px] xl:overflow-y-auto xl:[scrollbar-width:none] xl:[&::-webkit-scrollbar]:hidden">
         {visibleHours.map((hour) => {
           const label = `${String(hour).padStart(2, "0")}:00`;
           const slotItems = todayItems.filter((item) => Number(item.startTime.slice(0, 2)) === hour);
@@ -796,7 +796,7 @@ function TodayHome({
         </CardContent>
       </Card>
 
-      <Card className="hidden max-h-[280px] overflow-hidden md:block">
+      <Card className="hidden max-h-[380px] overflow-hidden md:block">
         <CardHeader className="shrink-0 pb-3">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -807,9 +807,9 @@ function TodayHome({
           </div>
         </CardHeader>
 
-        <CardContent className="grid max-h-[190px] items-start gap-3 overflow-y-auto pr-1 [scrollbar-width:none] md:grid-cols-2 xl:grid-cols-3 [&::-webkit-scrollbar]:hidden">
+        <CardContent className="grid max-h-[290px] items-start gap-3 overflow-y-auto pr-1 [scrollbar-width:none] md:grid-cols-2 xl:grid-cols-3 [&::-webkit-scrollbar]:hidden">
           {stationGroups.map(({ group, items }) => (
-            <div key={group} className="max-h-[160px] overflow-y-auto rounded-2xl border bg-background p-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div key={group} className="max-h-[250px] overflow-y-auto rounded-2xl border bg-background p-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <div className="mb-2 flex items-center justify-between">
                 <div className="font-medium">{group}</div>
                 <Badge variant="outline">{items.length}</Badge>
