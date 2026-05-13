@@ -264,21 +264,6 @@ function renderBlock(block: SopPreviewBlock) {
 
   const steps = block.steps || [];
 
-  function applySopTemplate(templateKey: string) {
-    const template = sopQuickTemplates.find((item) => item.key === templateKey);
-    if (!template) return;
-
-    setForm((current) => ({
-      ...current,
-      title: current.title || template.titlePrefix,
-      category: categoryOptions.includes(template.category) ? template.category : current.category,
-      processArea: processAreaOptions.includes(template.processArea) ? template.processArea : current.processArea,
-      acknowledgementRequired: template.key === "training" || template.key === "recipe" ? "Yes" : current.acknowledgementRequired,
-      trainingRequired: template.key === "training" || template.key === "recipe" ? "Yes" : current.trainingRequired,
-    }));
-  }
-
-
   return (
     <div className="space-y-2 rounded-xl border p-3 text-sm">
       <div className="font-medium">{block.title || "Step By Step"}</div>
@@ -291,60 +276,6 @@ function renderBlock(block: SopPreviewBlock) {
     </div>
   );
 }
-
-
-const sopQuickTemplates = [
-  {
-    key: "recipe",
-    title: "Recipe / Product SOP",
-    description: "Burger build, product launch, kitchen product guide.",
-    category: "Product",
-    processArea: "Kitchen",
-    titlePrefix: "New Product SOP",
-  },
-  {
-    key: "opening-closing",
-    title: "Opening / Closing",
-    description: "Daily outlet start-up, closing, handover, cash-up.",
-    category: "Operations",
-    processArea: "Outlet",
-    titlePrefix: "Opening / Closing SOP",
-  },
-  {
-    key: "cleaning",
-    title: "Cleaning",
-    description: "Cleaning checklist, hygiene, station reset.",
-    category: "Cleaning",
-    processArea: "Outlet",
-    titlePrefix: "Cleaning SOP",
-  },
-  {
-    key: "service",
-    title: "Service",
-    description: "Front counter, cashier, customer handling.",
-    category: "Service",
-    processArea: "Front",
-    titlePrefix: "Service SOP",
-  },
-  {
-    key: "safety",
-    title: "Safety",
-    description: "Food safety, equipment safety, risk control.",
-    category: "Safety",
-    processArea: "Compliance",
-    titlePrefix: "Safety SOP",
-  },
-  {
-    key: "training",
-    title: "Training",
-    description: "Staff onboarding, required reading, acknowledgement.",
-    category: "Training",
-    processArea: "People",
-    titlePrefix: "Training SOP",
-  },
-];
-
-const sopContentTypes: BlockType[] = ["heading", "text", "image", "step-list", "warning", "pdf", "checklist"];
 
 export function SopTrainingControlPage() {
   const router = useRouter();
@@ -631,68 +562,18 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
                 <div className="text-xs text-muted-foreground">Add blocks to the selected SOP page.</div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <div className="grid w-full gap-3">
-                          <div className="rounded-2xl border bg-card p-3">
-                            <div className="mb-2 flex items-center justify-between gap-3">
-                              <div>
-                                <div className="text-sm font-medium">Quick Templates</div>
-                                <div className="text-xs text-muted-foreground">Start with the SOP type. Add content inside the document.</div>
-                              </div>
-                            </div>
-                            <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-                              {sopQuickTemplates.map((template) => (
-                                <button
-                                  key={template.key}
-                                  type="button"
-                                  onClick={() => applySopTemplate(template.key)}
-                                  className="rounded-xl border bg-background px-3 py-2 text-left transition hover:bg-muted/30"
-                                >
-                                  <div className="text-sm font-medium">{template.title}</div>
-                                  <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{template.description}</div>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                const nextPage = newPage(pages.length + 1);
-                                setPages((current) => [...current, nextPage]);
-                                setSelectedPageId(nextPage.id);
-                              }}
-                            >
-                              <Plus className="h-4 w-4" />
-                              Add Page
-                            </Button>
-
-                            <details className="relative">
-                              <summary className="inline-flex h-9 cursor-pointer list-none items-center rounded-md border bg-background px-3 text-sm font-medium hover:bg-muted/30 [&::-webkit-details-marker]:hidden">
-                                Add Content
-                              </summary>
-                              <div className="absolute left-0 top-10 z-40 w-56 rounded-xl border bg-popover p-2 shadow-xl">
-                                {activeBuilderPageId ? sopContentTypes.map((type) => (
-                                  <button
-                                    key={type}
-                                    type="button"
-                                    onClick={() => addBlock(activeBuilderPageId, type)}
-                                    className="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-muted"
-                                  >
-                                    {type}
-                                  </button>
-                                )) : (
-                                  <div className="px-3 py-2 text-sm text-muted-foreground">Add a page first.</div>
-                                )}
-                              </div>
-                            </details>
-
-                            <div className="text-xs text-muted-foreground">
-                              Tip: create the SOP from template, then add only the content blocks needed.
-                            </div>
-                          </div>
-                        </div>
+                <Button variant="outline" size="sm" className="h-8" onClick={() => {
+                  const nextPage = newPage(pages.length + 1);
+                  setPages((current) => [...current, nextPage]);
+                  setSelectedPageId(nextPage.id);
+                }}><Plus className="h-4 w-4" />Add Page</Button>
+                {activeBuilderPageId ? (
+                  <>
+                    {(["heading", "text", "image", "step-list", "warning", "pdf", "checklist"] as BlockType[]).map((type) => (
+                      <Button key={type} type="button" variant="outline" size="sm" className="h-8" onClick={() => addBlock(activeBuilderPageId, type)}>+ {type}</Button>
+                    ))}
+                  </>
+                ) : null}
               </div>
             </div>
           </div>
