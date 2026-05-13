@@ -761,41 +761,6 @@ function TodayHome({
         <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
       </div>
 
-      <Card className="md:hidden">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <CardTitle className="text-base">Active Queue</CardTitle>
-              <p className="text-sm text-muted-foreground">Only active station work is shown on mobile.</p>
-            </div>
-            <Badge variant="outline">{activeMobileQueue.length}</Badge>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {!activeMobileQueue.length ? (
-            <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
-              No active station queue.
-            </div>
-          ) : activeMobileQueue.map(({ group, item }) => (
-            <button
-              key={`${group}-${item.id}`}
-              type="button"
-              onClick={() => onOpen(item)}
-              className="relative w-full overflow-hidden rounded-xl border bg-card p-3 pl-4 text-left hover:bg-muted/30"
-            >
-              <span className={cn("absolute inset-y-0 left-0 w-1", itemRailClass(item))} />
-              <div className="flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-medium">{item.title}</div>
-                  <div className="truncate text-xs text-muted-foreground">{group} · {item.startTime} · {item.inboxGroup}</div>
-                </div>
-                <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-              </div>
-            </button>
-          ))}
-        </CardContent>
-      </Card>
-
       <Card className="block md:hidden">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between gap-3">
