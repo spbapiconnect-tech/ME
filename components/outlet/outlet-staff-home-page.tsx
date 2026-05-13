@@ -1209,9 +1209,9 @@ function SopReader({
   return (
     <Card className={cn(
       "overflow-hidden border-0 bg-background shadow-none xl:min-h-[620px] xl:border xl:shadow-sm",
-      fullscreen && "fixed inset-0 z-50 overflow-y-auto rounded-none bg-background shadow-2xl xl:inset-4 xl:rounded-2xl",
+      fullscreen && "fixed inset-0 z-50 overflow-hidden rounded-none bg-background shadow-2xl xl:inset-4 xl:rounded-2xl",
     )}>
-      <div className="flex min-h-[100dvh] flex-col bg-background xl:hidden">
+      <div className="fixed inset-0 z-[60] flex h-[100dvh] w-screen flex-col overflow-hidden bg-background xl:hidden">
         <div className="sticky top-0 z-20 border-b bg-background/95 px-4 py-3 backdrop-blur">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
@@ -1224,9 +1224,13 @@ function SopReader({
               </div>
             </div>
             {onClose ? (
-              <Button size="sm" variant="outline" onClick={onClose}>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-lg border px-3 py-2 text-sm font-medium"
+              >
                 Close
-              </Button>
+              </button>
             ) : null}
           </div>
 
@@ -1249,7 +1253,7 @@ function SopReader({
           </div>
         </div>
 
-        <main className="min-h-0 flex-1 overflow-y-auto px-5 py-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <main className="min-h-0 flex-1 overflow-y-auto px-5 py-6 pb-28 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <article className="mx-auto max-w-[68ch]">
             <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Page {safePage + 1}
@@ -1263,7 +1267,7 @@ function SopReader({
           </article>
         </main>
 
-        <div className="sticky bottom-0 z-20 border-t bg-background/95 px-4 py-3 backdrop-blur">
+        <div className="fixed inset-x-0 bottom-0 z-[70] border-t bg-background/95 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 backdrop-blur xl:hidden">
           <div className="flex gap-2">
             <Button className="flex-1" variant="outline" disabled={safePage === 0} onClick={goPrevious}>
               Previous
@@ -1324,7 +1328,7 @@ function SopReader({
               {renderPageBody()}
             </div>
 
-            <div className="mt-8 flex items-center justify-between border-t pt-4">
+            <div className="mt-8 hidden items-center justify-between border-t pt-4 xl:flex">
               <Button variant="outline" disabled={safePage === 0} onClick={goPrevious}>Previous</Button>
               {safePage === pages.length - 1 ? (
                 <Button>Mark as understood</Button>
