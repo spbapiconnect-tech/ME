@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { cn } from "@/lib/utils";
 import { useMeRuntimeStore } from "@/stores/me-runtime";
 import {
@@ -611,6 +612,104 @@ function InboxView({
   );
 }
 
+
+type SopReaderPage = {
+  id: string;
+  title: string;
+  body: string;
+  type: "text" | "media" | "pdf" | "checklist";
+  asset?: string;
+  checklist?: string[];
+};
+
+function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
+  if (!item) {
+    return [{
+      id: "empty",
+      title: "Select SOP",
+      body: "Select an SOP or training document to start reading.",
+      type: "text",
+    }];
+  }
+
+  const pages: SopReaderPage[] = [];
+
+  if (item.contentJson) {
+    try {
+      const parsed = JSON.parse(item.contentJson);
+      const parsedPages = Array.isArray(parsed?.pages) ? parsed.pages : [];
+
+      parsedPages.forEach((page, pageIndex) => {
+        pages.push({
+          id: String(page.id || `page-${pageIndex}`),
+          title: page.title || `Page ${pageIndex + 1}`,
+          body: Array.isArray(page.blocks)
+            ? page.blocks
+                .map((block: { title?: string; body?: string; instruction?: string; checklistItems?: string[] }) => {
+                  if (block.checklistItems?.length) return `${block.title || "Checklist"}\n${block.checklistItems.map((item) => `• ${item}`).join("\n")}`;
+                  return [block.title, block.body, block.instruction].filter(Boolean).join("\n");
+                })
+                .filter(Boolean)
+                .join("\n\n")
+            : "",
+          type: "text",
+        });
+      });
+    } catch {
+      pages.push({
+        id: "content-json",
+        title: "SOP Content",
+        body: item.contentJson,
+        type: "text",
+      });
+    }
+  }
+
+  if (!pages.length) {
+    pages.push({
+      id: "summary",
+      title: "Overview",
+      body: item.description || "Read this SOP carefully before acknowledging.",
+      type: "text",
+    });
+  }
+
+  if (item.mediaUrl) {
+    pages.push({
+      id: "media",
+      title: "Training Media",
+      body: "Watch the media before continuing to the next page.",
+      type: "media",
+      asset: item.mediaUrl,
+    });
+  }
+
+  if (item.pdfUrl) {
+    pages.push({
+      id: "pdf",
+      title: "PDF Document",
+      body: "Read the attached PDF like a PRD / handbook.",
+      type: "pdf",
+      asset: item.pdfUrl,
+    });
+  }
+
+  const checklist = (item.checklistText || "")
+    .split(/\n|,/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  pages.push({
+    id: "acknowledgement",
+    title: "Checklist / Acknowledgement",
+    body: "Confirm only after reading and understanding the SOP.",
+    type: "checklist",
+    checklist: checklist.length ? checklist : ["I have read the SOP", "I understand the key steps", "I know when to ask manager"],
+  });
+
+  return pages;
+}
+
 function SopReader({
   item,
   onClose,
@@ -621,25 +720,8 @@ function SopReader({
   const [page, setPage] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
 
-  const pages = [
-    {
-      title: "Overview",
-      body: item?.description || "Select an SOP or training document to start reading.",
-      type: "text",
-    },
-    {
-      title: "Training Media",
-      body: "Video / image / media preview belongs here. Staff can fullscreen the video and continue to next lesson.",
-      type: "video",
-    },
-    {
-      title: "Checklist / Acknowledgement",
-      body: "After reading, staff confirms they understand the SOP.",
-      type: "checklist",
-    },
-  ];
-
-  const active = pages[page];
+  const pages = parseSopReaderPages(item);
+  const active = pages[Math.min(page, pages.length - 1)] || pages[0];
 
   return (
     <Card className={cn("min-h-[560px]", fullscreen && "fixed inset-4 z-50 overflow-y-auto bg-background shadow-2xl")}>
@@ -679,21 +761,24 @@ function SopReader({
           <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Page {page + 1} of {pages.length}</div>
           <h2 className="text-2xl font-semibold tracking-tight">{active.title}</h2>
 
-          {active.type === "video" ? (
-            <div className="mt-5 rounded-2xl border bg-black px-6 py-20 text-center text-sm text-white">
-              Video preview area · browser fullscreen · next lesson after watching
+          {active.type === "media" && active.asset ? (
+            <div className="mt-5">
+              <UploadAssetPreview value={active.asset} label="Training Media" />
             </div>
-          ) : (
-            <p className="mt-5 text-base leading-8 text-muted-foreground">{active.body}</p>
-          )}
-
-          {active.type === "checklist" ? (
+          ) : active.type === "pdf" && active.asset ? (
+            <div className="mt-5">
+              <UploadAssetPreview value={active.asset} label="PDF Document" />
+            </div>
+          ) : active.type === "checklist" ? (
             <div className="mt-5 space-y-2">
-              {["I have read the SOP", "I understand the key steps", "I know when to ask manager"].map((check) => (
+              {(active.checklist || []).map((check) => (
                 <div key={check} className="rounded-xl border px-4 py-3 text-sm">{check}</div>
               ))}
+              <p className="pt-2 text-sm leading-7 text-muted-foreground">{active.body}</p>
             </div>
-          ) : null}
+          ) : (
+            <div className="mt-5 whitespace-pre-wrap text-base leading-8 text-muted-foreground">{active.body}</div>
+          )}
 
           <div className="mt-8 flex items-center justify-between border-t pt-4">
             <Button variant="outline" disabled={page === 0} onClick={() => setPage((value) => Math.max(0, value - 1))}>Previous</Button>

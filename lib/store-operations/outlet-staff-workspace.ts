@@ -31,6 +31,10 @@ export type OutletStaffWorkItem = {
   primaryAction: string;
   proofRequired: boolean;
   reviewState?: string;
+  contentJson?: string;
+  mediaUrl?: string;
+  pdfUrl?: string;
+  checklistText?: string;
 };
 
 type RuntimeDetail = {
@@ -191,6 +195,24 @@ export function buildOutletStaffWorkItems(input: {
       primaryAction: "Read",
       proofRequired: false,
       reviewState: acknowledgement,
+      contentJson:
+        detailValue(row, "SOP Content JSON") ||
+        detailValue(row, "Content JSON") ||
+        detailValue(row, "Employee Content JSON") ||
+        detailValue(row, "Pages JSON"),
+      mediaUrl:
+        detailValue(row, "Cover Media") ||
+        detailValue(row, "Cover Image") ||
+        detailValue(row, "Training Video") ||
+        detailValue(row, "Media URL"),
+      pdfUrl:
+        detailValue(row, "PDF URL") ||
+        detailValue(row, "PDF") ||
+        detailValue(row, "PDF Attachment"),
+      checklistText:
+        detailValue(row, "Checklist Items") ||
+        detailValue(row, "Checklist") ||
+        detailValue(row, "SOP Checklist"),
     };
   });
 
