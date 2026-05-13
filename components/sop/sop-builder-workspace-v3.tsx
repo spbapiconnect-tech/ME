@@ -245,6 +245,7 @@ export function SopBuilderWorkspaceV3({
                   {rootPages.map((chapter, chapterIndex) => {
                     const active = activePage?.id === chapter.id;
                     const subPages = subPagesByParent[chapter.id] || [];
+                    const renamingChapter = renamingPageId === chapter.id;
 
                     return (
                       <div key={chapter.id} className="space-y-1">
@@ -252,117 +253,90 @@ export function SopBuilderWorkspaceV3({
                           className={cn(
                             "group flex items-center gap-1 rounded-lg pr-1 transition hover:bg-muted/50",
                             active && "bg-primary/10 text-primary",
+                            renamingChapter && "bg-muted/50",
                           )}
                         >
-                          <button
-                            type="button"
-                            onClick={() => onSelectPage(chapter.id)}
-                            className="flex min-w-0 flex-1 items-center gap-2 px-2 py-2 text-left text-sm"
-                          >
+                          <div className="flex min-w-0 flex-1 items-center gap-2 px-2 py-2 text-left text-sm">
                             <span className="w-4 shrink-0 text-[11px] font-medium text-muted-foreground">
                               {chapterIndex + 1}
                             </span>
 
-                            {renamingPageId === chapter.id ? (
+                            {renamingChapter ? (
                               <input
                                 autoFocus
-                                onClick={(event) => event.stopPropagation()}
                                 value={renameValue}
                                 onChange={(event) => setRenameValue(event.target.value)}
-                                onBlur={() => undefined}
                                 onKeyDown={(event) => {
                                   if (event.key === "Enter") commitRename(chapter.id);
-                                  if (event.key === "Escape") setRenamingPageId(null);
+                                  if (event.key === "Escape") {
+                                    setRenamingPageId(null);
+                                    setRenameValue("");
+                                  }
                                 }}
-                                className="min-w-0 flex-1 rounded-md border bg-background px-2 py-1 text-sm text-foreground"
+                                className="min-w-0 flex-1 rounded-md border bg-background px-2 py-1 text-sm text-foreground outline-none ring-2 ring-primary/20"
                               />
                             ) : (
-                              <span className="min-w-0 flex-1 truncate font-medium">
-                                {cleanOutlineTitle(chapter.title)}
-                              </span>
-                            )}
-                          </button>
-
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 shrink-0 opacity-100 transition md:opacity-0 md:group-hover:opacity-100"
-                            onClick={() => onAddSubPage?.(chapter.id)}
-                            title="Add page"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                          </Button>
-
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 shrink-0 opacity-100 transition md:opacity-0 md:group-hover:opacity-100"
-                            onClick={(event) => { event.stopPropagation(); beginRename(chapter); }}
-                            title="Rename chapter"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Button>
-
-                          <Button
-                            type="button"
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7 shrink-0 text-muted-foreground opacity-100 transition hover:text-destructive md:opacity-0 md:group-hover:opacity-100"
-                            onClick={(event) => { event.stopPropagation(); onDeletePage(chapter.id); }}
-                            title="Delete chapter"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-
-                        {subPages.map((page, pageIndex) => {
-                          const subActive = activePage?.id === page.id;
-
-                          return (
-                            <div
-                              key={page.id}
-                              className={cn(
-                                "group ml-4 flex items-center gap-1 rounded-lg pr-1 transition hover:bg-muted/50",
-                                subActive && "bg-primary/10 text-primary",
-                              )}
-                            >
                               <button
                                 type="button"
-                                onClick={() => onSelectPage(page.id)}
-                                className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left text-sm"
+                                onClick={() => onSelectPage(chapter.id)}
+                                className="min-w-0 flex-1 truncate text-left font-medium"
                               >
-                                <span className="w-7 shrink-0 text-[11px] text-muted-foreground">
-                                  {chapterIndex + 1}.{pageIndex + 1}
-                                </span>
-
-                                {renamingPageId === page.id ? (
-                                  <input
-                                    autoFocus
-                                    value={renameValue}
-                                    onChange={(event) => setRenameValue(event.target.value)}
-                                    onBlur={() => undefined}
-                                    onKeyDown={(event) => {
-                                      if (event.key === "Enter") commitRename(page.id);
-                                      if (event.key === "Escape") setRenamingPageId(null);
-                                    }}
-                                    className="min-w-0 flex-1 rounded-md border bg-background px-2 py-1 text-sm text-foreground"
-                                  />
-                                ) : (
-                                  <span className="min-w-0 flex-1 truncate">
-                                    {cleanOutlineTitle(page.title)}
-                                  </span>
-                                )}
+                                {cleanOutlineTitle(chapter.title)}
                               </button>
+                            )}
+                          </div>
+
+                          {renamingChapter ? (
+                            <div className="flex shrink-0 gap-1">
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7"
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => commitRename(chapter.id)}
+                                title="Save name"
+                              >
+                                <Check className="h-3.5 w-3.5" />
+                              </Button>
 
                               <Button
                                 type="button"
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 shrink-0 opacity-100 transition md:opacity-0 md:group-hover:opacity-100"
-                                onClick={(event) => { event.stopPropagation(); beginRename(page); }}
-                                title="Rename page"
+                                className="h-7 w-7"
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => {
+                                  setRenamingPageId(null);
+                                  setRenameValue("");
+                                }}
+                                title="Cancel rename"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex shrink-0 gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100">
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7"
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => onAddSubPage?.(chapter.id)}
+                                title="Add page"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                              </Button>
+
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7"
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => beginRename(chapter)}
+                                title="Rename chapter"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
                               </Button>
@@ -371,12 +345,116 @@ export function SopBuilderWorkspaceV3({
                                 type="button"
                                 size="icon"
                                 variant="ghost"
-                                className="h-7 w-7 shrink-0 text-muted-foreground opacity-100 transition hover:text-destructive md:opacity-0 md:group-hover:opacity-100"
-                                onClick={(event) => { event.stopPropagation(); onDeletePage(page.id); }}
-                                title="Delete page"
+                                className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => onDeletePage(chapter.id)}
+                                title="Delete chapter"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </Button>
+                            </div>
+                          )}
+                        </div>
+
+                        {subPages.map((page, pageIndex) => {
+                          const subActive = activePage?.id === page.id;
+                          const renamingPage = renamingPageId === page.id;
+
+                          return (
+                            <div
+                              key={page.id}
+                              className={cn(
+                                "group ml-4 flex items-center gap-1 rounded-lg pr-1 transition hover:bg-muted/50",
+                                subActive && "bg-primary/10 text-primary",
+                                renamingPage && "bg-muted/50",
+                              )}
+                            >
+                              <div className="flex min-w-0 flex-1 items-center gap-2 px-2 py-1.5 text-left text-sm">
+                                <span className="w-7 shrink-0 text-[11px] text-muted-foreground">
+                                  {chapterIndex + 1}.{pageIndex + 1}
+                                </span>
+
+                                {renamingPage ? (
+                                  <input
+                                    autoFocus
+                                    value={renameValue}
+                                    onChange={(event) => setRenameValue(event.target.value)}
+                                    onKeyDown={(event) => {
+                                      if (event.key === "Enter") commitRename(page.id);
+                                      if (event.key === "Escape") {
+                                        setRenamingPageId(null);
+                                        setRenameValue("");
+                                      }
+                                    }}
+                                    className="min-w-0 flex-1 rounded-md border bg-background px-2 py-1 text-sm text-foreground outline-none ring-2 ring-primary/20"
+                                  />
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => onSelectPage(page.id)}
+                                    className="min-w-0 flex-1 truncate text-left"
+                                  >
+                                    {cleanOutlineTitle(page.title)}
+                                  </button>
+                                )}
+                              </div>
+
+                              {renamingPage ? (
+                                <div className="flex shrink-0 gap-1">
+                                  <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7"
+                                    onMouseDown={(event) => event.preventDefault()}
+                                    onClick={() => commitRename(page.id)}
+                                    title="Save name"
+                                  >
+                                    <Check className="h-3.5 w-3.5" />
+                                  </Button>
+
+                                  <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7"
+                                    onMouseDown={(event) => event.preventDefault()}
+                                    onClick={() => {
+                                      setRenamingPageId(null);
+                                      setRenameValue("");
+                                    }}
+                                    title="Cancel rename"
+                                  >
+                                    <X className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              ) : (
+                                <div className="flex shrink-0 gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100">
+                                  <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7"
+                                    onMouseDown={(event) => event.preventDefault()}
+                                    onClick={() => beginRename(page)}
+                                    title="Rename page"
+                                  >
+                                    <Pencil className="h-3.5 w-3.5" />
+                                  </Button>
+
+                                  <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                    onMouseDown={(event) => event.preventDefault()}
+                                    onClick={() => onDeletePage(page.id)}
+                                    title="Delete page"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
