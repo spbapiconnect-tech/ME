@@ -367,6 +367,7 @@ function StaffTabs({
   );
 }
 
+
 function StationFilterBar({
   value,
   onChange,
@@ -382,17 +383,41 @@ function StationFilterBar({
   ];
 
   return (
-    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
-      {filters.map((item) => (
-        <Button
-          key={item.value}
-          size="sm"
-          variant={value === item.value ? "secondary" : "outline"}
-          onClick={() => onChange(item.value)}
-        >
-          {item.label}
-        </Button>
-      ))}
+    <div className="min-w-0">
+      <details className="relative sm:hidden">
+        <summary className="flex h-10 list-none items-center justify-between rounded-xl border bg-card px-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+          <span>Filter: {value}</span>
+          <span className="text-muted-foreground">⌄</span>
+        </summary>
+        <div className="absolute right-0 top-11 z-30 w-44 rounded-xl border bg-popover p-1 shadow-xl">
+          {filters.map((item) => (
+            <button
+              key={item.value}
+              type="button"
+              onClick={() => onChange(item.value)}
+              className={cn(
+                "w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-muted",
+                value === item.value && "bg-muted font-medium",
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </details>
+
+      <div className="hidden flex-wrap gap-2 sm:flex">
+        {filters.map((item) => (
+          <Button
+            key={item.value}
+            size="sm"
+            variant={value === item.value ? "secondary" : "outline"}
+            onClick={() => onChange(item.value)}
+          >
+            {item.label}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1162,46 +1187,82 @@ function SopReader({
   );
 }
 
+
 function SopView({
   items,
   selected,
   onSelect,
+  onOpenReader,
 }: {
   items: OutletStaffWorkItem[];
   selected?: OutletStaffWorkItem;
   onSelect: (item: OutletStaffWorkItem | undefined) => void;
+  onOpenReader: (item: OutletStaffWorkItem) => void;
 }) {
   const activeSop = selected || items[0];
 
   return (
-    <div className="grid min-w-0 gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base">
-            <BookOpen className="h-4 w-4 text-primary" />
-            SOP Library
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">Long-term SOPs stay here. Only assigned training appears in Today.</p>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {!items.length ? (
-            <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No SOP assigned.</div>
-          ) : items.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onSelect(item)}
-              className={cn("w-full rounded-xl border bg-card p-3 text-left hover:bg-muted/30", activeSop?.id === item.id && "border-primary bg-muted/30")}
-            >
-              <div className="font-medium">{item.title}</div>
-              <div className="text-xs text-muted-foreground">{item.description}</div>
-            </button>
-          ))}
-        </CardContent>
-      </Card>
+    <>
+      <div className="xl:hidden">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BookOpen className="h-4 w-4 text-primary" />
+              SOP Library
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">Tap one document to enter focused reading mode.</p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {!items.length ? (
+              <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No SOP assigned.</div>
+            ) : items.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  onSelect(item);
+                  onOpenReader(item);
+                }}
+                className="w-full rounded-xl border bg-card p-4 text-left hover:bg-muted/30"
+              >
+                <div className="font-medium">{item.title}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{item.description}</div>
+                <div className="mt-3 text-sm font-medium text-primary">Read SOP</div>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
 
-      <SopReader item={activeSop} />
-    </div>
+      <div className="hidden min-w-0 gap-4 xl:grid xl:grid-cols-[360px_minmax(0,1fr)]">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BookOpen className="h-4 w-4 text-primary" />
+              SOP Library
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">Long-term SOPs stay here. Only assigned training appears in Today.</p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {!items.length ? (
+              <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No SOP assigned.</div>
+            ) : items.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onSelect(item)}
+                className={cn("w-full rounded-xl border bg-card p-3 text-left hover:bg-muted/30", activeSop?.id === item.id && "border-primary bg-muted/30")}
+              >
+                <div className="font-medium">{item.title}</div>
+                <div className="text-xs text-muted-foreground">{item.description}</div>
+              </button>
+            ))}
+          </CardContent>
+        </Card>
+
+        <SopReader item={activeSop} />
+      </div>
+    </>
   );
 }
 
@@ -1250,7 +1311,7 @@ function WorkItemSheet({
                 </div>
                 <div className="flex shrink-0 gap-2">
                   <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-                  <Button size="sm" variant="outline" onClick={onClose}>Close</Button>
+                  
                 </div>
               </div>
             </CardHeader>
@@ -1478,7 +1539,7 @@ export function OutletStaffHomePage() {
         {activeTab === "today" ? <TodayHome workItems={workItems} shifts={shiftItems} station={station} onOpen={setSelectedItem} /> : null}
         {activeTab === "calendar" ? <CalendarView workItems={workItems} shifts={shiftItems} onOpen={setSelectedItem} /> : null}
         {activeTab === "inbox" ? <InboxView items={inboxItems} onOpen={setSelectedItem} /> : null}
-        {activeTab === "sop" ? <SopView items={trainingItems} selected={selectedSop} onSelect={setSelectedSop} /> : null}
+        {activeTab === "sop" ? <SopView items={trainingItems} selected={selectedSop} onSelect={setSelectedSop} onOpenReader={setSelectedItem} /> : null}
       </div>
     </ErpShell>
   );
