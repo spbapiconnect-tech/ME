@@ -151,10 +151,13 @@ export function SopBuilderWorkspaceV3({
     [pagesInput, sopDocument?.pages],
   );
 
-  const settings = useMemo(
+  const resolvedSettings = useMemo(
     () => settingsInput ?? sopDocument?.settings ?? fallbackSettings,
     [settingsInput, sopDocument?.settings],
   );
+
+  const [localSettings, setLocalSettings] = useState<SopBuilderV3Settings>(resolvedSettings);
+  const settings = localSettings;
 
   useEffect(() => {
     const browserDocument = globalThis.document;
@@ -266,13 +269,22 @@ export function SopBuilderWorkspaceV3({
     onDocumentChange?.(blocks);
   }
 
+  function patchSettings(patch: Partial<SopBuilderV3Settings>) {
+    setLocalSettings((current) => ({
+      ...current,
+      ...patch,
+    }));
+
+    onUpdateSettings(patch);
+  }
+
   function toggleCsvSetting(field: "targetOutlet" | "targetRole", value: string) {
     const current = csvToArray(settings[field]);
     const next = current.includes(value)
       ? current.filter((item) => item !== value)
       : [...current, value];
 
-    onUpdateSettings({ [field]: arrayToCsv(next) } as Partial<SopBuilderV3Settings>);
+    patchSettings({ [field]: arrayToCsv(next) } as Partial<SopBuilderV3Settings>);
   }
 
   function toggleLocalList(list: string[], setList: (value: string[]) => void, value: string) {
@@ -601,7 +613,7 @@ export function SopBuilderWorkspaceV3({
                             <Label>SOP Title</Label>
                             <Input
                               value={settings.title}
-                              onChange={(event) => onUpdateSettings({ title: event.target.value })}
+                              onChange={(event) => patchSettings({ title: event.target.value })}
                             />
                           </div>
 
@@ -611,7 +623,7 @@ export function SopBuilderWorkspaceV3({
                               <Input
                                 value={settings.documentCode}
                                 onChange={(event) =>
-                                  onUpdateSettings({ documentCode: event.target.value })
+                                  patchSettings({ documentCode: event.target.value })
                                 }
                               />
                             </div>
@@ -619,7 +631,7 @@ export function SopBuilderWorkspaceV3({
                               <Label>Version</Label>
                               <Input
                                 value={settings.version}
-                                onChange={(event) => onUpdateSettings({ version: event.target.value })}
+                                onChange={(event) => patchSettings({ version: event.target.value })}
                               />
                             </div>
                           </div>
