@@ -99,58 +99,224 @@ function WorkspaceSection({
 
 
 
-function StaffDayPlan({ items }: { items: OutletWorkspaceCard[] }) {
-  const [view, setView] = useState<"timeline" | "calendar">("timeline");
 
-  const workItems = items.slice(0, 6);
+function workItemColor(item: OutletWorkspaceCard) {
+  if (item.module === "tasks") return "bg-blue-500";
+  if (item.module === "inspection") return "bg-amber-500";
+  if (item.module === "issues") return "bg-red-500";
+  if (item.module === "sop") return "bg-emerald-500";
+  return "bg-muted-foreground";
+}
+
+function workItemGroupLabel(item: OutletWorkspaceCard) {
+  const text = `${item.title} ${item.subtitle}`.toLowerCase();
+  if (text.includes("grab")) return "GrabFood Complaint";
+  if (text.includes("customer") || text.includes("complaint")) return "Customer Complaint";
+  if (item.module === "inspection") return "Inspection Follow-up";
+  if (item.module === "issues") return "Rework / Proof";
+  if (item.module === "sop") return "Training / SOP";
+  return "Outlet Task";
+}
+
+function getItemHour(item: OutletWorkspaceCard, index: number) {
+  const source = `${item.dueLabel || ""} ${item.subtitle || ""} ${item.title || ""}`;
+  const match = source.match(/(\d{1,2})(?::\d{2})?\s*(am|pm)?/i);
+  if (match) {
+    let hour = Number(match[1]);
+    const meridiem = match[2]?.toLowerCase();
+    if (meridiem === "pm" && hour < 12) hour += 12;
+    if (meridiem === "am" && hour === 12) hour = 0;
+    return Math.max(0, Math.min(23, hour));
+  }
+  return [9, 11, 14, 16, 18, 20][index % 6];
+}
+
+function StaffCalendarWorkView({
+  tasks,
+  inspections,
+  proofs,
+  training,
+  onOpen,
+}: {
+  tasks: OutletWorkspaceCard[];
+  inspections: OutletWorkspaceCard[];
+  proofs: OutletWorkspaceCard[];
+  training: OutletWorkspaceCard[];
+  onOpen: (item: OutletWorkspaceCard) => void;
+}) {
+  const [view, setView] = useState<"calendar" | "timeline">("calendar");
+  const [selectedDay, setSelectedDay] = useState(new Date().getDate());
+
+  const allItems = [...tasks, ...inspections, ...proofs, ...training].slice(0, 48);
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+  const monthLabel = now.toLocaleString(undefined, { month: "long", year: "numeric" });
+
+  const dayItems = (day: number) => allItems.filter((_, index) => ((index * 3) % daysInMonth) + 1 === day);
+  const selectedItems = dayItems(selectedDay);
+  const timelineItems = allItems
+    .map((item, index) => ({ item, hour: getItemHour(item, index) }))
+    .sort((a, b) => a.hour - b.hour);
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <CardTitle className="text-base">Today Plan</CardTitle>
-            <p className="text-sm text-muted-foreground">Simple outlet view for what starts now, what is next, and what needs proof.</p>
+            <CardTitle className="text-base">Outlet Calendar</CardTitle>
+            <p className="text-sm text-muted-foreground">Month view and 24-hour timeline for outlet work, special tasks, inspection, complaints, and training.</p>
           </div>
           <div className="flex rounded-lg border p-1">
-            <Button size="sm" variant={view === "timeline" ? "secondary" : "ghost"} onClick={() => setView("timeline")}>Timeline</Button>
-            <Button size="sm" variant={view === "calendar" ? "secondary" : "ghost"} onClick={() => setView("calendar")}>Calendar</Button>
+            <Button size="sm" variant={view === "calendar" ? "secondary" : "ghost"} onClick={() => setView("calendar")}>Month</Button>
+            <Button size="sm" variant={view === "timeline" ? "secondary" : "ghost"} onClick={() => setView("timeline")}>24h Timeline</Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        {!workItems.length ? (
-          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No scheduled staff work for this outlet filter.</div>
-        ) : view === "timeline" ? (
-          <div className="space-y-3">
-            {workItems.map((item, index) => (
-              <div key={`${item.id}-${index}`} className="grid grid-cols-[72px_1fr] gap-3">
-                <div className="text-sm font-medium">{item.dueLabel || "Today"}</div>
-                <div className="rounded-xl border bg-muted/10 p-3">
-                  <div className="font-medium">{item.title}</div>
-                  <div className="text-xs text-muted-foreground">{item.subtitle}</div>
-                  {item.proofLabel ? <div className="mt-2 text-xs text-muted-foreground">Proof: {item.proofLabel}</div> : null}
-                </div>
+
+      <CardContent className="space-y-4">
+        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+          {[
+            ["Task", "bg-blue-500"],
+            ["Inspection", "bg-amber-500"],
+            ["Complaint / Rework", "bg-red-500"],
+            ["Training / SOP", "bg-emerald-500"],
+          ].map(([label, color]) => (
+            <span key={label} className="flex items-center gap-1 rounded-full border px-2 py-1">
+              <span className={cn("h-2 w-2 rounded-full", color)} />
+              {label}
+            </span>
+          ))}
+        </div>
+
+        {view === "calendar" ? (
+          <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-2xl border bg-muted/5 p-3">
+              <div className="mb-3 font-medium">{monthLabel}</div>
+              <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => <div key={day} className="py-1">{day}</div>)}
               </div>
-            ))}
+              <div className="grid grid-cols-7 gap-1">
+                {Array.from({ length: firstDay }).map((_, index) => <div key={`empty-${index}`} />)}
+                {Array.from({ length: daysInMonth }).map((_, index) => {
+                  const day = index + 1;
+                  const items = dayItems(day);
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      onClick={() => setSelectedDay(day)}
+                      className={cn(
+                        "min-h-[74px] rounded-xl border bg-background p-2 text-left transition-colors hover:bg-muted/40",
+                        selectedDay === day && "border-primary bg-primary/5"
+                      )}
+                    >
+                      <div className="text-sm font-medium">{day}</div>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {items.slice(0, 4).map((item) => (
+                          <span key={`${day}-${item.module}-${item.id}`} className={cn("h-2 w-2 rounded-full", workItemColor(item))} />
+                        ))}
+                      </div>
+                      {items.length > 4 ? <div className="mt-1 text-[10px] text-muted-foreground">+{items.length - 4}</div> : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border bg-background p-3">
+              <div className="mb-3">
+                <div className="text-sm font-semibold">Day {selectedDay}</div>
+                <div className="text-xs text-muted-foreground">{selectedItems.length} item(s)</div>
+              </div>
+              <div className="space-y-2">
+                {!selectedItems.length ? (
+                  <div className="rounded-xl border border-dashed p-3 text-sm text-muted-foreground">No work scheduled for this day.</div>
+                ) : selectedItems.map((item) => (
+                  <button key={`${item.module}-${item.id}`} type="button" onClick={() => onOpen(item)} className="w-full rounded-xl border bg-muted/10 p-3 text-left hover:bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <span className={cn("h-2 w-2 rounded-full", workItemColor(item))} />
+                      <span className="text-xs text-muted-foreground">{workItemGroupLabel(item)}</span>
+                    </div>
+                    <div className="mt-1 font-medium">{item.title}</div>
+                    <div className="text-xs text-muted-foreground">{item.dueLabel || item.status}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
-          <div className="grid gap-3 md:grid-cols-3">
-            {["Morning", "Afternoon", "Night"].map((slot, index) => (
-              <div key={slot} className="rounded-xl border bg-muted/10 p-3">
-                <div className="text-xs text-muted-foreground">{slot}</div>
-                <div className="mt-2 space-y-2">
-                  {workItems.filter((_, itemIndex) => itemIndex % 3 === index).map((item) => (
-                    <div key={item.id} className="rounded-lg bg-background px-3 py-2 text-sm">
-                      <div className="font-medium">{item.title}</div>
-                      <div className="text-xs text-muted-foreground">{item.dueLabel || "No time set"}</div>
+          <div className="rounded-2xl border bg-muted/5 p-3">
+            <div className="space-y-1">
+              {Array.from({ length: 24 }).map((_, hour) => {
+                const items = timelineItems.filter((entry) => entry.hour === hour).map((entry) => entry.item);
+                return (
+                  <div key={hour} className="grid grid-cols-[58px_1fr] gap-3 border-b py-2 last:border-b-0">
+                    <div className="text-xs font-medium text-muted-foreground">{String(hour).padStart(2, "0")}:00</div>
+                    <div className="space-y-2">
+                      {!items.length ? <div className="h-5 rounded-lg bg-muted/20" /> : items.map((item) => (
+                        <button key={`${hour}-${item.module}-${item.id}`} type="button" onClick={() => onOpen(item)} className="w-full rounded-xl border bg-background p-3 text-left hover:bg-muted/30">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <span className={cn("h-2 w-2 rounded-full", workItemColor(item))} />
+                              <span className="font-medium">{item.title}</span>
+                            </div>
+                            <Badge variant={statusVariant(item.tone)}>{item.status}</Badge>
+                          </div>
+                          <div className="mt-1 text-xs text-muted-foreground">{workItemGroupLabel(item)} · {item.subtitle}</div>
+                        </button>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function OutletInbox({
+  items,
+  onOpen,
+}: {
+  items: OutletWorkspaceCard[];
+  onOpen: (item: OutletWorkspaceCard) => void;
+}) {
+  const groups = ["Customer Complaint", "GrabFood Complaint", "Inspection Follow-up", "Rework / Proof", "Outlet Task"];
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">Inbox</CardTitle>
+        <p className="text-sm text-muted-foreground">Separated staff inbox for complaint, inspection follow-up, proof rework, and special outlet tasks.</p>
+      </CardHeader>
+      <CardContent className="grid gap-3 xl:grid-cols-2">
+        {groups.map((group) => {
+          const groupItems = items.filter((item) => workItemGroupLabel(item) === group);
+          return (
+            <div key={group} className="rounded-2xl border bg-muted/5 p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="font-medium">{group}</div>
+                <Badge variant="outline">{groupItems.length}</Badge>
+              </div>
+              <div className="space-y-2">
+                {!groupItems.length ? (
+                  <div className="rounded-xl border border-dashed p-3 text-xs text-muted-foreground">Nothing here.</div>
+                ) : groupItems.slice(0, 4).map((item) => (
+                  <button key={`${group}-${item.module}-${item.id}`} type="button" onClick={() => onOpen(item)} className="w-full rounded-xl border bg-background p-3 text-left hover:bg-muted/30">
+                    <div className="font-medium">{item.title}</div>
+                    <div className="text-xs text-muted-foreground">{item.subtitle}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );
@@ -405,7 +571,15 @@ export function OutletWorkspacePage() {
           ))}
         </div>
 
-        <StaffDayPlan items={filteredTasks} />
+        <StaffCalendarWorkView
+          tasks={filteredTasks}
+          inspections={filteredInspections}
+          proofs={filteredProofs}
+          training={filteredTraining}
+          onOpen={setSelectedWorkItem}
+        />
+
+        <OutletInbox items={[...filteredTasks, ...filteredInspections, ...filteredProofs]} onOpen={setSelectedWorkItem} />
 
         <StaffWorkPanel item={selectedWorkItem} onClose={() => setSelectedWorkItem(undefined)} />
 
