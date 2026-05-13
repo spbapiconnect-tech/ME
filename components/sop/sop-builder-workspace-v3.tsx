@@ -525,7 +525,7 @@ export function SopBuilderWorkspaceV3({
 
         <ResizablePanel defaultSize={inspectorOpen ? 56 : 84} minSize={36}>
           <main className="h-full min-h-0 overflow-y-auto bg-background [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <SopBlockNoteEditor onDocumentChange={handleDocumentChange} />
+            <SopBlockNoteEditor disabled={Boolean(renameTarget)} onDocumentChange={handleDocumentChange} />
           </main>
         </ResizablePanel>
 

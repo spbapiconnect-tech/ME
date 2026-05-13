@@ -218,3 +218,52 @@
 .sop-reader-preview [class*="FileName"] {
   display: none !important;
 }
+
+/* Strong ME dark-mode readability for BlockNote editor + preview. */
+.dark .sop-blocknote-shell,
+.dark .sop-reader-preview,
+[data-theme="dark"] .sop-blocknote-shell,
+[data-theme="dark"] .sop-reader-preview {
+  --bn-colors-editor-text: hsl(var(--foreground));
+  --bn-colors-editor-background: transparent;
+  --bn-colors-menu-text: hsl(var(--popover-foreground));
+  --bn-colors-menu-background: hsl(var(--popover));
+  --bn-colors-tooltip-text: hsl(var(--popover-foreground));
+  --bn-colors-tooltip-background: hsl(var(--popover));
+  --bn-colors-hovered-text: hsl(var(--foreground));
+  --bn-colors-hovered-background: hsl(var(--muted));
+  --bn-colors-selected-text: hsl(var(--primary-foreground));
+  --bn-colors-selected-background: hsl(var(--primary));
+  --bn-colors-disabled-text: hsl(var(--muted-foreground));
+  --bn-colors-disabled-background: transparent;
+  --bn-colors-shadow: rgb(0 0 0 / 0.45);
+  --bn-colors-border: hsl(var(--border));
+}
+
+.dark .sop-blocknote-shell .bn-container,
+.dark .sop-blocknote-shell .bn-editor,
+.dark .sop-reader-preview .bn-container,
+.dark .sop-reader-preview .bn-editor {
+  background: transparent !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.dark .sop-blocknote-shell [contenteditable="true"],
+.dark .sop-blocknote-shell .bn-block-content,
+.dark .sop-blocknote-shell .bn-inline-content,
+.dark .sop-reader-preview .bn-block-content,
+.dark .sop-reader-preview .bn-inline-content {
+  color: hsl(var(--foreground)) !important;
+  opacity: 1 !important;
+}
+
+.dark .sop-blocknote-shell .bn-inline-content span:not([style*="color"]),
+.dark .sop-reader-preview .bn-inline-content span:not([style*="color"]) {
+  color: hsl(var(--foreground)) !important;
+  opacity: 1 !important;
+}
+
+.dark .sop-blocknote-shell [data-placeholder]::before {
+  color: hsl(var(--muted-foreground)) !important;
+  opacity: 0.75 !important;
+}

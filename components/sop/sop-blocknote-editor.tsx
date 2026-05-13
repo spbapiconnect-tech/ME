@@ -13,7 +13,7 @@ import {
 } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 import { FileUp, ImageIcon, Video } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { SopBlockNoteDocument } from "@/components/sop/sop-blocknote-preview";
 
@@ -41,6 +41,40 @@ type InsertableEditor = {
 
 async function uploadLocalPreviewFile(file: File) {
   return URL.createObjectURL(file);
+}
+
+function useResolvedBlockNoteTheme() {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    function resolveTheme() {
+      const root = document.documentElement;
+      const isDark =
+        root.classList.contains("dark") ||
+        root.style.colorScheme === "dark" ||
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+      setTheme(isDark ? "dark" : "light");
+    }
+
+    resolveTheme();
+
+    const observer = new MutationObserver(resolveTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style"],
+    });
+
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    media.addEventListener("change", resolveTheme);
+
+    return () => {
+      observer.disconnect();
+      media.removeEventListener("change", resolveTheme);
+    };
+  }, []);
+
+  return theme;
 }
 
 function getSopSlashMenuItems(
@@ -86,12 +120,15 @@ function getSopSlashMenuItems(
 
 export function SopBlockNoteEditor({
   onDocumentChange,
+  disabled = false,
 }: {
   onDocumentChange?: (blocks: SopBlockNoteDocument) => void;
+  disabled?: boolean;
 }) {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const blockNoteTheme = useResolvedBlockNoteTheme();
 
   const editor = useCreateBlockNote({
     initialContent: [
@@ -105,12 +142,21 @@ export function SopBlockNoteEditor({
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      editor.focus();
+      if (!disabled) editor.focus();
       onDocumentChange?.(editor.document as SopBlockNoteDocument);
     }, 80);
 
     return () => window.clearTimeout(timer);
-  }, [editor, onDocumentChange]);
+  }, [editor, onDocumentChange, disabled]);
+
+  useEffect(() => {
+    if (!disabled) return;
+
+    const activeElement = document.activeElement as HTMLElement | null;
+    if (activeElement?.isContentEditable || activeElement?.closest?.(".sop-blocknote-shell")) {
+      activeElement.blur();
+    }
+  }, [disabled]);
 
   function openUploadPicker(kind: UploadKind) {
     if (kind === "image") imageInputRef.current?.click();
@@ -201,8 +247,9 @@ export function SopBlockNoteEditor({
 
         <BlockNoteView
           editor={editor}
-          theme="light"
+          theme={blockNoteTheme}
           slashMenu={false}
+          editable={!disabled}
           filePanel={false}
           formattingToolbar={true}
           className="min-h-[calc(100vh-220px)] rounded-2xl bg-background"
@@ -210,12 +257,14 @@ export function SopBlockNoteEditor({
             onDocumentChange?.(currentEditor.document as SopBlockNoteDocument);
           }}
         >
-          <SuggestionMenuController
-            triggerCharacter="/"
-            getItems={async (query) =>
-              filterSuggestionItems(getSopSlashMenuItems(editor, openUploadPicker), query)
-            }
-          />
+          {!disabled ? (
+            <SuggestionMenuController
+              triggerCharacter="/"
+              getItems={async (query) =>
+                filterSuggestionItems(getSopSlashMenuItems(editor, openUploadPicker), query)
+              }
+            />
+          ) : null}
         </BlockNoteView>
       </div>
     </div>
