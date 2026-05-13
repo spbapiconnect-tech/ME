@@ -201,7 +201,7 @@ function serializeContent(mode: SopForm["employeeReadMode"], pages: BuilderPage[
         body: block.body,
         imageUrl: block.imageUrl,
         pdfUrl: block.pdfUrl,
-        warningLevel: block.warningLevel,
+        warningLevel: block.warningLevel ?? "Info",
         checklistItems: block.checklistText
           .split("\n")
           .map((item) => item.trim())
