@@ -106,7 +106,7 @@ function SopColorButton({
   );
 }
 
-function SopFormattingToolbarfunction SopFormattingToolbar() {
+function SopFormattingToolbar() {
   return (
     <FormattingToolbar>
       <BlockTypeSelect key="blockTypeSelect" />
