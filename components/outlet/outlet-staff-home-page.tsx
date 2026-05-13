@@ -1045,10 +1045,17 @@ function InboxView({
 }
 
 type ParsedSopBlock = {
+  type?: string;
   title?: string;
   body?: string;
   instruction?: string;
   checklistItems?: string[];
+  asset?: string;
+  mediaUrl?: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  pdfUrl?: string;
+  url?: string;
 };
 
 type ParsedSopContentPage = {
@@ -1066,12 +1073,35 @@ type SopReaderPage = {
   checklist?: string[];
 };
 
+function blockAssetValue(block: ParsedSopBlock) {
+  return block.asset || block.mediaUrl || block.imageUrl || block.videoUrl || block.pdfUrl || block.url || "";
+}
+
+function blockReaderType(block: ParsedSopBlock, asset: string): SopReaderPage["type"] {
+  const source = `${block.type || ""} ${asset}`.toLowerCase();
+
+  if (source.includes("pdf") || source.endsWith(".pdf")) return "pdf";
+  if (
+    source.includes("image") ||
+    source.includes("video") ||
+    source.endsWith(".png") ||
+    source.endsWith(".jpg") ||
+    source.endsWith(".jpeg") ||
+    source.endsWith(".webp") ||
+    source.endsWith(".mp4") ||
+    source.endsWith(".mov") ||
+    source.endsWith(".webm")
+  ) return "media";
+
+  return "text";
+}
+
 function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
   if (!item) {
     return [{
       id: "empty",
       title: "No SOP selected",
-      body: "Choose a document from the left list. If there is only one assigned SOP, it will open automatically.",
+      body: "Choose a document from the SOP library to start reading.",
       type: "text",
     }];
   }
@@ -1084,20 +1114,46 @@ function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
       const parsedPages: ParsedSopContentPage[] = Array.isArray(parsed?.pages) ? parsed.pages : [];
 
       parsedPages.forEach((page, pageIndex) => {
-        pages.push({
-          id: String(page.id || `page-${pageIndex}`),
-          title: page.title || `Page ${pageIndex + 1}`,
-          body: Array.isArray(page.blocks)
-            ? page.blocks
-                .map((block) => {
-                  if (block.checklistItems?.length) return `${block.title || "Checklist"}\n${block.checklistItems.map((check) => `• ${check}`).join("\n")}`;
-                  return [block.title, block.body, block.instruction].filter(Boolean).join("\n");
-                })
-                .filter(Boolean)
-                .join("\n\n")
-            : "",
-          type: "text",
+        const blocks = Array.isArray(page.blocks) ? page.blocks : [];
+        const textBlocks: string[] = [];
+
+        blocks.forEach((block, blockIndex) => {
+          const asset = blockAssetValue(block);
+
+          if (asset) {
+            pages.push({
+              id: `${page.id || `page-${pageIndex}`}-media-${blockIndex}`,
+              title: block.title || page.title || `Media ${blockIndex + 1}`,
+              body: block.body || block.instruction || "Review this media before continuing.",
+              type: blockReaderType(block, asset),
+              asset,
+            });
+            return;
+          }
+
+          if (block.checklistItems?.length) {
+            pages.push({
+              id: `${page.id || `page-${pageIndex}`}-checklist-${blockIndex}`,
+              title: block.title || "Checklist",
+              body: block.body || block.instruction || "Complete this checklist after reading.",
+              type: "checklist",
+              checklist: block.checklistItems,
+            });
+            return;
+          }
+
+          const textContent = [block.title, block.body, block.instruction].filter(Boolean).join("\\n");
+          if (textContent) textBlocks.push(textContent);
         });
+
+        if (textBlocks.length) {
+          pages.push({
+            id: String(page.id || `page-${pageIndex}`),
+            title: page.title || `Page ${pageIndex + 1}`,
+            body: textBlocks.join("\\n\\n"),
+            type: "text",
+          });
+        }
       });
     } catch {
       pages.push({
@@ -1139,7 +1195,7 @@ function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
   }
 
   const checklist = (item.checklistText || "")
-    .split(/\n|,/)
+    .split(/\\n|,/)
     .map((entry) => entry.trim())
     .filter(Boolean);
 
@@ -1178,12 +1234,17 @@ function SopReader({
   }
 
   function renderPageBody() {
-    if (active.type === "media" && active.asset) {
-      return <UploadAssetPreview value={active.asset} label="Training Media" />;
-    }
-
-    if (active.type === "pdf" && active.asset) {
-      return <UploadAssetPreview value={active.asset} label="PDF Document" />;
+    if ((active.type === "media" || active.type === "pdf") && active.asset) {
+      return (
+        <div className="space-y-4">
+          <div className="rounded-3xl border bg-card p-3">
+            <UploadAssetPreview value={active.asset} label={active.title} />
+          </div>
+          {active.body ? (
+            <p className="text-sm leading-7 text-muted-foreground">{active.body}</p>
+          ) : null}
+        </div>
+      );
     }
 
     if (active.type === "checklist") {
@@ -1234,18 +1295,23 @@ function SopReader({
             ) : null}
           </div>
 
-          <div className="mt-3 space-y-2">
-            <select
-              value={String(safePage)}
-              onChange={(event) => setPage(Number(event.target.value))}
-              className="h-10 w-full rounded-xl border bg-background px-3 text-sm"
-            >
+          <div className="mt-3 space-y-3">
+            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {pages.map((readerPage, index) => (
-                <option key={readerPage.id} value={String(index)}>
-                  {index + 1}. {readerPage.title}
-                </option>
+                <button
+                  key={readerPage.id}
+                  type="button"
+                  onClick={() => setPage(index)}
+                  className={cn(
+                    "min-w-[120px] shrink-0 rounded-xl border px-3 py-2 text-left text-xs",
+                    safePage === index ? "border-primary bg-primary/10 text-primary" : "bg-card text-muted-foreground",
+                  )}
+                >
+                  <div className="font-medium">Page {index + 1}</div>
+                  <div className="mt-0.5 truncate">{readerPage.title}</div>
+                </button>
               ))}
-            </select>
+            </div>
 
             <div className="h-1.5 overflow-hidden rounded-full bg-muted">
               <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
