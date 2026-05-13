@@ -134,6 +134,7 @@ export function SopBuilderWorkspaceV3({
   onDocumentChange,
 }: SopBuilderWorkspaceV3Props) {
   const workspaceRef = useRef<HTMLDivElement | null>(null);
+  const renameInputRef = useRef<HTMLInputElement | null>(null);
   const [previewDocument, setPreviewDocument] = useState<SopBlockNoteDocument>([]);
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [inspectorTab, setInspectorTab] = useState<"preview" | "settings">("preview");
@@ -146,6 +147,17 @@ export function SopBuilderWorkspaceV3({
 
   const pages = pagesInput ?? sopDocument?.pages ?? [];
   const settings = settingsInput ?? sopDocument?.settings ?? fallbackSettings;
+
+  useEffect(() => {
+    if (!renameTarget) return;
+
+    const timer = window.setTimeout(() => {
+      renameInputRef.current?.focus();
+      renameInputRef.current?.select();
+    }, 30);
+
+    return () => window.clearTimeout(timer);
+  }, [renameTarget]);
 
   useEffect(() => {
     const browserDocument = globalThis.document;
@@ -729,30 +741,73 @@ export function SopBuilderWorkspaceV3({
       ) : null}
 
       {renameTarget ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/45 backdrop-blur-sm">
-          <div className="w-full max-w-sm rounded-2xl border bg-popover p-4 shadow-2xl">
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/55 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
+          onKeyDown={(event) => {
+            event.stopPropagation();
+          }}
+        >
+          <form
+            className="w-full max-w-sm rounded-2xl border bg-popover p-4 text-popover-foreground shadow-2xl"
+            onMouseDown={(event) => {
+              event.stopPropagation();
+            }}
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+            onSubmit={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              saveRename();
+            }}
+          >
             <div className="text-sm font-semibold">Rename</div>
             <div className="mt-1 text-xs text-muted-foreground">Rename this chapter or page.</div>
 
             <Input
-              autoFocus
+              ref={renameInputRef}
               className="mt-4"
               value={renameValue}
               onChange={(event) => setRenameValue(event.target.value)}
+              onMouseDown={(event) => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
               onKeyDown={(event) => {
-                if (event.key === "Enter") saveRename();
-                if (event.key === "Escape") setRenameTarget(null);
+                event.stopPropagation();
+
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  setRenameTarget(null);
+                  setRenameValue("");
+                }
               }}
             />
 
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setRenameTarget(null)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setRenameTarget(null);
+                  setRenameValue("");
+                }}
+              >
                 Cancel
               </Button>
-              <Button onClick={saveRename}>Save</Button>
+              <Button type="submit">Save</Button>
             </div>
-          </div>
+          </form>
         </div>
+      ) : null}
       ) : null}
     </div>
   );
