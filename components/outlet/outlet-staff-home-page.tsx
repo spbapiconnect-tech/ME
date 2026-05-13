@@ -613,6 +613,19 @@ function InboxView({
 }
 
 
+type ParsedSopBlock = {
+  title?: string;
+  body?: string;
+  instruction?: string;
+  checklistItems?: string[];
+};
+
+type ParsedSopContentPage = {
+  id?: string;
+  title?: string;
+  blocks?: ParsedSopBlock[];
+};
+
 type SopReaderPage = {
   id: string;
   title: string;
@@ -637,15 +650,15 @@ function parseSopReaderPages(item?: OutletStaffWorkItem): SopReaderPage[] {
   if (item.contentJson) {
     try {
       const parsed = JSON.parse(item.contentJson);
-      const parsedPages = Array.isArray(parsed?.pages) ? parsed.pages : [];
+      const parsedPages: ParsedSopContentPage[] = Array.isArray(parsed?.pages) ? parsed.pages : [];
 
-      parsedPages.forEach((page, pageIndex) => {
+      parsedPages.forEach((page: ParsedSopContentPage, pageIndex: number) => {
         pages.push({
           id: String(page.id || `page-${pageIndex}`),
           title: page.title || `Page ${pageIndex + 1}`,
           body: Array.isArray(page.blocks)
             ? page.blocks
-                .map((block: { title?: string; body?: string; instruction?: string; checklistItems?: string[] }) => {
+                .map((block: ParsedSopBlock) => {
                   if (block.checklistItems?.length) return `${block.title || "Checklist"}\n${block.checklistItems.map((item) => `• ${item}`).join("\n")}`;
                   return [block.title, block.body, block.instruction].filter(Boolean).join("\n");
                 })
