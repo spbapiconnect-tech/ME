@@ -1219,76 +1219,107 @@ function WorkItemSheet({
 
   if (!item) return null;
 
-  if (item.type === "sop" || item.type === "training") {
-    return <SopReader item={item} onClose={onClose} />;
-  }
+  const isReader = item.type === "sop" || item.type === "training";
 
   return (
-    <Card className="border-primary/30">
-      <CardHeader className="border-b">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="text-xs font-medium uppercase text-muted-foreground">{item.inboxGroup}</div>
-            <CardTitle className="text-xl">{item.title}</CardTitle>
-            <p className="text-sm text-muted-foreground">{item.description}</p>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-3 backdrop-blur-sm sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
+      <div
+        className={cn(
+          "w-full overflow-hidden rounded-2xl border bg-background shadow-2xl",
+          isReader ? "max-h-[92dvh] max-w-7xl" : "max-h-[86dvh] max-w-4xl",
+        )}
+        onClick={(event) => event.stopPropagation()}
+      >
+        {isReader ? (
+          <div className="max-h-[92dvh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <SopReader item={item} onClose={onClose} />
           </div>
-          <div className="flex gap-2">
-            <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
-            <Button size="sm" variant="ghost" onClick={onClose}>Close</Button>
-          </div>
-        </div>
-      </CardHeader>
+        ) : (
+          <Card className="border-0 shadow-none">
+            <CardHeader className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-xs font-medium uppercase text-muted-foreground">{item.inboxGroup}</div>
+                  <CardTitle className="truncate text-xl">{item.title}</CardTitle>
+                  <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <Badge variant={statusVariant(item)}>{isOverdue(item) ? "Overdue" : item.status}</Badge>
+                  <Button size="sm" variant="outline" onClick={onClose}>Close</Button>
+                </div>
+              </div>
+            </CardHeader>
 
-      <CardContent className="space-y-4 p-5">
-        <div className="grid gap-3 md:grid-cols-3">
-          {[
-            ["Time", `${item.date} · ${item.startTime}`],
-            ["Action", isOverdue(item) ? "Fix now" : item.primaryAction],
-            ["Review", item.reviewState || "Not submitted"],
-          ].map(([label, value]) => (
-            <div key={label} className="rounded-xl border bg-background p-3">
-              <div className="text-xs text-muted-foreground">{label}</div>
-              <div className="font-medium">{value}</div>
-            </div>
-          ))}
-        </div>
+            <CardContent className="max-h-[calc(86dvh-96px)] space-y-4 overflow-y-auto p-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="grid gap-3 md:grid-cols-3">
+                {[
+                  ["Time", `${item.date} · ${item.startTime}`],
+                  ["Action", isOverdue(item) ? "Fix now" : item.primaryAction],
+                  ["Review", item.reviewState || "Not submitted"],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-xl border bg-background p-3">
+                    <div className="text-xs text-muted-foreground">{label}</div>
+                    <div className="font-medium">{value}</div>
+                  </div>
+                ))}
+              </div>
 
-        {item.proofRequired ? (
-          <div className="rounded-2xl border bg-background p-4">
-            <div className="font-medium">Upload photo / video proof</div>
-            <Input
-              className="mt-3"
-              type="file"
-              accept="image/*,video/*"
-              onChange={async (event) => {
-                const file = event.target.files?.[0];
-                if (!file) return;
+              <div className="rounded-2xl border bg-card p-4">
+                <div className="font-medium">Work Detail</div>
+                <div className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+                  {item.description || "No extra detail provided."}
+                </div>
+              </div>
 
-                const uploadScope: "task" | "inspection" | "incident" = item.sourceModule === "issues" ? "incident" : item.sourceModule === "inspection" ? "inspection" : "task";
-                const asset = await uploadLocalPreviewAsset(file, uploadScope);
-                const serialized = serializeUploadAsset(asset);
-                setProofAsset(serialized);
-                setProofName(uploadAssetLabel(serialized));
-              }}
-            />
-            {proofName ? <div className="mt-2 text-xs text-muted-foreground">Selected: {proofName}</div> : null}
-            {proofAsset ? <UploadAssetPreview value={proofAsset} compact /> : null}
-          </div>
-        ) : null}
+              {item.proofRequired ? (
+                <div className="rounded-2xl border bg-card p-4">
+                  <div className="font-medium">Upload photo / video proof</div>
+                  <Input
+                    className="mt-3"
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={async (event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
 
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
-          <Button
-            disabled={item.proofRequired && !proofAsset}
-            onClick={async () => {
-              if (proofAsset) await onSubmitProof(item, proofAsset);
-            }}
-          >
-            {item.proofRequired ? "Submit Proof" : isOverdue(item) ? "Fix and submit" : item.primaryAction}
-          </Button>
-          <Button variant="outline">Save progress</Button>
-        </div>
-      </CardContent>
-    </Card>
+                      const uploadScope: "task" | "inspection" | "incident" =
+                        item.sourceModule === "issues" ? "incident" :
+                        item.sourceModule === "inspection" ? "inspection" :
+                        "task";
+
+                      const asset = await uploadLocalPreviewAsset(file, uploadScope);
+                      const serialized = serializeUploadAsset(asset);
+                      setProofAsset(serialized);
+                      setProofName(uploadAssetLabel(serialized));
+                    }}
+                  />
+                  {proofName ? <div className="mt-2 text-xs text-muted-foreground">Selected: {proofName}</div> : null}
+                  {proofAsset ? <div className="mt-3"><UploadAssetPreview value={proofAsset} compact /></div> : null}
+                </div>
+              ) : null}
+
+              <div className="sticky bottom-0 -mx-5 flex flex-wrap gap-2 border-t bg-background/95 px-5 py-4 backdrop-blur">
+                <Button
+                  disabled={item.proofRequired && !proofAsset}
+                  onClick={async () => {
+                    if (proofAsset) await onSubmitProof(item, proofAsset);
+                  }}
+                >
+                  {item.proofRequired ? "Submit Proof" : isOverdue(item) ? "Fix and submit" : item.primaryAction}
+                </Button>
+                <Button variant="outline">Save progress</Button>
+                <Button variant="ghost" onClick={onClose}>Cancel</Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
   );
 }
 
