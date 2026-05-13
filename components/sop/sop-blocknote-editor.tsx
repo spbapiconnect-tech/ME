@@ -45,10 +45,11 @@ async function uploadLocalPreviewFile(file: File) {
 }
 
 function getSopSlashMenuItems(
-  editor: Parameters<typeof getDefaultReactSlashMenuItems>[0],
+  editor: unknown,
   openUploadPicker: (kind: UploadKind) => void,
 ): DefaultReactSuggestionItem[] {
-  const defaultItems = getDefaultReactSlashMenuItems(editor).filter((item) => {
+  const slashEditor = editor as unknown as Parameters<typeof getDefaultReactSlashMenuItems>[0];
+  const defaultItems = getDefaultReactSlashMenuItems(slashEditor).filter((item) => {
     const title = item.title.toLowerCase();
     return !["image", "video", "audio", "file"].some((keyword) => title.includes(keyword));
   });
