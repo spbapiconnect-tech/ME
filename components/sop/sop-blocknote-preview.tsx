@@ -41,8 +41,8 @@ export function SopEmployeePreviewDevice({
   );
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      <div className="overflow-hidden rounded-2xl border bg-background shadow-sm">
+    <div className="flex h-full min-h-0 w-full flex-col">
+      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border bg-background shadow-sm">
         <div className="border-b bg-muted/20 px-5 py-4">
           <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
             SOP Reader Preview
@@ -74,7 +74,7 @@ export function SopEmployeePreviewDevice({
           </div>
         </div>
 
-        <div className="sop-reader-preview max-h-[calc(100vh-260px)] overflow-y-auto px-5 py-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="sop-reader-preview min-h-0 flex-1 overflow-y-auto px-5 py-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <BlockNoteView
             editor={editor}
             editable={false}

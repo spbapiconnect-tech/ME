@@ -85,6 +85,8 @@ export function SopBuilderWorkspaceV3({
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [inspectorTab, setInspectorTab] = useState<"preview" | "settings">("preview");
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -168,6 +170,8 @@ export function SopBuilderWorkspaceV3({
   }
 
   function commitRename(pageId: string) {
+    if (renamingPageId !== pageId) return;
+
     const nextTitle = renameValue.trim() || "Untitled";
     onUpdatePage(pageId, { title: nextTitle });
     setRenamingPageId(null);
@@ -204,11 +208,14 @@ export function SopBuilderWorkspaceV3({
               Settings
             </Button>
             <Button
-              variant={previewOpen ? "default" : "outline"}
-              onClick={() => setPreviewOpen((value) => !value)}
+              variant={inspectorOpen && inspectorTab === "preview" ? "default" : "outline"}
+              onClick={() => {
+                setInspectorOpen(true);
+                setInspectorTab("preview");
+              }}
             >
               <Smartphone className="h-4 w-4" />
-              {previewOpen ? "Hide Preview" : "Preview"}
+              Preview
             </Button>
             <Button onClick={onCreate}>Create SOP</Button>
           </div>
@@ -264,6 +271,8 @@ export function SopBuilderWorkspaceV3({
                             {renamingChapter ? (
                               <input
                                 autoFocus
+                                onMouseDown={(event) => event.stopPropagation()}
+                                onClick={(event) => event.stopPropagation()}
                                 value={renameValue}
                                 onChange={(event) => setRenameValue(event.target.value)}
                                 onKeyDown={(event) => {
@@ -377,6 +386,8 @@ export function SopBuilderWorkspaceV3({
                                 {renamingPage ? (
                                   <input
                                     autoFocus
+                                    onMouseDown={(event) => event.stopPropagation()}
+                                    onClick={(event) => event.stopPropagation()}
                                     value={renameValue}
                                     onChange={(event) => setRenameValue(event.target.value)}
                                     onKeyDown={(event) => {
@@ -471,240 +482,202 @@ export function SopBuilderWorkspaceV3({
           <SopBlockNoteEditor onDocumentChange={handleBlockNoteDocumentChange} />
         </main>
 
-        {previewOpen ? (
-          <div className="fixed inset-0 z-40 bg-background/45 backdrop-blur-sm">
-            <button
-              type="button"
-              className="absolute inset-0 cursor-default"
-              onClick={() => {
-                setPreviewOpen(false);
-                setPreviewFull(false);
-              }}
-              aria-label="Close preview"
-            />
 
-            <aside
-              className={cn(
-                "absolute right-0 top-0 h-full w-full overflow-y-auto border-l bg-background p-5 shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-                previewFull ? "max-w-none" : "max-w-[720px]",
-              )}
-            >
-              <div className="mb-5 flex items-start justify-between gap-3">
+        {inspectorOpen ? (
+          <aside className="hidden h-full min-h-0 overflow-hidden border-l bg-background lg:block">
+            <div className="flex h-full min-h-0 flex-col">
+              <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
                 <div>
-                  <div className="text-sm font-semibold">Employee Reading Preview</div>
-                  <div className="text-xs text-muted-foreground">Read-only SOP content as staff will see it.</div>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setPreviewFull((value) => !value)}>
-                    {previewFull ? "Side view" : "Full view"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setPreviewOpen(false);
-                      setPreviewFull(false);
-                    }}
-                  >
-                    Close
-                  </Button>
-                </div>
-              </div>
-
-              <SopEmployeePreviewDevice
-                blocks={previewDocument}
-                title={settings.title}
-                version={settings.version}
-                outlets={csvToArray(settings.targetOutlet)}
-                readRoles={csvToArray(settings.targetRole)}
-                visibleRoles={visibleRoles}
-              />
-
-              <div className="mt-4 rounded-2xl border bg-background p-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-semibold">Publish Readiness</div>
-                    <div className="text-xs text-muted-foreground">{readyCount}/{checks.length} ready</div>
+                  <div className="text-sm font-semibold">SOP Inspector</div>
+                  <div className="text-xs text-muted-foreground">
+                    Preview and setup while writing.
                   </div>
-                  <Badge variant={readyCount === checks.length ? "default" : "outline"}>
-                    {readyCount === checks.length ? "Ready" : "Not published"}
-                  </Badge>
                 </div>
 
-                <div className="space-y-2">
-                  {checks.map((item) => (
-                    <div key={item.key} className="flex items-center gap-2 text-sm">
-                      <span className={cn(
-                        "flex h-5 w-5 items-center justify-center rounded-full border",
-                        item.done && "border-primary bg-primary text-primary-foreground",
-                      )}>
-                        {item.done ? <Check className="h-3 w-3" /> : null}
-                      </span>
-                      <span className={item.done ? "text-foreground" : "text-muted-foreground"}>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
+                <Button variant="ghost" size="icon" onClick={() => setInspectorOpen(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-            </aside>
-          </div>
+
+              <div className="grid shrink-0 grid-cols-2 gap-1 border-b p-2">
+                <button
+                  type="button"
+                  onClick={() => setInspectorTab("preview")}
+                  className={cn(
+                    "rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-muted",
+                    inspectorTab === "preview" && "bg-primary text-primary-foreground",
+                  )}
+                >
+                  Preview
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setInspectorTab("settings")}
+                  className={cn(
+                    "rounded-lg px-3 py-2 text-sm font-medium transition hover:bg-muted",
+                    inspectorTab === "settings" && "bg-primary text-primary-foreground",
+                  )}
+                >
+                  Settings
+                </button>
+              </div>
+
+              {inspectorTab === "preview" ? (
+                <div className="min-h-0 flex-1 overflow-hidden p-4">
+                  <SopEmployeePreviewDevice
+                    blocks={previewDocument}
+                    title={settings.title}
+                    version={settings.version}
+                    outlets={csvToArray(settings.targetOutlet)}
+                    readRoles={csvToArray(settings.targetRole)}
+                    visibleRoles={visibleRoles}
+                  />
+                </div>
+              ) : (
+                <div className="min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="space-y-6">
+                    <section className="border-b pb-5">
+                      <div className="mb-3">
+                        <div className="text-sm font-semibold">Document</div>
+                        <div className="text-xs text-muted-foreground">Basic SOP identity and version control.</div>
+                      </div>
+
+                      <div className="grid gap-3">
+                        <div className="space-y-1.5">
+                          <Label>SOP Title</Label>
+                          <Input value={settings.title} onChange={(event) => onUpdateSettings({ title: event.target.value })} />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <Label>Document Code</Label>
+                            <Input value={settings.documentCode} onChange={(event) => onUpdateSettings({ documentCode: event.target.value })} />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label>Version</Label>
+                            <Input value={settings.version} onChange={(event) => onUpdateSettings({ version: event.target.value })} />
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section className="border-b pb-5">
+                      <div className="mb-3">
+                        <div className="text-sm font-semibold">Assigned outlets</div>
+                        <div className="text-xs text-muted-foreground">Select every outlet that should receive this SOP.</div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {outletOptions.map((outlet) => {
+                          const active = csvToArray(settings.targetOutlet).includes(outlet);
+
+                          return (
+                            <button
+                              key={outlet}
+                              type="button"
+                              onClick={() => toggleCsvSetting("targetOutlet", outlet)}
+                              className={cn(
+                                "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
+                                active && "border-primary bg-primary text-primary-foreground",
+                              )}
+                            >
+                              {outlet}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+
+                    <section className="border-b pb-5">
+                      <div className="mb-3">
+                        <div className="text-sm font-semibold">Required to read</div>
+                        <div className="text-xs text-muted-foreground">These roles must read and acknowledge the SOP.</div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {roleOptions.map((role) => {
+                          const active = csvToArray(settings.targetRole).includes(role);
+
+                          return (
+                            <button
+                              key={role}
+                              type="button"
+                              onClick={() => toggleCsvSetting("targetRole", role)}
+                              className={cn(
+                                "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
+                                active && "border-primary bg-primary text-primary-foreground",
+                              )}
+                            >
+                              {role}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+
+                    <section className="border-b pb-5">
+                      <div className="mb-3">
+                        <div className="text-sm font-semibold">Visible in library</div>
+                        <div className="text-xs text-muted-foreground">Roles that can view this SOP even when acknowledgement is not required.</div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {roleOptions.map((role) => {
+                          const active = visibleRoles.includes(role);
+
+                          return (
+                            <button
+                              key={role}
+                              type="button"
+                              onClick={() => toggleLocalList(visibleRoles, setVisibleRoles, role)}
+                              className={cn(
+                                "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
+                                active && "border-primary bg-primary text-primary-foreground",
+                              )}
+                            >
+                              {role}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+
+                    <section>
+                      <div className="mb-3">
+                        <div className="text-sm font-semibold">Can review / publish</div>
+                        <div className="text-xs text-muted-foreground">Manager roles allowed to review, update, or publish this SOP.</div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {roleOptions.map((role) => {
+                          const active = reviewerRoles.includes(role);
+
+                          return (
+                            <button
+                              key={role}
+                              type="button"
+                              onClick={() => toggleLocalList(reviewerRoles, setReviewerRoles, role)}
+                              className={cn(
+                                "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
+                                active && "border-primary bg-primary text-primary-foreground",
+                              )}
+                            >
+                              {role}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              )}
+            </div>
+          </aside>
         ) : null}
+
       </div>
 
-      {settingsOpen ? (
-        <div className="fixed inset-0 z-50 bg-background/70 backdrop-blur-sm">
-          <button className="absolute inset-0 cursor-default" type="button" onClick={() => setSettingsOpen(false)} />
-
-          <div className="absolute right-0 top-0 h-full w-full max-w-xl overflow-y-auto border-l bg-background p-5 shadow-2xl">
-            <div className="mb-5 flex items-start justify-between gap-3">
-              <div>
-                <div className="text-xl font-semibold">SOP Settings</div>
-                <div className="text-sm text-muted-foreground">Setup is here, not taking space from the writing canvas.</div>
-              </div>
-              <Button variant="outline" size="icon" onClick={() => setSettingsOpen(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="space-y-6">
-              <section className="border-b pb-5">
-                <div className="mb-3">
-                  <div className="text-sm font-semibold">Document</div>
-                  <div className="text-xs text-muted-foreground">Basic SOP identity and version control.</div>
-                </div>
-
-                <div className="grid gap-3">
-                  <div className="space-y-1.5">
-                    <Label>SOP Title</Label>
-                    <Input value={settings.title} onChange={(event) => onUpdateSettings({ title: event.target.value })} />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label>Document Code</Label>
-                      <Input value={settings.documentCode} onChange={(event) => onUpdateSettings({ documentCode: event.target.value })} />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label>Version</Label>
-                      <Input value={settings.version} onChange={(event) => onUpdateSettings({ version: event.target.value })} />
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <section className="border-b pb-5">
-                <div className="mb-3">
-                  <div className="text-sm font-semibold">Assigned outlets</div>
-                  <div className="text-xs text-muted-foreground">Select every outlet that should receive this SOP.</div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {outletOptions.map((outlet) => {
-                    const active = csvToArray(settings.targetOutlet).includes(outlet);
-
-                    return (
-                      <button
-                        key={outlet}
-                        type="button"
-                        onClick={() => toggleCsvSetting("targetOutlet", outlet)}
-                        className={cn(
-                          "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
-                          active && "border-primary bg-primary text-primary-foreground",
-                        )}
-                      >
-                        {outlet}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-
-              <section className="border-b pb-5">
-                <div className="mb-3">
-                  <div className="text-sm font-semibold">Required to read</div>
-                  <div className="text-xs text-muted-foreground">These roles must read and acknowledge the SOP.</div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {roleOptions.map((role) => {
-                    const active = csvToArray(settings.targetRole).includes(role);
-
-                    return (
-                      <button
-                        key={role}
-                        type="button"
-                        onClick={() => toggleCsvSetting("targetRole", role)}
-                        className={cn(
-                          "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
-                          active && "border-primary bg-primary text-primary-foreground",
-                        )}
-                      >
-                        {role}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-
-              <section className="border-b pb-5">
-                <div className="mb-3">
-                  <div className="text-sm font-semibold">Visible in library</div>
-                  <div className="text-xs text-muted-foreground">Roles that can view this SOP even when acknowledgement is not required.</div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {roleOptions.map((role) => {
-                    const active = visibleRoles.includes(role);
-
-                    return (
-                      <button
-                        key={role}
-                        type="button"
-                        onClick={() => toggleLocalList(visibleRoles, setVisibleRoles, role)}
-                        className={cn(
-                          "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
-                          active && "border-primary bg-primary text-primary-foreground",
-                        )}
-                      >
-                        {role}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-
-              <section>
-                <div className="mb-3">
-                  <div className="text-sm font-semibold">Can review / publish</div>
-                  <div className="text-xs text-muted-foreground">Manager roles allowed to review, update, or publish this SOP.</div>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {roleOptions.map((role) => {
-                    const active = reviewerRoles.includes(role);
-
-                    return (
-                      <button
-                        key={role}
-                        type="button"
-                        onClick={() => toggleLocalList(reviewerRoles, setReviewerRoles, role)}
-                        className={cn(
-                          "rounded-full border px-3 py-1.5 text-sm transition hover:bg-muted/50",
-                          active && "border-primary bg-primary text-primary-foreground",
-                        )}
-                      >
-                        {role}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <Button onClick={() => setSettingsOpen(false)}>Done</Button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }
