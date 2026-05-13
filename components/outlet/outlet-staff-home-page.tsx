@@ -349,12 +349,12 @@ function StaffTabs({
 
   return (
     <div className="rounded-2xl border bg-card p-1">
-      <div className="flex gap-1 overflow-x-auto">
+      <div className="grid grid-cols-2 gap-1 sm:flex sm:overflow-x-auto">
         {tabs.map((tab) => (
           <Button
             key={tab.key}
             variant={activeTab === tab.key ? "secondary" : "ghost"}
-            className="h-10 min-w-[92px] shrink-0 gap-2 sm:min-w-0"
+            className="h-10 w-full gap-2 sm:w-auto sm:min-w-[92px] sm:shrink-0"
             onClick={() => onChange(tab.key)}
           >
             {tab.icon}
@@ -515,12 +515,12 @@ function NextUpCard({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   return (
-    <Card className="flex h-auto min-h-[220px] flex-col xl:h-[260px]">
+    <Card className="flex h-auto min-h-0 flex-col xl:h-[260px]">
       <CardHeader className="shrink-0 pb-3">
         <CardTitle className="text-base">Next Up</CardTitle>
         <p className="text-sm text-muted-foreground">The next few things staff should prepare for.</p>
       </CardHeader>
-      <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <CardContent className="max-h-[280px] min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:max-h-none">
         {!items.length ? (
           <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">No upcoming task after current item.</div>
         ) : items.map((item) => (
@@ -551,7 +551,7 @@ function InboxSummaryCard({
   onOpen: (item: OutletStaffWorkItem) => void;
 }) {
   return (
-    <Card className="flex h-auto min-h-[220px] flex-col xl:h-[260px]">
+    <Card className="flex h-auto min-h-0 flex-col xl:h-[260px]">
       <CardHeader className="shrink-0 pb-3">
         <div className="flex items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2 text-base">
@@ -562,7 +562,7 @@ function InboxSummaryCard({
         </div>
         <p className="text-sm text-muted-foreground">Messages, complaints, rework, and review items.</p>
       </CardHeader>
-      <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <CardContent className="max-h-[280px] min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:max-h-none">
         {!items.length ? (
           <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No urgent management message now.</div>
         ) : items.map((item) => (
@@ -619,7 +619,7 @@ function CompactTimeline({
   const visibleHours = hours.length ? hours : [9, 12, 15, 18];
 
   return (
-    <Card className="flex h-auto min-h-[220px] flex-col xl:h-[260px]">
+    <Card className="flex h-auto min-h-0 flex-col xl:h-[260px]">
       <CardHeader className="shrink-0 pb-3">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -633,7 +633,7 @@ function CompactTimeline({
         </div>
       </CardHeader>
 
-      <CardContent className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <CardContent className="max-h-[280px] min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden xl:max-h-none">
         {visibleHours.map((hour) => {
           const label = `${String(hour).padStart(2, "0")}:00`;
           const slotItems = todayItems.filter((item) => Number(item.startTime.slice(0, 2)) === hour);
@@ -712,19 +712,19 @@ function TodayHome({
 
   return (
     <div className="space-y-4">
-      <div className="grid min-w-0 items-stretch gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
+      <div className="grid min-w-0 items-stretch gap-3 md:gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
         <ShiftSummaryCard shifts={shifts.filter((shift) => shift.date === today)} />
         <RedLightCard overdue={overdue} missed={missed} waiting={waiting} />
         <DoFirstCard item={doFirst} onOpen={onOpen} />
       </div>
 
-      <div className="grid min-w-0 items-stretch gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
+      <div className="grid min-w-0 items-stretch gap-3 md:gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
         <NextUpCard items={next} onOpen={onOpen} />
         <CompactTimeline items={surfaced} shifts={shifts} onOpen={onOpen} />
         <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
       </div>
 
-      <Card className="max-h-[280px] overflow-hidden">
+      <Card className="max-h-[360px] overflow-hidden xl:max-h-[280px]">
         <CardHeader className="shrink-0 pb-3">
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -734,7 +734,7 @@ function TodayHome({
             <Badge variant="outline">{station}</Badge>
           </div>
         </CardHeader>
-        <CardContent className="grid max-h-[190px] gap-3 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2 xl:grid-cols-3">
+        <CardContent className="grid max-h-[260px] gap-3 overflow-y-auto pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid-cols-2 xl:max-h-[190px] xl:grid-cols-3">
           {(["Kitchen", "Front", "Manager"] as StationFilter[]).map((group) => {
             const groupItems = sectionItems(workItems, group)
               .filter((item) => item.inboxGroup !== "Training / SOP" || shouldSurfaceTraining(item))
@@ -840,7 +840,7 @@ function CalendarView({
                   type="button"
                   onClick={() => setSelectedDate(date)}
                   className={cn(
-                    "min-h-[68px] rounded-xl border bg-card p-2 text-left transition hover:bg-muted/30 md:min-h-[92px]",
+                    "min-h-[60px] rounded-xl border bg-card p-2 text-left transition hover:bg-muted/30 sm:min-h-[72px] md:min-h-[92px]",
                     selectedDate === date && "border-primary ring-1 ring-primary/30",
                     dayShifts.length && "bg-muted/20",
                     hasRed && "border-red-500/70 ring-1 ring-red-500/20",
@@ -1086,7 +1086,7 @@ function SopReader({
   const active = pages[Math.min(page, pages.length - 1)] || pages[0];
 
   return (
-    <Card className={cn("min-h-[620px]", fullscreen && "fixed inset-4 z-50 overflow-y-auto bg-background shadow-2xl")}>
+    <Card className={cn("min-h-0 sm:min-h-[620px]", fullscreen && "fixed inset-0 z-50 overflow-y-auto rounded-none bg-background shadow-2xl sm:inset-4 sm:rounded-2xl")}>
       <CardHeader className="border-b">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -1121,7 +1121,7 @@ function SopReader({
 
         <main className="mx-auto w-full min-w-0 max-w-4xl p-4 md:p-6">
           <div className="mb-3 text-xs font-medium uppercase text-muted-foreground">Page {Math.min(page + 1, pages.length)} of {pages.length}</div>
-          <h2 className="text-3xl font-semibold tracking-tight">{active.title}</h2>
+          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{active.title}</h2>
 
           {active.type === "media" && active.asset ? (
             <div className="mt-5">
@@ -1223,20 +1223,20 @@ function WorkItemSheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-3 backdrop-blur-sm sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       onClick={onClose}
     >
       <div
         className={cn(
-          "w-full overflow-hidden rounded-2xl border bg-background shadow-2xl",
-          isReader ? "max-h-[92dvh] max-w-7xl" : "max-h-[86dvh] max-w-4xl",
+          "w-full overflow-hidden rounded-none border bg-background shadow-2xl sm:rounded-2xl",
+          isReader ? "h-[100dvh] max-w-7xl sm:h-auto sm:max-h-[92dvh]" : "h-[100dvh] max-w-4xl sm:h-auto sm:max-h-[86dvh]",
         )}
         onClick={(event) => event.stopPropagation()}
       >
         {isReader ? (
-          <div className="max-h-[92dvh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="h-[100dvh] overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:h-auto sm:max-h-[92dvh]">
             <SopReader item={item} onClose={onClose} />
           </div>
         ) : (
@@ -1255,7 +1255,7 @@ function WorkItemSheet({
               </div>
             </CardHeader>
 
-            <CardContent className="max-h-[calc(86dvh-96px)] space-y-4 overflow-y-auto p-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <CardContent className="max-h-[calc(100dvh-96px)] space-y-4 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:max-h-[calc(86dvh-96px)] sm:p-5">
               <div className="grid gap-3 md:grid-cols-3">
                 {[
                   ["Time", `${item.date} · ${item.startTime}`],
@@ -1303,8 +1303,9 @@ function WorkItemSheet({
                 </div>
               ) : null}
 
-              <div className="sticky bottom-0 -mx-5 flex flex-wrap gap-2 border-t bg-background/95 px-5 py-4 backdrop-blur">
+              <div className="sticky bottom-0 -mx-4 flex flex-col gap-2 border-t bg-background/95 px-4 py-4 backdrop-blur sm:-mx-5 sm:flex-row sm:flex-wrap sm:px-5">
                 <Button
+                  className="w-full sm:w-auto"
                   disabled={item.proofRequired && !proofAsset}
                   onClick={async () => {
                     if (proofAsset) await onSubmitProof(item, proofAsset);
@@ -1312,8 +1313,8 @@ function WorkItemSheet({
                 >
                   {item.proofRequired ? "Submit Proof" : isOverdue(item) ? "Fix and submit" : item.primaryAction}
                 </Button>
-                <Button variant="outline">Save progress</Button>
-                <Button variant="ghost" onClick={onClose}>Cancel</Button>
+                <Button className="w-full sm:w-auto" variant="outline">Save progress</Button>
+                <Button className="w-full sm:w-auto" variant="ghost" onClick={onClose}>Cancel</Button>
               </div>
             </CardContent>
           </Card>
