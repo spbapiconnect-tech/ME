@@ -152,15 +152,36 @@ function shouldSurfaceTraining(item: OutletStaffWorkItem) {
   if (item.inboxGroup !== "Training / SOP") return false;
   if (isDone(item)) return false;
 
-  const value = `${item.status} ${item.reviewState || ""}`.toLowerCase();
-  return value.includes("pending") || value.includes("required") || item.date <= todayISO();
+  const value = `${item.title} ${item.description} ${item.status} ${item.reviewState || ""} ${item.primaryAction}`.toLowerCase();
+
+  const isAssignedTraining =
+    value.includes("training") ||
+    value.includes("acknowledgement required") ||
+    value.includes("acknowledge required") ||
+    value.includes("must read") ||
+    value.includes("new product") ||
+    value.includes("launch") ||
+    value.includes("briefing") ||
+    value.includes("assigned");
+
+  return isAssignedTraining;
 }
 
 function stationOfItem(item: OutletStaffWorkItem): StationFilter {
   const source = `${item.title} ${item.description} ${item.inboxGroup}`.toLowerCase();
 
+  if (
+    source.includes("rework") ||
+    source.includes("proof") ||
+    source.includes("corrective") ||
+    source.includes("review") ||
+    source.includes("approval") ||
+    source.includes("follow-up") ||
+    source.includes("issue")
+  ) return "Manager";
+
   if (source.includes("cashier") || source.includes("customer") || source.includes("grab") || source.includes("front") || source.includes("service")) return "Front";
-  if (source.includes("manager") || source.includes("review") || source.includes("approval")) return "Manager";
+  if (source.includes("manager")) return "Manager";
   if (source.includes("kitchen") || source.includes("grill") || source.includes("fryer") || source.includes("prep") || source.includes("food") || source.includes("storage")) return "Kitchen";
 
   return "All";
@@ -258,10 +279,7 @@ function summarizeShifts(shifts: ShiftItem[]): ShiftSummary {
 function sectionItems(items: OutletStaffWorkItem[], station: StationFilter) {
   if (station === "All") return items;
 
-  return items.filter((item) => {
-    const itemStation = stationOfItem(item);
-    return itemStation === station || itemStation === "All";
-  });
+  return items.filter((item) => stationOfItem(item) === station);
 }
 
 function WorkCard({
@@ -410,8 +428,8 @@ function ShiftSummaryCard({ shifts }: { shifts: ShiftItem[] }) {
             ))}
           </div>
         ) : (
-          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">
-            No shift data connected for today. Connect schedule rows to show team by station.
+          <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
+            No shift data connected for today.
           </div>
         )}
       </CardContent>
@@ -503,7 +521,7 @@ function NextUpCard({
       </CardHeader>
       <CardContent className="space-y-2">
         {!items.length ? (
-          <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">No upcoming task after current item.</div>
+          <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">No upcoming task after current item.</div>
         ) : items.slice(0, 4).map((item) => (
           <button
             key={item.id}
@@ -691,13 +709,13 @@ function TodayHome({
 
   return (
     <div className="space-y-4">
-      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
+      <div className="grid min-w-0 items-start gap-4 md:grid-cols-2 xl:grid-cols-[1.1fr_0.8fr_1fr]">
         <ShiftSummaryCard shifts={shifts.filter((shift) => shift.date === today)} />
         <RedLightCard overdue={overdue} missed={missed} waiting={waiting} />
         <DoFirstCard item={doFirst} onOpen={onOpen} />
       </div>
 
-      <div className="grid min-w-0 gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
+      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-2 xl:grid-cols-[0.9fr_1.2fr_0.9fr]">
         <NextUpCard items={next} onOpen={onOpen} />
         <CompactTimeline items={surfaced} shifts={shifts} onOpen={onOpen} />
         <InboxSummaryCard items={inboxPreview} onOpen={onOpen} />
