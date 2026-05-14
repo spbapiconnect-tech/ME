@@ -101,10 +101,16 @@ function useResolvedBlockNoteTheme() {
   useEffect(() => {
     function resolveTheme() {
       const root = document.documentElement;
+      const declaredTheme =
+        root.getAttribute("data-theme") ||
+        root.getAttribute("data-mode") ||
+        root.style.colorScheme;
+
       const isDark =
         root.classList.contains("dark") ||
-        root.style.colorScheme === "dark" ||
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
+        declaredTheme === "dark" ||
+        root.dataset.theme === "dark" ||
+        root.dataset.mode === "dark";
 
       setTheme(isDark ? "dark" : "light");
     }
@@ -114,16 +120,10 @@ function useResolvedBlockNoteTheme() {
     const observer = new MutationObserver(resolveTheme);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ["class", "style"],
+      attributeFilter: ["class", "style", "data-theme", "data-mode"],
     });
 
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    media.addEventListener("change", resolveTheme);
-
-    return () => {
-      observer.disconnect();
-      media.removeEventListener("change", resolveTheme);
-    };
+    return () => observer.disconnect();
   }, []);
 
   return theme;

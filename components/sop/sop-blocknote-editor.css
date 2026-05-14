@@ -119,3 +119,76 @@ body.sop-builder-page-lock .sop-builder-workspace {
 .sop-reader-preview [class*="FileName"] {
   display: none !important;
 }
+
+/* =========================================================
+   BlockNote toolbar / color dropdown repair
+   - Do not use system dark mode.
+   - Do not stretch Radix popper.
+   - Do not force inline color spans, so color button still works.
+   ========================================================= */
+
+/* Let toolbar/dropdown use ME theme variables, but keep BlockNote layout native. */
+body.sop-builder-page-lock .bn-formatting-toolbar,
+body.sop-builder-page-lock .bn-toolbar {
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 0.22) !important;
+}
+
+/* Radix wrapper should only control layer, not size/color. */
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] {
+  z-index: 120 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  transform-origin: var(--radix-popper-transform-origin);
+}
+
+/* Actual BlockNote popup/menu surface. */
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] .bn-menu,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] .bn-popover,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] .bn-suggestion-menu,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="menu"],
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="listbox"] {
+  width: max-content !important;
+  min-width: 220px !important;
+  max-width: min(420px, calc(100vw - 32px)) !important;
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 20px 56px rgb(0 0 0 / 0.24) !important;
+  opacity: 1 !important;
+}
+
+/* Menu text/icons must be readable. */
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] .bn-menu *,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] .bn-popover *,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] .bn-suggestion-menu *,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="menu"] *,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="listbox"] * {
+  opacity: 1 !important;
+}
+
+/* Buttons/items readable without flattening custom color swatches. */
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] button,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="menuitem"],
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="option"] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+/* Hover / selected item. */
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] button:hover,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="option"]:hover,
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [data-highlighted] {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Keep color dropdown swatches visible. */
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [style*="background"],
+body.sop-builder-page-lock [data-radix-popper-content-wrapper] [style*="color"] {
+  opacity: 1 !important;
+}
