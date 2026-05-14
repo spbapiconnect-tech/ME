@@ -1,4 +1,4 @@
-/* SOP builder must behave like an IDE: ERP shell stays fixed, editor scrolls inside. */
+/* SOP builder behaves like app/IDE: ERP shell stays fixed, editor scrolls inside. */
 .sop-builder-workspace {
   height: calc(100dvh - 56px);
   max-height: calc(100dvh - 56px);
@@ -9,6 +9,21 @@
   height: 100%;
   min-height: 0;
   max-height: 100%;
+  overflow: hidden !important;
+}
+
+html.sop-builder-page-lock,
+body.sop-builder-page-lock {
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+body.sop-builder-page-lock main:has(.sop-builder-workspace),
+body.sop-builder-page-lock .sop-builder-workspace {
+  min-height: 0 !important;
+  height: calc(100dvh - 56px) !important;
+  max-height: calc(100dvh - 56px) !important;
   overflow: hidden !important;
 }
 
@@ -27,15 +42,15 @@
   max-height: 100%;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scroll-padding-bottom: 12rem;
+  scroll-padding-top: 5rem;
+  scroll-padding-bottom: 14rem;
 }
 
 .sop-blocknote-page {
   min-height: 100%;
-  padding-bottom: 12rem;
+  padding-bottom: 14rem;
 }
 
-/* Base BlockNote theme, supports bright + dark. */
 .sop-blocknote-shell,
 .sop-reader-preview {
   --bn-colors-editor-text: hsl(var(--foreground));
@@ -65,10 +80,11 @@
 
 .sop-blocknote-shell .bn-editor {
   min-height: 720px !important;
-  padding-bottom: 12rem !important;
+  padding-bottom: 14rem !important;
 }
 
-/* Do not force all inline spans to foreground, otherwise BlockNote color toolbar cannot work. */
+/* Important: do NOT force every span color.
+   This keeps BlockNote color dropdown working. */
 .sop-blocknote-shell .bn-block-content,
 .sop-blocknote-shell .bn-inline-content,
 .sop-reader-preview .bn-block-content,
@@ -76,14 +92,13 @@
   color: hsl(var(--foreground));
 }
 
-/* Placeholder readable but not too strong. */
 .sop-blocknote-shell [data-placeholder]::before,
 .sop-blocknote-shell .bn-inline-content[data-placeholder]::before {
   color: hsl(var(--muted-foreground)) !important;
   opacity: 0.75 !important;
 }
 
-/* Code / pre readability in both themes. */
+/* Code / pre readability only. Do not touch toolbar popper/menu. */
 .sop-blocknote-shell .bn-editor pre,
 .sop-blocknote-shell .bn-editor code,
 .sop-reader-preview .bn-editor pre,
@@ -96,40 +111,6 @@
   border-radius: 0.75rem;
 }
 
-/* BlockNote toolbar / slash menu are rendered in portal sometimes,
-   so target BlockNote menu classes globally, not only inside the editor shell. */
-.bn-formatting-toolbar,
-.bn-toolbar,
-.bn-menu,
-.bn-popover,
-[data-radix-popper-content-wrapper] .bn-menu,
-[data-radix-popper-content-wrapper] .bn-popover,
-[data-radix-popper-content-wrapper] [role="menu"],
-[data-radix-popper-content-wrapper] [role="listbox"] {
-  background: hsl(var(--popover)) !important;
-  color: hsl(var(--popover-foreground)) !important;
-  border-color: hsl(var(--border)) !important;
-  box-shadow: 0 18px 50px rgb(0 0 0 / 0.22) !important;
-  z-index: 80 !important;
-}
-
-.bn-formatting-toolbar button,
-.bn-toolbar button,
-.bn-menu button,
-.bn-popover button,
-[data-radix-popper-content-wrapper] [role="menuitem"],
-[data-radix-popper-content-wrapper] [role="option"] {
-  color: hsl(var(--popover-foreground)) !important;
-}
-
-.bn-menu button:hover,
-.bn-popover button:hover,
-[data-radix-popper-content-wrapper] [role="menuitem"]:hover,
-[data-radix-popper-content-wrapper] [role="option"]:hover {
-  background: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
-}
-
 /* Hide uploaded file names in preview. */
 .sop-reader-preview figcaption,
 .sop-reader-preview [class*="caption"],
@@ -137,86 +118,4 @@
 .sop-reader-preview [class*="file-name"],
 .sop-reader-preview [class*="FileName"] {
   display: none !important;
-}
-
-/* Hard lock only when SOP builder is open. Prevent pasted long content from moving ERP shell/browser body. */
-html.sop-builder-page-lock,
-body.sop-builder-page-lock {
-  height: 100dvh !important;
-  max-height: 100dvh !important;
-  overflow: hidden !important;
-}
-
-body.sop-builder-page-lock main,
-body.sop-builder-page-lock main:has(.sop-builder-workspace),
-body.sop-builder-page-lock .sop-builder-workspace {
-  min-height: 0 !important;
-  height: calc(100dvh - 56px) !important;
-  max-height: calc(100dvh - 56px) !important;
-  overflow: hidden !important;
-}
-
-/* Make sure BlockNote editor is the only scroll owner. */
-body.sop-builder-page-lock .sop-blocknote-shell,
-body.sop-builder-page-lock .sop-blocknote-scroll {
-  min-height: 0 !important;
-  max-height: 100% !important;
-  overscroll-behavior: contain !important;
-}
-
-body.sop-builder-page-lock .sop-blocknote-scroll {
-  overflow-y: auto !important;
-  scroll-padding-top: 5rem;
-  scroll-padding-bottom: 14rem;
-}
-
-body.sop-builder-page-lock .sop-blocknote-page {
-  padding-bottom: 14rem !important;
-}
-
-/* BlockNote portal menus are outside .sop-blocknote-shell, so theme them through body lock. */
-body.sop-builder-page-lock [data-radix-popper-content-wrapper] > *,
-body.sop-builder-page-lock .bn-formatting-toolbar,
-body.sop-builder-page-lock .bn-toolbar,
-body.sop-builder-page-lock .bn-menu,
-body.sop-builder-page-lock .bn-popover,
-body.sop-builder-page-lock .bn-suggestion-menu {
-  background: hsl(var(--popover)) !important;
-  color: hsl(var(--popover-foreground)) !important;
-  border-color: hsl(var(--border)) !important;
-  box-shadow: 0 18px 50px rgb(0 0 0 / 0.22) !important;
-}
-
-body.sop-builder-page-lock [data-radix-popper-content-wrapper] button,
-body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="menuitem"],
-body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="option"],
-body.sop-builder-page-lock .bn-formatting-toolbar button,
-body.sop-builder-page-lock .bn-toolbar button,
-body.sop-builder-page-lock .bn-menu button,
-body.sop-builder-page-lock .bn-popover button,
-body.sop-builder-page-lock .bn-suggestion-menu button {
-  color: hsl(var(--popover-foreground)) !important;
-}
-
-body.sop-builder-page-lock [data-radix-popper-content-wrapper] button:hover,
-body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="menuitem"]:hover,
-body.sop-builder-page-lock [data-radix-popper-content-wrapper] [role="option"]:hover,
-body.sop-builder-page-lock .bn-menu button:hover,
-body.sop-builder-page-lock .bn-popover button:hover,
-body.sop-builder-page-lock .bn-suggestion-menu button:hover {
-  background: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
-}
-
-/* Code block visibility in both themes. */
-body.sop-builder-page-lock .sop-blocknote-shell pre,
-body.sop-builder-page-lock .sop-blocknote-shell code,
-body.sop-builder-page-lock .sop-reader-preview pre,
-body.sop-builder-page-lock .sop-reader-preview code,
-body.sop-builder-page-lock .sop-blocknote-shell [data-content-type="codeBlock"],
-body.sop-builder-page-lock .sop-reader-preview [data-content-type="codeBlock"] {
-  background: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
-  border: 1px solid hsl(var(--border)) !important;
-  border-radius: 0.75rem !important;
 }
