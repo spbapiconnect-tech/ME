@@ -139,3 +139,82 @@ body.sop-builder-page-lock .bn-suggestion-menu {
 .sop-reader-preview [class*="FileName"] {
   display: none !important;
 }
+
+/* ME portal color palette: not inside BlockNote popper, so it will not be hidden by toolbar overflow/z-index. */
+.sop-color-portal-trigger {
+  display: inline-flex;
+  height: 32px;
+  min-width: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.sop-color-portal-trigger:hover {
+  background: hsl(var(--muted));
+}
+
+.sop-color-portal-panel {
+  position: fixed;
+  z-index: 2147483647;
+  width: 286px;
+  display: grid;
+  gap: 12px;
+  border-radius: 18px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  padding: 12px;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 0.3);
+}
+
+.sop-color-portal-section {
+  display: grid;
+  gap: 8px;
+}
+
+.sop-color-portal-title {
+  padding-inline: 2px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.sop-color-portal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.sop-color-portal-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  border-radius: 11px;
+  padding: 8px;
+  text-align: left;
+  font-size: 13px;
+  color: hsl(var(--popover-foreground));
+}
+
+.sop-color-portal-item:hover {
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
+.sop-color-portal-swatch {
+  height: 16px;
+  width: 16px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--border));
+}
