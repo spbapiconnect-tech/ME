@@ -182,6 +182,36 @@ export default function Page() {
   const [legacyMode, setLegacyMode] = useState(false);
 
   useEffect(() => {
+    const shell = document.querySelector(".sop-reader-route-shell") as HTMLElement | null;
+    const main = shell?.closest("main") as HTMLElement | null;
+    const lockedTargets = [main].filter(Boolean) as HTMLElement[];
+
+    for (const target of lockedTargets) {
+      target.classList.add("sop-builder-main-lock");
+      target.scrollTop = 0;
+    }
+
+    window.scrollTo(0, 0);
+
+    requestAnimationFrame(() => {
+      for (const target of lockedTargets) {
+        target.scrollTop = 0;
+      }
+
+      window.scrollTo(0, 0);
+    });
+
+    return () => {
+      for (const target of lockedTargets) {
+        target.classList.remove("sop-builder-main-lock");
+        target.scrollTop = 0;
+      }
+
+      window.scrollTo(0, 0);
+    };
+  }, []);
+
+  useEffect(() => {
     hydrateFromFoundation();
   }, [hydrateFromFoundation]);
 
@@ -228,7 +258,7 @@ export default function Page() {
 
   return (
     <ErpShell>
-      <div className="sop-builder-route-shell h-[calc(100vh-56px)] overflow-hidden bg-background">
+      <div className="sop-reader-route-shell sop-builder-route-shell h-[calc(100vh-56px)] min-h-0 overflow-hidden bg-background">
         <div className="sop-builder-workspace flex h-full min-h-0 flex-col overflow-hidden bg-background">
           <div className="sop-builder-document-header shrink-0 border-b border-border bg-background px-4 py-2">
             <div className="flex items-center justify-between gap-4">
@@ -311,7 +341,7 @@ export default function Page() {
             <ResizableHandle withHandle />
 
             <ResizablePanel defaultSize={56} minSize={36}>
-              <main className="h-full min-h-0 overflow-y-auto bg-background">
+              <main className="h-full min-h-0 overflow-y-auto overscroll-contain bg-background">
                 <div className="mx-auto max-w-4xl px-10 py-8">
                   <section className="border-b pb-8">
                     <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -340,7 +370,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   <InspectorSection title="Summary">
                     <div className="grid grid-cols-2 gap-x-5 gap-y-3 text-sm">
                       <div>
