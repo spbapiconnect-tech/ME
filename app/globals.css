@@ -433,3 +433,35 @@ textarea:focus:not(:focus-visible) {
 }
 
 /* PSI procurement detail UI polish removed */
+
+
+/* SOP builder / reader document header separator */
+.sop-builder-document-header {
+  border-bottom: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 0 hsl(var(--border));
+}
+
+/* SOP builder / reader document header separator */
+.sop-builder-document-header {
+  position: relative !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 1px 0 rgba(100, 116, 139, 0.22) !important;
+}
+
+.sop-builder-document-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  z-index: 50;
+  height: 1px;
+  pointer-events: none;
+  background: rgba(100, 116, 139, 0.32);
+}
+
+.dark .sop-builder-document-header::after {
+  background: rgba(148, 163, 184, 0.24);
+}
+/* END SOP builder / reader document header separator */
+

@@ -1,10 +1,10 @@
 import { Suspense } from "react";
-import { SopTrainingControlPage } from "@/components/sop/sop-training-control-page";
+import { SopTrainingLibraryPage } from "@/components/sop/sop-training-library-page";
 
 export default function Page() {
   return (
     <Suspense fallback={null}>
-      <SopTrainingControlPage />
+      <SopTrainingLibraryPage />
     </Suspense>
   );
 }

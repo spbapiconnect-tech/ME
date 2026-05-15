@@ -295,7 +295,7 @@ return () => {
       ref={workspaceRef}
       className="sop-builder-workspace flex h-full min-h-0 flex-col overflow-hidden bg-background"
     >
-      <div className="sop-builder-document-header shrink-0 border-b px-4 py-2">
+      <div className="sop-builder-document-header shrink-0 border-b border-border bg-background px-4 py-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <Button variant="outline" size="icon" onClick={onBack}>
