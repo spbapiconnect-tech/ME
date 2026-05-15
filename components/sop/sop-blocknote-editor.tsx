@@ -5,6 +5,7 @@ import { BlockNoteSchema, createCodeBlockSpec } from "@blocknote/core";
 import { codeBlockOptions } from "@blocknote/code-block";
 import "@blocknote/shadcn/style.css";
 import "./sop-blocknote-editor.css";
+import { SopFixedEditorToolbar } from "./sop-fixed-editor-toolbar";
 
 import { filterSuggestionItems } from "@blocknote/core/extensions";
 import {
@@ -15,9 +16,19 @@ import {
 } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 import { FileUp, ImageIcon, Video } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent} from "react";
 
 import type { SopBlockNoteDocument } from "@/components/sop/sop-blocknote-preview";
+
+type SopEditorInstance = ReturnType<typeof useCreateBlockNote>;
+
+type KeyboardCapableBlockNoteEditor = {
+  _tiptapEditor?: {
+    commands?: {
+      selectAll?: () => boolean;
+    };
+  };
+};
 
 type UploadKind = "image" | "video" | "file";
 
@@ -129,6 +140,26 @@ function useResolvedBlockNoteTheme() {
   return theme;
 }
 
+
+function insertSopLinkTemplate(
+  editor: SopEditorInstance,
+  label: string,
+  placeholder: string,
+) {
+  const currentBlock = editor.getTextCursorPosition().block;
+
+  editor.insertBlocks(
+    [
+      {
+        type: "paragraph",
+        content: `${label}: ${placeholder}`,
+      },
+    ],
+    currentBlock,
+    "after",
+  );
+}
+
 function getSopSlashMenuItems(
   editor: unknown,
   openUploadPicker: (kind: UploadKind) => void,
@@ -166,8 +197,44 @@ function getSopSlashMenuItems(
       onItemClick: () => openUploadPicker("file"),
     },
   ];
+  const sopLinkItems = [
+    {
+      title: "Link URL",
+      subtext: "Insert an external URL placeholder.",
+      aliases: ["link-url", "url", "external-link"],
+      group: "ME Link",
+      onItemClick: () =>
+        insertSopLinkTemplate(editor, "External URL", "Paste URL here"),
+    },
+    {
+      title: "Link SOP",
+      subtext: "Link to another SOP page or document.",
+      aliases: ["link-sop", "sop-link", "sop"],
+      group: "ME Link",
+      onItemClick: () =>
+        insertSopLinkTemplate(editor, "SOP Link", "Type SOP title or /sop/path"),
+    },
+    {
+      title: "Link Training",
+      subtext: "Link to a staff training course.",
+      aliases: ["link-training", "training-link", "course-link"],
+      group: "ME Link",
+      onItemClick: () =>
+        insertSopLinkTemplate(editor, "Training Link", "Type training title or /training/path"),
+    },
+    {
+      title: "Link Exam",
+      subtext: "Link to quiz, test, or assessment.",
+      aliases: ["link-exam", "exam-link", "quiz-link", "assessment-link"],
+      group: "ME Link",
+      onItemClick: () =>
+        insertSopLinkTemplate(editor, "Exam Link", "Type exam title or /exam/path"),
+    },
+  ];
 
-  return [...uploadItems, ...defaultItems];
+
+
+  return [...sopLinkItems, ...uploadItems, ...defaultItems];
 }
 
 export function SopBlockNoteEditor({
@@ -218,7 +285,11 @@ export function SopBlockNoteEditor({
       onDocumentChange?.(editor.document as SopBlockNoteDocument);
     }, 80);
 
-    return () => window.clearTimeout(timer);
+    
+
+
+
+return () => window.clearTimeout(timer);
   }, [editor, onDocumentChange, disabled]);
 
   useEffect(() => {
@@ -289,7 +360,30 @@ export function SopBlockNoteEditor({
 
   return (
     <div className="sop-blocknote-shell h-full min-h-0 overflow-hidden bg-background">
-      <div className="sop-blocknote-scroll h-full min-h-0 overflow-y-auto px-8 py-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <SopFixedEditorToolbar editor={editor} disabled={disabled} />
+      <div
+        onKeyDownCapture={(event) => {
+          const target = event.target as HTMLElement | null;
+
+          if (!target?.closest?.(".bn-editor")) return;
+
+          if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "a") {
+            const tiptap = (editor as unknown as {
+              _tiptapEditor?: {
+                commands?: {
+                  selectAll?: () => boolean;
+                };
+              };
+            })._tiptapEditor;
+
+            if (tiptap?.commands?.selectAll) {
+              event.preventDefault();
+              event.stopPropagation();
+              tiptap.commands.selectAll();
+            }
+          }
+        }}
+        className="sop-blocknote-scroll h-full min-h-0 overflow-y-auto px-8 py-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="sop-blocknote-page mx-auto min-h-full max-w-5xl pb-40">
         <input
           ref={imageInputRef}
@@ -319,12 +413,16 @@ export function SopBlockNoteEditor({
         />
 
         <BlockNoteView
+        formattingToolbar={false}
+        slashMenu={false}
+        sideMenu={false}
+        tableHandles={false}
           editor={editor}
           theme={blockNoteTheme}
-          slashMenu={false}
+         
           editable={!disabled}
           filePanel={false}
-          formattingToolbar={true}
+         
           className="min-h-[680px] rounded-2xl bg-background"
           onChange={(currentEditor) => {
             onDocumentChange?.(currentEditor.document as SopBlockNoteDocument);

@@ -776,14 +776,41 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   const activeBuilderPageIndex = Math.max(0, pages.findIndex((page) => page.id === activeBuilderPageId));
   const activeBuilderPageLabel = activeBuilderPageId ? `Adding to Page ${activeBuilderPageIndex + 1}` : "Select a page";
 
-  if (builderMode) {
+  
+  function resetSopTrainingScrollPosition() {
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+
+      const scrollTargets = document.querySelectorAll<HTMLElement>(
+        ".sop-training-control-shell, .sop-training-control-content, main",
+      );
+
+      for (const target of scrollTargets) {
+        target.scrollTop = 0;
+      }
+    });
+  }
+
+  function exitBuilderMode() {
+    setBuilderMode(false);
+    resetSopTrainingScrollPosition();
+
+    requestAnimationFrame(() => {
+      resetSopTrainingScrollPosition();
+    });
+  }
+
+if (builderMode) {
     return (
       <ErpShell>
         {builderVariant === "v3" ? (
-          <SopBuilderWorkspaceV3
+          <div className="sop-builder-route-shell">
+        <SopBuilderWorkspaceV3
             document={v3Document}
             selectedPageId={activeBuilderPageId}
-            onBack={() => setBuilderMode(false)}
+            onBack={exitBuilderMode}
             onCreate={async () => {
               await createSop();
               setBuilderMode(false);
@@ -799,8 +826,9 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             onUpdateSettings={updateV3Settings}
             onDocumentChange={setBlockNoteDocument}
           />
+      </div>
         ) : (
-        <div className="flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
+        <div className="sop-training-control-shell flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background">
           <div className="shrink-0 border-b bg-background px-5 py-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -827,7 +855,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" onClick={() => setBuilderVariant("v3")}>Use V3 Builder</Button>
-                <Button variant="outline" onClick={() => setBuilderMode(false)}>Back</Button>
+                <Button variant="outline" onClick={exitBuilderMode}>Back</Button>
                 <Button onClick={async () => {
                   await createSop();
                   setBuilderMode(false);
@@ -876,7 +904,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
             </div>
           </div>
 
-          <div className="grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[340px_minmax(0,1fr)]">
+          <div className="sop-training-control-content grid min-h-0 flex-1 overflow-hidden lg:grid-cols-[340px_minmax(0,1fr)]">
             <div className="space-y-3 overflow-y-auto border-r bg-muted/20 p-5">
               <div>
                 <div className="text-sm font-semibold">SOP Setup</div>

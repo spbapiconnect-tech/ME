@@ -11,22 +11,6 @@
   max-height: 100%;
   overflow: hidden !important;
 }
-
-html.sop-builder-page-lock,
-body.sop-builder-page-lock {
-  height: 100dvh !important;
-  max-height: 100dvh !important;
-  overflow: hidden !important;
-}
-
-body.sop-builder-page-lock main:has(.sop-builder-workspace),
-body.sop-builder-page-lock .sop-builder-workspace {
-  min-height: 0 !important;
-  height: calc(100dvh - 56px) !important;
-  max-height: calc(100dvh - 56px) !important;
-  overflow: hidden !important;
-}
-
 /* BlockNote scroll area. Do not use contain: paint; it breaks floating toolbar stacking. */
 .sop-blocknote-shell {
   height: 100%;
@@ -56,29 +40,6 @@ body.sop-builder-page-lock .sop-builder-workspace {
 /* BlockNote theme variables. Use variables only, don't crush dropdown internal styles. */
 .sop-blocknote-shell,
 .sop-reader-preview,
-body.sop-builder-page-lock {
-  --bn-colors-editor-text: hsl(var(--foreground));
-  --bn-colors-editor-background: transparent;
-
-  --bn-colors-menu-text: hsl(var(--popover-foreground));
-  --bn-colors-menu-background: hsl(var(--popover));
-
-  --bn-colors-tooltip-text: hsl(var(--popover-foreground));
-  --bn-colors-tooltip-background: hsl(var(--popover));
-
-  --bn-colors-hovered-text: hsl(var(--foreground));
-  --bn-colors-hovered-background: hsl(var(--muted));
-
-  --bn-colors-selected-text: hsl(var(--primary-foreground));
-  --bn-colors-selected-background: hsl(var(--primary));
-
-  --bn-colors-disabled-text: hsl(var(--muted-foreground));
-  --bn-colors-disabled-background: transparent;
-
-  --bn-colors-shadow: rgb(0 0 0 / 0.24);
-  --bn-colors-border: hsl(var(--border));
-  --bn-border-radius: 0.75rem;
-}
 
 .sop-blocknote-shell .bn-container,
 .sop-blocknote-shell .bn-editor,
@@ -121,15 +82,6 @@ body.sop-builder-page-lock {
 }
 
 /* Toolbar / dropdown must always float above editor content. No width/background hacks. */
-body.sop-builder-page-lock [data-radix-popper-content-wrapper],
-body.sop-builder-page-lock .bn-formatting-toolbar,
-body.sop-builder-page-lock .bn-toolbar,
-body.sop-builder-page-lock .bn-menu,
-body.sop-builder-page-lock .bn-popover,
-body.sop-builder-page-lock .bn-suggestion-menu {
-  z-index: 2147483647 !important;
-  pointer-events: auto !important;
-}
 
 /* Keep uploaded file names hidden in preview. */
 .sop-reader-preview figcaption,
@@ -218,3 +170,663 @@ body.sop-builder-page-lock .bn-suggestion-menu {
   border-radius: 999px;
   border: 1px solid hsl(var(--border));
 }
+
+/* SOP_FIXED_EDITOR_TOOLBAR_FUNCTIONS_START */
+.sop-fixed-editor-toolbar-shell {
+  position: relative;
+  z-index: 30;
+  flex: 0 0 auto;
+  border-bottom: 1px solid hsl(var(--border));
+  background: hsl(var(--background));
+  padding: 8px 12px;
+}
+
+.sop-fixed-editor-toolbar {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.sop-fixed-editor-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.sop-fixed-editor-toolbar button {
+  display: inline-flex;
+  height: 30px;
+  min-width: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: hsl(var(--foreground));
+  padding-inline: 7px;
+  font-size: 12px;
+}
+
+.sop-fixed-editor-toolbar button:hover,
+.sop-fixed-editor-toolbar button[aria-expanded="true"] {
+  background: hsl(var(--muted));
+}
+
+.sop-toolbar-divider {
+  display: block;
+  width: 1px;
+  height: 18px;
+  margin-inline: 4px;
+  background: hsl(var(--border));
+}
+
+.sop-fixed-toolbar-status {
+  position: absolute;
+  right: 12px;
+  top: calc(100% + 8px);
+  z-index: 70;
+  max-width: 360px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  background: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  padding: 8px 10px;
+  font-size: 12px;
+  box-shadow: 0 16px 50px rgb(15 23 42 / 0.16);
+}
+
+.sop-fixed-toolbar-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 12px;
+  z-index: 80;
+  border: 1px solid hsl(var(--border));
+  border-radius: 16px;
+  background: hsl(var(--popover));
+  color: hsl(var(--popover-foreground));
+  padding: 14px;
+  box-shadow: 0 24px 70px rgb(15 23 42 / 0.18);
+}
+
+.sop-fixed-toolbar-block-panel {
+  width: min(560px, calc(100vw - 64px));
+}
+
+.sop-fixed-toolbar-color-panel {
+  width: 340px;
+}
+
+.sop-fixed-toolbar-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sop-fixed-toolbar-panel-title {
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sop-fixed-toolbar-panel-head p {
+  margin: 4px 0 0;
+  color: hsl(var(--muted-foreground));
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.sop-fixed-toolbar-panel-head button {
+  display: inline-flex;
+  height: 28px;
+  width: 28px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+}
+
+.sop-fixed-toolbar-panel-head button:hover {
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
+.sop-fixed-toolbar-block-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sop-fixed-toolbar-block-card {
+  display: grid !important;
+  min-height: 86px !important;
+  align-content: start !important;
+  justify-items: start !important;
+  gap: 6px !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 12px !important;
+  background: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  padding: 12px !important;
+  text-align: left !important;
+}
+
+.sop-fixed-toolbar-block-card:hover {
+  border-color: hsl(var(--primary) / 0.45) !important;
+  background: hsl(var(--muted)) !important;
+}
+
+.sop-fixed-toolbar-block-card span {
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.sop-fixed-toolbar-block-card small {
+  color: hsl(var(--muted-foreground));
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.sop-fixed-toolbar-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sop-fixed-toolbar-swatch-item {
+  display: inline-flex !important;
+  height: 38px !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 11px !important;
+  background: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  padding-inline: 10px !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+}
+
+.sop-fixed-toolbar-swatch-item:hover {
+  border-color: hsl(var(--primary) / 0.45) !important;
+  background: hsl(var(--muted)) !important;
+}
+
+.sop-fixed-toolbar-swatch {
+  display: block;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  border: 1px solid hsl(var(--border));
+  border-radius: 999px;
+}
+
+.dark .sop-fixed-editor-toolbar-shell,
+html.dark .sop-fixed-editor-toolbar-shell,
+body.dark .sop-fixed-editor-toolbar-shell,
+[data-theme="dark"] .sop-fixed-editor-toolbar-shell {
+  background: #151719;
+}
+
+.dark .sop-fixed-toolbar-panel,
+html.dark .sop-fixed-toolbar-panel,
+body.dark .sop-fixed-toolbar-panel,
+[data-theme="dark"] .sop-fixed-toolbar-panel {
+  background: #151719;
+  color: #f8fafc;
+  border-color: #2a2f3a;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 0.52);
+}
+
+.dark .sop-fixed-toolbar-block-card,
+html.dark .sop-fixed-toolbar-block-card,
+body.dark .sop-fixed-toolbar-block-card,
+[data-theme="dark"] .sop-fixed-toolbar-block-card,
+.dark .sop-fixed-toolbar-swatch-item,
+html.dark .sop-fixed-toolbar-swatch-item,
+body.dark .sop-fixed-toolbar-swatch-item,
+[data-theme="dark"] .sop-fixed-toolbar-swatch-item {
+  background: #101317 !important;
+  color: #f8fafc !important;
+  border-color: #2a2f3a !important;
+}
+/* SOP_FIXED_EDITOR_TOOLBAR_FUNCTIONS_END */
+
+/* SOP_FIXED_TOOLBAR_LAYOUT_LOCK_START */
+/* Keep SOP custom toolbar permanently visible above the editor content. */
+
+.sop-blocknote-shell {
+  display: flex !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.sop-fixed-editor-toolbar-shell {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 120 !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  min-height: 50px !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--background)) !important;
+}
+
+.sop-fixed-editor-toolbar {
+  position: relative !important;
+  z-index: 121 !important;
+  flex-wrap: nowrap !important;
+}
+
+.sop-blocknote-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+}
+
+.sop-blocknote-scroll .bn-container,
+.sop-blocknote-scroll .bn-editor {
+  min-height: 100% !important;
+}
+
+.dark .sop-fixed-editor-toolbar-shell,
+html.dark .sop-fixed-editor-toolbar-shell,
+body.dark .sop-fixed-editor-toolbar-shell,
+[data-theme="dark"] .sop-fixed-editor-toolbar-shell {
+  background: #151719 !important;
+}
+/* SOP_FIXED_TOOLBAR_LAYOUT_LOCK_END */
+
+/* SOP_TOOLBAR_PANEL_FRONT_FIX_START */
+/* Keep custom toolbar panels above selected editor text/content. */
+
+.sop-blocknote-shell {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: hidden !important;
+}
+
+.sop-fixed-editor-toolbar-shell {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2147483000 !important;
+  isolation: isolate !important;
+  overflow: visible !important;
+}
+
+.sop-fixed-editor-toolbar {
+  position: relative !important;
+  z-index: 2147483001 !important;
+}
+
+.sop-fixed-toolbar-panel,
+.sop-fixed-toolbar-status {
+  z-index: 2147483002 !important;
+  isolation: isolate !important;
+  opacity: 1 !important;
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+}
+
+.sop-fixed-toolbar-panel * {
+  user-select: none !important;
+}
+
+.sop-blocknote-scroll {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.sop-blocknote-scroll .bn-container,
+.sop-blocknote-scroll .bn-editor {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.dark .sop-fixed-toolbar-panel,
+html.dark .sop-fixed-toolbar-panel,
+body.dark .sop-fixed-toolbar-panel,
+[data-theme="dark"] .sop-fixed-toolbar-panel,
+.dark .sop-fixed-toolbar-status,
+html.dark .sop-fixed-toolbar-status,
+body.dark .sop-fixed-toolbar-status,
+[data-theme="dark"] .sop-fixed-toolbar-status {
+  background: #151719 !important;
+  color: #f8fafc !important;
+  border-color: #2a2f3a !important;
+}
+/* SOP_TOOLBAR_PANEL_FRONT_FIX_END */
+
+/* SOP_TOOLBAR_PORTAL_PANEL_START */
+.sop-fixed-toolbar-portal-panel {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+  user-select: none !important;
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  box-shadow: 0 24px 70px rgb(15 23 42 / 0.22) !important;
+}
+
+.dark .sop-fixed-toolbar-portal-panel,
+html.dark .sop-fixed-toolbar-portal-panel,
+body.dark .sop-fixed-toolbar-portal-panel,
+[data-theme="dark"] .sop-fixed-toolbar-portal-panel {
+  background: #151719 !important;
+  color: #f8fafc !important;
+  border-color: #2a2f3a !important;
+  box-shadow: 0 24px 70px rgb(0 0 0 / 0.56) !important;
+}
+/* SOP_TOOLBAR_PORTAL_PANEL_END */
+
+/* SOP_TOOLBAR_PANEL_OPAQUE_FRONT_START */
+/* Browser selection can paint above normal layers; clear it in TSX and keep panels solid. */
+
+.sop-fixed-toolbar-portal-panel,
+.sop-fixed-toolbar-panel {
+  opacity: 1 !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  mix-blend-mode: normal !important;
+  backdrop-filter: none !important;
+}
+
+.sop-fixed-toolbar-portal-panel::before,
+.sop-fixed-toolbar-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: #ffffff;
+}
+
+.dark .sop-fixed-toolbar-portal-panel,
+html.dark .sop-fixed-toolbar-portal-panel,
+body.dark .sop-fixed-toolbar-portal-panel,
+[data-theme="dark"] .sop-fixed-toolbar-portal-panel,
+.dark .sop-fixed-toolbar-panel,
+html.dark .sop-fixed-toolbar-panel,
+body.dark .sop-fixed-toolbar-panel,
+[data-theme="dark"] .sop-fixed-toolbar-panel {
+  background: #151719 !important;
+  color: #f8fafc !important;
+}
+
+.dark .sop-fixed-toolbar-portal-panel::before,
+html.dark .sop-fixed-toolbar-portal-panel::before,
+body.dark .sop-fixed-toolbar-portal-panel::before,
+[data-theme="dark"] .sop-fixed-toolbar-portal-panel::before,
+.dark .sop-fixed-toolbar-panel::before,
+html.dark .sop-fixed-toolbar-panel::before,
+body.dark .sop-fixed-toolbar-panel::before,
+[data-theme="dark"] .sop-fixed-toolbar-panel::before {
+  background: #151719 !important;
+}
+/* SOP_TOOLBAR_PANEL_OPAQUE_FRONT_END */
+
+/* SOP_TOOLBAR_PANEL_FLAT_OUTLINE_START */
+/* Remove floating shadow and make toolbar panels match ME outline style */
+.sop-fixed-toolbar-portal-panel,
+.sop-fixed-toolbar-panel {
+  box-shadow: none !important;
+  border: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--background)) !important;
+}
+
+/* Light mode: cleaner white/soft panel */
+html:not(.dark) .sop-fixed-toolbar-portal-panel,
+body:not(.dark) .sop-fixed-toolbar-portal-panel,
+html:not(.dark) .sop-fixed-toolbar-panel,
+body:not(.dark) .sop-fixed-toolbar-panel {
+  background: #ffffff !important;
+  border-color: #dbe3ef !important;
+  box-shadow: none !important;
+}
+
+/* Dark mode: same as system card outline, no glow */
+.dark .sop-fixed-toolbar-portal-panel,
+html.dark .sop-fixed-toolbar-portal-panel,
+body.dark .sop-fixed-toolbar-portal-panel,
+[data-theme="dark"] .sop-fixed-toolbar-portal-panel,
+.dark .sop-fixed-toolbar-panel,
+html.dark .sop-fixed-toolbar-panel,
+body.dark .sop-fixed-toolbar-panel,
+[data-theme="dark"] .sop-fixed-toolbar-panel {
+  background: #151719 !important;
+  border-color: #2a2f36 !important;
+  box-shadow: none !important;
+}
+
+/* Remove pseudo overlay shadow/background if previous patch added it */
+.sop-fixed-toolbar-portal-panel::before,
+.sop-fixed-toolbar-panel::before {
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Menu option buttons: outline / soft hover, not floating card */
+.sop-fixed-toolbar-panel button,
+.sop-fixed-toolbar-portal-panel button {
+  box-shadow: none !important;
+  border-color: transparent;
+}
+
+.sop-fixed-toolbar-panel button:hover,
+.sop-fixed-toolbar-portal-panel button:hover {
+  background: hsl(var(--muted)) !important;
+}
+
+/* Active option color follows ME accent */
+.sop-fixed-toolbar-panel button[data-active="true"],
+.sop-fixed-toolbar-portal-panel button[data-active="true"],
+.sop-fixed-toolbar-panel .is-active,
+.sop-fixed-toolbar-portal-panel .is-active {
+  background: rgba(37, 99, 235, 0.10) !important;
+  color: #2563eb !important;
+  border-color: rgba(37, 99, 235, 0.22) !important;
+}
+
+.dark .sop-fixed-toolbar-panel button[data-active="true"],
+.dark .sop-fixed-toolbar-portal-panel button[data-active="true"],
+.dark .sop-fixed-toolbar-panel .is-active,
+.dark .sop-fixed-toolbar-portal-panel .is-active {
+  background: rgba(34, 197, 94, 0.13) !important;
+  color: #22c55e !important;
+  border-color: rgba(34, 197, 94, 0.28) !important;
+}
+/* SOP_TOOLBAR_PANEL_FLAT_OUTLINE_END */
+
+/* SOP_TOOLBAR_PANEL_ME_OUTLINE_FINAL_START */
+/* Final outline tuning: match ME split-panel border style, no shadow. */
+
+.sop-fixed-toolbar-portal-panel,
+.sop-fixed-toolbar-panel {
+  border: 1px solid #dce6f2 !important;
+  outline: 1px solid #f4f7fb !important;
+  outline-offset: -2px !important;
+  box-shadow: none !important;
+  background: #ffffff !important;
+  border-radius: 16px !important;
+}
+
+/* Make the edge readable on light editor background */
+.sop-fixed-toolbar-portal-panel {
+  box-shadow:
+    0 0 0 1px rgb(226 232 240 / 0.45) !important;
+}
+
+/* Remove inner pseudo background from previous fixes */
+.sop-fixed-toolbar-portal-panel::before,
+.sop-fixed-toolbar-panel::before {
+  display: none !important;
+}
+
+/* Option cards should not create another heavy outline */
+.sop-fixed-toolbar-block-card,
+.sop-fixed-toolbar-swatch-item {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.sop-fixed-toolbar-block-card:hover,
+.sop-fixed-toolbar-swatch-item:hover {
+  border-color: #dce6f2 !important;
+  background: #f8fafc !important;
+}
+
+/* Dark theme equivalent: same subtle panel border, no glow */
+.dark .sop-fixed-toolbar-portal-panel,
+html.dark .sop-fixed-toolbar-portal-panel,
+body.dark .sop-fixed-toolbar-portal-panel,
+[data-theme="dark"] .sop-fixed-toolbar-portal-panel,
+.dark .sop-fixed-toolbar-panel,
+html.dark .sop-fixed-toolbar-panel,
+body.dark .sop-fixed-toolbar-panel,
+[data-theme="dark"] .sop-fixed-toolbar-panel {
+  background: #151719 !important;
+  border-color: #2b313a !important;
+  outline: 1px solid #1f242b !important;
+  outline-offset: -2px !important;
+  box-shadow: none !important;
+}
+
+.dark .sop-fixed-toolbar-block-card:hover,
+html.dark .sop-fixed-toolbar-block-card:hover,
+body.dark .sop-fixed-toolbar-block-card:hover,
+[data-theme="dark"] .sop-fixed-toolbar-block-card:hover,
+.dark .sop-fixed-toolbar-swatch-item:hover,
+html.dark .sop-fixed-toolbar-swatch-item:hover,
+body.dark .sop-fixed-toolbar-swatch-item:hover,
+[data-theme="dark"] .sop-fixed-toolbar-swatch-item:hover {
+  border-color: #2b313a !important;
+  background: #1a1e25 !important;
+}
+/* SOP_TOOLBAR_PANEL_ME_OUTLINE_FINAL_END */
+
+/* SOP_BUILDER_MAIN_LOCK_FINAL_START */
+/* Builder locks only its actual app main container.
+   No body/html lock, no fixed full-screen overlay, no global main:has selector. */
+
+.sop-builder-main-lock {
+  height: calc(100dvh - 56px) !important;
+  max-height: calc(100dvh - 56px) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  overscroll-behavior: contain !important;
+}
+
+.sop-builder-route-shell {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  background: hsl(var(--background)) !important;
+}
+
+.sop-builder-workspace {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  background: hsl(var(--background)) !important;
+}
+
+.sop-builder-document-header {
+  flex: 0 0 54px !important;
+  height: 54px !important;
+  min-height: 54px !important;
+  max-height: 54px !important;
+  overflow: hidden !important;
+  background: hsl(var(--background)) !important;
+  border-bottom: 1px solid hsl(var(--border)) !important;
+  z-index: 50 !important;
+}
+
+.sop-builder-document-header h1 {
+  font-size: 17px !important;
+  line-height: 1.15 !important;
+}
+
+.sop-builder-document-header button {
+  height: 32px !important;
+  min-height: 32px !important;
+}
+
+.sop-builder-panel-group,
+.sop-builder-workspace [data-panel-group] {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+
+.sop-builder-workspace [data-panel],
+.sop-builder-workspace aside,
+.sop-builder-editor-main {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.sop-blocknote-shell {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.sop-fixed-editor-toolbar-shell {
+  flex: 0 0 auto !important;
+}
+
+.sop-blocknote-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+}
+
+.sop-blocknote-page {
+  min-height: auto !important;
+}
+
+.dark .sop-builder-route-shell,
+html.dark .sop-builder-route-shell,
+body.dark .sop-builder-route-shell,
+[data-theme="dark"] .sop-builder-route-shell,
+.dark .sop-builder-workspace,
+html.dark .sop-builder-workspace,
+body.dark .sop-builder-workspace,
+[data-theme="dark"] .sop-builder-workspace,
+.dark .sop-builder-document-header,
+html.dark .sop-builder-document-header,
+body.dark .sop-builder-document-header,
+[data-theme="dark"] .sop-builder-document-header {
+  background: #151719 !important;
+}
+/* SOP_BUILDER_MAIN_LOCK_FINAL_END */

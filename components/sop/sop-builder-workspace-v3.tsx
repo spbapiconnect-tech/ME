@@ -123,6 +123,38 @@ export function SopBuilderWorkspaceV3({
   onUpdateSettings,
   onDocumentChange,
 }: SopBuilderWorkspaceV3Props) {
+  useEffect(() => {
+    const shell = document.querySelector(".sop-builder-route-shell") as HTMLElement | null;
+    const main = shell?.closest("main") as HTMLElement | null;
+
+    const lockedTargets = [main].filter(Boolean) as HTMLElement[];
+
+    for (const target of lockedTargets) {
+      target.classList.add("sop-builder-main-lock");
+      target.scrollTop = 0;
+    }
+
+    window.scrollTo(0, 0);
+
+    requestAnimationFrame(() => {
+      for (const target of lockedTargets) {
+        target.scrollTop = 0;
+      }
+
+      window.scrollTo(0, 0);
+    });
+
+    return () => {
+      for (const target of lockedTargets) {
+        target.classList.remove("sop-builder-main-lock");
+        target.scrollTop = 0;
+      }
+
+      window.scrollTo(0, 0);
+    };
+  }, []);
+
+
   const workspaceRef = useRef<HTMLDivElement | null>(null);
   const renameInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -145,72 +177,14 @@ export function SopBuilderWorkspaceV3({
   );
 
   const [localSettings, setLocalSettings] = useState<SopBuilderV3Settings>(resolvedSettings);
-  const settings = localSettings;
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+const settings = localSettings;
 
   const [settingsDraft, setSettingsDraft] = useState(() => ({
     title: resolvedSettings.title || "",
     category: resolvedSettings.category || "",
     version: resolvedSettings.version || "v1.0",
   }));
-
-  useEffect(() => {
-    const browserDocument = globalThis.document;
-    if (!browserDocument?.body) return;
-
-    const body = browserDocument.body;
-    const html = browserDocument.documentElement;
-
-    const previousBodyOverflow = body.style.overflow;
-    const previousHtmlOverflow = html.style.overflow;
-
-    body.classList.add("sop-builder-page-lock");
-    html.classList.add("sop-builder-page-lock");
-
-    body.style.overflow = "hidden";
-    html.style.overflow = "hidden";
-    body.scrollTop = 0;
-    html.scrollTop = 0;
-
-    const lockedParents: Array<{ element: HTMLElement; overflow: string; overflowY: string }> = [];
-    let parent = workspaceRef.current?.parentElement || null;
-
-    while (parent && parent !== body) {
-      const computed = window.getComputedStyle(parent);
-      const canScroll =
-        parent.tagName.toLowerCase() === "main" ||
-        computed.overflow === "auto" ||
-        computed.overflow === "scroll" ||
-        computed.overflowY === "auto" ||
-        computed.overflowY === "scroll";
-
-      if (canScroll) {
-        lockedParents.push({
-          element: parent,
-          overflow: parent.style.overflow,
-          overflowY: parent.style.overflowY,
-        });
-
-        parent.style.overflow = "hidden";
-        parent.style.overflowY = "hidden";
-        parent.scrollTop = 0;
-      }
-
-      parent = parent.parentElement;
-    }
-
-    return () => {
-      body.classList.remove("sop-builder-page-lock");
-      html.classList.remove("sop-builder-page-lock");
-
-      body.style.overflow = previousBodyOverflow;
-      html.style.overflow = previousHtmlOverflow;
-
-      lockedParents.forEach(({ element, overflow, overflowY }) => {
-        element.style.overflow = overflow;
-        element.style.overflowY = overflowY;
-      });
-    };
-  }, []);
 
   useEffect(() => {
     if (!renameTarget) return;
@@ -224,7 +198,8 @@ export function SopBuilderWorkspaceV3({
     const frame = window.requestAnimationFrame(focusInput);
     const timer = window.setTimeout(focusInput, 80);
 
-    return () => {
+    
+return () => {
       window.cancelAnimationFrame(frame);
       window.clearTimeout(timer);
     };
@@ -318,9 +293,9 @@ export function SopBuilderWorkspaceV3({
   return (
     <div
       ref={workspaceRef}
-      className="sop-builder-workspace flex h-[calc(100dvh-56px)] min-h-0 flex-col overflow-hidden bg-background"
+      className="sop-builder-workspace flex h-full min-h-0 flex-col overflow-hidden bg-background"
     >
-      <div className="shrink-0 border-b px-4 py-3">
+      <div className="sop-builder-document-header shrink-0 border-b px-4 py-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <Button variant="outline" size="icon" onClick={onBack}>
@@ -328,9 +303,9 @@ export function SopBuilderWorkspaceV3({
             </Button>
 
             <div className="min-w-0">
-              <div className="text-xs text-muted-foreground">SOP Builder V3</div>
+              <div className="text-[11px] text-muted-foreground">SOP Builder V3</div>
               <div className="flex items-center gap-2">
-                <h1 className="truncate text-xl font-semibold tracking-tight">
+                <h1 className="truncate text-lg font-semibold tracking-tight">
                   {settings.title || "Untitled SOP"}
                 </h1>
                 <Badge variant="outline">{settings.version || "v1.0"}</Badge>
@@ -373,12 +348,43 @@ export function SopBuilderWorkspaceV3({
               Preview
             </Button>
 
-            <Button onClick={createAction}>Create SOP</Button>
+
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const savedAt = new Date().toISOString();
+
+                  window.localStorage.setItem(
+                    "me:sop-builder:v3:draft",
+                    JSON.stringify({
+                      version: 1,
+                      savedAt,
+                      sopDocument,
+                      pages,
+                      selectedPageId,
+                      settings: localSettings,
+                    }),
+                  );
+
+                  setDraftSavedAt(savedAt);
+                }}
+              >
+                Save Draft
+              </Button>
+              {draftSavedAt ? (
+                <span className="hidden text-xs text-muted-foreground md:inline">
+                  Saved {new Date(draftSavedAt).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              ) : null}
+<Button onClick={createAction}>Create SOP</Button>
           </div>
         </div>
       </div>
 
-      <ResizablePanelGroup direction="horizontal" className="min-h-0 flex-1 overflow-hidden">
+      <ResizablePanelGroup direction="horizontal" className="sop-builder-panel-group min-h-0 flex-1 overflow-hidden">
         <ResizablePanel defaultSize={16} minSize={12} maxSize={22}>
           <aside className="flex h-full min-h-0 flex-col border-r bg-background">
             <div className="shrink-0 border-b px-3 py-4">
