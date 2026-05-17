@@ -83,6 +83,20 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function runtimeActor() {
+  if (typeof window === "undefined") return "System";
+  return (
+    window.localStorage.getItem("me:sop:audit-actor") ||
+    window.localStorage.getItem("me:current-actor") ||
+    "Local user"
+  );
+}
+
+function withAuditActor(detail: string) {
+  if (/\bBy\s+[^·]+/i.test(detail)) return detail;
+  return `${detail} · By ${runtimeActor()}`;
+}
+
 function toLabel(moduleKey: string) {
   return moduleKey
     .split("-")
@@ -275,7 +289,7 @@ export const useMeRuntimeStore = create<MeRuntimeState>()(
                 at: nowIso(),
                 moduleKey,
                 action: "create",
-                detail: `Created record: ${title}`,
+                detail: withAuditActor(`Created record: ${title}`),
               },
               ...state.auditTrail,
             ].slice(0, 300),
@@ -323,7 +337,7 @@ export const useMeRuntimeStore = create<MeRuntimeState>()(
                 at: nowIso(),
                 moduleKey,
                 action: "create",
-                detail: `Created record: ${payload.title}`,
+                detail: withAuditActor(`Created record: ${payload.title}`),
               },
               ...state.auditTrail,
             ].slice(0, 300),
@@ -385,7 +399,7 @@ export const useMeRuntimeStore = create<MeRuntimeState>()(
                 at: nowIso(),
                 moduleKey,
                 action: "update",
-                detail: `Updated record: ${rowId}`,
+                detail: withAuditActor(`Updated record: ${rowId}`),
               },
               ...state.auditTrail,
             ].slice(0, 300),
@@ -419,7 +433,7 @@ export const useMeRuntimeStore = create<MeRuntimeState>()(
                 at: nowIso(),
                 moduleKey,
                 action: "delete",
-                detail: `Deleted record: ${rowId}`,
+                detail: withAuditActor(`Deleted record: ${rowId}`),
               },
               ...state.auditTrail,
             ].slice(0, 300),
@@ -456,7 +470,7 @@ export const useMeRuntimeStore = create<MeRuntimeState>()(
                 at: nowIso(),
                 moduleKey,
                 action: "update",
-                detail: `Toggled status for ${rowId}`,
+                detail: withAuditActor(`Toggled status for ${rowId}`),
               },
               ...state.auditTrail,
             ].slice(0, 300),
@@ -475,7 +489,7 @@ export const useMeRuntimeStore = create<MeRuntimeState>()(
         set((state) => ({
           ...state,
           auditTrail: [
-            { id: `AUD-${Date.now()}`, at: nowIso(), moduleKey, action, detail },
+            { id: `AUD-${Date.now()}`, at: nowIso(), moduleKey, action, detail: withAuditActor(detail) },
             ...state.auditTrail,
           ].slice(0, 300),
         }));

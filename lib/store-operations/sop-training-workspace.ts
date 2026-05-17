@@ -52,13 +52,118 @@ function splitList(value: string) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
+function blockNoteText(value: unknown): string {
+  if (typeof value === "string") return value;
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object" && "text" in item) {
+          return String((item as { text?: unknown }).text || "");
+        }
+        return "";
+      })
+      .filter(Boolean)
+      .join("");
+  }
+
+  return "";
+}
+
+function blockNoteJsonToSopContent(raw: { blocks?: unknown[]; plainText?: string }): SopPreviewContent {
+  const blocks = Array.isArray(raw.blocks) ? raw.blocks : [];
+  const parsedBlocks = blocks
+    .map((block, index): SopPreviewBlock | null => {
+      const record = block as Record<string, unknown>;
+      const type = String(record.type || "paragraph");
+      const text = blockNoteText(record.content).trim();
+      const props = (record.props || {}) as Record<string, unknown>;
+      const id = String(record.id || `blocknote-${index + 1}`);
+
+      if (!text && !props.url && !props.name) return null;
+
+      if (type.includes("heading")) {
+        return {
+          id,
+          type: "heading",
+          title: text || "Section",
+          body: "",
+        };
+      }
+
+      if (type === "image" || type === "video") {
+        return {
+          id,
+          type: "image",
+          title: text || "Media",
+          imageUrl: String(props.url || ""),
+        };
+      }
+
+      if (type === "file") {
+        return {
+          id,
+          type: "pdf",
+          title: text || String(props.name || "Attachment"),
+          pdfUrl: String(props.url || ""),
+        };
+      }
+
+      return {
+        id,
+        type: "text",
+        title: "",
+        body: text,
+      };
+    })
+    .filter(Boolean) as SopPreviewBlock[];
+
+  if (!parsedBlocks.length && raw.plainText) {
+    parsedBlocks.push({
+      id: "blocknote-plain-text",
+      type: "text",
+      body: raw.plainText,
+    });
+  }
+
+  return {
+    mode: "Interactive Book",
+    pages: [
+      {
+        id: "blocknote-reader-page",
+        pageNo: 1,
+        title: "Document",
+        blocks: parsedBlocks.length
+          ? parsedBlocks
+          : [
+              {
+                id: "empty-blocknote-reader",
+                type: "text",
+                body: "No SOP content yet.",
+              },
+            ],
+      },
+    ],
+  };
+}
+
 function parseSopContent(row: ModuleRow | undefined): SopPreviewContent {
   if (!row) return { mode: "Interactive Book", pages: [] };
 
   const raw = detailValue(row, "SOP Content JSON");
   if (raw) {
     try {
-      const parsed = JSON.parse(raw) as SopPreviewContent;
+      const parsed = JSON.parse(raw) as SopPreviewContent & {
+        source?: string;
+        blocks?: unknown[];
+        plainText?: string;
+      };
+
+      if (parsed.source === "blocknote") {
+        return blockNoteJsonToSopContent(parsed);
+      }
+
       return {
         mode: parsed.mode || "Interactive Book",
         pages: Array.isArray(parsed.pages) ? parsed.pages : [],

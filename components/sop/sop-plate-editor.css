@@ -1,0 +1,473 @@
+.sop-plate-shell {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex: 1 1 0;
+  flex-direction: column;
+  overflow: hidden;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.sop-builder-workspace.sop-builder-workspace-v3 .sop-builder-chapter-panel,
+.sop-builder-workspace.sop-builder-workspace-v3 .sop-builder-editor-main,
+.sop-builder-workspace.sop-builder-workspace-v3 .sop-builder-inspector-panel {
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.sop-builder-workspace.sop-builder-workspace-v3 .sop-builder-chapter-panel > :first-child,
+.sop-builder-workspace.sop-builder-workspace-v3 .sop-builder-inspector-panel > :first-child,
+.sop-builder-workspace.sop-builder-workspace-v3 .sop-builder-editor-main > :first-child {
+  flex: 0 0 auto;
+}
+
+.sop-builder-workspace.sop-builder-workspace-v3 .sop-builder-chapter-panel > :last-child,
+.sop-builder-workspace.sop-builder-workspace-v3 .sop-builder-inspector-panel > :last-child {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.sop-plate-toolbar {
+  z-index: 20;
+  flex: 0 0 auto;
+  border-bottom: 1px solid hsl(var(--border));
+  background:
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted) / 0.55) 100%);
+  padding: 8px 14px;
+}
+
+.sop-plate-toolbar-scroll {
+  display: flex;
+  min-width: max-content;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.sop-toolbar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 12px;
+  border-right: 1px solid hsl(var(--border));
+}
+
+.sop-toolbar-group:last-child {
+  border-right: 0;
+  padding-right: 0;
+}
+
+.sop-toolbar-group-table {
+  padding-right: 0;
+}
+
+.sop-toolbar-group-label {
+  flex: 0 0 auto;
+  border: 1px solid hsl(var(--border));
+  border-radius: 999px;
+  background: hsl(var(--background) / 0.9);
+  padding: 6px 10px;
+  color: hsl(var(--muted-foreground));
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sop-toolbar-group-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sop-plate-toolbar button,
+.sop-plate-panel button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 0 10px;
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sop-plate-toolbar button:hover,
+.sop-plate-toolbar button.is-active,
+.sop-plate-panel button:hover {
+  border-color: hsl(var(--ring) / 0.55);
+  background: hsl(var(--primary) / 0.1);
+}
+
+.sop-plate-toolbar button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.sop-toolbar-dual-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sop-toolbar-size-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.sop-plate-panel {
+  position: absolute;
+  left: 18px;
+  top: 74px;
+  z-index: 40;
+  width: min(460px, calc(100% - 36px));
+  max-height: min(560px, calc(100vh - 180px));
+  overflow: auto;
+  border-radius: 18px;
+  border: 1px solid #d9e2ef;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+  padding: 14px;
+}
+
+.dark .sop-plate-panel,
+[data-theme="dark"] .sop-plate-panel,
+[data-theme="moon"] .sop-plate-panel {
+  border-color: #334155;
+  background: #111827;
+  color: #e5e7eb;
+}
+
+.sop-plate-panel-title {
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.sop-plate-grid,
+.sop-plate-color-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.sop-plate-grid button,
+.sop-plate-color-grid button {
+  min-height: 34px;
+  height: auto;
+  justify-content: flex-start;
+  border: 1px solid #d9e2ef;
+  background: #f8fafc;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.sop-plate-grid button:hover,
+.sop-plate-color-grid button:hover {
+  background: #eef4ff;
+  border-color: #93c5fd;
+}
+
+.dark .sop-plate-grid button,
+.dark .sop-plate-color-grid button,
+[data-theme="dark"] .sop-plate-grid button,
+[data-theme="dark"] .sop-plate-color-grid button,
+[data-theme="moon"] .sop-plate-grid button,
+[data-theme="moon"] .sop-plate-color-grid button {
+  border-color: #334155;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+.sop-plate-color-grid span {
+  width: 18px;
+  height: 18px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+}
+
+.sop-plate-color-grid span.is-clear {
+  border-style: dashed;
+}
+
+.sop-link-form {
+  display: grid;
+  gap: 10px;
+}
+
+.sop-link-form label {
+  display: grid;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sop-link-form input,
+.sop-link-form select {
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid #d9e2ef;
+  background: #ffffff;
+  color: #0f172a;
+  padding: 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.dark .sop-link-form input,
+.dark .sop-link-form select,
+[data-theme="dark"] .sop-link-form input,
+[data-theme="dark"] .sop-link-form select,
+[data-theme="moon"] .sop-link-form input,
+[data-theme="moon"] .sop-link-form select {
+  border-color: #334155;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+.sop-plate-close {
+  margin-top: 10px;
+  width: 100%;
+  border-color: hsl(var(--border)) !important;
+  background: hsl(var(--muted)) !important;
+}
+
+.sop-plate-content {
+  display: block;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px clamp(24px, 6vw, 88px) 88px;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 15px;
+  line-height: 1.65;
+  outline: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.sop-plate-content:empty::before {
+  content: "Enter text or insert a table...";
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+}
+
+.sop-plate-content p {
+  min-height: 1.4em;
+  margin: 0.55em 0;
+}
+
+.sop-plate-content h1,
+.sop-plate-preview h1 {
+  margin: 18px 0 10px;
+  font-size: 34px;
+  line-height: 1.12;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.sop-plate-content h2,
+.sop-plate-preview h2 {
+  margin: 16px 0 8px;
+  font-size: 26px;
+  line-height: 1.18;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.sop-plate-content h3,
+.sop-plate-preview h3 {
+  margin: 14px 0 6px;
+  font-size: 19px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+
+.sop-plate-content table,
+.sop-plate-preview table {
+  width: min(100%, 920px);
+  min-width: 220px;
+  margin: 16px auto;
+  border-collapse: collapse;
+  table-layout: fixed;
+  border: 1.5px solid #64748b !important;
+  background: hsl(var(--background));
+}
+
+.sop-plate-content th,
+.sop-plate-content td,
+.sop-plate-preview th,
+.sop-plate-preview td {
+  min-width: 96px;
+  min-height: 40px;
+  height: 40px;
+  border: 1.5px solid #64748b !important;
+  padding: 7px 9px;
+  vertical-align: top;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+}
+
+.sop-plate-content th,
+.sop-plate-preview th {
+  background: hsl(var(--muted));
+  font-weight: 800;
+}
+
+.sop-plate-content table:focus-within {
+  outline: 2px solid hsl(var(--ring) / 0.65);
+  outline-offset: 3px;
+}
+
+.sop-plate-content .sop-selected-cell {
+  outline: 2px solid #2563eb !important;
+  outline-offset: -2px;
+}
+
+.sop-plate-density-compact .sop-plate-content th,
+.sop-plate-density-compact .sop-plate-content td {
+  min-height: 30px;
+  height: 30px;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.sop-plate-density-comfortable .sop-plate-content th,
+.sop-plate-density-comfortable .sop-plate-content td {
+  min-height: 54px;
+  height: 54px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.sop-media {
+  margin: 16px 0;
+  border-radius: 16px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.25);
+  padding: 10px;
+}
+
+.sop-media img,
+.sop-media video,
+.sop-plate-preview img,
+.sop-plate-preview video {
+  display: block;
+  max-width: 100%;
+  max-height: 420px;
+  border-radius: 12px;
+}
+
+.sop-media figcaption {
+  margin-top: 6px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+}
+
+.sop-link-chip {
+  color: #2563eb;
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.sop-link-chip[data-link-type="sop"]::before {
+  content: "SOP · ";
+}
+
+.sop-link-chip[data-link-type="training"]::before {
+  content: "TRAINING · ";
+}
+
+.sop-link-chip[data-link-type="exam"]::before {
+  content: "EXAM · ";
+}
+
+.sop-plate-preview {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.sop-plate-preview p {
+  margin: 0.55em 0;
+}
+
+.dark .sop-plate-content table,
+.dark .sop-plate-preview table,
+[data-theme="dark"] .sop-plate-content table,
+[data-theme="dark"] .sop-plate-preview table,
+[data-theme="moon"] .sop-plate-content table,
+[data-theme="moon"] .sop-plate-preview table {
+  border-color: #94a3b8 !important;
+  background: hsl(var(--background));
+}
+
+.dark .sop-plate-content th,
+.dark .sop-plate-content td,
+.dark .sop-plate-preview th,
+.dark .sop-plate-preview td,
+[data-theme="dark"] .sop-plate-content th,
+[data-theme="dark"] .sop-plate-content td,
+[data-theme="dark"] .sop-plate-preview th,
+[data-theme="dark"] .sop-plate-preview td,
+[data-theme="moon"] .sop-plate-content th,
+[data-theme="moon"] .sop-plate-content td,
+[data-theme="moon"] .sop-plate-preview th,
+[data-theme="moon"] .sop-plate-preview td {
+  border-color: #94a3b8 !important;
+}
+
+@media (max-width: 900px) {
+  .sop-plate-toolbar {
+    padding-inline: 12px;
+  }
+
+  .sop-toolbar-group {
+    gap: 8px;
+    padding-right: 10px;
+  }
+
+  .sop-toolbar-group-actions {
+    gap: 5px;
+  }
+
+  .sop-plate-panel {
+    top: 70px;
+    width: min(420px, calc(100% - 24px));
+    left: 12px;
+  }
+
+  .sop-plate-content {
+    padding-inline: 18px;
+    padding-bottom: 72px;
+  }
+}

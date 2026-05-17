@@ -167,25 +167,9 @@ function newPage(index: number, parentPageId?: string): BuilderPage {
   return {
     id: `page-${Date.now()}-${Math.random().toString(16).slice(2)}`,
     parentPageId,
-    title: index === 1 ? "Page 1 · What staff need to know" : `Page ${index}`,
+    title: index === 1 ? "Overview" : `Page ${index}`,
     coverImageUrl: "",
-    blocks: [
-      {
-        ...newBlock("heading"),
-        title: "SOP title / section heading",
-        body: "Explain what this page is about.",
-      },
-      {
-        ...newBlock("text"),
-        title: "Instruction context",
-        body: "Write the reason, standard, or important background here so staff understand what to do.",
-      },
-      {
-        ...newBlock("step-list"),
-        title: "Step-by-step execution",
-        stepsText: "Step 1: Prepare the station\nStep 2: Follow the standard\nStep 3: Take proof photo if required",
-      },
-    ],
+    blocks: [],
   };
 }
 
@@ -222,6 +206,146 @@ function serializeContent(mode: SopForm["employeeReadMode"], pages: BuilderPage[
       })),
     })),
   };
+}
+
+
+function builderBlockNoteText(value: unknown): string {
+  if (typeof value === "string") return value;
+
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object" && "text" in item) {
+          return String((item as { text?: unknown }).text || "");
+        }
+        return "";
+      })
+      .filter(Boolean)
+      .join("");
+  }
+
+  return "";
+}
+
+function builderBlockNoteBlocksToLegacyBlocks(blocks: unknown[]): BuilderBlock[] {
+  const converted = blocks
+    .map((block, index): BuilderBlock | null => {
+      const record = block as Record<string, unknown>;
+      const type = String(record.type || "paragraph");
+      const props = (record.props || {}) as Record<string, unknown>;
+      const content = builderBlockNoteText(record.content).trim();
+      const id = String(record.id || `blocknote-${Date.now()}-${index}`);
+
+      if (!content && !props.url && !props.name) return null;
+
+      if (type.includes("heading")) {
+        return {
+          id,
+          type: "heading",
+          title: content || "Section",
+          body: "",
+          imageUrl: "",
+          pdfUrl: "",
+          stepsText: "",
+          checklistText: "",
+          warningLevel: "Info",
+        };
+      }
+
+      if (type === "image" || type === "video") {
+        return {
+          id,
+          type: "image",
+          title: content || (type === "video" ? "Training video" : "Photo / GIF guide"),
+          body: "",
+          imageUrl: String(props.url || ""),
+          pdfUrl: "",
+          stepsText: "",
+          checklistText: "",
+          warningLevel: "Info",
+        };
+      }
+
+      if (type === "file") {
+        return {
+          id,
+          type: "pdf",
+          title: content || String(props.name || "PDF document"),
+          body: "",
+          imageUrl: "",
+          pdfUrl: String(props.url || ""),
+          stepsText: "",
+          checklistText: "",
+          warningLevel: "Info",
+        };
+      }
+
+      return {
+        id,
+        type: "text",
+        title: "",
+        body: content,
+        imageUrl: "",
+        pdfUrl: "",
+        stepsText: "",
+        checklistText: "",
+        warningLevel: "Info",
+      };
+    })
+    .filter(Boolean) as BuilderBlock[];
+
+  return converted.length ? converted : [newBlock("text")];
+}
+
+function parseBuilderPagesFromSop(row: { id: string; title?: string; detailItems?: Array<{ label: string; value: string }> }): BuilderPage[] {
+  const raw = detailValue(row, "SOP Content JSON");
+
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw) as SopPreviewContent & {
+        source?: string;
+        blocks?: unknown[];
+        plainText?: string;
+      };
+
+      if (parsed.source === "blocknote") {
+        return [
+          {
+            id: `page-${row.id}-blocknote`,
+            parentPageId: undefined,
+            title: row.title || "Document",
+            coverImageUrl: "",
+            blocks: builderBlockNoteBlocksToLegacyBlocks(parsed.blocks || []),
+          },
+        ];
+      }
+
+      if (Array.isArray(parsed.pages) && parsed.pages.length) {
+        return parsed.pages.map((page, pageIndex) => ({
+          id: page.id || `page-${row.id}-${pageIndex + 1}`,
+          parentPageId: undefined,
+          title: page.title || `Page ${pageIndex + 1}`,
+          coverImageUrl: page.coverImageUrl || "",
+          blocks: (page.blocks || []).map((block, blockIndex) => ({
+            id: block.id || `block-${row.id}-${pageIndex + 1}-${blockIndex + 1}`,
+            type: block.type || "text",
+            title: block.title || "",
+            body: block.body || "",
+            imageUrl: block.imageUrl || "",
+            pdfUrl: block.pdfUrl || "",
+            stepsText: (block.steps || []).map((step) => step.instruction).filter(Boolean).join("\n"),
+            checklistText: (block.checklistItems || []).join("\n"),
+            warningLevel: block.warningLevel || "Info",
+          })),
+        }));
+      }
+    } catch {
+      // Fall through to default page.
+    }
+  }
+
+  return [newPage(1)];
 }
 
 function renderBlock(block: SopPreviewBlock) {
@@ -307,6 +431,7 @@ export function SopTrainingControlPage() {
   const branchRows = getRows("branches", []);
 
   const [selectedSopId, setSelectedSopId] = useState<string | undefined>();
+  const [editingSopId, setEditingSopId] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("create");
   const [createTypeModalOpen, setCreateTypeModalOpen] = useState(false);
@@ -322,7 +447,7 @@ export function SopTrainingControlPage() {
     return () => window.cancelAnimationFrame(frame);
   }, []);
   const [blockNoteDocument, setBlockNoteDocument] = useState<SopBlockNoteDocument>([]);
-  const [builderMode, setBuilderMode] = useState(false);
+  const [builderMode, setBuilderMode] = useState(() => Boolean(searchParams.get("createSop") === "1" || searchParams.get("editSopId") || searchParams.get("builderSopId")));
   const [pages, setPages] = useState<BuilderPage[]>([newPage(1)]);
   const [selectedPageId, setSelectedPageId] = useState<string>("");
   const [form, setForm] = useState<SopForm>({
@@ -369,12 +494,80 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     return sopId && sopRows.some((row) => row.id === sopId) ? sopId : undefined;
   }, [searchParams, sopRows]);
 
+  const createSopMode = useMemo(() => searchParams.get("createSop") === "1", [searchParams]);
+
+  const requestedEditSopId = useMemo(() => {
+    const editSopId = searchParams.get("editSopId") || searchParams.get("builderSopId");
+    return editSopId && sopRows.some((row) => row.id === editSopId) ? editSopId : undefined;
+  }, [searchParams, sopRows]);
+
   const selectedSop = sopRows.find((row) => row.id === selectedSopId)
     ?? sopRows.find((row) => row.id === requestedSopId)
     ?? sopRows[0];
 
   const detail = useMemo(() => getSopDetail(selectedSop), [selectedSop]);
   const nextActions = useMemo(() => getSopNextActions(selectedSop), [selectedSop]);
+
+  // reset createSopMode into clean builder when opened from the Library Create SOP button.
+  useEffect(() => {
+    if (!createSopMode || editingSopId) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const starterPage = pages[0] || newPage(1);
+      setEditingSopId(undefined);
+      setSelectedSopId(undefined);
+      setBlockNoteDocument([]);
+      if (!pages.length) setPages([starterPage]);
+      setSelectedPageId(starterPage.id);
+      setBuilderVariant("v3");
+      setBuilderMode(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [createSopMode, editingSopId, pages]);
+
+  // hydrate existing SOP into builder when opened from /sop/[sopId] Edit.
+  useEffect(() => {
+    if (!requestedEditSopId || editingSopId === requestedEditSopId) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const row = sopRows.find((item) => item.id === requestedEditSopId);
+      if (!row) return;
+
+      const parsedPages = parseBuilderPagesFromSop(row);
+      const version = detailValue(row, "Version") || "v1.0";
+
+      setEditingSopId(row.id);
+      setSelectedSopId(row.id);
+      setPages(parsedPages);
+      setSelectedPageId(parsedPages[0]?.id || "");
+      setBlockNoteDocument([]);
+      setForm((current) => ({
+        ...current,
+        title: row.title,
+        documentCode: detailValue(row, "Document Code"),
+        category: detailValue(row, "Category") || current.category,
+        processArea: detailValue(row, "Process Area") || current.processArea,
+        version,
+        processOwner: detailValue(row, "Process Owner") || row.owner || "",
+        approver: detailValue(row, "Approver"),
+        targetRole: detailValue(row, "Target Role") || current.targetRole,
+        targetBranch: detailValue(row, "Target Branch"),
+        acknowledgementRequired: detailValue(row, "Acknowledgement Required") || current.acknowledgementRequired,
+        effectiveDate: detailValue(row, "Effective Date") || current.effectiveDate,
+        reviewCycle: detailValue(row, "Review Cycle") || current.reviewCycle,
+        reviewDueDate: detailValue(row, "Review Due Date") || current.reviewDueDate,
+        riskPoints: detailValue(row, "Risk Points"),
+        notes: row.detailNote || "",
+        existingSopId: row.id,
+        employeeReadMode: (detailValue(row, "Employee Read Mode") || "Interactive Book") as SopForm["employeeReadMode"],
+      }));
+      setBuilderVariant("v3");
+      setBuilderMode(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [requestedEditSopId, editingSopId, sopRows]);
 
   function updatePage(pageId: string, patch: Partial<BuilderPage>) {
     setPages((current) => current.map((page) => page.id === pageId ? { ...page, ...patch } : page));
@@ -415,9 +608,9 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     setDialogOpen(true);
   }
 
-  async function createSop() {
-    if (!form.title.trim()) return;
-    const content = serializeContent(form.employeeReadMode, pages);
+  async function createSop(blocksOverride?: SopBlockNoteDocument) {
+    const safeTitle = form.title.trim() || "Untitled SOP";
+    const contentJson = latestBuilderContentJson(blocksOverride);
     const matches = runStoreOperationRules("sop-training", {
       status: "Draft",
       reviewDueDate: form.reviewDueDate,
@@ -430,7 +623,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     const nextAction = matches[0]?.result.suggestedAction || "Assign training or create templates";
 
     const created = await createRecordWithPayload("sop", {
-      title: form.title.trim(),
+      title: safeTitle,
       subtitle: `${form.category} · ${form.processArea}`,
       status: "Draft",
       owner: form.processOwner || "SOP Control",
@@ -454,7 +647,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
         { label: "Assigned Training IDs", value: "" },
         { label: "Risk Points", value: form.riskPoints },
         { label: "Employee Read Mode", value: form.employeeReadMode },
-        { label: "SOP Content JSON", value: JSON.stringify(content) },
+        { label: "SOP Content JSON", value: contentJson },
       ],
       detailNote: form.notes || "Controlled SOP created with interactive page content.",
       nextAction,
@@ -462,6 +655,7 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     setSelectedSopId(created.id);
     setDialogOpen(false);
     await logAction("sop", "create-sop", `Created SOP ${created.title}`);
+    router.push(`/sop/${created.id}`);
   }
 
   async function publishVersion() {
@@ -557,6 +751,8 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
 
   function startCreateSopFromType(type: SopCreateTypeConfig) {
     setCreateTypeModalOpen(false);
+    setEditingSopId(undefined);
+    setBlockNoteDocument([]);
 
     setForm((current) => ({
       ...current,
@@ -576,6 +772,30 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     setBuilderMode(true);
   }
 
+
+  // force createSop=1 into Builder V3 without showing the old SOP Control Board.
+  useEffect(() => {
+    if (!createSopMode) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      setEditingSopId(undefined);
+      setSelectedSopId(undefined);
+      setBlockNoteDocument([]);
+
+      if (!pages.length) {
+        const starterPage = newPage(1);
+        setPages([starterPage]);
+        setSelectedPageId(starterPage.id);
+      } else if (!selectedPageId) {
+        setSelectedPageId(pages[0]?.id);
+      }
+
+      setBuilderVariant("v3");
+      setBuilderMode(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [createSopMode, pages, selectedPageId]);
 
   const v3Document = useMemo(() => createSopBuilderV3Document(form, pages), [form, pages]);
 
@@ -745,6 +965,106 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     return "";
   }
 
+  function blockNoteDocumentToBuilderBlocks(blocks: SopBlockNoteDocument): BuilderBlock[] {
+    const converted = blocks
+      .map((block, index): BuilderBlock | null => {
+        const record = block as Record<string, unknown>;
+        const type = String(record.type || "paragraph");
+        const content = blockNoteText(record.content).trim();
+        const props = (record.props || {}) as Record<string, unknown>;
+        const id = String(record.id || `blocknote-${Date.now()}-${index}`);
+
+        if (!content && !props.url && !props.name) return null;
+
+        if (type.includes("heading")) {
+          return {
+            id,
+            type: "heading",
+            title: content || "Section",
+            body: "",
+            imageUrl: "",
+            pdfUrl: "",
+            stepsText: "",
+            checklistText: "",
+            warningLevel: "Info",
+          };
+        }
+
+        if (type === "image" || type === "video") {
+          return {
+            id,
+            type: "image",
+            title: content || (type === "video" ? "Training video" : "Photo / GIF guide"),
+            body: "",
+            imageUrl: String(props.url || ""),
+            pdfUrl: "",
+            stepsText: "",
+            checklistText: "",
+            warningLevel: "Info",
+          };
+        }
+
+        if (type === "file") {
+          return {
+            id,
+            type: "pdf",
+            title: content || String(props.name || "PDF document"),
+            body: "",
+            imageUrl: "",
+            pdfUrl: String(props.url || ""),
+            stepsText: "",
+            checklistText: "",
+            warningLevel: "Info",
+          };
+        }
+
+        const checklistMatch = content.match(/^☐\s*(.+)$/);
+        if (checklistMatch) {
+          return {
+            id,
+            type: "checklist",
+            title: "Checklist",
+            body: "",
+            imageUrl: "",
+            pdfUrl: "",
+            stepsText: "",
+            checklistText: checklistMatch[1],
+            warningLevel: "Info",
+          };
+        }
+
+        const stepMatch = content.match(/^\d+[.)]\s*(.+)$/);
+        if (stepMatch) {
+          return {
+            id,
+            type: "step-list",
+            title: "Step-by-step execution",
+            body: "",
+            imageUrl: "",
+            pdfUrl: "",
+            stepsText: stepMatch[1],
+            checklistText: "",
+            warningLevel: "Info",
+          };
+        }
+
+        return {
+          id,
+          type: "text",
+          title: "",
+          body: content,
+          imageUrl: "",
+          pdfUrl: "",
+          stepsText: "",
+          checklistText: "",
+          warningLevel: "Info",
+        };
+      })
+      .filter(Boolean) as BuilderBlock[];
+
+    return converted.length ? converted : [newBlock("text")];
+  }
+
   function serializeBlockNoteDocument(blocks: SopBlockNoteDocument) {
     const plainText = blocks
       .map((block) => {
@@ -776,7 +1096,93 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   const activeBuilderPageIndex = Math.max(0, pages.findIndex((page) => page.id === activeBuilderPageId));
   const activeBuilderPageLabel = activeBuilderPageId ? `Adding to Page ${activeBuilderPageIndex + 1}` : "Select a page";
 
+  function handleV3DocumentChange(blocks: SopBlockNoteDocument) {
+    setBlockNoteDocument(blocks);
+
+    if (!activeBuilderPageId) return;
+
+    const nextBlocks = blockNoteDocumentToBuilderBlocks(blocks);
+    setPages((current) =>
+      current.map((page) =>
+        page.id === activeBuilderPageId
+          ? { ...page, blocks: nextBlocks }
+          : page,
+      ),
+    );
+  }
+
   
+  async function saveExistingSopChanges(blocksOverride?: SopBlockNoteDocument) {
+    if (!editingSopId) return;
+
+    const existing = sopRows.find((row) => row.id === editingSopId);
+    if (!existing) return;
+
+    const contentJson = latestBuilderContentJson(blocksOverride);
+
+    let details = existing.detailItems ?? [];
+    details = upsertDetail(details, "Document Code", form.documentCode);
+    details = upsertDetail(details, "Category", form.category);
+    details = upsertDetail(details, "Process Area", form.processArea);
+    details = upsertDetail(details, "Version", form.version);
+    details = upsertDetail(details, "Process Owner", form.processOwner);
+    details = upsertDetail(details, "Approver", form.approver);
+    details = upsertDetail(details, "Effective Date", form.effectiveDate);
+    details = upsertDetail(details, "Review Cycle", form.reviewCycle);
+    details = upsertDetail(details, "Review Due Date", form.reviewDueDate);
+    details = upsertDetail(details, "Target Role", form.targetRole);
+    details = upsertDetail(details, "Target Branch", form.targetBranch);
+    details = upsertDetail(details, "Acknowledgement Required", form.acknowledgementRequired);
+    details = upsertDetail(details, "Risk Points", form.riskPoints);
+    details = upsertDetail(details, "Employee Read Mode", form.employeeReadMode);
+    details = upsertDetail(details, "SOP Content JSON", contentJson);
+
+    await updateRecord("sop", existing.id, {
+      title: form.title.trim() || existing.title,
+      subtitle: `${form.category} · ${form.processArea}`,
+      owner: form.processOwner || existing.owner || "SOP Control",
+      detailItems: details,
+      detailNote: form.notes || existing.detailNote || "SOP content updated.",
+      nextAction: "Review and publish changes",
+    });
+
+    await logAction("sop", "update-sop", `Updated SOP ${form.title || existing.title}`);
+    router.push(`/sop/${existing.id}`);
+  }
+
+  function readLatestBuilderDocumentForActivePage() {
+    if (!activeBuilderPageId) return blockNoteDocument;
+
+    const keys = [
+      editingSopId ? `me:sop-builder:v3:editor:${editingSopId}:${activeBuilderPageId}` : "",
+      `me:sop-builder:v3:editor:create:${activeBuilderPageId}`,
+    ].filter(Boolean);
+
+    for (const key of keys) {
+      try {
+        const raw = window.localStorage.getItem(key);
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(parsed) && parsed.length) {
+          return parsed as SopBlockNoteDocument;
+        }
+      } catch {
+        // fall back to parent state
+      }
+    }
+
+    return blockNoteDocument;
+  }
+
+  function latestBuilderContentJson(blocksOverride?: SopBlockNoteDocument) {
+    const latest = blocksOverride?.length ? blocksOverride : readLatestBuilderDocumentForActivePage();
+
+    if (latest.length) {
+      return serializeBlockNoteDocument(latest);
+    }
+
+    return JSON.stringify(serializeContent(form.employeeReadMode, pages));
+  }
+
   function resetSopTrainingScrollPosition() {
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
@@ -794,6 +1200,16 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
   }
 
   function exitBuilderMode() {
+    if (editingSopId) {
+      router.push(`/sop/${editingSopId}`);
+      return;
+    }
+
+    if (createSopMode) {
+      router.push("/sop");
+      return;
+    }
+
     setBuilderMode(false);
     resetSopTrainingScrollPosition();
 
@@ -802,19 +1218,42 @@ const kpis = useMemo(() => getSopKpis(sopRows, taskRows), [sopRows, taskRows]);
     });
   }
 
-if (builderMode) {
+if (builderMode || searchParams.get("createSop") === "1" || searchParams.get("editSopId") || searchParams.get("builderSopId")) {
+    const editModeHydrating = Boolean(requestedEditSopId && editingSopId !== requestedEditSopId);
+
+    if (editModeHydrating) {
+      return (
+        <ErpShell>
+          <div className="sop-builder-route-shell relative -m-3 flex h-[calc(100vh-56px)] min-h-0 items-center justify-center overflow-hidden bg-background md:-m-4">
+            <div className="rounded-2xl border bg-card px-6 py-5 text-sm text-muted-foreground shadow-xs">
+              Loading current SOP into builder...
+            </div>
+          </div>
+        </ErpShell>
+      );
+    }
+
     return (
       <ErpShell>
         {builderVariant === "v3" ? (
-          <div className="sop-builder-route-shell">
+          <div className="sop-builder-route-shell relative -m-3 md:-m-4">
         <SopBuilderWorkspaceV3
             document={v3Document}
             selectedPageId={activeBuilderPageId}
             onBack={exitBuilderMode}
-            onCreate={async () => {
-              await createSop();
+            onCreate={async (blocks?: SopBlockNoteDocument) => {
+              if (blocks?.length) setBlockNoteDocument(blocks);
+
+              if (editingSopId) {
+                await saveExistingSopChanges(blocks);
+                return;
+              }
+
+              await createSop(blocks);
               setBuilderMode(false);
             }}
+            submitLabel={editingSopId ? "Save Changes" : "Create SOP"}
+            editorStorageKey={editingSopId ? `me:sop-builder:v3:editor:${editingSopId}` : undefined}
             onSelectPage={setSelectedPageId}
             onAddPage={addV3Page}
             onAddSubPage={addV3SubPage}
@@ -824,7 +1263,7 @@ if (builderMode) {
             onUpdateBlock={updateV3Block}
             onDeleteBlock={deleteV3Block}
             onUpdateSettings={updateV3Settings}
-            onDocumentChange={setBlockNoteDocument}
+            onDocumentChange={handleV3DocumentChange}
           />
       </div>
         ) : (

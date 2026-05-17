@@ -119,7 +119,7 @@ export function SopEmployeePreviewDevice({
           sideMenu={false}
           filePanel={false}
           tableHandles={false}
-          className="min-h-[360px] bg-transparent"
+          className="sop-reader-preview-blocknote min-h-[360px] bg-transparent"
         />
       </div>
     </div>

@@ -240,23 +240,43 @@ function getSopSlashMenuItems(
 export function SopBlockNoteEditor({
   onDocumentChange,
   disabled = false,
+  initialContent,
+  storageKey,
 }: {
   onDocumentChange?: (blocks: SopBlockNoteDocument) => void;
   disabled?: boolean;
+  initialContent?: SopBlockNoteDocument;
+  storageKey?: string;
 }) {
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const blockNoteTheme = useResolvedBlockNoteTheme();
 
+  const editorInitialContent: SopBlockNoteDocument = initialContent?.length
+    ? initialContent
+    : [
+        {
+          type: "paragraph",
+          content: "",
+        },
+      ];
+
+  function emitDocumentChange(blocks: SopBlockNoteDocument) {
+    if (storageKey) {
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(blocks));
+      } catch {
+        // localStorage may be unavailable in private mode; parent state still receives changes.
+      }
+    }
+
+    onDocumentChange?.(blocks);
+  }
+
   const editor = useCreateBlockNote({
     schema: sopBlockNoteSchema,
-    initialContent: [
-      {
-        type: "paragraph",
-        content: "",
-      },
-    ],
+    initialContent: editorInitialContent,
     uploadFile: uploadLocalPreviewFile,
     pasteHandler: ({ event, editor, defaultPasteHandler }) => {
       const text = event.clipboardData?.getData("text/plain") || "";
@@ -282,7 +302,7 @@ export function SopBlockNoteEditor({
   useEffect(() => {
     const timer = window.setTimeout(() => {
       if (!disabled) editor.focus();
-      onDocumentChange?.(editor.document as SopBlockNoteDocument);
+      emitDocumentChange(editor.document as SopBlockNoteDocument);
     }, 80);
 
     
@@ -344,7 +364,7 @@ return () => window.clearTimeout(timer);
 
     window.setTimeout(() => {
       editor.focus();
-      onDocumentChange?.(editor.document as SopBlockNoteDocument);
+      emitDocumentChange(editor.document as SopBlockNoteDocument);
     }, 60);
   }
 
@@ -416,7 +436,7 @@ return () => window.clearTimeout(timer);
         formattingToolbar={false}
         slashMenu={false}
         sideMenu={false}
-        tableHandles={false}
+        tableHandles={!disabled}
           editor={editor}
           theme={blockNoteTheme}
          
@@ -425,7 +445,7 @@ return () => window.clearTimeout(timer);
          
           className="min-h-[680px] rounded-2xl bg-background"
           onChange={(currentEditor) => {
-            onDocumentChange?.(currentEditor.document as SopBlockNoteDocument);
+            emitDocumentChange(currentEditor.document as SopBlockNoteDocument);
           }}
         >
           {!disabled ? (

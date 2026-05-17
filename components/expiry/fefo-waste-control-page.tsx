@@ -5,6 +5,9 @@ import { ArrowRightLeft, Camera, ClipboardCheck, PackagePlus, ShieldAlert, Targe
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
+import { OpsCalendarBoard, type OpsCalendarEvent } from "@/components/operations/ops-calendar-board";
+import { OpsDayTimeline, type OpsTimelineEvent } from "@/components/operations/ops-day-timeline";
+import { resolveOpsTone } from "@/components/operations/ops-status-chip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +50,25 @@ function upsertDetail(items: Array<{ label: string; value: string }> | undefined
 
 function detailValue(row: { detailItems?: Array<{ label: string; value: string }> }, label: string) {
   return row.detailItems?.find((item) => item.label === label)?.value ?? "";
+}
+
+
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function todayIso() {
+  return formatLocalDate(new Date());
+}
+
+function dateFromDateTime(value: string) {
+  if (!value || value === "Not set") return "";
+  if (value.includes("T")) return value.slice(0, 10);
+  if (value.includes(" ")) return value.slice(0, 10);
+  return value.slice(0, 10);
 }
 
 type ModalMode = "register" | "daily-check" | "action" | "disposal";
@@ -100,6 +122,8 @@ export function FefoWasteControlPage() {
   const branchRows = getRows("branches", []);
 
   const [selectedBatchId, setSelectedBatchId] = useState<string | undefined>();
+  const [selectedDate, setSelectedDate] = useState(todayIso());
+  const [calendarAnchor, setCalendarAnchor] = useState(new Date());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("register");
   const [form, setForm] = useState<FefoForm>({
@@ -167,6 +191,60 @@ export function FefoWasteControlPage() {
   const detail = useMemo(() => getBatchDetail(selectedBatch), [selectedBatch]);
   const nextActions = useMemo(() => getFefoNextActions(selectedBatch), [selectedBatch]);
   const branchOptions = useMemo(() => branchRows.map((row) => row.title), [branchRows]);
+
+  const fefoCalendarEvents = useMemo<OpsCalendarEvent[]>(() => {
+    return fefoRows.reduce<OpsCalendarEvent[]>((events, row) => {
+      const expiryDate = detailValue(row, "Expiry Date");
+      const date = dateFromDateTime(expiryDate);
+      if (!date) return events;
+
+      const remainingDays = detailValue(row, "Remaining Days");
+      const priority = detailValue(row, "FEFO Priority") || row.status;
+
+      events.push({
+        id: row.id,
+        title: row.title,
+        date,
+        status: row.status,
+        source: "FEFO / Waste",
+        tone: resolveOpsTone(priority),
+        ...(remainingDays ? { time: `${remainingDays}d` } : {}),
+      });
+
+      return events;
+    }, []);
+  }, [fefoRows]);
+
+  const fefoTimelineEvents = useMemo<OpsTimelineEvent[]>(() => {
+    return fefoRows.reduce<OpsTimelineEvent[]>((events, row) => {
+      const expiryDate = detailValue(row, "Expiry Date");
+      const date = dateFromDateTime(expiryDate);
+      if (date !== selectedDate) return events;
+
+      const priority = detailValue(row, "FEFO Priority") || row.status;
+      const remainingDays = detailValue(row, "Remaining Days");
+      const storage = detailValue(row, "Storage Location");
+      const quantity = [detailValue(row, "Quantity"), detailValue(row, "Unit")].filter(Boolean).join(" ");
+
+      events.push({
+        id: row.id,
+        title: row.title,
+        startTime: "09:00",
+        subtitle: `${detailValue(row, "Branch") || row.subtitle} · ${storage || "Storage not set"}`,
+        source: "FEFO / Waste",
+        status: row.status,
+        tone: resolveOpsTone(priority),
+        meta: [
+          priority ? `Priority: ${priority}` : "",
+          remainingDays ? `Remaining: ${remainingDays} days` : "",
+          quantity ? `Qty: ${quantity}` : "",
+          detailValue(row, "Photo Proof Status") ? `Proof: ${detailValue(row, "Photo Proof Status")}` : "",
+        ].filter(Boolean).join(" · "),
+      });
+
+      return events;
+    }, []);
+  }, [fefoRows, selectedDate]);
 
   function openModal(mode: ModalMode) {
     setDialogMode(mode);
@@ -352,6 +430,29 @@ export function FefoWasteControlPage() {
               <CardContent><p className="text-2xl font-semibold">{kpi.value}</p></CardContent>
             </Card>
           ))}
+        </section>
+
+        <section className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_420px]">
+          <OpsCalendarBoard
+            title="FEFO Expiry Calendar"
+            description="Month view of expiry dates, use-first batches, disposed stock, and waste review workload."
+            events={fefoCalendarEvents}
+            selectedDate={selectedDate}
+            anchorDate={calendarAnchor}
+            onSelectedDateChange={setSelectedDate}
+            onAnchorDateChange={setCalendarAnchor}
+          />
+
+          <OpsDayTimeline
+            title="FEFO Action Timeline"
+            description="Selected day expiry time frame for use-first, disposal, hold, transfer, and review actions."
+            selectedDate={selectedDate}
+            events={fefoTimelineEvents}
+            startHour={0}
+            endHour={24}
+            emptyText="No FEFO batch expires on the selected day."
+            onSelectEvent={(event) => setSelectedBatchId(event.id)}
+          />
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)_420px]">

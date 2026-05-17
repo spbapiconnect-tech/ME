@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, CheckCheck, ClipboardList, Clock3, FileSearch, Plus, RefreshCw, ShieldAlert, Target, Upload } from "lucide-react";
+import { AlertTriangle, CheckCheck, ClipboardList, Clock3, FileSearch, ImageIcon, ListFilter, Plus, RefreshCw, ShieldAlert, Target, Upload } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
+import { ErpDataTable } from "@/components/erp/erp-data-table";
+import { ErpPageHeader } from "@/components/erp/erp-page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,7 +19,6 @@ import { taskMasterData } from "@/lib/master-data/task";
 import { runStoreOperationRules } from "@/lib/rules/rule-runner";
 import {
   getBranchCompletionSummary,
-  getCalendarDayStats,
   getCorrectiveActionQueue,
   getDailyExecutionPlan,
   getExecutionBoard,
@@ -26,10 +27,12 @@ import {
   getExecutionSlaSummary,
   getManagerReviewStatusTone,
   getOutletExecutionKpis,
+  type OutletExecutionView,
   getPhotoProofQueue,
   getPhotoProofStatusTone,
   getReviewQueue,
   getTaskStatusTone,
+  toExecutionView,
 } from "@/lib/store-operations/outlet-execution-workspace";
 import { UploadAssetPreview } from "@/components/uploads/upload-asset-preview";
 import { serializeUploadAsset, uploadAssetLabel, uploadLocalPreviewAsset } from "@/lib/uploads/upload-provider";
@@ -173,18 +176,8 @@ function todayIso() {
   return formatLocalDate(new Date());
 }
 
-function monthDays(anchor: Date) {
-  const year = anchor.getFullYear();
-  const month = anchor.getMonth();
-  const first = new Date(year, month, 1);
-  const start = new Date(first);
-  start.setDate(first.getDate() - first.getDay());
-  return Array.from({ length: 42 }, (_, index) => {
-    const date = new Date(start);
-    date.setDate(start.getDate() + index);
-    return date;
-  });
-}
+type ExecutionWorkbenchView = "attention" | "all" | "overdue" | "proof" | "review" | "corrective" | "today";
+
 
 type TaskFormMode = "new" | "corrective" | "recheck";
 
@@ -251,7 +244,7 @@ export function OutletExecutionCommandCenter() {
   const incidentRows = getRows("issues", []);
   const inspectionRows = getRows("inspection", []);
   const [selectedDate, setSelectedDate] = useState(todayIso());
-  const [calendarAnchor, setCalendarAnchor] = useState(new Date());
+  const [activeView, setActiveView] = useState<ExecutionWorkbenchView>("attention");
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<TaskFormMode>("new");
@@ -290,10 +283,62 @@ export function OutletExecutionCommandCenter() {
   const correctiveQueue = useMemo(() => getCorrectiveActionQueue(taskRows), [taskRows]);
   const dailyPlan = useMemo(() => getDailyExecutionPlan(taskRows, selectedDate), [taskRows, selectedDate]);
   const branchSummary = useMemo(() => getBranchCompletionSummary(taskRows), [taskRows]);
-  const calendarStats = useMemo(() => getCalendarDayStats(taskRows), [taskRows]);
   const kpis = useMemo(() => getOutletExecutionKpis(taskRows), [taskRows]);
   const slaSummary = useMemo(() => getExecutionSlaSummary(taskRows), [taskRows]);
-  const days = useMemo(() => monthDays(calendarAnchor), [calendarAnchor]);
+  const taskViews = useMemo(() => taskRows.map(toExecutionView), [taskRows]);
+  const savedViews = useMemo(() => ([
+    {
+      key: "attention" as const,
+      label: "Needs attention",
+      description: "Overdue, proof blocked, or waiting decision",
+      count: taskViews.filter((task) =>
+        task.status === "Overdue"
+        || task.status === "Escalated"
+        || task.status === "Rework Required"
+        || task.managerReviewStatus === "Pending Review"
+        || task.managerReviewStatus === "Rejected"
+        || ["Missing", "Submitted", "Rejected", "Recheck Required"].includes(task.photoProofStatus)
+      ).length,
+    },
+    { key: "all" as const, label: "All active", description: "Every outlet execution task", count: taskViews.length },
+    { key: "overdue" as const, label: "Overdue", description: "Breached or escalated", count: board.overdue.length },
+    { key: "proof" as const, label: "Proof queue", description: "Missing, submitted, or rejected proof", count: photoProofQueue.length },
+    { key: "review" as const, label: "Manager review", description: "Awaiting HQ sign-off", count: reviewQueue.length },
+    { key: "corrective" as const, label: "Corrective action", description: "Linked incident / remediation work", count: correctiveQueue.length },
+    { key: "today" as const, label: "Due on selected date", description: "Filtered by date picker", count: dailyPlan.tasks.length },
+  ]), [board.overdue.length, correctiveQueue.length, dailyPlan.tasks.length, photoProofQueue.length, reviewQueue.length, taskViews]);
+  const visibleTasks = useMemo(() => {
+    switch (activeView) {
+      case "overdue":
+        return taskViews.filter((task) => task.status === "Overdue" || task.status === "Escalated");
+      case "proof":
+        return taskViews.filter((task) => ["Missing", "Submitted", "Rejected", "Recheck Required"].includes(task.photoProofStatus));
+      case "review":
+        return taskViews.filter((task) => task.status === "Pending Review" || task.managerReviewStatus === "Pending Review");
+      case "corrective":
+        return taskViews.filter((task) => task.taskType === "Corrective Action" || Boolean(task.linkedIncidentId));
+      case "today":
+        return taskViews.filter((task) => task.dueDate === selectedDate);
+      case "attention":
+        return taskViews.filter((task) =>
+          task.status === "Overdue"
+          || task.status === "Escalated"
+          || task.status === "Rework Required"
+          || task.managerReviewStatus === "Pending Review"
+          || task.managerReviewStatus === "Rejected"
+          || ["Missing", "Submitted", "Rejected", "Recheck Required"].includes(task.photoProofStatus)
+        );
+      case "all":
+      default:
+        return taskViews;
+    }
+  }, [activeView, selectedDate, taskViews]);
+  const branchWatchlist = useMemo(() => [...branchSummary].sort((a, b) => a.completionRate - b.completionRate).slice(0, 6), [branchSummary]);
+  const proofPressure = useMemo(() => ([
+    { label: "Proof missing", value: taskViews.filter((task) => task.photoProofStatus === "Missing").length, tone: "destructive" as const, icon: ImageIcon },
+    { label: "Pending review", value: taskViews.filter((task) => task.managerReviewStatus === "Pending Review").length, tone: "secondary" as const, icon: ClipboardList },
+    { label: "Rejected / rework", value: taskViews.filter((task) => task.managerReviewStatus === "Rejected" || task.status === "Rework Required").length, tone: "destructive" as const, icon: AlertTriangle },
+  ]), [taskViews]);
 
   const requestedTaskId = useMemo(() => {
     const taskId = searchParams.get("taskId");
@@ -323,12 +368,61 @@ export function OutletExecutionCommandCenter() {
   }, [searchParams, taskRows, branchRows]);
   const selectedTask = taskRows.find((row) => row.id === selectedTaskId)
     ?? taskRows.find((row) => row.id === requestedTaskId)
+    ?? visibleTasks[0]?.row
     ?? dailyPlan.tasks[0]?.row
-    ?? reviewQueue[0]?.row
     ?? taskRows[0];
   const detail = useMemo(() => getExecutionDetail(selectedTask), [selectedTask]);
   const nextActions = useMemo(() => getExecutionNextActions(selectedTask), [selectedTask]);
   const branchOptions = useMemo(() => branchRows.map((row) => row.title), [branchRows]);
+  const taskTableColumns = useMemo(() => ([
+    {
+      key: "row",
+      label: "Task",
+      type: "name" as const,
+      width: "260px",
+      render: (task: OutletExecutionView) => (
+        <div className="min-w-0">
+          <div className="truncate font-medium text-foreground">{task.row.title}</div>
+          <div className="truncate text-xs text-muted-foreground">{task.branch} · {task.taskType}</div>
+        </div>
+      ),
+    },
+    {
+      key: "source",
+      label: "Source",
+      type: "text" as const,
+      width: "120px",
+      render: (task: OutletExecutionView) => task.source,
+    },
+    {
+      key: "dueAt",
+      label: "Due",
+      type: "time" as const,
+      width: "128px",
+      render: (task: OutletExecutionView) => task.dueAt || "Not set",
+    },
+    {
+      key: "photoProofStatus",
+      label: "Proof",
+      type: "badge" as const,
+      width: "130px",
+      render: (task: OutletExecutionView) => task.photoProofStatus,
+    },
+    {
+      key: "managerReviewStatus",
+      label: "Review",
+      type: "badge" as const,
+      width: "136px",
+      render: (task: OutletExecutionView) => task.managerReviewStatus,
+    },
+    {
+      key: "status",
+      label: "Execution",
+      type: "status" as const,
+      width: "140px",
+      render: (task: OutletExecutionView) => task.status,
+    },
+  ]), []);
 
   function updateInstructionStep(stepId: string, patch: Partial<TaskInstructionBuilderStep>) {
     setInstructionSteps((current) => current.map((step) => step.id === stepId ? { ...step, ...patch } : step));
@@ -549,56 +643,91 @@ export function OutletExecutionCommandCenter() {
   return (
     <ErpShell>
       <div className="space-y-5 pb-24 md:pb-6">
-        <header className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Outlet Execution</h1>
-            <p className="text-sm text-muted-foreground">Command daily outlet work, corrective actions, photo proof, and manager review across branches.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={openPhotoReview}><FileSearch className="h-4 w-4" />Review Photo Proof</Button>
-            <Button variant="outline" onClick={openCorrectiveAction}><Target className="h-4 w-4" />Create Corrective Action</Button>
-            <Button onClick={openNewTask}><Plus className="h-4 w-4" />New Outlet Task</Button>
-          </div>
-        </header>
+        <ErpPageHeader
+          breadcrumbs={["Store Operations", "Outlet Execution"]}
+          title="Outlet Execution Command Center"
+          subtitle="Run daily outlet work, unblock proof submission, and close manager review without bouncing between modules."
+          actions={(
+            <>
+              <Button variant="outline" onClick={openPhotoReview}><FileSearch className="h-4 w-4" />Request Recheck</Button>
+              <Button variant="outline" onClick={openCorrectiveAction}><Target className="h-4 w-4" />Corrective Action</Button>
+              <Button onClick={openNewTask}><Plus className="h-4 w-4" />New Outlet Task</Button>
+            </>
+          )}
+        />
 
-        <section className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-7">
+        <section className="grid grid-cols-2 gap-2 xl:grid-cols-7">
           {kpis.map((kpi) => (
-            <Card key={kpi.label}>
-              <CardHeader className="px-3 pb-1 pt-3"><CardTitle className="text-[11px] font-medium text-muted-foreground md:text-xs">{kpi.label}</CardTitle></CardHeader>
+            <Card key={kpi.label} className="border-border/70 bg-card/95 shadow-sm">
+              <CardHeader className="px-3 pb-1 pt-3"><CardTitle className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{kpi.label}</CardTitle></CardHeader>
               <CardContent className="px-3 pb-3 pt-0"><p className="text-xl font-semibold md:text-2xl">{kpi.value}</p></CardContent>
             </Card>
           ))}
         </section>
 
-        <section className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)_420px]">
+        <section className="grid gap-4 xl:grid-cols-[260px_minmax(0,1fr)_390px]">
           <div className="space-y-4">
-            <Card>
+            <Card className="overflow-hidden border-border/70">
               <CardHeader>
-                <CardTitle className="text-base">Execution Board</CardTitle>
-                <p className="text-sm text-muted-foreground">Operational states across daily execution, corrective action, rework, and review.</p>
+                <CardTitle className="text-base">Saved Views</CardTitle>
+                <p className="text-sm text-muted-foreground">Keep the team on the most urgent queue instead of hunting across screens.</p>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {!taskRows.length ? <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Create outlet execution tasks, assign corrective action from incidents, or request photo recheck from inspection failures.</div> : null}
-                {boardSections.map((section) => (
-                  <div key={section.key} className="space-y-2">
-                    <div className="flex items-center justify-between text-sm font-medium"><span>{section.label}</span><Badge variant="outline">{section.items.length}</Badge></div>
-                    {!section.items.length ? <div className="rounded-lg border border-dashed p-3 text-xs text-muted-foreground">No items in {section.label.toLowerCase()}.</div> : null}
-                    {section.items.slice(0, 3).map((task) => (
-                      <button key={task.row.id} type="button" onClick={() => setSelectedTaskId(task.row.id)} className={cn("w-full rounded-lg border p-3 text-left transition hover:border-primary", selectedTaskId === task.row.id && "border-primary bg-primary/5")}>
-                        <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="font-medium">{task.row.title}</p>
-                            <p className="text-xs text-muted-foreground">{task.branch} · {task.taskType}</p>
-                          </div>
-                          <Badge variant={getTaskStatusTone(task.status)}>{task.status}</Badge>
-                        </div>
-                        <div className="mt-2 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                          <span>{task.source}</span>
-                          {task.linkedIncident ? <span>Incident linked</span> : null}
-                          {task.linkedInspection ? <span>Inspection linked</span> : null}
-                        </div>
-                      </button>
-                    ))}
+              <CardContent className="space-y-2">
+                {savedViews.map((view) => (
+                  <button
+                    key={view.key}
+                    type="button"
+                    onClick={() => setActiveView(view.key)}
+                    className={cn(
+                      "w-full rounded-xl border px-3 py-3 text-left transition",
+                      activeView === view.key ? "border-primary bg-primary/5 shadow-sm" : "hover:border-primary/50",
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">{view.label}</div>
+                        <div className="text-xs text-muted-foreground">{view.description}</div>
+                      </div>
+                      <Badge variant={activeView === view.key ? "secondary" : "outline"}>{view.count}</Badge>
+                    </div>
+                  </button>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/70">
+              <CardHeader>
+                <CardTitle className="text-base">Proof Pressure</CardTitle>
+                <p className="text-sm text-muted-foreground">The queues that make managers lose time first.</p>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {proofPressure.map((item) => (
+                  <div key={item.label} className="flex items-center justify-between rounded-xl border px-3 py-2">
+                    <div className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{item.label}</span>
+                    </div>
+                    <Badge variant={item.tone}>{item.value}</Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card className="border-border/70">
+              <CardHeader>
+                <CardTitle className="text-base">Branch Watchlist</CardTitle>
+                <p className="text-sm text-muted-foreground">Lowest completion branches right now.</p>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {!branchWatchlist.length ? <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No active branch load yet.</div> : branchWatchlist.map((branch) => (
+                  <div key={branch.branch} className="rounded-xl border px-3 py-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium">{branch.branch}</div>
+                        <div className="text-xs text-muted-foreground">{branch.completed} / {branch.total} completed</div>
+                      </div>
+                      <div className="text-sm font-semibold">{branch.completionRate}%</div>
+                    </div>
                   </div>
                 ))}
               </CardContent>
@@ -606,85 +735,132 @@ export function OutletExecutionCommandCenter() {
           </div>
 
           <div className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="text-base">Daily Plan</CardTitle>
-                  <p className="text-sm text-muted-foreground">Selected date workload and branch completion.</p>
-                </div>
-                <div className="flex gap-1">
-                  <Button variant="outline" size="sm" onClick={() => setCalendarAnchor(new Date(calendarAnchor.getFullYear(), calendarAnchor.getMonth() - 1, 1))}>Prev</Button>
-                  <Button variant="outline" size="sm" onClick={() => setCalendarAnchor(new Date(calendarAnchor.getFullYear(), calendarAnchor.getMonth() + 1, 1))}>Next</Button>
+            <Card className="border-border/70">
+              <CardHeader>
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <CardTitle className="text-base">Live Execution Queue</CardTitle>
+                    <p className="text-sm text-muted-foreground">One workspace for outlet execution, proof handling, corrective action, and manager review.</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center gap-2 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+                      <ListFilter className="h-4 w-4 text-muted-foreground" />
+                      <span>{savedViews.find((view) => view.key === activeView)?.label}</span>
+                    </div>
+                    <Input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(event) => setSelectedDate(event.target.value)}
+                      className="w-[164px]"
+                    />
+                  </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center gap-2 text-sm font-medium"><CalendarDays className="h-4 w-4 text-primary" />{calendarAnchor.toLocaleDateString("en-MY", { month: "long", year: "numeric" })}</div>
-                <div className="grid grid-cols-7 gap-1 text-center text-[11px] text-muted-foreground">{["S", "M", "T", "W", "T", "F", "S"].map((day, index) => <div key={`${day}-${index}`}>{day}</div>)}</div>
-                <div className="grid grid-cols-7 gap-1">
-                  {days.map((date) => {
-                    const iso = formatLocalDate(date);
-                    const stats = calendarStats.get(iso);
-                    const rate = stats?.total ? Math.round((stats.completed / stats.total) * 100) : 0;
-                    return (
-                      <button key={iso} type="button" onClick={() => setSelectedDate(iso)} className={cn("min-h-12 rounded-md border p-1 text-left text-xs transition hover:border-primary", iso === selectedDate && "border-primary bg-primary/10", date.getMonth() !== calendarAnchor.getMonth() && "opacity-40")}>
-                        <span>{date.getDate()}</span>
-                        {stats ? <span className={cn("mt-2 block rounded-full px-1 text-[10px]", rate === 100 ? "bg-emerald-500/20 text-emerald-300" : rate > 0 ? "bg-amber-500/20 text-amber-300" : "bg-destructive/20 text-destructive")}>{stats.completed}/{stats.total}</span> : null}
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="space-y-2">
-                  {!dailyPlan.tasks.length ? <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No outlet work scheduled for the selected day.</div> : null}
-                  {dailyPlan.tasks.map((task) => (
-                    <button key={task.row.id} type="button" onClick={() => setSelectedTaskId(task.row.id)} className={cn("w-full rounded-lg border p-3 text-left transition hover:border-primary", selectedTaskId === task.row.id && "border-primary bg-primary/5")}>
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-medium">{task.row.title}</p>
-                          <p className="text-xs text-muted-foreground">{task.branch} · {task.dueAt || "No due time"}</p>
-                        </div>
-                        <Badge variant={getTaskStatusTone(task.status)}>{task.status}</Badge>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3 md:grid-cols-3">
+                  {boardSections.map((section) => (
+                    <button
+                      key={section.key}
+                      type="button"
+                      onClick={() => setActiveView(section.key === "pendingReview" ? "review" : section.key === "correctiveAction" ? "corrective" : section.key === "overdue" ? "overdue" : "attention")}
+                      className="rounded-2xl border bg-background px-4 py-3 text-left transition hover:border-primary/60"
+                    >
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">{section.label}</div>
+                      <div className="mt-2 flex items-end justify-between gap-3">
+                        <div className="text-2xl font-semibold">{section.items.length}</div>
+                        <div className="text-xs text-muted-foreground">{section.items.slice(0, 1).map((task) => task.branch).join("") || "No blockers"}</div>
                       </div>
                     </button>
                   ))}
                 </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Branch Completion</p>
-                  {branchSummary.slice(0, 4).map((branch) => (
-                    <div key={branch.branch} className="flex items-center justify-between rounded-lg border px-3 py-2 text-sm">
-                      <span>{branch.branch}</span>
-                      <span className="font-medium">{branch.completionRate}%</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Review Queue</CardTitle>
-                <p className="text-sm text-muted-foreground">Submitted proof waiting for manager decision. {photoProofQueue.length} proof items and {correctiveQueue.length} corrective action items are active.</p>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {!reviewQueue.length ? <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No submitted proof is waiting for manager review.</div> : null}
-                {reviewQueue.map((task) => (
-                  <button key={task.row.id} type="button" onClick={() => setSelectedTaskId(task.row.id)} className={cn("w-full rounded-lg border p-3 text-left transition hover:border-primary", selectedTaskId === task.row.id && "border-primary bg-primary/5")}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-medium">{task.row.title}</p>
-                        <p className="text-xs text-muted-foreground">{task.branch} · {task.taskType}</p>
-                      </div>
-                      <Badge variant={getManagerReviewStatusTone(task.managerReviewStatus)}>{task.managerReviewStatus}</Badge>
-                    </div>
-                  </button>
-                ))}
+                <ErpDataTable
+                  columns={taskTableColumns}
+                  data={visibleTasks}
+                  getRowId={(task) => task.row.id}
+                  selectedId={selectedTask?.id}
+                  onRowSelect={(task) => setSelectedTaskId(task.row.id)}
+                  emptyMessage="No outlet execution tasks match this view."
+                  rowActions={(task) => (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setSelectedTaskId(task.row.id);
+                      }}
+                    >
+                      Review
+                    </Button>
+                  )}
+                />
+
+                <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_320px]">
+                  <Card className="border-border/60 shadow-none">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Selected Date Sequencing</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {!dailyPlan.tasks.length ? (
+                        <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No outlet execution task is scheduled on {selectedDate}.</div>
+                      ) : dailyPlan.tasks.slice(0, 6).map((task) => (
+                        <button
+                          key={task.row.id}
+                          type="button"
+                          onClick={() => setSelectedTaskId(task.row.id)}
+                          className={cn(
+                            "flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left transition hover:border-primary/60",
+                            selectedTask?.id === task.row.id && "border-primary bg-primary/5",
+                          )}
+                        >
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium">{task.row.title}</div>
+                            <div className="text-xs text-muted-foreground">{task.branch} · {task.dueTime || task.dueAt || "No time"}</div>
+                          </div>
+                          <Badge variant={getTaskStatusTone(task.status)}>{task.status}</Badge>
+                        </button>
+                      ))}
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-border/60 shadow-none">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Review Queue</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      {!reviewQueue.length ? (
+                        <div className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">No submitted proof is waiting for manager review.</div>
+                      ) : reviewQueue.slice(0, 6).map((task) => (
+                        <button
+                          key={task.row.id}
+                          type="button"
+                          onClick={() => setSelectedTaskId(task.row.id)}
+                          className={cn(
+                            "w-full rounded-xl border px-3 py-2 text-left transition hover:border-primary/60",
+                            selectedTask?.id === task.row.id && "border-primary bg-primary/5",
+                          )}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <div className="truncate text-sm font-medium">{task.row.title}</div>
+                              <div className="text-xs text-muted-foreground">{task.branch} · {task.taskType}</div>
+                            </div>
+                            <Badge variant={getManagerReviewStatusTone(task.managerReviewStatus)}>{task.managerReviewStatus}</Badge>
+                          </div>
+                        </button>
+                      ))}
+                    </CardContent>
+                  </Card>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          <Card>
+          <Card className="border-border/70">
             <CardHeader>
-              <CardTitle className="text-base">Execution Detail</CardTitle>
-              <p className="text-sm text-muted-foreground">Selected task, proof, linked incident, linked inspection, and next action.</p>
+              <CardTitle className="text-base">Execution Inspector</CardTitle>
+              <p className="text-sm text-muted-foreground">Stay in context while reviewing proof, linked records, and remediation.</p>
             </CardHeader>
             <CardContent className="space-y-4">
               {!detail ? (

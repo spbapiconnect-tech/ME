@@ -2,8 +2,8 @@
 
 import dynamic from "next/dynamic";
 import {
-  ChevronLeft,
   Maximize2,
+  PanelLeftClose,
   Pencil,
   Plus,
   Settings2,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { SopDocumentHeader } from "@/components/sop/sop-document-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +37,7 @@ const SopBlockNoteEditor = dynamic(
     ssr: false,
     loading: () => (
       <div className="mx-auto max-w-4xl px-10 py-10 text-sm text-muted-foreground">
-        Loading document editor...
+        Loading editor...
       </div>
     ),
   },
@@ -44,14 +45,14 @@ const SopBlockNoteEditor = dynamic(
 
 const SopEmployeePreviewDevice = dynamic(
   () =>
-    import("@/components/sop/sop-blocknote-preview").then(
+    import("@/components/sop/sop-plate-preview").then(
       (mod) => mod.SopEmployeePreviewDevice,
     ),
   {
     ssr: false,
     loading: () => (
       <div className="rounded-2xl border bg-card p-6 text-sm text-muted-foreground">
-        Loading employee preview...
+        Loading Plate preview...
       </div>
     ),
   },
@@ -63,10 +64,10 @@ type SopBuilderWorkspaceV3Props = {
   selectedPageId?: string;
   settings?: SopBuilderV3Settings;
   onBack?: () => void;
-  onCreate?: () => void;
-  onCreateSop?: () => void;
-  onCreateSOP?: () => void;
-  onSubmit?: () => void;
+  onCreate?: (blocks?: SopBlockNoteDocument) => void;
+  onCreateSop?: (blocks?: SopBlockNoteDocument) => void;
+  onCreateSOP?: (blocks?: SopBlockNoteDocument) => void;
+  onSubmit?: (blocks?: SopBlockNoteDocument) => void;
   onSelectPage: (pageId: string) => void;
   onAddPage: () => void;
   onAddSubPage?: (parentPageId: string) => void;
@@ -74,6 +75,8 @@ type SopBuilderWorkspaceV3Props = {
   onUpdatePage: (pageId: string, patch: Partial<SopBuilderV3Page>) => void;
   onUpdateSettings: (patch: Partial<SopBuilderV3Settings>) => void;
   onDocumentChange?: (blocks: SopBlockNoteDocument) => void;
+  submitLabel?: string;
+  editorStorageKey?: string;
 } & Record<string, unknown>;
 
 const fallbackSettings = {
@@ -93,6 +96,65 @@ const fallbackSettings = {
   reviewDueDate: "",
   status: "draft",
 } as unknown as SopBuilderV3Settings;
+
+
+function paragraph(content: string): SopBlockNoteDocument[number] {
+  return {
+    type: "paragraph",
+    content: content || "",
+  };
+}
+
+function heading(content: string): SopBlockNoteDocument[number] {
+  return {
+    type: "heading",
+    props: { level: 2 },
+    content: content || "Section",
+  } as SopBlockNoteDocument[number];
+}
+
+function v3BlocksToBlockNoteDocument(blocks: SopBuilderV3Page["blocks"] = []): SopBlockNoteDocument {
+  const converted = blocks.flatMap((block): SopBlockNoteDocument => {
+    if (block.type === "heading") {
+      return [heading(block.title || block.body || "Section")];
+    }
+
+    if (block.type === "step-list") {
+      return [
+        heading(block.title || "Step-by-step execution"),
+        ...(block.steps || []).map((step, index) => paragraph(`${index + 1}. ${step}`)),
+      ];
+    }
+
+    if (block.type === "checklist") {
+      return [
+        heading(block.title || "Checklist"),
+        ...(block.checklist || []).map((item) => paragraph(`☐ ${item}`)),
+      ];
+    }
+
+    if (block.type === "warning") {
+      return [
+        heading(block.title || block.warningLevel || "Warning"),
+        paragraph(block.body || ""),
+      ];
+    }
+
+    if (block.type === "image" || block.type === "video" || block.type === "pdf") {
+      return [
+        heading(block.title || "Attachment"),
+        paragraph(block.assetUrl || block.body || ""),
+      ];
+    }
+
+    return [
+      block.title ? heading(block.title) : paragraph(block.body || ""),
+      ...(block.title && block.body ? [paragraph(block.body)] : []),
+    ];
+  });
+
+  return converted.length ? converted : [paragraph("")];
+}
 
 
 function cleanOutlineTitle(title?: string) {
@@ -122,6 +184,8 @@ export function SopBuilderWorkspaceV3({
   onUpdatePage,
   onUpdateSettings,
   onDocumentChange,
+  submitLabel = "Create SOP",
+  editorStorageKey,
 }: SopBuilderWorkspaceV3Props) {
   useEffect(() => {
     const shell = document.querySelector(".sop-builder-route-shell") as HTMLElement | null;
@@ -130,7 +194,7 @@ export function SopBuilderWorkspaceV3({
     const lockedTargets = [main].filter(Boolean) as HTMLElement[];
 
     for (const target of lockedTargets) {
-      target.classList.add("sop-builder-main-lock");
+      target.classList.add("sop-builder-v3-main-lock");
       target.scrollTop = 0;
     }
 
@@ -146,7 +210,7 @@ export function SopBuilderWorkspaceV3({
 
     return () => {
       for (const target of lockedTargets) {
-        target.classList.remove("sop-builder-main-lock");
+        target.classList.remove("sop-builder-v3-main-lock");
         target.scrollTop = 0;
       }
 
@@ -159,6 +223,8 @@ export function SopBuilderWorkspaceV3({
   const renameInputRef = useRef<HTMLInputElement | null>(null);
 
   const [previewDocument, setPreviewDocument] = useState<SopBlockNoteDocument>([]);
+  const [previewPageId, setPreviewPageId] = useState<string | null>(null);
+  const [chapterPanelOpen, setChapterPanelOpen] = useState(true);
   const [inspectorOpen, setInspectorOpen] = useState(true);
   const [inspectorTab, setInspectorTab] = useState<"preview" | "settings">("preview");
   const [previewFull, setPreviewFull] = useState(false);
@@ -177,7 +243,6 @@ export function SopBuilderWorkspaceV3({
   );
 
   const [localSettings, setLocalSettings] = useState<SopBuilderV3Settings>(resolvedSettings);
-  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
 const settings = localSettings;
 
   const [settingsDraft, setSettingsDraft] = useState(() => ({
@@ -185,6 +250,20 @@ const settings = localSettings;
     category: resolvedSettings.category || "",
     version: resolvedSettings.version || "v1.0",
   }));
+
+  // sync resolved SOP settings into local builder state after an existing SOP is loaded.
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setLocalSettings(resolvedSettings);
+      setSettingsDraft({
+        title: resolvedSettings.title || "",
+        category: resolvedSettings.category || "",
+        version: resolvedSettings.version || "v1.0",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [resolvedSettings]);
 
   useEffect(() => {
     if (!renameTarget) return;
@@ -216,6 +295,11 @@ return () => {
     return roots.length ? roots : pages;
   }, [pages]);
 
+  const activePageEditorContent = useMemo(
+    () => v3BlocksToBlockNoteDocument(activePage?.blocks || []),
+    [activePage?.blocks],
+  );
+
   const subPagesByParent = useMemo(() => {
     return pages.reduce<Record<string, SopBuilderV3Page[]>>((groups, page) => {
       if (!page.parentPageId) return groups;
@@ -231,6 +315,7 @@ return () => {
 
   function handleDocumentChange(blocks: SopBlockNoteDocument) {
     setPreviewDocument(blocks);
+    setPreviewPageId(activePage?.id || null);
     onDocumentChange?.(blocks);
   }
 
@@ -289,32 +374,42 @@ return () => {
   }
 
   const createAction = onCreateSop || onCreateSOP || onCreate || onSubmit;
+  const previewBlocks =
+    activePage?.id && previewPageId === activePage.id && previewDocument.length
+      ? previewDocument
+      : activePageEditorContent;
+
+  function submitCurrentDocument() {
+    const blocks = previewBlocks.length ? previewBlocks : activePageEditorContent;
+    onDocumentChange?.(blocks);
+    createAction?.(blocks);
+  }
+
 
   return (
     <div
       ref={workspaceRef}
-      className="sop-builder-workspace flex h-full min-h-0 flex-col overflow-hidden bg-background"
+      className="sop-builder-workspace sop-builder-workspace-v3 flex h-[calc(100vh-56px)] min-h-0 flex-col overflow-hidden bg-background"
     >
-      <div className="sop-builder-document-header shrink-0 border-b border-border bg-background px-4 py-2">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <Button variant="outline" size="icon" onClick={onBack}>
-              <ChevronLeft className="h-4 w-4" />
+      <SopDocumentHeader
+        eyebrow={`SOP Builder V3${settings.category ? ` / ${settings.category}` : ""}`}
+        title={settings.title || "Untitled SOP"}
+        badges={
+          <>
+            <Badge variant="secondary">{settings.version || "v1.0"}</Badge>
+            <Badge variant="secondary">{settings.status || "Draft"}</Badge>
+          </>
+        }
+        onBack={onBack}
+        actions={
+          <>
+            <Button
+              variant={chapterPanelOpen ? "default" : "outline"}
+              onClick={() => setChapterPanelOpen((current) => !current)}
+            >
+              <PanelLeftClose className="h-4 w-4" />
+              Chapters
             </Button>
-
-            <div className="min-w-0">
-              <div className="text-[11px] text-muted-foreground">SOP Builder V3</div>
-              <div className="flex items-center gap-2">
-                <h1 className="truncate text-lg font-semibold tracking-tight">
-                  {settings.title || "Untitled SOP"}
-                </h1>
-                <Badge variant="outline">{settings.version || "v1.0"}</Badge>
-                <Badge variant="secondary">Not published</Badge>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex shrink-0 items-center gap-2">
             <Button
               variant={inspectorOpen && inspectorTab === "settings" ? "default" : "outline"}
               onClick={() => {
@@ -347,46 +442,20 @@ return () => {
               <Smartphone className="h-4 w-4" />
               Preview
             </Button>
+            <Button onClick={submitCurrentDocument}>{submitLabel}</Button>
+          </>
+        }
+      />
 
-
-              <Button
-                variant="outline"
-                onClick={() => {
-                  const savedAt = new Date().toISOString();
-
-                  window.localStorage.setItem(
-                    "me:sop-builder:v3:draft",
-                    JSON.stringify({
-                      version: 1,
-                      savedAt,
-                      sopDocument,
-                      pages,
-                      selectedPageId,
-                      settings: localSettings,
-                    }),
-                  );
-
-                  setDraftSavedAt(savedAt);
-                }}
-              >
-                Save Draft
-              </Button>
-              {draftSavedAt ? (
-                <span className="hidden text-xs text-muted-foreground md:inline">
-                  Saved {new Date(draftSavedAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
-              ) : null}
-<Button onClick={createAction}>Create SOP</Button>
-          </div>
-        </div>
-      </div>
-
-      <ResizablePanelGroup direction="horizontal" className="sop-builder-panel-group min-h-0 flex-1 overflow-hidden">
-        <ResizablePanel defaultSize={16} minSize={12} maxSize={22}>
-          <aside className="flex h-full min-h-0 flex-col border-r bg-background">
+      <ResizablePanelGroup
+        direction="horizontal"
+        autoSaveId="me:sop-builder-v3-panels"
+        className="sop-builder-panel-group min-h-0 flex-1 overflow-hidden"
+      >
+        {chapterPanelOpen ? (
+          <>
+            <ResizablePanel defaultSize={16} minSize={12} maxSize={24} order={1}>
+              <aside className="sop-builder-chapter-panel flex h-full min-h-0 flex-col overflow-hidden border-r bg-muted/20">
             <div className="shrink-0 border-b px-3 py-4">
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
@@ -531,14 +600,26 @@ return () => {
                 </div>
               )}
             </div>
-          </aside>
-        </ResizablePanel>
+              </aside>
+            </ResizablePanel>
 
-        <ResizableHandle withHandle />
+            <ResizableHandle withHandle />
+          </>
+        ) : null}
 
-        <ResizablePanel defaultSize={inspectorOpen ? 56 : 84} minSize={36}>
-          <main className="sop-builder-editor-main h-full min-h-0 overflow-hidden bg-background">
-            <SopBlockNoteEditor disabled={Boolean(renameTarget) || (inspectorOpen && inspectorTab === "settings")} onDocumentChange={handleDocumentChange} />
+        <ResizablePanel
+          defaultSize={inspectorOpen ? (chapterPanelOpen ? 56 : 72) : (chapterPanelOpen ? 84 : 100)}
+          minSize={36}
+          order={2}
+        >
+          <main className="sop-builder-editor-main flex h-full min-h-0 flex-col overflow-hidden bg-background">
+            <SopBlockNoteEditor
+              key={activePage?.id || "empty-page"}
+              disabled={Boolean(renameTarget) || (inspectorOpen && inspectorTab === "settings")}
+              initialContent={activePageEditorContent}
+              storageKey={editorStorageKey ? `${editorStorageKey}:${activePage?.id || "page"}` : undefined}
+              onDocumentChange={handleDocumentChange}
+            />
           </main>
         </ResizablePanel>
 
@@ -546,8 +627,8 @@ return () => {
           <>
             <ResizableHandle withHandle />
 
-            <ResizablePanel defaultSize={28} minSize={20} maxSize={42}>
-              <aside className="flex h-full min-h-0 flex-col border-l bg-background">
+            <ResizablePanel defaultSize={28} minSize={20} maxSize={42} order={3}>
+              <aside className="sop-builder-inspector-panel flex h-full min-h-0 flex-col overflow-hidden border-l bg-muted/10">
                 <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
                   <div>
                     <div className="text-sm font-semibold">
@@ -582,9 +663,9 @@ return () => {
                 </div>
 
                 {inspectorTab === "preview" ? (
-                  <div className="min-h-0 flex-1 overflow-hidden p-4">
+                  <div className="sop-builder-preview-scroll min-h-0 flex-1 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     <SopEmployeePreviewDevice
-                      blocks={previewDocument}
+                      blocks={previewBlocks}
                       title={settings.title}
                       version={settings.version}
                       category={settings.category}
@@ -664,7 +745,7 @@ return () => {
 
           <div className="min-h-0 flex-1 p-5">
             <SopEmployeePreviewDevice
-              blocks={previewDocument}
+              blocks={previewBlocks}
               title={settings.title}
               version={settings.version}
               category={settings.category}

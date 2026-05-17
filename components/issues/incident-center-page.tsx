@@ -5,6 +5,10 @@ import { AlertTriangle, ArrowUpRight, CheckCheck, ClipboardList, Flag, ShieldAle
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
+import { OpsCalendarBoard, type OpsCalendarEvent } from "@/components/operations/ops-calendar-board";
+import { OpsDayTimeline, type OpsTimelineEvent } from "@/components/operations/ops-day-timeline";
+import { OpsSignalInbox, type OpsSignalItem } from "@/components/operations/ops-signal-inbox";
+import { resolveOpsTone } from "@/components/operations/ops-status-chip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,6 +46,30 @@ function upsertDetail(items: Array<{ label: string; value: string }> | undefined
   if (index >= 0) next[index] = { label, value };
   else next.push({ label, value });
   return next;
+}
+
+
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function todayIso() {
+  return formatLocalDate(new Date());
+}
+
+function dateFromDateTime(value: string) {
+  if (!value || value === "Not set") return "";
+  if (value.includes("T")) return value.slice(0, 10);
+  if (value.includes(" ")) return value.slice(0, 10);
+  return value.slice(0, 10);
+}
+
+function timeFromDateTime(value: string) {
+  const match = value.match(/(\d{1,2}:\d{2})/);
+  return match?.[1] ?? "";
 }
 
 type IncidentForm = {
@@ -92,6 +120,8 @@ export function IncidentCenterPage() {
 
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | undefined>();
   const [selectedSignalId, setSelectedSignalId] = useState<string | undefined>();
+  const [selectedDate, setSelectedDate] = useState(todayIso());
+  const [calendarAnchor, setCalendarAnchor] = useState(new Date());
   const [activeFilter, setActiveFilter] = useState("New");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [form, setForm] = useState<IncidentForm>({
@@ -123,6 +153,108 @@ export function IncidentCenterPage() {
   const signals = useMemo(() => getIncidentSourceSignals(inspectionRows, taskRows, expiryRows), [inspectionRows, taskRows, expiryRows]);
   const kpis = useMemo(() => getIncidentKpis(incidentRows, taskRows), [incidentRows, taskRows]);
   const branchOptions = useMemo(() => branchRows.map((row) => row.title), [branchRows]);
+
+  const incidentCalendarEvents = useMemo<OpsCalendarEvent[]>(() => {
+    return incidentRows.reduce<OpsCalendarEvent[]>((events, row) => {
+      const dueOrReported = detailValue(row, "Due Time") || detailValue(row, "Due At") || detailValue(row, "Reported Time");
+      const date = dateFromDateTime(dueOrReported);
+      if (!date) return events;
+
+      const parsedTime = timeFromDateTime(dueOrReported);
+      const severity = detailValue(row, "Severity") || row.status;
+
+      events.push({
+        id: row.id,
+        title: row.title,
+        date,
+        ...(parsedTime ? { time: parsedTime } : {}),
+        status: getIncidentSlaSummary(row).status,
+        source: detailValue(row, "Source") || "Incident Center",
+        tone: resolveOpsTone(severity),
+      });
+
+      return events;
+    }, []);
+  }, [incidentRows]);
+
+  const incidentTimelineEvents = useMemo<OpsTimelineEvent[]>(() => {
+    return incidentRows.reduce<OpsTimelineEvent[]>((events, row) => {
+      const dueOrReported = detailValue(row, "Due Time") || detailValue(row, "Due At") || detailValue(row, "Reported Time");
+      const date = dateFromDateTime(dueOrReported);
+      if (date !== selectedDate) return events;
+
+      const sla = getIncidentSlaSummary(row);
+      const severity = detailValue(row, "Severity") || row.status;
+
+      events.push({
+        id: row.id,
+        title: row.title,
+        startTime: dueOrReported || "09:00",
+        subtitle: `${detailValue(row, "Branch") || row.subtitle} · ${detailValue(row, "Category") || "Incident"}`,
+        source: detailValue(row, "Source") || "Incident Center",
+        status: sla.status,
+        tone: resolveOpsTone(severity),
+        meta: [
+          severity ? `Severity: ${severity}` : "",
+          row.owner ? `Owner: ${row.owner}` : "",
+          detailValue(row, "Escalation Level") ? `Escalation: ${detailValue(row, "Escalation Level")}` : "",
+        ].filter(Boolean).join(" · "),
+      });
+
+      return events;
+    }, []);
+  }, [incidentRows, selectedDate]);
+
+  const incidentSignalInbox = useMemo<OpsSignalItem[]>(() => {
+    const sourceSignals: OpsSignalItem[] = signals.map((signal) => ({
+      id: signal.id,
+      title: signal.title,
+      source:
+        signal.sourceType === "inspection"
+          ? "store_inspection"
+          : signal.sourceType === "outlet-execution"
+            ? "outlet_execution"
+            : "fefo_waste",
+      message: signal.reason,
+      branch: signal.branch,
+      time: signal.dueAt,
+      status: signal.severity,
+      tone: resolveOpsTone(signal.severity),
+      meta: "Convert source signal into incident",
+    }));
+
+    const connectorPlaceholders: OpsSignalItem[] = [
+      {
+        id: "incident-grabfood-review",
+        title: "GrabFood complaint / review connector",
+        source: "grabfood_review",
+        message: "Placeholder for future review-to-incident routing. No API call is active yet.",
+        status: "Planned",
+        tone: "neutral",
+        meta: "Future connector",
+      },
+      {
+        id: "incident-feedme-pos-alert",
+        title: "FeedMe POS alert connector",
+        source: "feedme_pos_alert",
+        message: "Placeholder for future POS alert incident creation such as refund spike, item outage, or abnormal sales pattern.",
+        status: "Planned",
+        tone: "neutral",
+        meta: "Future connector",
+      },
+      {
+        id: "incident-whatsapp-group",
+        title: "WhatsApp group incident connector",
+        source: "whatsapp_group",
+        message: "Placeholder for future manager group complaint or urgent branch report routing.",
+        status: "Planned",
+        tone: "neutral",
+        meta: "Future connector",
+      },
+    ];
+
+    return [...sourceSignals, ...connectorPlaceholders];
+  }, [signals]);
 
   const filteredQueue = useMemo(() => {
     if (!activeFilter) return queue;
@@ -354,6 +486,46 @@ export function IncidentCenterPage() {
               <CardContent className="px-3 pb-3 pt-0"><p className="text-xl font-semibold md:text-2xl">{kpi.value}</p></CardContent>
             </Card>
           ))}
+        </section>
+
+        <section className="grid gap-4 xl:grid-cols-[340px_minmax(0,1fr)]">
+          <OpsSignalInbox
+            title="Incident Signal Inbox"
+            description="Source signals from Store Inspection, Outlet Execution, FEFO plus future GrabFood, FeedMe POS, and WhatsApp connectors."
+            signals={incidentSignalInbox}
+            selectedSignalId={selectedSignalId}
+            onSelectSignal={(signal) => {
+              setSelectedSignalId(signal.id);
+              const sourceSignal = signals.find((item) => item.id === signal.id);
+              if (sourceSignal) {
+                openSignalIncident(sourceSignal);
+              }
+            }}
+            emptyText="No incident source signals yet."
+          />
+
+          <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_420px]">
+            <OpsCalendarBoard
+              title="Incident SLA Calendar"
+              description="Month view of reported incidents, SLA due times, escalation, and review workload."
+              events={incidentCalendarEvents}
+              selectedDate={selectedDate}
+              anchorDate={calendarAnchor}
+              onSelectedDateChange={setSelectedDate}
+              onAnchorDateChange={setCalendarAnchor}
+            />
+
+            <OpsDayTimeline
+              title="24h Incident Timeline"
+              description="Selected day incident time frame for containment, SLA, escalation, and follow-up work."
+              selectedDate={selectedDate}
+              events={incidentTimelineEvents}
+              startHour={0}
+              endHour={24}
+              emptyText="No incident is due or reported on the selected day."
+              onSelectEvent={(event) => setSelectedIncidentId(event.id)}
+            />
+          </div>
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[340px_minmax(0,1fr)_420px]">

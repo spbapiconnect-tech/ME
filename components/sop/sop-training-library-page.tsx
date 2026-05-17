@@ -1,6 +1,13 @@
 "use client";
 
+function sopLibraryNavigate(path: string, _options?: unknown) {
+  if (typeof window === "undefined") return;
+  window.location.assign(path);
+}
+
+
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   BookOpen,
@@ -9,7 +16,6 @@ import {
   GraduationCap,
   Library,
   MoreHorizontal,
-  Pencil,
   Plus,
   Search,
   Users,
@@ -109,16 +115,35 @@ function actionCell(row: MatrixRecord, openLegacyTools: () => void) {
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href={href}>Read SOP</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={openLegacyTools}>Edit / Builder</DropdownMenuItem>
-          <DropdownMenuItem onClick={openLegacyTools}>Assign Training</DropdownMenuItem>
-          <DropdownMenuItem onClick={openLegacyTools}>Publish / Template</DropdownMenuItem>
-        </DropdownMenuContent>
+        <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => sopLibraryNavigate(`/sop/${row.id}`)}>
+                          Read SOP
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => sopLibraryNavigate(`/sop?editSopId=${row.id}`)}>
+                          Edit / Builder
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => sopLibraryNavigate(`/sop/${row.id}?action=draft`)}>
+                          Create Draft Version
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => sopLibraryNavigate(`/sop/${row.id}?action=duplicate`)}>
+                          Duplicate SOP
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => sopLibraryNavigate(`/sop/${row.id}?action=training`)}>
+                          Assign Training
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => sopLibraryNavigate(`/sop/${row.id}?action=activity`)}>
+                          View Reader Activity
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => sopLibraryNavigate(`/sop/${row.id}?action=audit`)}>
+                          Audit Log
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => sopLibraryNavigate(`/sop/${row.id}?action=delete`)} className="text-destructive">
+                          Delete SOP
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
@@ -260,6 +285,14 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
 }
 
 export function SopTrainingLibraryPage() {
+  const searchParams = useSearchParams();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setIsMounted(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
   const hydrateFromFoundation = useMeRuntimeStore((state) => state.hydrateFromFoundation);
   const getRows = useMeRuntimeStore((state) => state.getRows);
 
@@ -268,7 +301,6 @@ export function SopTrainingLibraryPage() {
 
   const [activeTab, setActiveTab] = useState<TabKey>("library");
   const [searchTerm, setSearchTerm] = useState("");
-  const [legacyMode, setLegacyMode] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilterKey>("all");
   const [extraFilters, setExtraFilters] = useState<ExtraFilterKey[]>([]);
 
@@ -310,7 +342,7 @@ export function SopTrainingLibraryPage() {
         missingTemplate: templates.checklist === 0 || templates.inspection === 0 || templates.task === 0,
         acknowledgementStatus: detailValue(row, "Acknowledgement Status") || "Not Required",
         reviewDue: detailValue(row, "Review Due Date") || "Not Set",
-        action: actionCell({ id: row.id, sopId: row.id }, () => setLegacyMode(true)),
+        action: actionCell({ id: row.id, sopId: row.id }, () => sopLibraryNavigate(`/sop?editSopId=${row.id}`)),
       };
     });
   }, [sopRows, taskRows]);
@@ -328,7 +360,7 @@ export function SopTrainingLibraryPage() {
       overdue: item.training.overdue,
       completed: item.training.completed,
       rate: `${item.training.rate}%`,
-      action: actionCell({ id: `training-${item.row.id}`, sopId: item.row.id }, () => setLegacyMode(true)),
+      action: actionCell({ id: `training-${item.row.id}`, sopId: item.row.id }, () => sopLibraryNavigate(`/sop?editSopId=${item.row.id}`)),
     }));
   }, [trainingQueue]);
 
@@ -345,7 +377,7 @@ export function SopTrainingLibraryPage() {
       failed: detailValue(row, "Exam Failed") || "0",
       status: detailValue(row, "Exam Status") || "Not Configured",
       owner: detailValue(row, "Process Owner") || row.owner || "Unassigned",
-      action: actionCell({ id: `exam-${row.id}`, sopId: row.id }, () => setLegacyMode(true)),
+      action: actionCell({ id: `exam-${row.id}`, sopId: row.id }, () => sopLibraryNavigate(`/sop?editSopId=${row.id}`)),
     }));
   }, [sopRows]);
 
@@ -371,7 +403,7 @@ export function SopTrainingLibraryPage() {
         completedAt: detailValue(row, "Completed At") || "—",
         pending: row.status === "Completed" ? 0 : 1,
         overdue: row.status === "Overdue" ? 1 : 0,
-        action: actionCell({ id: `reader-${row.id}`, sopId }, () => setLegacyMode(true)),
+        action: actionCell({ id: `reader-${row.id}`, sopId }, () => sopId ? sopLibraryNavigate(`/sop?editSopId=${sopId}`) : sopLibraryNavigate("/sop")),
       };
     });
   }, [taskRows]);
@@ -481,8 +513,22 @@ export function SopTrainingLibraryPage() {
     "training-pending": "Training Pending",
     "training-overdue": "Training Overdue",
   };
+  if (!isMounted) {
+    return (
+      <ErpShell>
+        <div className="flex h-[calc(100vh-56px)] min-h-0 items-center justify-center overflow-hidden bg-background">
+          <div className="rounded-2xl border bg-card px-6 py-5 text-sm text-muted-foreground shadow-xs">
+            Loading SOP & Training...
+          </div>
+        </div>
+      </ErpShell>
+    );
+  }
 
-  if (legacyMode) {
+  const createSopMode = searchParams.get("createSop") === "1";
+  const editSopId = searchParams.get("editSopId") || searchParams.get("builderSopId");
+
+  if (createSopMode || editSopId) {
     return <SopTrainingControlPage />;
   }
 
@@ -504,13 +550,9 @@ export function SopTrainingLibraryPage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setLegacyMode(true)}>
+            <Button onClick={() => sopLibraryNavigate("/sop?createSop=1")}>
               <Plus className="h-4 w-4" />
               Create SOP
-            </Button>
-            <Button variant="outline" onClick={() => setLegacyMode(true)}>
-              <Pencil className="h-4 w-4" />
-              Open Builder
             </Button>
           </div>
         </header>

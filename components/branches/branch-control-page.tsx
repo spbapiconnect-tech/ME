@@ -5,6 +5,9 @@ import { CalendarClock, ClipboardCheck, Plus } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
+import { OpsCalendarBoard, type OpsCalendarEvent } from "@/components/operations/ops-calendar-board";
+import { OpsDayTimeline, type OpsTimelineEvent } from "@/components/operations/ops-day-timeline";
+import { resolveOpsTone } from "@/components/operations/ops-status-chip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +42,30 @@ function upsertDetail(items: Array<{ label: string; value: string }> | undefined
   if (index >= 0) next[index] = { label, value };
   else next.push({ label, value });
   return next;
+}
+
+
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function todayIso() {
+  return formatLocalDate(new Date());
+}
+
+function dateFromDateTime(value: string) {
+  if (!value || value === "Not set" || value === "Not scheduled") return "";
+  if (value.includes("T")) return value.slice(0, 10);
+  if (value.includes(" ")) return value.slice(0, 10);
+  return value.slice(0, 10);
+}
+
+function timeFromDateTime(value: string) {
+  const match = value.match(/(\d{1,2}:\d{2})/);
+  return match?.[1] ?? "";
 }
 
 type ModalMode = "register" | "open" | "setup";
@@ -98,6 +125,8 @@ export function BranchControlPage() {
   const fefoRows = getRows("expiry", []);
 
   const [selectedBranchId, setSelectedBranchId] = useState<string | undefined>();
+  const [selectedDate, setSelectedDate] = useState(todayIso());
+  const [calendarAnchor, setCalendarAnchor] = useState(new Date());
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<ModalMode>("register");
   const [form, setForm] = useState<BranchForm>({
@@ -153,6 +182,116 @@ export function BranchControlPage() {
     ?? branchRows[0];
   const branchDetail = useMemo(() => getBranchDetail(selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows), [selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows]);
   const nextActions = useMemo(() => selectedBranch ? getBranchNextActions(selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows) : [], [selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows]);
+
+  const branchDailyOpsCalendarEvents = useMemo<OpsCalendarEvent[]>(() => {
+    if (!selectedBranch) return [];
+
+    const branchName = selectedBranch.title;
+    const branchId = selectedBranch.id;
+
+    function belongsToBranch(row: { subtitle?: string; detailItems?: Array<{ label: string; value: string }> }) {
+      const values = [
+        detailValue(row, "Branch"),
+        detailValue(row, "Outlets"),
+        detailValue(row, "Linked Branch"),
+        detailValue(row, "Linked Branch ID"),
+        row.subtitle ?? "",
+      ].join(" ");
+      return values.includes(branchName) || values.includes(branchId);
+    }
+
+    const events: OpsCalendarEvent[] = [];
+
+    taskRows.filter(belongsToBranch).forEach((row) => {
+      const dueDate = detailValue(row, "Due Date");
+      const dueTime = detailValue(row, "Due Time");
+      const dueAt = detailValue(row, "Due At");
+      const date = dueDate || dateFromDateTime(dueAt);
+      if (!date) return;
+
+      const parsedTime = dueTime || timeFromDateTime(dueAt);
+      events.push({
+        id: `task:${row.id}`,
+        title: `Task · ${row.title}`,
+        date,
+        ...(parsedTime ? { time: parsedTime } : {}),
+        status: row.status,
+        source: "Outlet Execution",
+        tone: resolveOpsTone(row.status),
+      });
+    });
+
+    inspectionRows.filter(belongsToBranch).forEach((row) => {
+      const scheduledTime = detailValue(row, "Scheduled Time");
+      const date = dateFromDateTime(scheduledTime);
+      if (!date) return;
+
+      const parsedTime = timeFromDateTime(scheduledTime);
+      events.push({
+        id: `inspection:${row.id}`,
+        title: `Inspection · ${row.title}`,
+        date,
+        ...(parsedTime ? { time: parsedTime } : {}),
+        status: row.status,
+        source: "Store Inspection",
+        tone: resolveOpsTone(row.status),
+      });
+    });
+
+    incidentRows.filter(belongsToBranch).forEach((row) => {
+      const dueOrReported = detailValue(row, "Due Time") || detailValue(row, "Due At") || detailValue(row, "Reported Time");
+      const date = dateFromDateTime(dueOrReported);
+      if (!date) return;
+
+      const parsedTime = timeFromDateTime(dueOrReported);
+      const severity = detailValue(row, "Severity") || row.status;
+      events.push({
+        id: `incident:${row.id}`,
+        title: `Incident · ${row.title}`,
+        date,
+        ...(parsedTime ? { time: parsedTime } : {}),
+        status: severity,
+        source: "Incident Center",
+        tone: resolveOpsTone(severity),
+      });
+    });
+
+    fefoRows.filter(belongsToBranch).forEach((row) => {
+      const expiryDate = detailValue(row, "Expiry Date");
+      const date = dateFromDateTime(expiryDate);
+      if (!date) return;
+
+      const priority = detailValue(row, "FEFO Priority") || row.status;
+      events.push({
+        id: `fefo:${row.id}`,
+        title: `FEFO · ${row.title}`,
+        date,
+        status: row.status,
+        source: "FEFO / Waste",
+        tone: resolveOpsTone(priority),
+      });
+    });
+
+    return events;
+  }, [selectedBranch, taskRows, inspectionRows, incidentRows, fefoRows]);
+
+  const branchDailyOpsTimelineEvents = useMemo<OpsTimelineEvent[]>(() => {
+    return branchDailyOpsCalendarEvents
+      .filter((event) => event.date === selectedDate)
+      .map((event) => {
+        const [source, recordId] = event.id.split(":");
+        return {
+          id: event.id,
+          title: event.title,
+          startTime: event.time && /^\d{1,2}:\d{2}$/.test(event.time) ? event.time : source === "fefo" ? "09:00" : "12:00",
+          subtitle: `${selectedBranch?.title ?? "Branch"} · ${event.source ?? "Daily Ops"}`,
+          source: event.source,
+          status: event.status,
+          tone: event.tone,
+          meta: recordId ? `Record: ${recordId}` : "",
+        } satisfies OpsTimelineEvent;
+      });
+  }, [branchDailyOpsCalendarEvents, selectedDate, selectedBranch]);
 
   function openModal(mode: ModalMode) {
     if (mode !== "register" && selectedBranch) {
@@ -351,6 +490,38 @@ export function BranchControlPage() {
             </Card>
           ))}
         </div>
+
+        {selectedBranch ? (
+          <section className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_420px]">
+            <OpsCalendarBoard
+              title="Branch Daily Ops Calendar"
+              description="Month view of this branch's outlet tasks, inspections, incidents, and FEFO expiry risks."
+              events={branchDailyOpsCalendarEvents}
+              selectedDate={selectedDate}
+              anchorDate={calendarAnchor}
+              onSelectedDateChange={setSelectedDate}
+              onAnchorDateChange={setCalendarAnchor}
+            />
+
+            <OpsDayTimeline
+              title="Branch 24h Timeline"
+              description="Selected day work schedule for the active branch."
+              selectedDate={selectedDate}
+              events={branchDailyOpsTimelineEvents}
+              startHour={0}
+              endHour={24}
+              emptyText="No task, inspection, incident, or FEFO event is scheduled for this branch on the selected day."
+              onSelectEvent={(event) => {
+                const [source, recordId] = event.id.split(":");
+                if (!recordId) return;
+                if (source === "task") router.push(`/tasks?taskId=${recordId}`);
+                if (source === "inspection") router.push(`/inspection?inspectionId=${recordId}`);
+                if (source === "incident") router.push(`/issues?incidentId=${recordId}`);
+                if (source === "fefo") router.push(`/expiry?fefoId=${recordId}`);
+              }}
+            />
+          </section>
+        ) : null}
 
         {!branchRows.length ? (
           <Card>

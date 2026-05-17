@@ -38,7 +38,7 @@ type SopBlock = ReturnType<SopEditorInstance["getTextCursorPosition"]>["block"];
 type SopStylePatch = Parameters<SopEditorInstance["addStyles"]>[0];
 type SopUpdatePatch = Parameters<SopEditorInstance["updateBlock"]>[1];
 
-type ToolbarPanel = "block" | "textColor" | "highlight" | null;
+type ToolbarPanel = "block" | "textColor" | "highlight" | "table" | "tableColor" | "tableDensity" | null;
 
 type ToolbarPanelPosition = {
   top: number;
@@ -51,6 +51,7 @@ type SavedTextSelection = {
 };
 
 type TiptapChainLike = {
+  [key: string]: unknown;
   focus?: () => TiptapChainLike;
   setTextSelection?: (range: SavedTextSelection) => TiptapChainLike;
   setTextAlign?: (value: string) => TiptapChainLike;
@@ -92,6 +93,17 @@ const highlightColors = [
   { label: "Pink", value: "pink", swatch: "#fbcfe8" },
 ];
 
+const tableCellColors = [
+  { label: "Clear", value: "", swatch: "transparent" },
+  { label: "Gray", value: "#f8fafc", swatch: "#f8fafc" },
+  { label: "Yellow", value: "#fef3c7", swatch: "#fef3c7" },
+  { label: "Green", value: "#dcfce7", swatch: "#dcfce7" },
+  { label: "Blue", value: "#dbeafe", swatch: "#dbeafe" },
+  { label: "Red", value: "#fee2e2", swatch: "#fee2e2" },
+  { label: "Purple", value: "#f3e8ff", swatch: "#f3e8ff" },
+  { label: "Dark", value: "#111827", swatch: "#111827" },
+];
+
 const blockOptions = [
   { label: "Paragraph", description: "Normal SOP instruction", value: "paragraph", icon: Pilcrow },
   { label: "Heading 1", description: "Main section title", value: "heading1", icon: Type },
@@ -115,19 +127,6 @@ function getTiptapEditor(editor: SopEditorInstance): TiptapLikeEditor | undefine
 function getSelectedEditorBlocks(editor: SopEditorInstance): SopBlock[] {
   return editor.getSelection()?.blocks || [editor.getTextCursorPosition().block];
 }
-
-function updateSelectedBlocks(
-  editor: SopEditorInstance,
-  patch: { type?: string; props?: Record<string, unknown> },
-) {
-  const blocks = getSelectedEditorBlocks(editor);
-  editor.focus();
-
-  for (const block of blocks) {
-    editor.updateBlock(block, patch as SopUpdatePatch);
-  }
-}
-
 
 function SopToolbarPortalPanel({
   children,
@@ -293,7 +292,11 @@ export function SopFixedEditorToolbar({
     setStatus("");
     rememberEditorStateForToolbar();
     updatePanelPosition();
-    clearNativeSelection();
+
+    if (panel !== "table" && panel !== "tableColor" && panel !== "tableDensity") {
+      clearNativeSelection();
+    }
+
     setOpenPanel((current) => (current === panel ? null : panel));
   }
 
@@ -411,6 +414,70 @@ export function SopFixedEditorToolbar({
     }
   }
 
+  function runTableCommand(
+    commandName: string,
+    args: unknown[],
+    successMessage: string,
+    fallbackMessage = "Click inside a native table first.",
+  ) {
+    editor.focus();
+
+    const tiptap = getTiptapEditor(editor);
+    const chain = tiptap?.chain?.();
+
+    if (!chain || typeof chain.focus !== "function") {
+      setStatus(fallbackMessage);
+      return false;
+    }
+
+    const focusedChain = chain.focus();
+    const command = focusedChain[commandName];
+
+    if (typeof command !== "function") {
+      setStatus(fallbackMessage);
+      return false;
+    }
+
+    const nextChain = command.apply(focusedChain, args) as TiptapChainLike | undefined;
+    const runnable = nextChain && typeof nextChain.run === "function" ? nextChain : focusedChain;
+    const didRun = typeof runnable.run === "function" ? runnable.run() : false;
+
+    if (didRun === false) {
+      setStatus(fallbackMessage);
+      return false;
+    }
+
+    setStatus(successMessage);
+    return true;
+  }
+
+  function insertNativeTable(rows = 3, cols = 3, withHeaderRow = true) {
+    runTableCommand(
+      "insertTable",
+      [{ rows, cols, withHeaderRow }],
+      `Inserted ${rows} × ${cols} table.`,
+      "Native table command is not available here. Type /table in the editor.",
+    );
+    setOpenPanel(null);
+  }
+
+  function applyTableCellColor(color: string) {
+    const didRun = runTableCommand(
+      "setCellAttribute",
+      ["backgroundColor", color || null],
+      color ? "Applied cell color." : "Cleared cell color.",
+      "Select a table cell first.",
+    );
+
+    if (didRun) setOpenPanel(null);
+  }
+
+  function runTableDensity(mode: "compact" | "normal" | "comfortable") {
+    document.documentElement.dataset.sopTableDensity = mode;
+    setStatus(`Table density: ${mode}.`);
+    setOpenPanel(null);
+  }
+
   function showLinkCommandHint() {
     editor.focus();
     setOpenPanel(null);
@@ -462,6 +529,15 @@ export function SopFixedEditorToolbar({
         <span className="sop-toolbar-divider" />
 
         <button type="button" title="Use slash command for links" onPointerDown={(event) => runToolbarAction(event, showLinkCommandHint)}><LinkIcon size={14} /></button>
+
+        <span className="sop-toolbar-divider" />
+
+        <button type="button" title="Insert 3 × 3 table" onPointerDown={(event) => runToolbarAction(event, () => insertNativeTable(3, 3, true))}>
+          <span className="sop-toolbar-text-icon">▦</span>
+        </button>
+        <button type="button" title="Table tools" aria-expanded={openPanel === "table"} onPointerDown={(event) => runToolbarAction(event, () => togglePanel("table"))}>
+          <ChevronDown size={12} />
+        </button>
       </div>
 
       {status ? <div className="sop-fixed-toolbar-status">{status}</div> : null}
@@ -496,6 +572,123 @@ export function SopFixedEditorToolbar({
                 </button>
               );
             })}
+          </div>
+        </SopToolbarPortalPanel>
+      ) : null}
+
+      {openPanel === "table" ? (
+        <SopToolbarPortalPanel panelRef={panelRef} position={panelPosition} className="sop-fixed-toolbar-table-panel sop-fixed-toolbar-table-pro-panel">
+          <div className="sop-fixed-toolbar-panel-head">
+            <div>
+              <div className="sop-fixed-toolbar-panel-title">Table tools</div>
+              <p>Use native table handles for fast row/column changes. Use this panel for full actions.</p>
+            </div>
+            <button type="button" title="Close" onPointerDown={(event) => runToolbarAction(event, () => setOpenPanel(null))}>
+              <X size={13} />
+            </button>
+          </div>
+
+          <div className="sop-table-tool-section">
+            <div className="sop-table-tool-label">Insert</div>
+            <div className="sop-fixed-toolbar-table-grid">
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => insertNativeTable(2, 2, true))}>2 × 2</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => insertNativeTable(3, 3, true))}>3 × 3</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => insertNativeTable(4, 4, true))}>4 × 4</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => insertNativeTable(5, 5, true))}>5 × 5</button>
+            </div>
+          </div>
+
+          <div className="sop-table-tool-section">
+            <div className="sop-table-tool-label">Rows</div>
+            <div className="sop-fixed-toolbar-table-grid">
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("addRowBefore", [], "Added row above."))}>Row above</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("addRowAfter", [], "Added row below."))}>Row below</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("deleteRow", [], "Deleted row."))}>Delete row</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("toggleHeaderRow", [], "Toggled header row."))}>Header row</button>
+            </div>
+          </div>
+
+          <div className="sop-table-tool-section">
+            <div className="sop-table-tool-label">Columns</div>
+            <div className="sop-fixed-toolbar-table-grid">
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("addColumnBefore", [], "Added column left."))}>Column left</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("addColumnAfter", [], "Added column right."))}>Column right</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("deleteColumn", [], "Deleted column."))}>Delete column</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("toggleHeaderColumn", [], "Toggled header column."))}>Header column</button>
+            </div>
+          </div>
+
+          <div className="sop-table-tool-section">
+            <div className="sop-table-tool-label">Cells</div>
+            <div className="sop-fixed-toolbar-table-grid">
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("mergeCells", [], "Merged cells.", "Select adjacent table cells first."))}>Merge cells</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("splitCell", [], "Split cell.", "Select a merged table cell first."))}>Split cell</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("toggleHeaderCell", [], "Toggled header cell."))}>Header cell</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => togglePanel("tableColor"))}>Cell color</button>
+            </div>
+          </div>
+
+          <div className="sop-table-tool-section">
+            <div className="sop-table-tool-label">Table</div>
+            <div className="sop-fixed-toolbar-table-grid">
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("fixTables", [], "Fixed table structure.", "No table repair needed."))}>Fix table</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableCommand("deleteTable", [], "Deleted table."))}>Delete table</button>
+              <button type="button" onPointerDown={(event) => runToolbarAction(event, () => togglePanel("tableDensity"))}>Density</button>
+            </div>
+          </div>
+        </SopToolbarPortalPanel>
+      ) : null}
+
+      {openPanel === "tableColor" ? (
+        <SopToolbarPortalPanel panelRef={panelRef} position={panelPosition} className="sop-fixed-toolbar-color-panel sop-fixed-toolbar-table-color-panel">
+          <div className="sop-fixed-toolbar-panel-head">
+            <div>
+              <div className="sop-fixed-toolbar-panel-title">Table cell color</div>
+              <p>Apply background color to selected table cells.</p>
+            </div>
+            <button type="button" title="Close" onPointerDown={(event) => runToolbarAction(event, () => setOpenPanel(null))}>
+              <X size={13} />
+            </button>
+          </div>
+
+          <div className="sop-fixed-toolbar-swatch-grid">
+            {tableCellColors.map((color) => (
+              <button
+                key={color.label}
+                type="button"
+                title={color.label}
+                className="sop-fixed-toolbar-swatch-item"
+                onPointerDown={(event) => runToolbarAction(event, () => applyTableCellColor(color.value))}
+              >
+                <span
+                  className="sop-fixed-toolbar-swatch"
+                  style={{
+                    background: color.swatch,
+                    borderStyle: color.value ? "solid" : "dashed",
+                  }}
+                />
+                <span>{color.label}</span>
+              </button>
+            ))}
+          </div>
+        </SopToolbarPortalPanel>
+      ) : null}
+
+      {openPanel === "tableDensity" ? (
+        <SopToolbarPortalPanel panelRef={panelRef} position={panelPosition} className="sop-fixed-toolbar-table-panel">
+          <div className="sop-fixed-toolbar-panel-head">
+            <div>
+              <div className="sop-fixed-toolbar-panel-title">Table density</div>
+              <p>Change row height and cell padding.</p>
+            </div>
+            <button type="button" title="Close" onPointerDown={(event) => runToolbarAction(event, () => setOpenPanel(null))}>
+              <X size={13} />
+            </button>
+          </div>
+          <div className="sop-fixed-toolbar-table-grid">
+            <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableDensity("compact"))}>Compact</button>
+            <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableDensity("normal"))}>Normal</button>
+            <button type="button" onPointerDown={(event) => runToolbarAction(event, () => runTableDensity("comfortable"))}>Comfortable</button>
           </div>
         </SopToolbarPortalPanel>
       ) : null}

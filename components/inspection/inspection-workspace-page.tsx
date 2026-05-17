@@ -5,6 +5,10 @@ import { AlertTriangle, Camera, CheckCircle2, ClipboardList, FileWarning, Link2,
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { ErpShell } from "@/components/erp";
+import { OpsCalendarBoard, type OpsCalendarEvent } from "@/components/operations/ops-calendar-board";
+import { OpsDayTimeline, type OpsTimelineEvent } from "@/components/operations/ops-day-timeline";
+import { OpsSignalInbox, type OpsSignalItem } from "@/components/operations/ops-signal-inbox";
+import { resolveOpsTone } from "@/components/operations/ops-status-chip";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,6 +57,30 @@ function statusTone(status: string): "outline" | "secondary" | "destructive" {
   if (value.includes("failed") || value.includes("critical") || value.includes("overdue") || value.includes("rejected")) return "destructive";
   if (value.includes("pending") || value.includes("review") || value.includes("scheduled") || value.includes("new")) return "secondary";
   return "outline";
+}
+
+
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function todayIso() {
+  return formatLocalDate(new Date());
+}
+
+function dateFromDateTime(value: string) {
+  if (!value || value === "Not scheduled") return "";
+  if (value.includes("T")) return value.slice(0, 10);
+  if (value.includes(" ")) return value.slice(0, 10);
+  return value.slice(0, 10);
+}
+
+function timeFromDateTime(value: string) {
+  const match = value.match(/(\d{1,2}:\d{2})/);
+  return match?.[1] ?? "";
 }
 
 type InspectionForm = {
@@ -108,6 +136,8 @@ export function InspectionWorkspacePage() {
   const [inspectionDialogOpen, setInspectionDialogOpen] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [selectedSignalId, setSelectedSignalId] = useState<string | undefined>(undefined);
+  const [selectedDate, setSelectedDate] = useState(todayIso());
+  const [calendarAnchor, setCalendarAnchor] = useState(new Date());
   const [form, setForm] = useState<InspectionForm>({
     title: "",
     branch: "",
@@ -142,6 +172,98 @@ export function InspectionWorkspacePage() {
   const queue = useMemo(() => getInspectionQueue(inspectionRows), [inspectionRows]);
   const signals = useMemo(() => getExecutionSignals(taskRows), [taskRows]);
   const kpis = useMemo(() => getInspectionKpis(inspectionRows, taskRows, issueRows), [inspectionRows, taskRows, issueRows]);
+
+  const inspectionCalendarEvents = useMemo<OpsCalendarEvent[]>(() => {
+    return inspectionRows.reduce<OpsCalendarEvent[]>((events, row) => {
+      const scheduledTime = detailValue(row, "Scheduled Time");
+      const date = dateFromDateTime(scheduledTime);
+      if (!date) return events;
+
+      const parsedTime = timeFromDateTime(scheduledTime);
+      events.push({
+        id: row.id,
+        title: row.title,
+        date,
+        ...(parsedTime ? { time: parsedTime } : {}),
+        status: row.status,
+        source: detailValue(row, "Source") || "Store Inspection",
+        tone: resolveOpsTone(row.status),
+      });
+
+      return events;
+    }, []);
+  }, [inspectionRows]);
+
+  const inspectionTimelineEvents = useMemo<OpsTimelineEvent[]>(() => {
+    return inspectionRows.reduce<OpsTimelineEvent[]>((events, row) => {
+      const scheduledTime = detailValue(row, "Scheduled Time");
+      const date = dateFromDateTime(scheduledTime);
+      if (date !== selectedDate) return events;
+
+      events.push({
+        id: row.id,
+        title: row.title,
+        startTime: scheduledTime || "09:00",
+        subtitle: `${detailValue(row, "Branch") || row.subtitle} · ${detailValue(row, "Inspection Type") || "Inspection"}`,
+        source: detailValue(row, "Source") || "Store Inspection",
+        status: row.status,
+        tone: resolveOpsTone(row.status),
+        meta: [
+          detailValue(row, "Checklist Template") ? `Checklist: ${detailValue(row, "Checklist Template")}` : "",
+          detailValue(row, "Score") ? `Score: ${detailValue(row, "Score")}` : "",
+          detailValue(row, "Failed Items") ? `Failed: ${detailValue(row, "Failed Items")}` : "",
+        ].filter(Boolean).join(" · "),
+      });
+
+      return events;
+    }, []);
+  }, [inspectionRows, selectedDate]);
+
+  const inspectionSignalInbox = useMemo<OpsSignalItem[]>(() => {
+    const executionSignals: OpsSignalItem[] = signals.map((signal) => ({
+      id: signal.id,
+      title: signal.taskTitle,
+      source: "outlet_execution",
+      message: signal.reason,
+      branch: signal.branchName,
+      time: signal.dueAt,
+      status: signal.status,
+      tone: resolveOpsTone(signal.status),
+      meta: "Create or review inspection from outlet execution proof",
+    }));
+
+    const connectorPlaceholders: OpsSignalItem[] = [
+      {
+        id: "connector-grabfood-review",
+        title: "GrabFood review connector",
+        source: "grabfood_review",
+        message: "Placeholder for future customer review signal ingestion. No API call is active yet.",
+        status: "Planned",
+        tone: "neutral",
+        meta: "Future connector",
+      },
+      {
+        id: "connector-feedme-pos-alert",
+        title: "FeedMe POS alert connector",
+        source: "feedme_pos_alert",
+        message: "Placeholder for future POS alerts such as refund spike, item unavailable, or abnormal order pattern.",
+        status: "Planned",
+        tone: "neutral",
+        meta: "Future connector",
+      },
+      {
+        id: "connector-whatsapp-group",
+        title: "WhatsApp group signal connector",
+        source: "whatsapp_group",
+        message: "Placeholder for future group complaint or manager note routing into inspection workflow.",
+        status: "Planned",
+        tone: "neutral",
+        meta: "Future connector",
+      },
+    ];
+
+    return [...executionSignals, ...connectorPlaceholders];
+  }, [signals]);
 
   const filteredQueue = useMemo(() => {
     if (!activeFilter) return queue;
@@ -391,6 +513,46 @@ export function InspectionWorkspacePage() {
               </CardContent>
             </Card>
           ))}
+        </section>
+
+        <section className="grid gap-4 xl:grid-cols-[340px_minmax(0,1fr)]">
+          <OpsSignalInbox
+            title="Inspection Signal Inbox"
+            description="Outlet execution signals plus future GrabFood, FeedMe POS, and WhatsApp connectors."
+            signals={inspectionSignalInbox}
+            selectedSignalId={selectedSignalId}
+            onSelectSignal={(signal) => {
+              setSelectedSignalId(signal.id);
+              const executionSignal = signals.find((item) => item.id === signal.id);
+              if (executionSignal) {
+                openSignalInspection(executionSignal);
+              }
+            }}
+            emptyText="No inspection signals yet."
+          />
+
+          <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_420px]">
+            <OpsCalendarBoard
+              title="Inspection Calendar"
+              description="Month view of scheduled inspections and failed-item follow ups."
+              events={inspectionCalendarEvents}
+              selectedDate={selectedDate}
+              anchorDate={calendarAnchor}
+              onSelectedDateChange={setSelectedDate}
+              onAnchorDateChange={setCalendarAnchor}
+            />
+
+            <OpsDayTimeline
+              title="Inspection Day Timeline"
+              description="Selected day inspection time frame for outlet supervisors and auditors."
+              selectedDate={selectedDate}
+              events={inspectionTimelineEvents}
+              startHour={0}
+              endHour={24}
+              emptyText="No inspection is scheduled for the selected day."
+              onSelectEvent={(event) => setSelectedInspectionId(event.id)}
+            />
+          </div>
         </section>
 
         <section className="grid gap-4 xl:grid-cols-[340px_minmax(0,1fr)_420px]">

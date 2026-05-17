@@ -435,33 +435,793 @@ textarea:focus:not(:focus-visible) {
 /* PSI procurement detail UI polish removed */
 
 
-/* SOP builder / reader document header separator */
-.sop-builder-document-header {
-  border-bottom: 1px solid hsl(var(--border));
-  box-shadow: 0 1px 0 hsl(var(--border));
+/* SOP reader contrast tuning */
+.sop-reader-route-shell main,
+.sop-reader-route-shell aside {
+  color: hsl(var(--foreground));
 }
 
-/* SOP builder / reader document header separator */
-.sop-builder-document-header {
-  position: relative !important;
-  border-bottom: 1px solid hsl(var(--border)) !important;
-  box-shadow: 0 1px 0 rgba(100, 116, 139, 0.22) !important;
+.sop-reader-route-shell main p,
+.sop-reader-route-shell main li {
+  color: hsl(var(--foreground) / 0.86);
 }
 
-.sop-builder-document-header::after {
+.sop-reader-route-shell .text-muted-foreground {
+  color: hsl(var(--foreground) / 0.70) !important;
+}
+
+.sop-reader-route-shell aside .text-muted-foreground,
+.sop-reader-action-panel .text-muted-foreground {
+  color: hsl(var(--foreground) / 0.72) !important;
+}
+
+.sop-reader-route-shell h1,
+.sop-reader-route-shell h2,
+.sop-reader-route-shell h3,
+.sop-reader-route-shell .font-semibold,
+.sop-reader-action-panel .font-semibold {
+  color: hsl(var(--foreground));
+}
+
+.dark .sop-reader-route-shell main p,
+.dark .sop-reader-route-shell main li,
+[data-theme="dark"] .sop-reader-route-shell main p,
+[data-theme="dark"] .sop-reader-route-shell main li {
+  color: hsl(var(--foreground) / 0.90);
+}
+
+.dark .sop-reader-route-shell .text-muted-foreground,
+.dark .sop-reader-action-panel .text-muted-foreground,
+[data-theme="dark"] .sop-reader-route-shell .text-muted-foreground,
+[data-theme="dark"] .sop-reader-action-panel .text-muted-foreground {
+  color: hsl(var(--foreground) / 0.78) !important;
+}
+
+
+/* SOP reader contrast cleanup */
+.sop-reader-route-shell main,
+.sop-reader-route-shell aside,
+.sop-reader-action-panel {
+  color: hsl(var(--foreground));
+}
+
+.sop-reader-route-shell main p,
+.sop-reader-route-shell main li,
+.sop-reader-route-shell main article,
+.sop-reader-route-shell main section {
+  color: hsl(var(--foreground) / 0.88);
+}
+
+.sop-reader-route-shell .text-muted-foreground,
+.sop-reader-action-panel .text-muted-foreground {
+  color: hsl(var(--foreground) / 0.74) !important;
+}
+
+.sop-reader-route-shell h1,
+.sop-reader-route-shell h2,
+.sop-reader-route-shell h3,
+.sop-reader-route-shell .font-semibold,
+.sop-reader-action-panel .font-semibold {
+  color: hsl(var(--foreground));
+}
+
+.dark .sop-reader-route-shell main p,
+.dark .sop-reader-route-shell main li,
+.dark .sop-reader-route-shell .text-muted-foreground,
+.dark .sop-reader-action-panel .text-muted-foreground,
+[data-theme="dark"] .sop-reader-route-shell main p,
+[data-theme="dark"] .sop-reader-route-shell main li,
+[data-theme="dark"] .sop-reader-route-shell .text-muted-foreground,
+[data-theme="dark"] .sop-reader-action-panel .text-muted-foreground {
+  color: hsl(var(--foreground) / 0.82) !important;
+}
+
+/* SOP reader final action suite */
+.sop-reader-route-shell main,
+.sop-reader-route-shell aside,
+.sop-reader-action-panel {
+  color: hsl(var(--foreground));
+}
+
+.sop-reader-route-shell main p,
+.sop-reader-route-shell main li,
+.sop-reader-route-shell main article,
+.sop-reader-route-shell main section {
+  color: hsl(var(--foreground) / 0.9);
+}
+
+.sop-reader-route-shell .text-muted-foreground,
+.sop-reader-action-panel .text-muted-foreground {
+  color: hsl(var(--foreground) / 0.74) !important;
+}
+
+.sop-reader-route-shell h1,
+.sop-reader-route-shell h2,
+.sop-reader-route-shell h3,
+.sop-reader-route-shell .font-semibold,
+.sop-reader-action-panel .font-semibold {
+  color: hsl(var(--foreground));
+}
+
+.dark .sop-reader-route-shell main p,
+.dark .sop-reader-route-shell main li,
+.dark .sop-reader-route-shell .text-muted-foreground,
+.dark .sop-reader-action-panel .text-muted-foreground,
+[data-theme="dark"] .sop-reader-route-shell main p,
+[data-theme="dark"] .sop-reader-route-shell main li,
+[data-theme="dark"] .sop-reader-route-shell .text-muted-foreground,
+[data-theme="dark"] .sop-reader-action-panel .text-muted-foreground {
+  color: hsl(var(--foreground) / 0.82) !important;
+}
+
+/* SOP reader frame lock
+   ErpShell desktop main has p-4 + overflow-y-auto.
+   The SOP reader is a full workspace like Builder, so it cancels that padding
+   and owns its own internal column scroll. */
+.sop-reader-route-shell {
+  isolation: isolate;
+}
+
+.sop-reader-route-shell > .flex,
+.sop-reader-route-shell .grid {
+  min-height: 0;
+}
+
+.sop-reader-route-shell main,
+.sop-reader-route-shell aside {
+  overscroll-behavior: contain;
+}
+
+/* SOP native BlockNote table final visibility fix
+   Verified DOM: [data-content-type="table"] > .tableWrapper > TABLE.
+   The table exists and can be selected; previous CSS was not hitting the actual visible cell borders strongly enough. */
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"],
+html body .sop-blocknote-shell .bn-editor .bn-block-content[data-content-type="table"] {
+  display: block !important;
+  width: min(100%, 920px) !important;
+  min-height: 112px !important;
+  margin: 16px auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] .tableWrapper,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] [class*="tableWrapper"],
+html body .sop-blocknote-shell .bn-editor .tableWrapper,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] {
+  display: block !important;
+  width: 100% !important;
+  min-height: 112px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] .tableWrapper table,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] [class*="tableWrapper"] table,
+html body .sop-blocknote-shell .bn-editor .tableWrapper table,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] table,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] table,
+html body .sop-blocknote-shell .bn-editor table {
+  display: table !important;
+  width: 100% !important;
+  min-width: 360px !important;
+  min-height: 112px !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  empty-cells: show !important;
+  border: 2px solid #94a3b8 !important;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12) !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] colgroup,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] tbody,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] thead,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] tr,
+html body .sop-blocknote-shell .bn-editor table colgroup,
+html body .sop-blocknote-shell .bn-editor table tbody,
+html body .sop-blocknote-shell .bn-editor table thead,
+html body .sop-blocknote-shell .bn-editor table tr {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] tr,
+html body .sop-blocknote-shell .bn-editor table tr {
+  display: table-row !important;
+  height: 48px !important;
+  min-height: 48px !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+html body .sop-blocknote-shell .bn-editor .tableWrapper td,
+html body .sop-blocknote-shell .bn-editor .tableWrapper th,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] td,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] th,
+html body .sop-blocknote-shell .bn-editor table td,
+html body .sop-blocknote-shell .bn-editor table th {
+  display: table-cell !important;
+  min-width: 120px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  padding: 8px 10px !important;
+  border: 2px solid #94a3b8 !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  vertical-align: top !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] td::after,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] th::after,
+html body .sop-blocknote-shell .bn-editor table td::after,
+html body .sop-blocknote-shell .bn-editor table th::after {
   content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  z-index: 50;
-  height: 1px;
-  pointer-events: none;
-  background: rgba(100, 116, 139, 0.32);
+  display: inline-block !important;
+  min-height: 24px !important;
+  width: 1px !important;
 }
 
-.dark .sop-builder-document-header::after {
-  background: rgba(148, 163, 184, 0.24);
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] td:hover,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] th:hover,
+html body .sop-blocknote-shell .bn-editor table td:hover,
+html body .sop-blocknote-shell .bn-editor table th:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #3b82f6 !important;
 }
-/* END SOP builder / reader document header separator */
 
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"]:focus-within table,
+html body .sop-blocknote-shell .bn-editor .tableWrapper:focus-within table,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"]:focus-within table,
+html body .sop-blocknote-shell .bn-editor table:focus-within {
+  outline: 3px solid rgba(59, 130, 246, 0.55) !important;
+  outline-offset: 3px !important;
+}
+
+/* Dark theme */
+html.dark body .sop-blocknote-shell .bn-editor [data-content-type="table"] .tableWrapper table,
+html.dark body .sop-blocknote-shell .bn-editor [data-content-type="table"] [class*="tableWrapper"] table,
+html.dark body .sop-blocknote-shell .bn-editor .tableWrapper table,
+html.dark body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] table,
+html.dark body .sop-blocknote-shell .bn-editor [data-content-type="table"] table,
+html.dark body .sop-blocknote-shell .bn-editor table,
+html body[data-theme="dark"] .sop-blocknote-shell .bn-editor [data-content-type="table"] table,
+html body[data-theme="dark"] .sop-blocknote-shell .bn-editor table,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor [data-content-type="table"] table,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor table {
+  border-color: #64748b !important;
+  background-color: #020617 !important;
+  box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.14) !important;
+}
+
+html.dark body .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+html.dark body .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+html.dark body .sop-blocknote-shell .bn-editor .tableWrapper td,
+html.dark body .sop-blocknote-shell .bn-editor .tableWrapper th,
+html.dark body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] td,
+html.dark body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] th,
+html.dark body .sop-blocknote-shell .bn-editor table td,
+html.dark body .sop-blocknote-shell .bn-editor table th,
+html body[data-theme="dark"] .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+html body[data-theme="dark"] .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+html body[data-theme="dark"] .sop-blocknote-shell .bn-editor table td,
+html body[data-theme="dark"] .sop-blocknote-shell .bn-editor table th,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor table td,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor table th {
+  border-color: #64748b !important;
+  background-color: #020617 !important;
+  color: #e5e7eb !important;
+  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.10) !important;
+}
+
+html.dark body .sop-blocknote-shell .bn-editor [data-content-type="table"] td:hover,
+html.dark body .sop-blocknote-shell .bn-editor [data-content-type="table"] th:hover,
+html.dark body .sop-blocknote-shell .bn-editor table td:hover,
+html.dark body .sop-blocknote-shell .bn-editor table th:hover,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor [data-content-type="table"] td:hover,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor [data-content-type="table"] th:hover,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor table td:hover,
+[data-theme="dark"] .sop-blocknote-shell .bn-editor table th:hover {
+  background-color: #0f172a !important;
+  border-color: #60a5fa !important;
+}
+
+/* SOP preview native table visibility
+   Builder editor uses .sop-blocknote-shell; phone preview uses .sop-reader-preview.
+   The preview was receiving table content, but table borders were not targeted there. */
+html body .sop-reader-preview .bn-editor [data-content-type="table"],
+html body .sop-reader-preview .bn-editor .bn-block-content[data-content-type="table"] {
+  display: block !important;
+  width: 100% !important;
+  min-height: 72px !important;
+  margin: 12px 0 !important;
+  padding: 0 !important;
+  overflow-x: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] .tableWrapper,
+html body .sop-reader-preview .bn-editor [data-content-type="table"] [class*="tableWrapper"],
+html body .sop-reader-preview .bn-editor .tableWrapper,
+html body .sop-reader-preview .bn-editor [class*="tableWrapper"] {
+  display: block !important;
+  width: 100% !important;
+  min-height: 72px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow-x: auto !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] .tableWrapper table,
+html body .sop-reader-preview .bn-editor [data-content-type="table"] [class*="tableWrapper"] table,
+html body .sop-reader-preview .bn-editor .tableWrapper table,
+html body .sop-reader-preview .bn-editor [class*="tableWrapper"] table,
+html body .sop-reader-preview .bn-editor [data-content-type="table"] table,
+html body .sop-reader-preview .bn-editor table {
+  display: table !important;
+  width: 100% !important;
+  min-width: 220px !important;
+  table-layout: fixed !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  empty-cells: show !important;
+  border: 1.5px solid #94a3b8 !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.10) !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] tr,
+html body .sop-reader-preview .bn-editor table tr {
+  display: table-row !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] td,
+html body .sop-reader-preview .bn-editor [data-content-type="table"] th,
+html body .sop-reader-preview .bn-editor .tableWrapper td,
+html body .sop-reader-preview .bn-editor .tableWrapper th,
+html body .sop-reader-preview .bn-editor [class*="tableWrapper"] td,
+html body .sop-reader-preview .bn-editor [class*="tableWrapper"] th,
+html body .sop-reader-preview .bn-editor table td,
+html body .sop-reader-preview .bn-editor table th {
+  display: table-cell !important;
+  min-width: 72px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 6px 8px !important;
+  border: 1.5px solid #94a3b8 !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  vertical-align: top !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06) !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] td::after,
+html body .sop-reader-preview .bn-editor [data-content-type="table"] th::after,
+html body .sop-reader-preview .bn-editor table td::after,
+html body .sop-reader-preview .bn-editor table th::after {
+  content: "";
+  display: inline-block !important;
+  min-height: 16px !important;
+  width: 1px !important;
+}
+
+/* Dark preview */
+html.dark body .sop-reader-preview .bn-editor [data-content-type="table"] table,
+html.dark body .sop-reader-preview .bn-editor .tableWrapper table,
+html.dark body .sop-reader-preview .bn-editor [class*="tableWrapper"] table,
+html.dark body .sop-reader-preview .bn-editor table,
+html body[data-theme="dark"] .sop-reader-preview .bn-editor [data-content-type="table"] table,
+html body[data-theme="dark"] .sop-reader-preview .bn-editor table,
+[data-theme="dark"] .sop-reader-preview .bn-editor [data-content-type="table"] table,
+[data-theme="dark"] .sop-reader-preview .bn-editor table {
+  border-color: #64748b !important;
+  background-color: #020617 !important;
+  color: #e5e7eb !important;
+  box-shadow: 0 0 0 1px rgba(226, 232, 240, 0.14) !important;
+}
+
+html.dark body .sop-reader-preview .bn-editor [data-content-type="table"] td,
+html.dark body .sop-reader-preview .bn-editor [data-content-type="table"] th,
+html.dark body .sop-reader-preview .bn-editor .tableWrapper td,
+html.dark body .sop-reader-preview .bn-editor .tableWrapper th,
+html.dark body .sop-reader-preview .bn-editor [class*="tableWrapper"] td,
+html.dark body .sop-reader-preview .bn-editor [class*="tableWrapper"] th,
+html.dark body .sop-reader-preview .bn-editor table td,
+html.dark body .sop-reader-preview .bn-editor table th,
+html body[data-theme="dark"] .sop-reader-preview .bn-editor [data-content-type="table"] td,
+html body[data-theme="dark"] .sop-reader-preview .bn-editor [data-content-type="table"] th,
+html body[data-theme="dark"] .sop-reader-preview .bn-editor table td,
+html body[data-theme="dark"] .sop-reader-preview .bn-editor table th,
+[data-theme="dark"] .sop-reader-preview .bn-editor [data-content-type="table"] td,
+[data-theme="dark"] .sop-reader-preview .bn-editor [data-content-type="table"] th,
+[data-theme="dark"] .sop-reader-preview .bn-editor table td,
+[data-theme="dark"] .sop-reader-preview .bn-editor table th {
+  border-color: #64748b !important;
+  background-color: #020617 !important;
+  color: #e5e7eb !important;
+  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.10) !important;
+}
+
+/* SOP native BlockNote table handles
+   Row/column add/delete should use BlockNote native table handles instead of the fixed top toolbar,
+   because the top toolbar can lose table cell selection. */
+.sop-blocknote-shell .bn-editor [class*="tableHandle"],
+.sop-blocknote-shell .bn-editor [class*="TableHandle"],
+.sop-blocknote-shell .bn-editor [class*="table-handle"],
+.sop-blocknote-shell .bn-editor [data-table-handle],
+.sop-blocknote-shell .bn-editor [data-table-row-handle],
+.sop-blocknote-shell .bn-editor [data-table-column-handle],
+.sop-blocknote-shell [class*="tableHandle"],
+.sop-blocknote-shell [class*="TableHandle"],
+.sop-blocknote-shell [class*="table-handle"],
+.sop-blocknote-shell [data-table-handle],
+.sop-blocknote-shell [data-table-row-handle],
+.sop-blocknote-shell [data-table-column-handle] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 80 !important;
+  pointer-events: auto !important;
+}
+
+.sop-blocknote-shell .bn-editor [class*="tableHandle"] button,
+.sop-blocknote-shell .bn-editor [class*="TableHandle"] button,
+.sop-blocknote-shell .bn-editor [class*="table-handle"] button,
+.sop-blocknote-shell [class*="tableHandle"] button,
+.sop-blocknote-shell [class*="TableHandle"] button,
+.sop-blocknote-shell [class*="table-handle"] button {
+  border: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  box-shadow: 0 10px 28px hsl(var(--foreground) / 0.14) !important;
+}
+
+/* SOP table compact sizing final
+   Table is now visible and native handles work. This layer only controls box height / padding. */
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"],
+html body .sop-blocknote-shell .bn-editor .bn-block-content[data-content-type="table"] {
+  min-height: auto !important;
+  margin: 12px auto !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] .tableWrapper,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] [class*="tableWrapper"],
+html body .sop-blocknote-shell .bn-editor .tableWrapper,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] {
+  min-height: auto !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] table,
+html body .sop-blocknote-shell .bn-editor .tableWrapper table,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] table,
+html body .sop-blocknote-shell .bn-editor table {
+  min-height: auto !important;
+  border-width: 1.5px !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] tr,
+html body .sop-blocknote-shell .bn-editor table tr {
+  height: 38px !important;
+  min-height: 38px !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+html body .sop-blocknote-shell .bn-editor .tableWrapper td,
+html body .sop-blocknote-shell .bn-editor .tableWrapper th,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] td,
+html body .sop-blocknote-shell .bn-editor [class*="tableWrapper"] th,
+html body .sop-blocknote-shell .bn-editor table td,
+html body .sop-blocknote-shell .bn-editor table th {
+  min-width: 110px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 6px 8px !important;
+  border-width: 1.5px !important;
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}
+
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] td::after,
+html body .sop-blocknote-shell .bn-editor [data-content-type="table"] th::after,
+html body .sop-blocknote-shell .bn-editor table td::after,
+html body .sop-blocknote-shell .bn-editor table th::after {
+  min-height: 16px !important;
+}
+
+/* Reader/phone preview table should be tighter than builder table. */
+html body .sop-reader-preview .bn-editor [data-content-type="table"],
+html body .sop-reader-preview .bn-editor .bn-block-content[data-content-type="table"] {
+  min-height: auto !important;
+  margin: 10px 0 !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] .tableWrapper,
+html body .sop-reader-preview .bn-editor [data-content-type="table"] [class*="tableWrapper"],
+html body .sop-reader-preview .bn-editor .tableWrapper,
+html body .sop-reader-preview .bn-editor [class*="tableWrapper"] {
+  min-height: auto !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] table,
+html body .sop-reader-preview .bn-editor .tableWrapper table,
+html body .sop-reader-preview .bn-editor [class*="tableWrapper"] table,
+html body .sop-reader-preview .bn-editor table {
+  min-width: 210px !important;
+  min-height: auto !important;
+  border-width: 1px !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] tr,
+html body .sop-reader-preview .bn-editor table tr {
+  height: 30px !important;
+  min-height: 30px !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] td,
+html body .sop-reader-preview .bn-editor [data-content-type="table"] th,
+html body .sop-reader-preview .bn-editor .tableWrapper td,
+html body .sop-reader-preview .bn-editor .tableWrapper th,
+html body .sop-reader-preview .bn-editor [class*="tableWrapper"] td,
+html body .sop-reader-preview .bn-editor [class*="tableWrapper"] th,
+html body .sop-reader-preview .bn-editor table td,
+html body .sop-reader-preview .bn-editor table th {
+  min-width: 64px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 6px !important;
+  border-width: 1px !important;
+  font-size: 11px !important;
+  line-height: 1.25 !important;
+}
+
+html body .sop-reader-preview .bn-editor [data-content-type="table"] td::after,
+html body .sop-reader-preview .bn-editor [data-content-type="table"] th::after,
+html body .sop-reader-preview .bn-editor table td::after,
+html body .sop-reader-preview .bn-editor table th::after {
+  min-height: 12px !important;
+}
+
+
+/* SOP full table tools menu */
+.sop-toolbar-text-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.sop-fixed-toolbar-table-pro-panel {
+  width: min(520px, calc(100vw - 32px));
+  max-height: min(720px, calc(100vh - 96px));
+  overflow: auto;
+}
+
+.sop-table-tool-section {
+  display: grid;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.sop-table-tool-section:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.sop-table-tool-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.sop-fixed-toolbar-table-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sop-fixed-toolbar-table-grid button {
+  min-height: 34px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+  padding: 8px 10px;
+}
+
+.sop-fixed-toolbar-table-grid button:hover {
+  background: hsl(var(--muted));
+}
+
+.sop-table-native-note {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 1px dashed hsl(var(--border));
+  background: hsl(var(--muted) / 0.5);
+  padding: 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Table density presets */
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] tr,
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor table tr {
+  height: 30px !important;
+  min-height: 30px !important;
+}
+
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor table td,
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor table th {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 6px !important;
+  font-size: 12px !important;
+}
+
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] tr,
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor table tr {
+  height: 52px !important;
+  min-height: 52px !important;
+}
+
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor table td,
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor table th {
+  height: 52px !important;
+  min-height: 52px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+}
+
+
+/* SOP table tools compact panel reset */
+.sop-toolbar-text-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.sop-fixed-toolbar-table-pro-panel {
+  width: min(440px, calc(100vw - 32px)) !important;
+  max-height: min(620px, calc(100vh - 96px)) !important;
+  overflow: auto !important;
+}
+
+.sop-table-tool-section {
+  display: grid;
+  gap: 8px;
+  padding: 9px 0;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.sop-table-tool-section:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.sop-table-tool-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.sop-fixed-toolbar-table-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.sop-fixed-toolbar-table-grid button {
+  min-height: 32px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 9px;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+  padding: 7px 9px;
+}
+
+.sop-fixed-toolbar-table-grid button:hover {
+  background: hsl(var(--muted));
+}
+
+.sop-fixed-toolbar-table-color-panel {
+  width: min(340px, calc(100vw - 32px)) !important;
+}
+
+/* Table density presets */
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] tr,
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor table tr {
+  height: 30px !important;
+  min-height: 30px !important;
+}
+
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor table td,
+html[data-sop-table-density="compact"] body .sop-blocknote-shell .bn-editor table th {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 6px !important;
+  font-size: 12px !important;
+}
+
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] tr,
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor table tr {
+  height: 52px !important;
+  min-height: 52px !important;
+}
+
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] td,
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor [data-content-type="table"] th,
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor table td,
+html[data-sop-table-density="comfortable"] body .sop-blocknote-shell .bn-editor table th {
+  height: 52px !important;
+  min-height: 52px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+}
+
+
+body:has(.sop-builder-workspace.sop-builder-workspace-v3) {
+  overflow: hidden;
+}
+
+main.sop-builder-v3-main-lock {
+  height: calc(100vh - 56px) !important;
+  max-height: calc(100vh - 56px) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  overscroll-behavior: contain !important;
+}
+
+.sop-builder-route-shell:has(.sop-builder-workspace.sop-builder-workspace-v3) {
+  height: calc(100vh - 56px);
+  min-height: 0;
+  overflow: hidden;
+}
